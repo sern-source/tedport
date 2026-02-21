@@ -6,12 +6,14 @@ import FirmaDetay from './FirmaDetay';
 import Login from './Login';
 import Profile from './Profile';
 import Register from './Register';
+import Home2 from './Home2';
 
 export default function Router() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home2 />} />
+        <Route path="/home2" element={<Home2 />} />
         <Route path="/firmalar" element={<Firmalar />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />

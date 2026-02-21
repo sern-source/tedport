@@ -46,7 +46,7 @@ const Home = () => {
         <>
             {/* HEADER */}
             <header className="header">
-                <div className="header-container">
+                <div className="header-container2">
                     <div className="logo-area">
                         <span className="material-symbols-outlined logo-icon icon-filled">inventory_2</span>
                         <h2 className="logo-text">Tedport</h2>
