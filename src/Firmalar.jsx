@@ -84,12 +84,10 @@ const SupplierCard = ({ data }) => {
 
   return (
     <div className="supplier-card">
+
       <div className="card-images">
         <div className="main-image">
-          <img
-            src={data.images || 'https://via.placeholder.com/300x200'}
-            alt={data.name}
-          />
+          <div className='supp-avatar2' style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '90%' }}>{data.name?.charAt(0)}</div>
         </div>
       </div>
 
@@ -183,6 +181,50 @@ function App() {
 
     const { data, error, count } = await query.range(from, to);
 
+    function degerleriDiziyeCevir(rawData) {
+      // 1. Veri hiç yoksa (null veya undefined) hata vermeden boş dizi dön
+      if (!rawData) return [];
+
+      let data = rawData;
+
+      // 2. Veritabanından JSON string'i (metin) olarak geldiyse onu gerçek diziye çevir
+      if (typeof rawData === 'string') {
+        try {
+          data = JSON.parse(rawData);
+        } catch (e) {
+          console.error("JSON parse hatası:", e);
+          return []; // Bozuk bir JSON varsa uygulamayı çökertme
+        }
+      }
+
+      // 3. Parse işleminden sonra bile dizi değilse, boş dizi dön
+      if (!Array.isArray(data)) {
+        return [];
+      }
+
+      const sonuc = [];
+
+      data.forEach((kategori) => {
+        // Ana kategoriyi ekle (varsa)
+        if (kategori.ana_kategori) sonuc.push(kategori.ana_kategori);
+
+        // Alt kategorilerde dön (varsa ve diziyse)
+        if (kategori.alt_kategoriler && Array.isArray(kategori.alt_kategoriler)) {
+          kategori.alt_kategoriler.forEach((alt) => {
+            // Alt kategori başlığını ekle
+            if (alt.baslik) sonuc.push(alt.baslik);
+
+            // Ürünleri diziye dağıtarak ekle (varsa ve diziyse)
+            if (alt.urunler && Array.isArray(alt.urunler)) {
+              sonuc.push(...alt.urunler);
+            }
+          });
+        }
+      });
+
+      return sonuc;
+    }
+
     if (!error) {
       setSuppliers(
         data.map(item => ({
@@ -190,7 +232,7 @@ function App() {
           name: item.firma_adi,
           isVerified: item.is_verified,
           location: item.il_ilce,
-          tags: item.tags || [],
+          tags: degerleriDiziyeCevir(item.urun_kategorileri) || [],
           description: item.description,
           images: item.logo_url
         }))
@@ -224,7 +266,7 @@ function App() {
       <main className="layout-container">
         <div className="breadcrumb-row">
           <div className="breadcrumb">
-            <a href="#">Anasayfa</a>
+            <a href="/">Anasayfa</a>
             <span className="material-symbols-outlined">chevron_right</span>
             <span>Firmalar</span>
           </div>
