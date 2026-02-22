@@ -380,6 +380,8 @@ function App() {
       );
     }
 
+    query = query.order('best', { ascending: false });
+
     const { data, error, count } = await query.range(from, to);
 
     function degerleriDiziyeCevir(rawData) {
@@ -413,11 +415,11 @@ function App() {
         if (kategori.alt_kategoriler && Array.isArray(kategori.alt_kategoriler)) {
           kategori.alt_kategoriler.forEach((alt) => {
             // Alt kategori başlığını ekle
-            if (alt.baslik) sonuc.push(alt.baslik);
+            if (alt.baslik) //sonuc.push(alt.baslik);
 
             // Ürünleri diziye dağıtarak ekle (varsa ve diziyse)
             if (alt.urunler && Array.isArray(alt.urunler)) {
-              sonuc.push(...alt.urunler);
+              //sonuc.push(...alt.urunler);
             }
           });
         }
@@ -433,7 +435,7 @@ function App() {
           name: item.firma_adi,
           isVerified: item.is_verified,
           location: item.il_ilce,
-          tags: degerleriDiziyeCevir(item.urun_kategorileri) || [],
+          tags: (degerleriDiziyeCevir(item.urun_kategorileri) || []),
           description: item.description,
           images: item.logo_url
         }))
