@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './Firmalar.css';
 import { supabase } from './supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 /* ================= HEADER ================= */
 
 const Header = ({ search, setSearch }) => (
   <header className="header">
     <div className="header-left">
-      <div className="logo-section">
+      <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="logo-icon">
           <span className="material-symbols-outlined">inventory_2</span>
         </div>
         <h2>Tedport</h2>
-      </div>
+      </Link>
       <div className="search-bar">
         <div className="search-icon">
           <span className="material-symbols-outlined">search</span>
@@ -43,39 +43,240 @@ const Header = ({ search, setSearch }) => (
 
 /* ================= SIDEBAR ================= */
 
-const Sidebar = () => (
-  <aside className="sidebar">
-    <div className="sidebar-header">
-      <h3>Filtreler</h3>
-      <button className="clear-btn">Tümünü temizle</button>
-    </div>
 
-    <div className="filter-group">
-      <details open>
-        <summary>
-          Konum <span className="material-symbols-outlined">expand_more</span>
-        </summary>
-        <div className="filter-content">
-          <label><input type="checkbox" defaultChecked /> Tümü</label>
-          <label><input type="checkbox" /> İstanbul</label>
-          <label><input type="checkbox" /> Diğer</label>
-        </div>
-      </details>
 
-      <details open>
-        <summary>
-          Sektör <span className="material-symbols-outlined">expand_more</span>
-        </summary>
-        <div className="filter-content">
-          <label><input type="checkbox" defaultChecked /> Tümü</label>
-          <label><input type="checkbox" /> Makine</label>
-          <label><input type="checkbox" /> Metal</label>
-          <label><input type="checkbox" /> Otomasyon</label>
-        </div>
-      </details>
-    </div>
-  </aside>
-);
+const Sidebar = () => {
+  const [cities, setCities] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFilters();
+  }, []);
+
+  const fetchFilters = async () => {
+    setLoading(true);
+
+    // Şehirleri çek
+    const { data: cityData } = await supabase
+      .from("sehirler")
+      .select("sehir")
+      .order("sehir", { ascending: true });
+
+    // Kategorileri çek (firmalar tablosundan)
+    const { data: categoryData } = await supabase
+      .from("firmalar")
+      .select("category_name");
+
+    if (cityData) setCities(cityData);
+
+    if (categoryData) {
+      const uniqueCategories = [
+        ...new Set(categoryData.map(item => item.category_name))
+      ].filter(Boolean);
+
+      setCategories(uniqueCategories.sort());
+    }
+
+    setLoading(false);
+  };
+
+  const toggleSelection = (value, selected, setSelected) => {
+    if (selected.includes(value)) {
+      setSelected(selected.filter(item => item !== value));
+    } else {
+      setSelected([...selected, value]);
+    }
+  };
+
+  const toggleSelectAll = (list, selected, setSelected, keyName) => {
+    if (selected.length === list.length) {
+      setSelected([]);
+    } else {
+      setSelected(
+        list.map(item =>
+          keyName ? item[keyName] : item
+        )
+      );
+    }
+  };
+
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-header">
+        <h3>Filtreler</h3>
+        <button
+          className="clear-btn"
+          onClick={() => {
+            setSelectedCities([]);
+            setSelectedCategories([]);
+          }}
+        >
+          Tümünü temizle
+        </button>
+      </div>
+
+      <div className="filter-group">
+        {/* 🔵 KONUM */}
+        <details>
+          <summary>
+            Konum{" "}
+            <span className="material-symbols-outlined">
+              expand_more
+            </span>
+          </summary>
+
+          <div className="filter-content">
+            {loading ? (
+              <p>Yükleniyor...</p>
+            ) : (
+              <>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedCities.length === cities.length &&
+                      cities.length > 0
+                    }
+                    onChange={() =>
+                      toggleSelectAll(
+                        cities,
+                        selectedCities,
+                        setSelectedCities,
+                        "sehir"
+                      )
+                    }
+                  />
+                  Tümü
+                </label>
+
+                {cities.map(city => (
+                  <label key={city.sehir}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCities.includes(city.sehir)}
+                      onChange={() =>
+                        toggleSelection(
+                          city.sehir,
+                          selectedCities,
+                          setSelectedCities
+                        )
+                      }
+                    />
+                    {city.sehir}
+                  </label>
+                ))}
+              </>
+            )}
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            Sektör{" "}
+            <span className="material-symbols-outlined">
+              expand_more
+            </span>
+          </summary>
+          <div className="filter-content">
+            <label><input type="checkbox" /> Makine</label>
+            <label><input type="checkbox" /> Metal</label>
+            <label><input type="checkbox" /> Otomasyon</label>
+            <label><input type="checkbox" /> Elektrik</label>
+            <label><input type="checkbox" /> Elektronik</label>
+            <label><input type="checkbox" /> Enerji</label>
+            <label><input type="checkbox" /> Mekanik</label>
+            <label><input type="checkbox" /> Hırdavat</label>
+            <label><input type="checkbox" /> İnşaat</label>
+            <label><input type="checkbox" /> Kimya</label>
+            <label><input type="checkbox" /> Plastik</label>
+            <label><input type="checkbox" /> Ambalaj</label>
+            <label><input type="checkbox" /> Lojistik</label>
+            <label><input type="checkbox" /> Tekstil</label>
+            <label><input type="checkbox" /> Gıda</label>
+            <label><input type="checkbox" /> Otomotiv</label>
+            <label><input type="checkbox" /> Medikal</label>
+            <label><input type="checkbox" /> Bilişim</label>
+            <label><input type="checkbox" /> Güvenlik</label>
+            <label><input type="checkbox" /> Hizmet</label>
+          </div>
+        </details>
+
+
+        {/* 🟢 KATEGORİ */}
+        <details>
+          <summary>
+            Kategori{" "}
+            <span className="material-symbols-outlined">
+              expand_more
+            </span>
+          </summary>
+
+          <div className="filter-content">
+            {loading ? (
+              <p>Yükleniyor...</p>
+            ) : (
+              <>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedCategories.length === categories.length &&
+                      categories.length > 0
+                    }
+                    onChange={() =>
+                      toggleSelectAll(
+                        categories,
+                        selectedCategories,
+                        setSelectedCategories
+                      )
+                    }
+                  />
+                  Tümü
+                </label>
+
+                {categories.map(category => (
+                  <label key={category}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(category)}
+                      onChange={() =>
+                        toggleSelection(
+                          category,
+                          selectedCategories,
+                          setSelectedCategories
+                        )
+                      }
+                    />
+                    {category}
+                  </label>
+                ))}
+              </>
+            )}
+          </div>
+        </details>
+      </div>
+      <div className="filter-apply">
+        <button
+          className="apply-btn2"
+          onClick={() =>
+            onApplyFilters({
+              cities: selectedCities,
+              categories: selectedCategories
+            })
+          }
+        >
+          Filtreleri Uygula
+        </button>
+      </div>
+
+    </aside>
+  );
+};
 
 /* ================= CARD ================= */
 
@@ -151,7 +352,7 @@ const getSmartPages = (current, total) => {
 /* ================= APP ================= */
 
 function App() {
-  const PAGE_SIZE = 5;
+  const PAGE_SIZE = 10;
 
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);

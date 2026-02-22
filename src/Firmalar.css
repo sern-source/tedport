@@ -250,6 +250,7 @@ details {
     border-radius: var(--radius);
     background: var(--bg-white);
     overflow: hidden;
+    width: 400px;
 }
 
 summary {
@@ -271,13 +272,32 @@ summary {
     gap: 0.5rem;
 }
 
+.filter-apply{
+    width: 400px;
+}
+
+.apply-btn2{
+    width: 100%;
+    padding: 0.5rem;
+    background: #137fec;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 700;
+    cursor: pointer;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color:#fff;
+    font-size: 14px;
+}
+
 .filter-content label {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-size: 0.875rem;
+    font-size: 0.900rem;
     color: var(--text-dark);
     cursor: pointer;
+    padding: 5px;
 }
 
 .range-inputs .range-row {
@@ -324,7 +344,7 @@ summary {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    width: 1000px;
+    width: 900px;
 }
 
 .supplier-card {
