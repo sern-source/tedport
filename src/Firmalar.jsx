@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Firmalar.css';
 import { supabase } from './supabaseClient';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 
 /* ================= HEADER ================= */
 
@@ -28,9 +28,10 @@ const Header = ({ search, setSearch }) => (
     </div>
     <div className="header-right">
       <nav className="nav-links">
-        <a href="#">Firmalar</a>
-        <a href="#">Ürünler</a>
-        <a href="#">Favoriler</a>
+        <a href="/">Anasayfa</a>
+        <a href="/firmalar">Firmalar</a>
+        <a href="#">Hakkımızda</a>
+        <a href="#">İletişim</a>
       </nav>
       <div className="user-actions">
         <button>
@@ -354,11 +355,15 @@ const getSmartPages = (current, total) => {
 function App() {
   const PAGE_SIZE = 10;
 
+  const [searchParams] = useSearchParams();
+  const urlSearchTerm = searchParams.get('search') || '';
+
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [search, setSearch] = useState('');
+
+  const [search, setSearch] = useState(urlSearchTerm);
 
   useEffect(() => {
     fetchSuppliers();

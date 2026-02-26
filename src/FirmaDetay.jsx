@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './FirmaDetay.css';
-import { useParams } from 'react-router-dom';
 import { supabase } from './supabaseClient';
+import { useNavigate, Link, useSearchParams, useParams } from 'react-router-dom';
 
 const SupplierProfile = () => {
 
@@ -96,29 +96,32 @@ const SupplierProfile = () => {
         <div className="supplier-page">
             {/* HEADER */}
             <header className="header">
-                <div className="header-left">
-                    <div className="brand">
-                        <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
-                            <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="#137fec"></path>
-                        </svg>
-                        Tedport
-                    </div>
 
+                <div className="header-left">
+                    <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <div className="brand">
+                            <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                                <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="#137fec"></path>
+                            </svg>
+                            Tedport
+                        </div>
+                    </Link>
                 </div>
                 <div className="header-right">
                     <nav className="header-nav">
+                        <a href="/">Anasayfa</a>
                         <a href="/firmalar">Firmalar</a>
-                        <a href="#">Ürünler</a>
-                        <a href="#">Favoriler</a>
+                        <a href="#">Hakkımızda</a>
+                        <a href="#">İletişim</a>
                     </nav>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <div className="avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuDBfXFoWq-Oedkexbt-QB3UeNKtEv8MFpmn5ejU5Kr8gTRLnvldCxkdPYippL03z_Be-vUEWM8cahhT9OWWSk3CladKdZL4kNeduBp71pvYnWnIRA8TqabZW-pRD9ECHh0KFaVK7joq1YVYAkWZJtnWYAO7SnhgXhfkosRW5d4v_mYCrQk7K-hGRSm93oo7QM9PSY0B3BuLhqJ5xFZvSWQ4IAcrNLi0J45kN-sMC6Cdf1RDM3YlukZSS9_i12OwxL5XJFlaNhxiGgIm) center/cover' }}></div>
+                        <span className="material-symbols-outlined">person</span>
                     </div>
                 </div>
-            </header>
+            </header >
 
             {/* HERO SECTION */}
-            <section className="profile-hero">
+            < section className="profile-hero" >
                 <div className="container">
                     <div className="hero-flex">
                         {/*<div className="logo-box" style={{ backgroundImage: `url(${firma.logo_url || 'https://via.placeholder.com/200'})` }}></div>*/}
@@ -145,12 +148,12 @@ const SupplierProfile = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
 
 
             {/* MAIN CONTENT */}
-            <main className="container">
+            < main className="container" >
                 <div className="content-grid">
                     {/* LEFT COLUMN */}
                     <div className="main-info">
@@ -199,6 +202,7 @@ const SupplierProfile = () => {
                                 Teklif İste
                             </button>
 
+
                             <button className="btn btn-outline" style={{ width: '100%' }}>
                                 Telefon Numarası
                             </button>
@@ -216,6 +220,10 @@ const SupplierProfile = () => {
                             >
                                 <div className="map-label">{firma.il_ilce}</div>
                             </div>
+
+                            
+
+                            <hr style={{ margin: '1.5rem 0', border: 'none', borderTop: '1px solid #e2e8f0' }} />
 
                             {/* ADRES */}
                             {firma.adres && (
@@ -333,8 +341,8 @@ const SupplierProfile = () => {
                         </div>
                     </aside>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 };
 

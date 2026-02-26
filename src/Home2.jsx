@@ -6,10 +6,21 @@ import { NavLink, useNavigate } from 'react-router-dom';
 const SupplierConnect = () => {
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const [topSuppliers, setTopSuppliers] = useState([]);
 
     const navigate = useNavigate();
+
+    const handleSearch = () => {
+        if (searchTerm.trim()) {
+            // Kelime girildiyse parametre ile yönlendir
+            navigate(`/firmalar?search=${encodeURIComponent(searchTerm.trim())}`);
+        } else {
+            // Kelime girilmediyse boş yönlendir
+            navigate(`/firmalar`);
+        }
+    };
 
     useEffect(() => {
         const fetchRandomSuppliers = async () => {
@@ -54,8 +65,8 @@ const SupplierConnect = () => {
 
                     <div className="sc-nav">
                         <div className="sc-nav-links">
-                            <a href="#browse">Kategorilere Göz At</a>
                             <a href="/firmalar">Firmalar</a>
+                            <a href="#">Hakkımızda</a>
                             <a href="#/iletisim">İletişim</a>
                             <a href="/login">Giriş Yap</a>
                         </div>
@@ -78,18 +89,24 @@ const SupplierConnect = () => {
                                 <div className="sc-search-box">
                                     <div className="sc-search-input-group">
                                         <span className="material-symbols-outlined" style={{ color: '#94a3b8', marginRight: '12px' }}>search</span>
-                                        <input type="text" placeholder="Ürün veya firma ara..." />
+                                        <input
+                                            type="text"
+                                            placeholder="Ürün veya firma ara..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                        />
                                     </div>
 
-                                    <button className="sc-search-btn">Ara</button>
+                                    <button className="sc-search-btn" onClick={handleSearch}>Ara</button>
                                 </div>
 
                                 <div className="sc-popular-tags">
                                     <span>Popüler:</span>
-                                    <a href="#celik">Çelik Borular</a>
-                                    <a href="#pamuk">Pamuklu Kumaş</a>
-                                    <a href="#ambalaj">Ambalaj</a>
-                                    <a href="#elektronik">Elektronik</a>
+                                    <a href="/firmalar?search=celik">Çelik Borular</a>
+                                    <a href="/firmalar?search=pamuk">Pamuklu Kumaş</a>
+                                    <a href="/firmalar?search=ambalaj">Ambalaj</a>
+                                    <a href="/firmalar?search=elektronik">Elektronik</a>
                                 </div>
                             </div>
                         </div>
@@ -128,14 +145,14 @@ const SupplierConnect = () => {
                                 <h2 className="sc-section-title">Öne Çıkan Kategoriler</h2>
                                 <p className="sc-section-desc">Kapsamlı endüstriyel kategorilerimizi keşfedin.</p>
                             </div>
-                            <a href="#all" className="sc-view-all">
+                            <a href="/firmalar" className="sc-view-all">
                                 Tüm kategorileri gör <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
                             </a>
                         </div>
 
                         <div className="sc-cat-grid">
                             {/* Kategori 1 */}
-                            <a href="#tekstil" className="sc-cat-card">
+                            <a href="/firmalar" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">checkroom</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Tekstil</h3>
@@ -143,7 +160,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 2 */}
-                            <a href="#gida" className="sc-cat-card">
+                            <a href="/firmalar" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">restaurant</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Gıda</h3>
@@ -151,7 +168,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 3 */}
-                            <a href="#makine" className="sc-cat-card">
+                            <a href="/firmalar" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">build</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Makine</h3>
@@ -159,7 +176,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 4 */}
-                            <a href="#teknoloji" className="sc-cat-card">
+                            <a href="/firmalar" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">devices</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Teknoloji</h3>
@@ -167,7 +184,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 5 */}
-                            <a href="#lojistik" className="sc-cat-card">
+                            <a href="/firmalar" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">local_shipping</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Lojistik</h3>
@@ -175,7 +192,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 6 */}
-                            <a href="#kimya" className="sc-cat-card">
+                            <a href="/firmalar" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">science</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Kimya</h3>
@@ -233,8 +250,8 @@ const SupplierConnect = () => {
                         <h2>İşinizi Büyütmeye Hazır mısınız?</h2>
                         <p>Her gün uluslararası alıcılarla bağlantı kuran binlerce tedarikçiye katılın. Ücretsiz profilinizi şimdi oluşturun.</p>
                         <div className="sc-cta-buttons">
-                            <button className="sc-btn-white">Tedarikçi Olarak Katıl</button>
-                            <button className="sc-btn-transparent">Ben Bir Alıcıyım</button>
+                            <button className="sc-btn-white" onClick={() => navigate(`/register`)}>Tedarikçi Olarak Katıl</button>
+                            <button className="sc-btn-transparent" onClick={() => navigate(`/register`)}>Ben Bir Alıcıyım</button>
                         </div>
                     </div>
                 </section>
@@ -260,7 +277,6 @@ const SupplierConnect = () => {
                         <div>
                             <h4>Alıcılar İçin</h4>
                             <ul>
-                                <li><a href="#link">Kategorilere Göz At</a></li>
                                 <li><a href="#link">Teklif İste</a></li>
                                 <li><a href="#link">Doğrulanmış Tedarikçiler</a></li>
                                 <li><a href="#link">Alıcı Başarı Hikayeleri</a></li>
@@ -281,7 +297,6 @@ const SupplierConnect = () => {
                             <ul>
                                 <li><a href="#link">Hakkımızda</a></li>
                                 <li><a href="#link">Kariyer</a></li>
-                                <li><a href="#link">Basın</a></li>
                                 <li><a href="#link">Destek ile İletişime Geç</a></li>
                             </ul>
                         </div>
