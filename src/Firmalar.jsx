@@ -28,8 +28,8 @@ const Header = ({ search, setSearch }) => (
     </div>
     <div className="header-right">
       <nav className="nav-links">
-        <a href="/">Anasayfa</a>
-        <a href="/firmalar">Firmalar</a>
+        <Link to="/">Anasayfa</Link>
+        <Link to="/firmalar">Firmalar</Link>
         <a href="#">Hakkımızda</a>
         <a href="#">İletişim</a>
       </nav>
@@ -44,16 +44,28 @@ const Header = ({ search, setSearch }) => (
 
 /* ================= SIDEBAR ================= */
 
-
-
-const Sidebar = () => {
+const Sidebar = ({ activeFilters, onApplyFilters }) => {
   const [cities, setCities] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const [selectedCities, setSelectedCities] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  
+  const [selectedSectors, setSelectedSectors] = useState([]);
+  const SEKTORLER = [
+    "Makine", "Metal", "Otomasyon", "Elektrik", "Elektronik", "Enerji", 
+    "Mekanik", "Hırdavat", "İnşaat", "Kimya", "Plastik", "Ambalaj", 
+    "Lojistik", "Tekstil", "Gıda", "Otomotiv", "Medikal", "Bilişim", 
+    "Güvenlik", "Hizmet"
+  ];
 
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setSelectedCities(activeFilters.cities || []);
+    setSelectedCategories(activeFilters.categories || []);
+    setSelectedSectors(activeFilters.sectors || []);
+  }, [activeFilters]);
 
   useEffect(() => {
     fetchFilters();
@@ -62,13 +74,11 @@ const Sidebar = () => {
   const fetchFilters = async () => {
     setLoading(true);
 
-    // Şehirleri çek
     const { data: cityData } = await supabase
       .from("sehirler")
       .select("sehir")
       .order("sehir", { ascending: true });
 
-    // Kategorileri çek (firmalar tablosundan)
     const { data: categoryData } = await supabase
       .from("firmalar")
       .select("category_name");
@@ -106,6 +116,14 @@ const Sidebar = () => {
     }
   };
 
+  const handleApplyFilters = () => {
+    onApplyFilters({
+      cities: selectedCities.length === cities.length ? [] : selectedCities,
+      categories: selectedCategories.length === categories.length ? [] : selectedCategories,
+      sectors: selectedSectors.length === SEKTORLER.length ? [] : selectedSectors
+    });
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -115,6 +133,8 @@ const Sidebar = () => {
           onClick={() => {
             setSelectedCities([]);
             setSelectedCategories([]);
+            setSelectedSectors([]);
+            onApplyFilters({ cities: [], categories: [], sectors: [] });
           }}
         >
           Tümünü temizle
@@ -126,9 +146,7 @@ const Sidebar = () => {
         <details>
           <summary>
             Konum{" "}
-            <span className="material-symbols-outlined">
-              expand_more
-            </span>
+            <span className="material-symbols-outlined">expand_more</span>
           </summary>
 
           <div className="filter-content">
@@ -144,12 +162,7 @@ const Sidebar = () => {
                       cities.length > 0
                     }
                     onChange={() =>
-                      toggleSelectAll(
-                        cities,
-                        selectedCities,
-                        setSelectedCities,
-                        "sehir"
-                      )
+                      toggleSelectAll(cities, selectedCities, setSelectedCities, "sehir")
                     }
                   />
                   Tümü
@@ -161,11 +174,7 @@ const Sidebar = () => {
                       type="checkbox"
                       checked={selectedCities.includes(city.sehir)}
                       onChange={() =>
-                        toggleSelection(
-                          city.sehir,
-                          selectedCities,
-                          setSelectedCities
-                        )
+                        toggleSelection(city.sehir, selectedCities, setSelectedCities)
                       }
                     />
                     {city.sehir}
@@ -176,45 +185,44 @@ const Sidebar = () => {
           </div>
         </details>
 
+        {/* 🔵 SEKTÖR */}
         <details>
           <summary>
             Sektör{" "}
-            <span className="material-symbols-outlined">
-              expand_more
-            </span>
+            <span className="material-symbols-outlined">expand_more</span>
           </summary>
           <div className="filter-content">
-            <label><input type="checkbox" /> Makine</label>
-            <label><input type="checkbox" /> Metal</label>
-            <label><input type="checkbox" /> Otomasyon</label>
-            <label><input type="checkbox" /> Elektrik</label>
-            <label><input type="checkbox" /> Elektronik</label>
-            <label><input type="checkbox" /> Enerji</label>
-            <label><input type="checkbox" /> Mekanik</label>
-            <label><input type="checkbox" /> Hırdavat</label>
-            <label><input type="checkbox" /> İnşaat</label>
-            <label><input type="checkbox" /> Kimya</label>
-            <label><input type="checkbox" /> Plastik</label>
-            <label><input type="checkbox" /> Ambalaj</label>
-            <label><input type="checkbox" /> Lojistik</label>
-            <label><input type="checkbox" /> Tekstil</label>
-            <label><input type="checkbox" /> Gıda</label>
-            <label><input type="checkbox" /> Otomotiv</label>
-            <label><input type="checkbox" /> Medikal</label>
-            <label><input type="checkbox" /> Bilişim</label>
-            <label><input type="checkbox" /> Güvenlik</label>
-            <label><input type="checkbox" /> Hizmet</label>
+            <label>
+              <input
+                type="checkbox"
+                checked={
+                  selectedSectors.length === SEKTORLER.length &&
+                  SEKTORLER.length > 0
+                }
+                onChange={() =>
+                  toggleSelectAll(SEKTORLER, selectedSectors, setSelectedSectors)
+                }
+              />
+              Tümü
+            </label>
+            {SEKTORLER.map(sektor => (
+              <label key={sektor}>
+                <input 
+                  type="checkbox" 
+                  checked={selectedSectors.includes(sektor)}
+                  onChange={() => toggleSelection(sektor, selectedSectors, setSelectedSectors)}
+                /> 
+                {sektor}
+              </label>
+            ))}
           </div>
         </details>
-
 
         {/* 🟢 KATEGORİ */}
         <details>
           <summary>
             Kategori{" "}
-            <span className="material-symbols-outlined">
-              expand_more
-            </span>
+            <span className="material-symbols-outlined">expand_more</span>
           </summary>
 
           <div className="filter-content">
@@ -230,11 +238,7 @@ const Sidebar = () => {
                       categories.length > 0
                     }
                     onChange={() =>
-                      toggleSelectAll(
-                        categories,
-                        selectedCategories,
-                        setSelectedCategories
-                      )
+                      toggleSelectAll(categories, selectedCategories, setSelectedCategories)
                     }
                   />
                   Tümü
@@ -246,11 +250,7 @@ const Sidebar = () => {
                       type="checkbox"
                       checked={selectedCategories.includes(category)}
                       onChange={() =>
-                        toggleSelection(
-                          category,
-                          selectedCategories,
-                          setSelectedCategories
-                        )
+                        toggleSelection(category, selectedCategories, setSelectedCategories)
                       }
                     />
                     {category}
@@ -261,16 +261,9 @@ const Sidebar = () => {
           </div>
         </details>
       </div>
+      
       <div className="filter-apply">
-        <button
-          className="apply-btn2"
-          onClick={() =>
-            onApplyFilters({
-              cities: selectedCities,
-              categories: selectedCategories
-            })
-          }
-        >
+        <button className="apply-btn2" onClick={handleApplyFilters}>
           Filtreleri Uygula
         </button>
       </div>
@@ -281,15 +274,16 @@ const Sidebar = () => {
 
 /* ================= CARD ================= */
 
-const SupplierCard = ({ data }) => {
+const SupplierCard = ({ data, onSearchTag }) => {
   const navigate = useNavigate();
 
   return (
     <div className="supplier-card">
-
       <div className="card-images">
         <div className="main-image">
-          <div className='supp-avatar2' style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '90%' }}>{data.name?.charAt(0)}</div>
+          <div className='supp-avatar2' style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '90%' }}>
+            {data.name?.charAt(0)}
+          </div>
         </div>
       </div>
 
@@ -307,7 +301,14 @@ const SupplierCard = ({ data }) => {
 
         <div className="tags">
           {(data.tags || []).map((tag, i) => (
-            <span key={i} className="tag">#{tag}</span>
+            <span 
+              key={i} 
+              className="tag" 
+              style={{ cursor: 'pointer' }} 
+              onClick={() => onSearchTag(tag)}
+            >
+              #{tag}
+            </span>
           ))}
         </div>
 
@@ -364,10 +365,11 @@ function App() {
   const [totalCount, setTotalCount] = useState(0);
 
   const [search, setSearch] = useState(urlSearchTerm);
+  const [filters, setFilters] = useState({ cities: [], categories: [], sectors: [] });
 
   useEffect(() => {
     fetchSuppliers();
-  }, [page, search]);
+  }, [page, search, filters]);
 
   const fetchSuppliers = async () => {
     setLoading(true);
@@ -379,61 +381,61 @@ function App() {
       .from('firmalar')
       .select('*', { count: 'exact' });
 
-    if (search) {
+    // --- ARAMA ---
+    if (search?.trim()) {
+      const safeSearch = search.replace(/["#%]/g, '').trim();
       query = query.or(
-        `firma_adi.ilike.%${search}%,description.ilike.%${search}%`
+        `firma_adi.ilike."%${safeSearch}%",description.ilike."%${safeSearch}%",ana_sektor.ilike."%${safeSearch}%",urun_kategorileri.ilike."%${safeSearch}%"`
       );
+    }
+
+    // --- FİLTRELER (LIKE KULLANILARAK) ---
+    if (filters.cities && filters.cities.length > 0) {
+      const cityQuery = filters.cities
+        .map(city => `il_ilce.ilike."%${city.replace(/["%]/g, '')}%"`)
+        .join(',');
+      query = query.or(cityQuery);
+    }
+    
+    if (filters.sectors && filters.sectors.length > 0) {
+      const sectorQuery = filters.sectors
+        .map(sector => `ana_sektor.ilike."%${sector.replace(/["%]/g, '')}%"`)
+        .join(',');
+      query = query.or(sectorQuery);
+    }
+
+    if (filters.categories && filters.categories.length > 0) {
+      const categoryQuery = filters.categories
+        .map(cat => `category_name.ilike."%${cat.replace(/["%]/g, '')}%"`)
+        .join(',');
+      query = query.or(categoryQuery);
     }
 
     query = query.order('best', { ascending: false });
 
     const { data, error, count } = await query.range(from, to);
 
+    if (error) {
+      console.error("SUPABASE SORGUSU HATASI:", error);
+    }
+
     function degerleriDiziyeCevir(rawData) {
-      // 1. Veri hiç yoksa (null veya undefined) hata vermeden boş dizi dön
       if (!rawData) return [];
-
       let data = rawData;
-
-      // 2. Veritabanından JSON string'i (metin) olarak geldiyse onu gerçek diziye çevir
       if (typeof rawData === 'string') {
-        try {
-          data = JSON.parse(rawData);
-        } catch (e) {
-          console.error("JSON parse hatası:", e);
-          return []; // Bozuk bir JSON varsa uygulamayı çökertme
-        }
+        try { data = JSON.parse(rawData); } 
+        catch (e) { return []; }
       }
-
-      // 3. Parse işleminden sonra bile dizi değilse, boş dizi dön
-      if (!Array.isArray(data)) {
-        return [];
-      }
+      if (!Array.isArray(data)) return [];
 
       const sonuc = [];
-
       data.forEach((kategori) => {
-        // Ana kategoriyi ekle (varsa)
         if (kategori.ana_kategori) sonuc.push(kategori.ana_kategori);
-
-        // Alt kategorilerde dön (varsa ve diziyse)
-        if (kategori.alt_kategoriler && Array.isArray(kategori.alt_kategoriler)) {
-          kategori.alt_kategoriler.forEach((alt) => {
-            // Alt kategori başlığını ekle
-            if (alt.baslik) //sonuc.push(alt.baslik);
-
-            // Ürünleri diziye dağıtarak ekle (varsa ve diziyse)
-            if (alt.urunler && Array.isArray(alt.urunler)) {
-              //sonuc.push(...alt.urunler);
-            }
-          });
-        }
       });
-
       return sonuc;
     }
 
-    if (!error) {
+    if (!error && data) {
       setSuppliers(
         data.map(item => ({
           id: item.firmaID,
@@ -446,6 +448,9 @@ function App() {
         }))
       );
       setTotalCount(count);
+    } else if (error) {
+      setSuppliers([]);
+      setTotalCount(0);
     }
 
     setLoading(false);
@@ -453,10 +458,25 @@ function App() {
 
   useEffect(() => {
     setPage(1);
-  }, [search]);
+  }, [search, filters]);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   const smartPages = getSmartPages(page, totalPages);
+
+  // Aktif filtreleri tek bir dizide topluyoruz (Tag olarak göstermek için)
+  const activeTags = [
+    ...(filters.cities || []).map(c => ({ type: 'cities', value: c })),
+    ...(filters.sectors || []).map(s => ({ type: 'sectors', value: s })),
+    ...(filters.categories || []).map(c => ({ type: 'categories', value: c }))
+  ];
+
+  // Çarpıya tıklandığında ilgili filtreyi kaldırır
+  const removeFilterTag = (type, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [type]: prev[type].filter(item => item !== value)
+    }));
+  };
 
   return (
     <div className="app">
@@ -474,55 +494,111 @@ function App() {
       <main className="layout-container">
         <div className="breadcrumb-row">
           <div className="breadcrumb">
-            <a href="/">Anasayfa</a>
+            <Link to="/">Anasayfa</Link>
             <span className="material-symbols-outlined">chevron_right</span>
             <span>Firmalar</span>
           </div>
         </div>
 
         <div className="content-grid">
-          <Sidebar />
+          <Sidebar 
+            activeFilters={filters} 
+            onApplyFilters={(newFilters) => setFilters(newFilters)} 
+          />
 
           <div className="results-list">
+            
+            {/* ETİKETLER (TAGS) ALANI */}
+            {activeTags.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', color: '#64748b', marginRight: '4px' }}>Uygulanan Filtreler:</span>
+                
+                {activeTags.map(tag => (
+                  <span
+                    key={`${tag.type}-${tag.value}`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      backgroundColor: '#e0e7ff',
+                      color: '#4f46e5',
+                      padding: '4px 12px',
+                      borderRadius: '999px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      border: '1px solid #c7d2fe'
+                    }}
+                  >
+                    {tag.value}
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: '16px', cursor: 'pointer', marginLeft: '2px' }}
+                      onClick={() => removeFilterTag(tag.type, tag.value)}
+                    >
+                      close
+                    </span>
+                  </span>
+                ))}
+                
+                <button
+                  onClick={() => setFilters({ cities: [], categories: [], sectors: [] })}
+                  style={{
+                    background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '13px', marginLeft: '8px', textDecoration: 'underline'
+                  }}
+                >
+                  Tümünü Temizle
+                </button>
+              </div>
+            )}
+
             {loading && <p>Yükleniyor...</p>}
+
+            {!loading && suppliers.length === 0 && (
+              <p>Arama veya filtre kriterlerinize uygun firma bulunamadı.</p>
+            )}
 
             {!loading &&
               suppliers.map(supplier => (
-                <SupplierCard key={supplier.id} data={supplier} />
+                <SupplierCard 
+                  key={supplier.id} 
+                  data={supplier} 
+                  onSearchTag={setSearch} 
+                />
               ))}
 
-            <div className="pagination">
-              <button
-                className="page-btn nav"
-                disabled={page === 1}
-                onClick={() => setPage(p => p - 1)}
-              >
-                <span className="material-symbols-outlined">chevron_left</span>
-              </button>
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  className="page-btn nav"
+                  disabled={page === 1}
+                  onClick={() => setPage(p => p - 1)}
+                >
+                  <span className="material-symbols-outlined">chevron_left</span>
+                </button>
 
-              {smartPages.map((p, i) =>
-                p === '...' ? (
-                  <span key={i} className="page-btn dots">...</span>
-                ) : (
-                  <button
-                    key={p}
-                    className={`page-btn ${page === p ? 'active' : ''}`}
-                    onClick={() => setPage(p)}
-                  >
-                    {p}
-                  </button>
-                )
-              )}
+                {smartPages.map((p, i) =>
+                  p === '...' ? (
+                    <span key={i} className="page-btn dots">...</span>
+                  ) : (
+                    <button
+                      key={p}
+                      className={`page-btn ${page === p ? 'active' : ''}`}
+                      onClick={() => setPage(p)}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
 
-              <button
-                className="page-btn nav"
-                disabled={page === totalPages}
-                onClick={() => setPage(p => p + 1)}
-              >
-                <span className="material-symbols-outlined">chevron_right</span>
-              </button>
-            </div>
-
+                <button
+                  className="page-btn nav"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>
