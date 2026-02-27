@@ -66,8 +66,8 @@ const SupplierConnect = () => {
                     <div className="sc-nav">
                         <div className="sc-nav-links">
                             <a href="/firmalar">Firmalar</a>
-                            <a href="#">Hakkımızda</a>
-                            <a href="#/iletisim">İletişim</a>
+                            <a href="/hakkimizda">Hakkımızda</a>
+                            <a href="/iletisim">İletişim</a>
                             <a href="/login">Giriş Yap</a>
                         </div>
                         <button className="sc-btn-primary" onClick={() => navigate(`/register`)}>Kayıt Ol</button>

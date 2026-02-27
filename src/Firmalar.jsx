@@ -30,8 +30,8 @@ const Header = ({ search, setSearch }) => (
       <nav className="nav-links">
         <Link to="/">Anasayfa</Link>
         <Link to="/firmalar">Firmalar</Link>
-        <a href="#">Hakkımızda</a>
-        <a href="#">İletişim</a>
+        <a href="/hakkimizda">Hakkımızda</a>
+        <a href="/iletisim">İletişim</a>
       </nav>
       <div className="user-actions">
         <button>

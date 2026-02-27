@@ -7,6 +7,8 @@ import Login from './Login';
 import Profile from './Profile';
 import Register from './Register';
 import Home2 from './Home2';
+import Hakkimizda from './hakkimizda';
+import Iletisim from './iletisim';
 
 export default function Router() {
   return (
@@ -18,6 +20,8 @@ export default function Router() {
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/hakkimizda" element={<Hakkimizda />} />
+        <Route path="/iletisim" element={<Iletisim />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />
       </Route>
     </Routes>

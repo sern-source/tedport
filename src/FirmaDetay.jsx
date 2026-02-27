@@ -111,8 +111,8 @@ const SupplierProfile = () => {
                     <nav className="header-nav">
                         <a href="/">Anasayfa</a>
                         <a href="/firmalar">Firmalar</a>
-                        <a href="#">Hakkımızda</a>
-                        <a href="#">İletişim</a>
+                        <a href="/hakkimizda">Hakkımızda</a>
+                        <a href="/iletisim">İletişim</a>
                     </nav>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                         <span className="material-symbols-outlined">person</span>
