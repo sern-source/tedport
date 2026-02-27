@@ -9,6 +9,7 @@ import Register from './Register';
 import Home2 from './Home2';
 import Hakkimizda from './hakkimizda';
 import Iletisim from './iletisim';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function Router() {
   return (
