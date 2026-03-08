@@ -103,7 +103,7 @@ const SupplierConnect = () => {
 
                                 <div className="sc-popular-tags">
                                     <span>Popüler:</span>
-                                    <a href="/firmalar?search=celik">Çelik Borular</a>
+                                    <a href="/firmalar?search=çelik">Çelik Borular</a>
                                     <a href="/firmalar?search=pamuk">Pamuklu Kumaş</a>
                                     <a href="/firmalar?search=ambalaj">Ambalaj</a>
                                     <a href="/firmalar?search=elektronik">Elektronik</a>
@@ -152,7 +152,7 @@ const SupplierConnect = () => {
 
                         <div className="sc-cat-grid">
                             {/* Kategori 1 */}
-                            <a href="/firmalar" className="sc-cat-card">
+                            <a href="/firmalar?search=tekstil" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">checkroom</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Tekstil</h3>
@@ -160,7 +160,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 2 */}
-                            <a href="/firmalar" className="sc-cat-card">
+                            <a href="/firmalar?search=gıda" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">restaurant</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Gıda</h3>
@@ -168,7 +168,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 3 */}
-                            <a href="/firmalar" className="sc-cat-card">
+                            <a href="/firmalar?search=makine" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">build</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Makine</h3>
@@ -176,7 +176,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 4 */}
-                            <a href="/firmalar" className="sc-cat-card">
+                            <a href="/firmalar?search=teknoloji" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">devices</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Teknoloji</h3>
@@ -184,7 +184,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 5 */}
-                            <a href="/firmalar" className="sc-cat-card">
+                            <a href="/firmalar?search=lojistik" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">local_shipping</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Lojistik</h3>
@@ -192,7 +192,7 @@ const SupplierConnect = () => {
                                 </div>
                             </a>
                             {/* Kategori 6 */}
-                            <a href="/firmalar" className="sc-cat-card">
+                            <a href="/firmalar?search=kimya" className="sc-cat-card">
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">science</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Kimya</h3>

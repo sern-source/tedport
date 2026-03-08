@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Login.css';
 import { supabase } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,32 @@ const LoginPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Sayfa yüklendiğinde oturum kontrolü yap
+  useEffect(() => {
+    const checkSession = async () => {
+      // Mevcut oturumu al
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Eğer kullanıcı zaten giriş yapmışsa, beklemeden profile yönlendir
+      if (session) {
+        navigate('/profile');
+      }
+    };
+
+    checkSession();
+
+    // Opsiyonel: Anlık oturum değişikliklerini dinle (Aynı tarayıcıda sekme arası vs.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        navigate('/profile');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
@@ -32,7 +58,12 @@ const LoginPage = () => {
     setLoading(false);
 
     if (error) {
-      setError("E-posta veya şifre hatalı!");
+      // Supabase'in kendi dönen İngilizce hatalarını da baz alarak uyarıları kişiselleştirebiliriz
+      if (error.message.includes("Email not confirmed")) {
+        setError("Lütfen önce e-posta adresinizi onaylayın.");
+      } else {
+        setError("E-posta veya şifre hatalı!");
+      }
     } else {
       console.log("Giriş başarılı:", data.user);
       navigate('/profile');
@@ -45,7 +76,7 @@ const LoginPage = () => {
       {/* HEADER */}
       <header className="main-header">
         <div className="header-content">
-          <div className="logo-section">
+          <div className="logo-section" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <div className="logo-icon">
               <span className="material-symbols-outlined">inventory_2</span>
             </div>
@@ -154,7 +185,7 @@ const LoginPage = () => {
 
             <div className="signup-prompt">
               <p>
-                Henüz hesabın yok mu? <a href="#">Kayıt Ol</a>
+                Henüz hesabın yok mu? <a href="/register">Kayıt Ol</a>
               </p>
             </div>
           </div>

@@ -61,6 +61,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
 
   const [loading, setLoading] = useState(true);
 
+  // App componentinden gelen aktif filtreleri Sidebar'da göster
   useEffect(() => {
     setSelectedCities(activeFilters.cities || []);
     setSelectedCategories(activeFilters.categories || []);
@@ -96,31 +97,42 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
     setLoading(false);
   };
 
-  const toggleSelection = (value, selected, setSelected) => {
-    if (selected.includes(value)) {
-      setSelected(selected.filter(item => item !== value));
-    } else {
-      setSelected([...selected, value]);
-    }
-  };
+  // Filtreler seçildiği an anında güncelleme yapan ana fonksiyon
+  const updateFilter = (type, value, isAll = false, list = []) => {
+    let newCities = selectedCities;
+    let newCategories = selectedCategories;
+    let newSectors = selectedSectors;
 
-  const toggleSelectAll = (list, selected, setSelected, keyName) => {
-    if (selected.length === list.length) {
-      setSelected([]);
-    } else {
-      setSelected(
-        list.map(item =>
-          keyName ? item[keyName] : item
-        )
-      );
+    if (type === 'cities') {
+      if (isAll) {
+        newCities = selectedCities.length === list.length ? [] : list.map(c => c.sehir);
+      } else {
+        newCities = selectedCities.includes(value) ? selectedCities.filter(c => c !== value) : [...selectedCities, value];
+      }
+      setSelectedCities(newCities);
+    } 
+    else if (type === 'sectors') {
+      if (isAll) {
+        newSectors = selectedSectors.length === list.length ? [] : list;
+      } else {
+        newSectors = selectedSectors.includes(value) ? selectedSectors.filter(s => s !== value) : [...selectedSectors, value];
+      }
+      setSelectedSectors(newSectors);
+    } 
+    else if (type === 'categories') {
+      if (isAll) {
+        newCategories = selectedCategories.length === list.length ? [] : list;
+      } else {
+        newCategories = selectedCategories.includes(value) ? selectedCategories.filter(c => c !== value) : [...selectedCategories, value];
+      }
+      setSelectedCategories(newCategories);
     }
-  };
 
-  const handleApplyFilters = () => {
+    // Seçim yapıldığı an üst component'e (App) filtreleri uygulat
     onApplyFilters({
-      cities: selectedCities.length === cities.length ? [] : selectedCities,
-      categories: selectedCategories.length === categories.length ? [] : selectedCategories,
-      sectors: selectedSectors.length === SEKTORLER.length ? [] : selectedSectors
+      cities: newCities.length === cities.length ? [] : newCities,
+      categories: newCategories.length === categories.length ? [] : newCategories,
+      sectors: newSectors.length === SEKTORLER.length ? [] : newSectors
     });
   };
 
@@ -161,9 +173,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                       selectedCities.length === cities.length &&
                       cities.length > 0
                     }
-                    onChange={() =>
-                      toggleSelectAll(cities, selectedCities, setSelectedCities, "sehir")
-                    }
+                    onChange={() => updateFilter('cities', null, true, cities)}
                   />
                   Tümü
                 </label>
@@ -173,9 +183,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                     <input
                       type="checkbox"
                       checked={selectedCities.includes(city.sehir)}
-                      onChange={() =>
-                        toggleSelection(city.sehir, selectedCities, setSelectedCities)
-                      }
+                      onChange={() => updateFilter('cities', city.sehir)}
                     />
                     {city.sehir}
                   </label>
@@ -199,9 +207,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                   selectedSectors.length === SEKTORLER.length &&
                   SEKTORLER.length > 0
                 }
-                onChange={() =>
-                  toggleSelectAll(SEKTORLER, selectedSectors, setSelectedSectors)
-                }
+                onChange={() => updateFilter('sectors', null, true, SEKTORLER)}
               />
               Tümü
             </label>
@@ -210,7 +216,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                 <input 
                   type="checkbox" 
                   checked={selectedSectors.includes(sektor)}
-                  onChange={() => toggleSelection(sektor, selectedSectors, setSelectedSectors)}
+                  onChange={() => updateFilter('sectors', sektor)}
                 /> 
                 {sektor}
               </label>
@@ -237,9 +243,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                       selectedCategories.length === categories.length &&
                       categories.length > 0
                     }
-                    onChange={() =>
-                      toggleSelectAll(categories, selectedCategories, setSelectedCategories)
-                    }
+                    onChange={() => updateFilter('categories', null, true, categories)}
                   />
                   Tümü
                 </label>
@@ -249,9 +253,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                     <input
                       type="checkbox"
                       checked={selectedCategories.includes(category)}
-                      onChange={() =>
-                        toggleSelection(category, selectedCategories, setSelectedCategories)
-                      }
+                      onChange={() => updateFilter('categories', category)}
                     />
                     {category}
                   </label>
@@ -261,13 +263,6 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
           </div>
         </details>
       </div>
-      
-      <div className="filter-apply">
-        <button className="apply-btn2" onClick={handleApplyFilters}>
-          Filtreleri Uygula
-        </button>
-      </div>
-
     </aside>
   );
 };
