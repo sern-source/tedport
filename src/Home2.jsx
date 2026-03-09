@@ -9,6 +9,9 @@ const SupplierConnect = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [topSuppliers, setTopSuppliers] = useState([]);
+    
+    // Kullanıcı bilgisi için yeni state
+    const [userProfile, setUserProfile] = useState(null); 
 
     const navigate = useNavigate();
 
@@ -22,6 +25,32 @@ const SupplierConnect = () => {
         }
     };
 
+    // 👤 Oturum Kontrolü ve Profil Bilgisi Çekme İşlemi
+    useEffect(() => {
+        const checkUserSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session?.user) {
+                // Giriş yapılmışsa profiles tablosundan ismini çek
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profileData) {
+                    setUserProfile(profileData);
+                } else {
+                    // Veritabanında ismi yoksa varsayılan metin göster
+                    setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
+                }
+            }
+        };
+
+        checkUserSession();
+    }, []);
+
+    // 🏢 Rastgele Firmaları Çekme İşlemi
     useEffect(() => {
         const fetchRandomSuppliers = async () => {
             // 1️⃣ toplam firma sayısı
@@ -58,7 +87,7 @@ const SupplierConnect = () => {
             {/* Header */}
             <header className="sc-header">
                 <div className="container sc-header-inner">
-                    <div className="sc-logo-area">
+                    <div className="sc-logo-area" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                         <span className="material-symbols-outlined sc-logo-icon icon-filled">inventory_2</span>
                         <span className="sc-logo-text">Tedport</span>
                     </div>
@@ -68,9 +97,23 @@ const SupplierConnect = () => {
                             <a href="/firmalar">Firmalar</a>
                             <a href="/hakkimizda">Hakkımızda</a>
                             <a href="/iletisim">İletişim</a>
-                            <a href="/login">Giriş Yap</a>
+                            {/* Sadece giriş YAPILMAMIŞSA Giriş Yap linkini göster */}
+                            {!userProfile && <a href="/login">Giriş Yap</a>}
                         </div>
-                        <button className="sc-btn-primary" onClick={() => navigate(`/register`)}>Kayıt Ol</button>
+                        
+                        {/* Koşullu Buton Gösterimi */}
+                        {userProfile ? (
+                            <button 
+                                className="sc-btn-primary" 
+                                onClick={() => navigate(`/profile`)}
+                                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                            >
+                                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>account_circle</span>
+                                {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                            </button>
+                        ) : (
+                            <button className="sc-btn-primary" onClick={() => navigate(`/register`)}>Kayıt Ol</button>
+                        )}
                     </div>
                 </div>
             </header>
@@ -209,9 +252,9 @@ const SupplierConnect = () => {
                         <h2 className="sc-section-title" style={{ marginBottom: '32px' }}>En İyi Tedarikçiler</h2>
                         <div className="sc-sup-grid">
 
-                            {/* Tedarikçi 1 */}
+                            {/* Tedarikçiler */}
                             {topSuppliers.map((firma) => (
-                                <div className="sc-sup-card">
+                                <div className="sc-sup-card" key={firma.firmaID || Math.random()}>
                                     <div className="sc-sup-header">
                                         <div className="sc-sup-avatar" style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>{firma.firma_adi?.charAt(0)}</div>
                                         <div className="sc-sup-verified"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span> Onaylı</div>
@@ -238,8 +281,6 @@ const SupplierConnect = () => {
                                 </div>
                             ))}
 
-
-
                         </div>
                     </div>
                 </section>
@@ -250,8 +291,12 @@ const SupplierConnect = () => {
                         <h2>İşinizi Büyütmeye Hazır mısınız?</h2>
                         <p>Her gün uluslararası alıcılarla bağlantı kuran binlerce tedarikçiye katılın. Ücretsiz profilinizi şimdi oluşturun.</p>
                         <div className="sc-cta-buttons">
-                            <button className="sc-btn-white" onClick={() => navigate(`/register`)}>Tedarikçi Olarak Katıl</button>
-                            <button className="sc-btn-transparent" onClick={() => navigate(`/register`)}>Ben Bir Alıcıyım</button>
+                            <button className="sc-btn-white" onClick={() => navigate(userProfile ? '/profile' : '/register')}>
+                                {userProfile ? 'Profilime Git' : 'Tedarikçi Olarak Katıl'}
+                            </button>
+                            <button className="sc-btn-transparent" onClick={() => navigate('/firmalar')}>
+                                Ürünleri Keşfet
+                            </button>
                         </div>
                     </div>
                 </section>

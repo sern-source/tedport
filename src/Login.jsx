@@ -66,7 +66,7 @@ const LoginPage = () => {
       }
     } else {
       console.log("Giriş başarılı:", data.user);
-      navigate('/profile');
+      navigate('/');
     }
   };
 
