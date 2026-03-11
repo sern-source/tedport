@@ -149,8 +149,9 @@ const RegistrationPage = () => {
             <a href="/firmalar">Firmalar</a>
             <a href="/hakkimizda">Hakkımızda</a>
             <a href="/iletisim">İletişim</a>
+            <a href="/login">Giriş Yap</a>
           </nav>
-          <button className="btn-primary">Giriş Yap</button>
+          
         </div>
       </header>
 

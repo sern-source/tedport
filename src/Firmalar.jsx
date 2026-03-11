@@ -1,46 +1,164 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Firmalar.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 
 /* ================= HEADER ================= */
 
-const Header = ({ search, setSearch }) => (
-  <header className="header">
-    <div className="header-left">
-      <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <div className="logo-icon">
-          <span className="material-symbols-outlined">inventory_2</span>
+const Header = ({ search, setSearch, userProfile, handleLogout }) => {
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Menü dışında tıklamayı algıla
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <header className="header">
+      <div className="header-left">
+        <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="logo-icon">
+            <span className="material-symbols-outlined">inventory_2</span>
+          </div>
+          <h2>Tedport</h2>
+        </Link>
+        <div className="search-bar">
+          <div className="search-icon">
+            <span className="material-symbols-outlined">search</span>
+          </div>
+          <input
+            type="text"
+            placeholder="Firma, ürün ya da kategori ara..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-        <h2>Tedport</h2>
-      </Link>
-      <div className="search-bar">
-        <div className="search-icon">
-          <span className="material-symbols-outlined">search</span>
+      </div>
+      <div className="header-right">
+        <nav className="nav-links">
+          <Link to="/">Anasayfa</Link>
+          <Link to="/firmalar">Firmalar</Link>
+          <a href="/hakkimizda">Hakkımızda</a>
+          <a href="/iletisim">İletişim</a>
+          {/* Giriş yapılmamışsa linki göster */}
+          {!userProfile && <a href="/login">Giriş Yap</a>}
+        </nav>
+        
+        {/* Kullanıcı Durumuna Göre Aksiyon Alanı */}
+        <div className="user-actions">
+          {userProfile ? (
+            <div 
+              className="user-dropdown-container" 
+              ref={dropdownRef} 
+              style={{ position: 'relative' }}
+            >
+              <button 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px', 
+                  background: '#1d4ed8', 
+                  color: 'white', 
+                  padding: '8px 16px', 
+                  borderRadius: '6px', 
+                  border: 'none', 
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  fontSize: '14px'
+                }}
+              >
+                
+                {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                  {isDropdownOpen ? 'expand_less' : 'expand_more'}
+                </span>
+              </button>
+
+              {/* Dropdown Menü */}
+              {isDropdownOpen && (
+                <div 
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: '0',
+                    marginTop: '8px',
+                    width: '200px',
+                    backgroundColor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    zIndex: 100,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div 
+                    onClick={() => navigate('/profile')}
+                    style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>person</span>
+                    <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Profil</span>
+                  </div>
+                  
+                  <div 
+                    onClick={() => navigate('/profile?tab=favorites')}
+                    style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>favorite</span>
+                    <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Favoriler</span>
+                  </div>
+                  
+                  <div 
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      handleLogout();
+                    }}
+                    style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.2s' }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>logout</span>
+                    <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Çıkış Yap</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button 
+              onClick={() => navigate('/register')}
+              style={{ 
+                background: '#1d4ed8', 
+                color: 'white', 
+                padding: '8px 16px', 
+                borderRadius: '6px', 
+                border: 'none', 
+                cursor: 'pointer',
+                fontWeight: '500',
+                fontSize: '14px'
+              }}
+            >
+              Kayıt Ol
+            </button>
+          )}
         </div>
-        <input
-          type="text"
-          placeholder="Firma, ürün ya da kategori ara..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
       </div>
-    </div>
-    <div className="header-right">
-      <nav className="nav-links">
-        <Link to="/">Anasayfa</Link>
-        <Link to="/firmalar">Firmalar</Link>
-        <a href="/hakkimizda">Hakkımızda</a>
-        <a href="/iletisim">İletişim</a>
-      </nav>
-      <div className="user-actions">
-        <button>
-          <span className="material-symbols-outlined">person</span>
-        </button>
-      </div>
-    </div>
-  </header>
-);
+    </header>
+  );
+};
 
 /* ================= SIDEBAR ================= */
 
@@ -166,17 +284,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
               <p>Yükleniyor...</p>
             ) : (
               <>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={
-                      selectedCities.length === cities.length &&
-                      cities.length > 0
-                    }
-                    onChange={() => updateFilter('cities', null, true, cities)}
-                  />
-                  Tümü
-                </label>
+                
 
                 {cities.map(city => (
                   <label key={city.sehir}>
@@ -200,17 +308,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
             <span className="material-symbols-outlined">expand_more</span>
           </summary>
           <div className="filter-content">
-            <label>
-              <input
-                type="checkbox"
-                checked={
-                  selectedSectors.length === SEKTORLER.length &&
-                  SEKTORLER.length > 0
-                }
-                onChange={() => updateFilter('sectors', null, true, SEKTORLER)}
-              />
-              Tümü
-            </label>
+            
             {SEKTORLER.map(sektor => (
               <label key={sektor}>
                 <input 
@@ -236,17 +334,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
               <p>Yükleniyor...</p>
             ) : (
               <>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={
-                      selectedCategories.length === categories.length &&
-                      categories.length > 0
-                    }
-                    onChange={() => updateFilter('categories', null, true, categories)}
-                  />
-                  Tümü
-                </label>
+                
 
                 {categories.map(category => (
                   <label key={category}>
@@ -361,6 +449,37 @@ function App() {
 
   const [search, setSearch] = useState(urlSearchTerm);
   const [filters, setFilters] = useState({ cities: [], categories: [], sectors: [] });
+
+  // 👤 Kullanıcı Durumu State'i
+  const [userProfile, setUserProfile] = useState(null);
+
+  // Sayfa Yüklendiğinde Oturum Kontrolü
+  useEffect(() => {
+    const checkUserSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileData) {
+          setUserProfile(profileData);
+        } else {
+          setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
+        }
+      }
+    };
+    checkUserSession();
+  }, []);
+
+  // Çıkış Yapma İşlemi
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUserProfile(null);
+  };
 
   useEffect(() => {
     fetchSuppliers();
@@ -484,7 +603,12 @@ function App() {
         rel="stylesheet"
       />
 
-      <Header search={search} setSearch={setSearch} />
+      <Header 
+        search={search} 
+        setSearch={setSearch} 
+        userProfile={userProfile} 
+        handleLogout={handleLogout} 
+      />
 
       <main className="layout-container">
         <div className="breadcrumb-row">

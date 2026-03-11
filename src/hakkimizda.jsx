@@ -1,7 +1,60 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from './supabaseClient';
 import './hakkimizda.css';
 
 const About = () => {
+    const navigate = useNavigate();
+    
+    // Kullanıcı bilgisi ve dropdown için state'ler
+    const [userProfile, setUserProfile] = useState(null); 
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    // Menü dışında bir yere tıklanınca dropdown'ı kapat
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // 👤 Oturum Kontrolü ve Profil Bilgisi Çekme İşlemi
+    useEffect(() => {
+        const checkUserSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session?.user) {
+                // Giriş yapılmışsa profiles tablosundan ismini çek
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profileData) {
+                    setUserProfile(profileData);
+                } else {
+                    // Veritabanında ismi yoksa varsayılan metin göster
+                    setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
+                }
+            }
+        };
+
+        checkUserSession();
+    }, []);
+
+    // Çıkış Yapma İşlemi
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setUserProfile(null);
+        setIsDropdownOpen(false);
+        navigate('/');
+    };
+
     return (
         <div className="about-page-wrapper">
             {/* Header / Navbar */}
@@ -9,7 +62,7 @@ const About = () => {
                 <div className="about-container about-header-inner">
                     <div className="about-header-left">
                         {/* Logo */}
-                        <a className="about-logo" href="/">
+                        <a className="about-logo" href="/" style={{ textDecoration: 'none' }}>
                             <div className="about-logo-icon">
                                 <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z" fill="currentColor"></path>
@@ -18,20 +71,92 @@ const About = () => {
                             </div>
                             <h2>Tedport</h2>
                         </a>
-                        {/* Nav Links */}
-
                     </div>
 
                     <div className="about-header-right">
                         <nav className="about-nav-links hidden-mobile">
                             <a href="/">Ana Sayfa</a>
                             <a href="/firmalar">Firmalar</a>
-                            <a href="/hakkimizda" >Hakkımızda</a>
+                            <a href="/hakkimizda">Hakkımızda</a>
                             <a href="/iletisim">İletişim</a>
-
+                            {!userProfile && <a href="/login">Giriş Yap</a>}
                         </nav>
+                        
+                        {/* 👤 Kullanıcı Durumuna Göre Aksiyon Alanı */}
                         <div className="about-actions">
-                            <button className="about-btn-primary">Giriş Yap</button>
+                            {userProfile ? (
+                                <div 
+                                    className="user-dropdown-container" 
+                                    ref={dropdownRef} 
+                                    style={{ position: 'relative' }}
+
+                                >
+                                    <button 
+                                        className="about-btn-primary" 
+                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                                    >
+                                        
+                                        {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                                            {isDropdownOpen ? 'expand_less' : 'expand_more'}
+                                        </span>
+                                    </button>
+
+                                    {/* Dropdown Menü */}
+                                    {isDropdownOpen && (
+                                        <div 
+                                            style={{
+                                                position: 'absolute',
+                                                top: '100%',
+                                                right: '0',
+                                                marginTop: '8px',
+                                                width: '200px',
+                                                backgroundColor: '#fff',
+                                                border: '1px solid #e2e8f0',
+                                                borderRadius: '8px',
+                                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                                                zIndex: 100,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                overflow: 'hidden'
+                                            }}
+                                        >
+                                            <div 
+                                                onClick={() => navigate('/profile')}
+                                                style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                                                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                            >
+                                                <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>person</span>
+                                                <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Profil</span>
+                                            </div>
+                                            
+                                            <div 
+                                                onClick={() => navigate('/profile?tab=favorites')}
+                                                style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                                                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                            >
+                                                <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>favorite</span>
+                                                <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Favoriler</span>
+                                            </div>
+                                            
+                                            <div 
+                                                onClick={handleLogout}
+                                                style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.2s' }}
+                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                                                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                            >
+                                                <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>logout</span>
+                                                <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Çıkış Yap</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <button className="about-btn-primary" onClick={() => navigate('/register')}>Kayıt Ol</button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -213,8 +338,8 @@ const About = () => {
                         <h2>Bizimle Büyümeye Hazır Mısınız?</h2>
                         <p>Tedarik ağınızı güçlendirmek veya ürünlerinizi binlerce alıcıya ulaştırmak için bugün katılın.</p>
                         <div className="about-cta-buttons">
-                            <button className="about-btn-white">Hemen Başlayın</button>
-                            <button className="about-btn-transparent">Daha Fazla Bilgi</button>
+                            <button className="about-btn-white" onClick={() => navigate('/register')}>Hemen Başlayın</button>
+                            <button className="about-btn-transparent" onClick={() => navigate('/firmalar')}>Tedarikçileri Keşfet</button>
                         </div>
                     </div>
                 </section>
@@ -240,18 +365,18 @@ const About = () => {
                         <div className="about-footer-links">
                             <h3>Kurumsal</h3>
                             <ul>
-                                <li><a href="#">Hakkımızda</a></li>
+                                <li><a href="/hakkimizda">Hakkımızda</a></li>
                                 <li><a href="#">Kariyer</a></li>
                                 <li><a href="#">Basın Odası</a></li>
-                                <li><a href="#">İletişim</a></li>
+                                <li><a href="/iletisim">İletişim</a></li>
                             </ul>
                         </div>
 
                         <div className="about-footer-links">
                             <h3>Platform</h3>
                             <ul>
-                                <li><a href="#">Tedarikçi Ol</a></li>
-                                <li><a href="#">Tedarikçi Bul</a></li>
+                                <li><a href="/register">Tedarikçi Ol</a></li>
+                                <li><a href="/firmalar">Tedarikçi Bul</a></li>
                                 <li><a href="#">Fiyatlandırma</a></li>
                                 <li><a href="#">Yardım Merkezi</a></li>
                             </ul>
@@ -268,7 +393,7 @@ const About = () => {
                     </div>
 
                     <div className="about-footer-bottom">
-                        <p>© 2024 Tedport Teknoloji A.Ş. Tüm hakları saklıdır.</p>
+                        <p>© 2026 Tedport Teknoloji A.Ş. Tüm hakları saklıdır.</p>
                     </div>
                 </div>
             </footer>

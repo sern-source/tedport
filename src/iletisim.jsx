@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './iletisim.css';
 import { supabase } from './supabaseClient';
+import { useNavigate } from 'react-router-dom';
 
 const Contact = () => {
+    const navigate = useNavigate();
+
     // Form verilerini tutacağımız state
     const [formData, setFormData] = useState({
         name: '',
@@ -13,6 +16,55 @@ const Contact = () => {
 
     // Formun durumunu (bekliyor, yükleniyor, başarılı, hata) tutacağımız state
     const [status, setStatus] = useState('idle');
+
+    // 👤 Kullanıcı bilgisi ve dropdown için state'ler
+    const [userProfile, setUserProfile] = useState(null); 
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    // Menü dışında bir yere tıklanınca dropdown'ı kapat
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // 👤 Oturum Kontrolü ve Profil Bilgisi Çekme İşlemi
+    useEffect(() => {
+        const checkUserSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session?.user) {
+                // Giriş yapılmışsa profiles tablosundan ismini çek
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('first_name, last_name')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profileData) {
+                    setUserProfile(profileData);
+                } else {
+                    // Veritabanında ismi yoksa varsayılan metin göster
+                    setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
+                }
+            }
+        };
+
+        checkUserSession();
+    }, []);
+
+    // Çıkış Yapma İşlemi
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setUserProfile(null);
+        setIsDropdownOpen(false);
+        navigate('/');
+    };
 
     // Inputlar değiştikçe state'i güncelleyen fonksiyon
     const handleChange = (e) => {
@@ -63,7 +115,7 @@ const Contact = () => {
             <header className="contact-header">
                 <div className="contact-container contact-header-inner">
                     <div className="contact-header-left">
-                        <a className="contact-logo" href="/">
+                        <a className="contact-logo" href="/" style={{ textDecoration: 'none' }}>
                             <div className="contact-logo-icon">
                                 <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M13.8261 30.5736C16.7203 29.8826 20.2244 29.4783 24 29.4783C27.7756 29.4783 31.2797 29.8826 34.1739 30.5736C36.9144 31.2278 39.9967 32.7669 41.3563 33.8352L24.8486 7.36089C24.4571 6.73303 23.5429 6.73303 23.1514 7.36089L6.64374 33.8352C8.00331 32.7669 11.0856 31.2278 13.8261 30.5736Z" fill="currentColor"></path>
@@ -78,9 +130,83 @@ const Contact = () => {
                             <a href="/">Ana Sayfa</a>
                             <a href="/firmalar">Firmalar</a>
                             <a href="/hakkimizda">Hakkımızda</a>
-                            <a href="/iletisim" className="active">İletişim</a>
+                            <a href="/iletisim">İletişim</a>
+                            {!userProfile && <a href="/login" className="mobile-only">Giriş Yap</a>}
                         </nav>
-                        <button className="contact-btn-primary">Giriş Yap</button>
+
+                        {/* 👤 Kullanıcı Durumuna Göre Aksiyon Alanı */}
+                        {userProfile ? (
+                            <div 
+                                className="user-dropdown-container" 
+                                ref={dropdownRef} 
+                                style={{ position: 'relative' }}
+                            >
+                                <button 
+                                    className="contact-btn-primary" 
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                                >
+                                    
+                                    {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                                        {isDropdownOpen ? 'expand_less' : 'expand_more'}
+                                    </span>
+                                </button>
+
+                                {/* Dropdown Menü */}
+                                {isDropdownOpen && (
+                                    <div 
+                                        style={{
+                                            position: 'absolute',
+                                            top: '100%',
+                                            right: '0',
+                                            marginTop: '8px',
+                                            width: '200px',
+                                            backgroundColor: '#fff',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                                            zIndex: 100,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            overflow: 'hidden'
+                                        }}
+                                    >
+                                        <div 
+                                            onClick={() => navigate('/profile')}
+                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>person</span>
+                                            <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Profil</span>
+                                        </div>
+                                        
+                                        <div 
+                                            onClick={() => navigate('/profile?tab=favorites')}
+                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>favorite</span>
+                                            <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Favoriler</span>
+                                        </div>
+                                        
+                                        <div 
+                                            onClick={handleLogout}
+                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.2s' }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>logout</span>
+                                            <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Çıkış Yap</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <button className="contact-btn-primary" onClick={() => navigate('/register')}>Kayıt Ol</button>
+                        )}
                     </div>
                 </div>
             </header>
@@ -274,6 +400,9 @@ const Contact = () => {
                                 <span>Tedport</span>
                             </div>
                             <p>Güvenilir tedarikçilerle işinizi büyütün. Türkiye'nin en kapsamlı B2B pazar yeri.</p>
+                            <div className="contact-socials">
+                                <a href="#"></a><a href="#"></a><a href="#"></a>
+                            </div>
                         </div>
 
                         <div className="contact-footer-links">

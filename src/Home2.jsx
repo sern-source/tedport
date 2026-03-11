@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Home2.css';
 import { supabase } from './supabaseClient';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -10,10 +10,12 @@ const SupplierConnect = () => {
 
     const [topSuppliers, setTopSuppliers] = useState([]);
     
-    // Kullanıcı bilgisi için yeni state
+    // Kullanıcı bilgisi için state'ler
     const [userProfile, setUserProfile] = useState(null); 
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown menü durumu
 
     const navigate = useNavigate();
+    const dropdownRef = useRef(null); // Tıklama dışı alanı algılamak için
 
     const handleSearch = () => {
         if (searchTerm.trim()) {
@@ -24,6 +26,17 @@ const SupplierConnect = () => {
             navigate(`/firmalar`);
         }
     };
+
+    // Menü dışında bir yere tıklanınca dropdown'ı kapat
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     // 👤 Oturum Kontrolü ve Profil Bilgisi Çekme İşlemi
     useEffect(() => {
@@ -82,6 +95,14 @@ const SupplierConnect = () => {
         fetchRandomSuppliers();
     }, []);
 
+    // Çıkış Yapma İşlemi
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setUserProfile(null);
+        setIsDropdownOpen(false);
+        navigate('/'); // Opsiyonel: Çıkış yaptıktan sonra sayfayı yeniletebilirsiniz window.location.reload();
+    };
+
     return (
         <div className="supplier-connect-wrapper">
             {/* Header */}
@@ -101,16 +122,77 @@ const SupplierConnect = () => {
                             {!userProfile && <a href="/login">Giriş Yap</a>}
                         </div>
                         
-                        {/* Koşullu Buton Gösterimi */}
+                        {/* Koşullu Buton ve Dropdown Gösterimi */}
                         {userProfile ? (
-                            <button 
-                                className="sc-btn-primary" 
-                                onClick={() => navigate(`/profile`)}
-                                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                            <div 
+                                className="user-dropdown-container" 
+                                ref={dropdownRef} 
+                                style={{ position: 'relative' }}
+                                
                             >
-                                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>account_circle</span>
-                                {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
-                            </button>
+                                <button 
+                                    className="sc-btn-primary" 
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                                >
+                                    
+                                    {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                                        {isDropdownOpen ? 'expand_less' : 'expand_more'}
+                                    </span>
+                                </button>
+
+                                {/* Dropdown Menü (Açık ise gösterilir) */}
+                                {isDropdownOpen && (
+                                    <div 
+                                        style={{
+                                            position: 'absolute',
+                                            top: '100%',
+                                            right: '0',
+                                            marginTop: '8px',
+                                            width: '200px',
+                                            backgroundColor: '#fff',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                                            zIndex: 100,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            overflow: 'hidden'
+                                        }}
+                                    >
+                                        <div 
+                                            onClick={() => navigate('/profile')}
+                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>person</span>
+                                            <span style={{ pointerEvents: 'none' }}>Profil</span>
+                                        </div>
+                                        
+                                        <div 
+                                            onClick={() => navigate('/profile?tab=favorites')} // Favoriler sekmesini Profile sayfasında yönetebilirsiniz
+                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>favorite</span>
+                                            <span style={{ pointerEvents: 'none' }}>Favoriler</span>
+                                        </div>
+                                        
+                                        <div 
+                                            onClick={handleLogout}
+                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.2s' }}
+                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>logout</span>
+                                            <span style={{ pointerEvents: 'none' }}>Çıkış Yap</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <button className="sc-btn-primary" onClick={() => navigate(`/register`)}>Kayıt Ol</button>
                         )}
