@@ -67,16 +67,17 @@ const EmailConfirmation = () => {
     <div className="ec-wrapper">
       {/* Top Navigation Bar */}
       <header className="ec-header">
-        {/* LOGO ALANI - Tıklanabilir hale getirildi */}
+        {/* LOGO ALANI - Görsel olarak güncellendi */}
         <div 
           className="ec-header-left" 
           onClick={() => navigate('/')} 
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
-          <div className="ec-logo-icon">
-            <span className="material-symbols-outlined">corporate_fare</span>
-          </div>
-          <h2 className="ec-logo-text">Tedport</h2>
+            <img 
+                src="/tedport-logo.jpg" 
+                alt="Tedport Logo" 
+                style={{ height: '50px', objectFit: 'contain' }} 
+            />
         </div>
       </header>
 

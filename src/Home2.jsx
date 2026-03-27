@@ -9,9 +9,9 @@ const SupplierConnect = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [topSuppliers, setTopSuppliers] = useState([]);
-    
+
     // Kullanıcı bilgisi için state'ler
-    const [userProfile, setUserProfile] = useState(null); 
+    const [userProfile, setUserProfile] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown menü durumu
 
     const navigate = useNavigate();
@@ -42,7 +42,7 @@ const SupplierConnect = () => {
     useEffect(() => {
         const checkUserSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            
+
             if (session?.user) {
                 // Giriş yapılmışsa profiles tablosundan ismini çek
                 const { data: profileData } = await supabase
@@ -108,9 +108,13 @@ const SupplierConnect = () => {
             {/* Header */}
             <header className="sc-header">
                 <div className="container sc-header-inner">
-                    <div className="sc-logo-area" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                        <span className="material-symbols-outlined sc-logo-icon icon-filled">inventory_2</span>
-                        <span className="sc-logo-text">Tedport</span>
+                    <div className="sc-logo-area" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                        {/* LOGO BURAYA EKLENDİ */}
+                        <img
+                            src="/tedport-logo.jpg"
+                            alt="Tedport Logo"
+                            style={{ height: '60px', objectFit: 'contain' }}
+                        />
                     </div>
 
                     <div className="sc-nav">
@@ -121,21 +125,21 @@ const SupplierConnect = () => {
                             {/* Sadece giriş YAPILMAMIŞSA Giriş Yap linkini göster */}
                             {!userProfile && <a href="/login">Giriş Yap</a>}
                         </div>
-                        
+
                         {/* Koşullu Buton ve Dropdown Gösterimi */}
                         {userProfile ? (
-                            <div 
-                                className="user-dropdown-container" 
-                                ref={dropdownRef} 
+                            <div
+                                className="user-dropdown-container"
+                                ref={dropdownRef}
                                 style={{ position: 'relative' }}
-                                
+
                             >
-                                <button 
-                                    className="sc-btn-primary" 
+                                <button
+                                    className="sc-btn-primary"
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                     style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                                 >
-                                    
+
                                     {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
                                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                                         {isDropdownOpen ? 'expand_less' : 'expand_more'}
@@ -144,7 +148,7 @@ const SupplierConnect = () => {
 
                                 {/* Dropdown Menü (Açık ise gösterilir) */}
                                 {isDropdownOpen && (
-                                    <div 
+                                    <div
                                         style={{
                                             position: 'absolute',
                                             top: '100%',
@@ -161,7 +165,7 @@ const SupplierConnect = () => {
                                             overflow: 'hidden'
                                         }}
                                     >
-                                        <div 
+                                        <div
                                             onClick={() => navigate('/profile')}
                                             style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
                                             onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
@@ -170,8 +174,8 @@ const SupplierConnect = () => {
                                             <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>person</span>
                                             <span style={{ pointerEvents: 'none' }}>Profil</span>
                                         </div>
-                                        
-                                        <div 
+
+                                        <div
                                             onClick={() => navigate('/profile?tab=favorites')} // Favoriler sekmesini Profile sayfasında yönetebilirsiniz
                                             style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
                                             onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
@@ -180,8 +184,8 @@ const SupplierConnect = () => {
                                             <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>favorite</span>
                                             <span style={{ pointerEvents: 'none' }}>Favoriler</span>
                                         </div>
-                                        
-                                        <div 
+
+                                        <div
                                             onClick={handleLogout}
                                             style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.2s' }}
                                             onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
@@ -389,9 +393,13 @@ const SupplierConnect = () => {
                 <div className="container">
                     <div className="sc-footer-grid">
                         <div className="sc-footer-brand">
-                            <div className="sc-logo-area">
-                                <span className="material-symbols-outlined sc-logo-icon icon-filled">inventory_2</span>
-                                <span className="sc-logo-text">Tedport</span>
+                            <div className="sc-logo-area" style={{ display: 'flex', alignItems: 'center' }}>
+                                {/* LOGO BURAYA EKLENDİ */}
+                                <img
+                                    src="/tedport-logo.jpg"
+                                    alt="Tedport Logo"
+                                    style={{ height: '60px', objectFit: 'contain' }}
+                                />
                             </div>
                             <p>Küresel ticaret için lider B2B pazaryeri. Doğrulanmış tedarikçileri dünya genelindeki alıcılarla buluşturuyoruz.</p>
                             <div className="sc-socials">

@@ -24,11 +24,13 @@ const Header = ({ search, setSearch, userProfile, handleLogout }) => {
   return (
     <header className="header">
       <div className="header-left">
-        <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div className="logo-icon">
-            <span className="material-symbols-outlined">inventory_2</span>
-          </div>
-          <h2>Tedport</h2>
+        <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
+          {/* LOGO BURAYA EKLENDİ VE 60PX OLARAK AYARLANDI */}
+          <img 
+            src="/tedport-logo.jpg" 
+            alt="Tedport Logo" 
+            style={{ height: '50px', objectFit: 'contain' }} 
+          />
         </Link>
         <div className="search-bar">
           <div className="search-icon">

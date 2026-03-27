@@ -135,13 +135,13 @@ const RegistrationPage = () => {
     <div className="page-container">
       {/* Header */}
       <header className="header">
-        <div className="logo-section">
-          <div className="logo-icon">
-            <span className="material-symbols-outlined" style={{ fontSize: '30px' }}>
-              handshake
-            </span>
-          </div>
-          <h2 className="logo-text">Tedport</h2>
+        <div className="logo-section" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          {/* LOGO BURAYA EKLENDİ */}
+          <img 
+              src="/tedport-logo.jpg" 
+              alt="Tedport Logo" 
+              style={{ height: '50px', objectFit: 'contain' }} 
+          />
         </div>
         <div className="header-right">
           <nav className="nav-links">

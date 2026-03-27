@@ -19,7 +19,7 @@ const SupplierProfile = () => {
     const [noteText, setNoteText] = useState('');
     const [savedNote, setSavedNote] = useState(null);
     const [isNoteSaving, setIsNoteSaving] = useState(false);
-    
+
     // 💖 Favori ve Liste State'leri
     const [isFavorited, setIsFavorited] = useState(false);
     const [myLists, setMyLists] = useState([]); // Kullanıcının oluşturduğu listeler
@@ -87,7 +87,7 @@ const SupplierProfile = () => {
 
     const checkUserSessionAndNotes = async () => {
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (session?.user) {
             // Kullanıcı profilini çek
             const { data: profileData } = await supabase
@@ -113,7 +113,7 @@ const SupplierProfile = () => {
                 .from('kullanici_listeleri')
                 .select('*')
                 .eq('user_id', session.user.id);
-            
+
             if (listsData) setMyLists(listsData);
 
             // 💖 Kullanıcının bu firmayı favorileyip favorilemediğini kontrol et
@@ -123,7 +123,7 @@ const SupplierProfile = () => {
                 .eq('user_id', session.user.id)
                 .eq('firma_id', id)
                 .single();
-            
+
             if (favData) {
                 setIsFavorited(true);
             }
@@ -156,7 +156,7 @@ const SupplierProfile = () => {
                     .delete()
                     .eq('user_id', session.user.id)
                     .eq('firma_id', id);
-                
+
                 if (error) throw error;
                 setIsFavorited(false);
                 setSelectedListId(""); // Seçimi sıfırla
@@ -170,7 +170,7 @@ const SupplierProfile = () => {
                 const { error } = await supabase
                     .from('kullanici_favorileri')
                     .insert([insertData]);
-                
+
                 if (error) throw error;
                 setIsFavorited(true);
             }
@@ -215,20 +215,20 @@ const SupplierProfile = () => {
     const adresText = firma.adres || firma.il_ilce;
     const encodedAddress = encodeURIComponent(adresText);
     const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodedAddress}&zoom=14&size=600x300&markers=color:red|${encodedAddress}&key=YOUR_GOOGLE_MAPS_API_KEY`.replace(/\s/g, '');
-    const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=$${encodedAddress}`;
+    const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
 
     return (
         <div className="supplier-page">
             {/* HEADER */}
             <header className="header">
                 <div className="header-left">
-                    <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <div className="brand">
-                            <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
-                                <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="#137fec"></path>
-                            </svg>
-                            Tedport
-                        </div>
+                    <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
+                        {/* LOGO BURAYA EKLENDİ */}
+                        <img
+                            src="/tedport-logo.jpg"
+                            alt="Tedport Logo"
+                            style={{ height: '50px', objectFit: 'contain' }}
+                        />
                     </Link>
                 </div>
                 <div className="header-right">
@@ -238,16 +238,16 @@ const SupplierProfile = () => {
                         <a href="/hakkimizda">Hakkımızda</a>
                         <a href="/iletisim">İletişim</a>
                     </nav>
-                    
+
                     {/* 👤 Kullanıcı Dropdown */}
                     <div style={{ position: 'relative' }} ref={dropdownRef}>
                         {userProfile ? (
                             <div>
-                                <button 
+                                <button
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    style={{ 
-                                        display: 'flex', alignItems: 'center', gap: '6px', 
-                                        background: '#1d4ed8', color: 'white', padding: '8px 16px', 
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        background: '#1d4ed8', color: 'white', padding: '8px 16px',
                                         borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: '500'
                                     }}
                                 >
@@ -258,7 +258,7 @@ const SupplierProfile = () => {
                                 </button>
 
                                 {isDropdownOpen && (
-                                    <div 
+                                    <div
                                         style={{
                                             position: 'absolute', top: '100%', right: '0', marginTop: '8px', width: '200px',
                                             backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px',
@@ -281,7 +281,7 @@ const SupplierProfile = () => {
                                 )}
                             </div>
                         ) : (
-                            <button 
+                            <button
                                 onClick={() => navigate('/login')}
                                 style={{ background: '#1d4ed8', color: 'white', padding: '8px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: '500' }}
                             >
@@ -357,10 +357,10 @@ const SupplierProfile = () => {
                                     <select
                                         value={selectedListId}
                                         onChange={(e) => setSelectedListId(e.target.value)}
-                                        style={{ 
-                                            width: '100%', padding: '8px', borderRadius: '6px', 
-                                            border: '1px solid #cbd5e1', color: '#334155', 
-                                            fontSize: '13px', outline: 'none', background: '#fff' 
+                                        style={{
+                                            width: '100%', padding: '8px', borderRadius: '6px',
+                                            border: '1px solid #cbd5e1', color: '#334155',
+                                            fontSize: '13px', outline: 'none', background: '#fff'
                                         }}
                                     >
                                         <option value="">Genel Favoriler (Tümü)</option>
@@ -372,14 +372,14 @@ const SupplierProfile = () => {
                             )}
 
                             {/* 💖 FAVORİYE EKLE BUTONU */}
-                            <button 
-                                onClick={toggleFavorite} 
-                                style={{ 
-                                    width: '100%', marginBottom: '10px', 
-                                    background: isFavorited ? '#fee2e2' : '#f8fafc', 
-                                    color: isFavorited ? '#ef4444' : '#475569', 
-                                    border: isFavorited ? '1px solid #fca5a5' : '1px solid #cbd5e1', 
-                                    borderRadius: '6px', padding: '10px', display: 'flex', alignItems: 'center', 
+                            <button
+                                onClick={toggleFavorite}
+                                style={{
+                                    width: '100%', marginBottom: '10px',
+                                    background: isFavorited ? '#fee2e2' : '#f8fafc',
+                                    color: isFavorited ? '#ef4444' : '#475569',
+                                    border: isFavorited ? '1px solid #fca5a5' : '1px solid #cbd5e1',
+                                    borderRadius: '6px', padding: '10px', display: 'flex', alignItems: 'center',
                                     justifyContent: 'center', gap: '8px', cursor: 'pointer', fontWeight: '600'
                                 }}
                             >
@@ -425,7 +425,7 @@ const SupplierProfile = () => {
                                 <span className="material-symbols-outlined" style={{ color: '#137fec', fontSize: '24px' }}>edit_note</span>
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a' }}>Kişisel Notlarım</h3>
                             </div>
-                            
+
                             {userProfile ? (
                                 <>
                                     <textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} placeholder="Bu tedarikçi hakkında not al..." style={{ width: '100%', minHeight: '90px', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', resize: 'vertical', fontSize: '14px', outline: 'none', color: '#334155', boxSizing: 'border-box', fontFamily: 'inherit' }} />
