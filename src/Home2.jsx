@@ -210,7 +210,7 @@ const SupplierConnect = () => {
                     <div className="container">
                         <div className="sc-hero-box">
                             <div style={{ zIndex: 10 }}>
-                                <h1 className="sc-hero-title">Doğru Tedarikçiyi Hemen Bulun</h1>
+                                <h1 className="sc-hero-title">Doğru2 Tedarikçiyi Hemen Bulun</h1>
                                 <p className="sc-hero-subtitle">Dünya çapındaki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.</p>
                             </div>
 
