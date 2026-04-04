@@ -71,12 +71,12 @@ const SupplierProfile = () => {
     // "Tüm Ürünler" ana kategorisinde sarmalayan fonksiyon
     function convertFlatToCategorized(rawData) {
         if (!rawData) return [];
-        
+
         // Düz listeyi al
         const items = degerleriDiziyeCevir(rawData);
-        
+
         if (items.length === 0) return [];
-        
+
         // "Tüm Ürünler" ana kategorisinde bir yapı oluştur
         return [
             {
@@ -106,7 +106,7 @@ const SupplierProfile = () => {
             }
         }
         if (!Array.isArray(data)) return [];
-        
+
         // Eğer veri zaten hiyerarşik ise direkt döndür
         // Yoksa düz listeyi hiyerarşiye çevir
         if (data.length > 0 && data[0].ana_kategori) {
@@ -413,10 +413,10 @@ const SupplierProfile = () => {
                                 {parseHiyerarsikKategoriler(firma.urun_kategorileri).map((kategori, idx) => {
                                     const categoryKey = `cat-${idx}`;
                                     const isExpanded = expandedCategories.has(categoryKey);
-                                    
+
                                     return (
                                         <div key={idx} className="accordion-item">
-                                            <button 
+                                            <button
                                                 className="accordion-button"
                                                 onClick={() => toggleCategory(categoryKey)}
                                             >
@@ -425,7 +425,7 @@ const SupplierProfile = () => {
                                                 </span>
                                                 <span style={{ fontWeight: '600' }}>{kategori.ana_kategori}</span>
                                             </button>
-                                            
+
                                             {isExpanded && (
                                                 <div className="accordion-content">
                                                     {kategori.alt_kategoriler && kategori.alt_kategoriler.length > 0 ? (

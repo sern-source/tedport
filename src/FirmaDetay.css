@@ -23,7 +23,8 @@
 }
 
 /* Layout Reset */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -54,10 +55,11 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.header-left, .header-right {
+.header-left,
+.header-right {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -102,7 +104,9 @@ html, body {
   transition: color 0.2s;
 }
 
-.header-nav a:hover { color: var(--primary); }
+.header-nav a:hover {
+  color: var(--primary);
+}
 
 /* Hero / Üst Bilgi Alanı */
 .profile-hero {
@@ -118,7 +122,9 @@ html, body {
 }
 
 @media (min-width: 1024px) {
-  .container { padding: 0 10rem; }
+  .container {
+    padding: 0 10rem;
+  }
 }
 
 .hero-flex {
@@ -189,7 +195,10 @@ html, body {
 }
 
 /* Butonlar */
-.btn-group { display: flex; gap: 0.75rem; }
+.btn-group {
+  display: flex;
+  gap: 0.75rem;
+}
 
 .btn {
   padding: 0 1.5rem;
@@ -208,7 +217,9 @@ html, body {
   width: 200px;
 }
 
-.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
 
 .btn-outline {
   background: white;
@@ -216,7 +227,9 @@ html, body {
   color: var(--text-dark);
 }
 
-.btn-outline:hover { background: var(--bg-light); }
+.btn-outline:hover {
+  background: var(--bg-light);
+}
 
 /* Tab Navigasyon */
 .tab-nav-wrapper {
@@ -259,7 +272,9 @@ html, body {
 }
 
 @media (min-width: 1024px) {
-  .content-grid { grid-template-columns: 2fr 1fr; }
+  .content-grid {
+    grid-template-columns: 2fr 1fr;
+  }
 }
 
 /* Enes Doğanay | 4 Nisan 2026: Mobil cihazlarda sidebar'ı main content'in altına taşı (responsive layout) */
@@ -267,7 +282,7 @@ html, body {
   .content-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .sticky-sidebar {
     position: static;
     top: auto;
@@ -303,7 +318,9 @@ html, body {
   background-position: center;
 }
 
-.product-details { padding: 1rem; }
+.product-details {
+  padding: 1rem;
+}
 
 /* Sidebar */
 .sticky-sidebar {
@@ -397,6 +414,7 @@ html, body {
     opacity: 0;
     max-height: 0;
   }
+
   to {
     opacity: 1;
     max-height: 500px;
