@@ -1,4 +1,13 @@
 /* Değişkenler ve Temel Ayarlar */
+/* 
+  ===== FİRMA DETAY SAYFASI CSS =====
+  Güncelleme: Enes Doğanay | Tarih: 4 Nisan 2026
+  Değişiklikler:
+  - Accordion (açılır/kapalır) ürün kategorileri stili eklendi
+  - İhale/Tender (Calls) bölümü stili eklendi
+  - Responsive tasarım güncellemesi (mobilde tek sütun layout)
+  - Animate slide-down efekti accordion içeriği için
+*/
 :root {
   --primary: #137fec;
   --primary-hover: #116ed1;
@@ -253,6 +262,18 @@ html, body {
   .content-grid { grid-template-columns: 2fr 1fr; }
 }
 
+/* Enes Doğanay | 4 Nisan 2026: Mobil cihazlarda sidebar'ı main content'in altına taşı (responsive layout) */
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sticky-sidebar {
+    position: static;
+    top: auto;
+  }
+}
+
 .card {
   background: var(--bg-white);
   border: 1px solid var(--border);
@@ -311,4 +332,163 @@ html, body {
   font-size: 0.75rem;
   font-weight: 700;
   border-radius: 4px;
+}
+
+/* ========== ACCORDION STYLESİ ========== */
+/* Enes Doğanay | 4 Nisan 2026: Ürün kategorilerini accordion (açılır/kapalır) şekilde göstermek için stiller */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.accordion-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-white);
+  transition: all 0.2s ease;
+}
+
+.accordion-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(19, 127, 236, 0.1);
+}
+
+.accordion-button {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  background: var(--bg-white);
+  color: var(--text-dark);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.accordion-button:hover {
+  background: var(--bg-light);
+  color: var(--primary);
+}
+
+.accordion-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.accordion-content {
+  padding: 0 1rem 1rem 1rem;
+  background: rgba(239, 242, 255, 0.5);
+  border-top: 1px solid var(--border);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+/* ========== TENDER/İHALE STYLESİ ========== */
+/* Enes Doğanay | 4 Nisan 2026: Firma ihalelerini listelemek için stiller */
+.tenders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tender-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  background: var(--bg-white);
+  transition: all 0.2s ease;
+}
+
+.tender-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(19, 127, 236, 0.15);
+}
+
+.tender-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tender-status {
+  display: inline-flex;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tender-status-canlı {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.tender-status-yaklaşan {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.tender-status-kapalı {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
+/* Enes Doğanay | 4 Nisan 2026: Mobil cihazlarda (< 768px) tek sütun layout ve ayarlamalar */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  .header {
+    padding: 0.75rem 1.25rem;
+  }
+
+  .hero-flex {
+    gap: 1rem;
+  }
+
+  .tender-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .accordion-button {
+    padding: 0.875rem;
+    font-size: 0.95rem;
+  }
+
+  .accordion-content {
+    padding: 0 0.875rem 0.875rem 0.875rem;
+  }
+
+  .tender-item {
+    padding: 1rem;
+  }
 }

@@ -3,6 +3,14 @@ import './FirmaDetay.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 
+// ===== FİRMA DETAY SAYFASI =====
+// Güncelleme: Enes Doğanay | Tarih: 4 Nisan 2026
+// Değişiklikler:
+// - Accordion (açılır/kapalır) ürün kategorileri sistemi eklendi
+// - İhale/Tender bölümü eklendi
+// - Responsive layout güncellemesi (mobilde tek sütun)
+// - Düz ürün listesini hiyerarşik yapıya dönüştürme fonksiyonu
+
 const SupplierProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -24,6 +32,10 @@ const SupplierProfile = () => {
     const [isFavorited, setIsFavorited] = useState(false);
     const [myLists, setMyLists] = useState([]); // Kullanıcının oluşturduğu listeler
     const [selectedListId, setSelectedListId] = useState(""); // Seçilen liste
+
+    // 📂 Accordion State'leri - Açık/Kapalı kategoriler
+    // Enes Doğanay | 4 Nisan 2026: Ürün kategorilerini accordion olarak göstermek için state eklendi
+    const [expandedCategories, setExpandedCategories] = useState(new Set());
 
     // Diziye Çevirme Fonksiyonu
     function degerleriDiziyeCevir(rawData) {
@@ -53,6 +65,69 @@ const SupplierProfile = () => {
         });
         return sonuc;
     }
+
+    // Düz listeyi hiyerarşik yapıya çevir (Gelecekte DB hiyerarşik olduğunda buna gerek kalmayacak)
+    // Enes Doğanay | 4 Nisan 2026: DB'de üst kategori olmadığı için düz ürün listesini 
+    // "Tüm Ürünler" ana kategorisinde sarmalayan fonksiyon
+    function convertFlatToCategorized(rawData) {
+        if (!rawData) return [];
+        
+        // Düz listeyi al
+        const items = degerleriDiziyeCevir(rawData);
+        
+        if (items.length === 0) return [];
+        
+        // "Tüm Ürünler" ana kategorisinde bir yapı oluştur
+        return [
+            {
+                ana_kategori: "Tüm Ürünler",
+                alt_kategoriler: [
+                    {
+                        baslik: "Ürün Listesi",
+                        urunler: items
+                    }
+                ]
+            }
+        ];
+    }
+
+    // Hiyerarşik Kategori Parse Fonksiyonu (Accordion için)
+    // Enes Doğanay | 4 Nisan 2026: Veri yapısını kontrol ederek hiyerarşik mi düz mi olduğunu belirler
+    // Hiyerarşik veri varsa direkt kullanır, yoksa convertFlatToCategorized ile dönüştürür
+    function parseHiyerarsikKategoriler(rawData) {
+        if (!rawData) return [];
+        let data = rawData;
+        if (typeof rawData === 'string') {
+            try {
+                data = JSON.parse(rawData);
+            } catch (e) {
+                console.error("JSON parse hatası:", e);
+                return [];
+            }
+        }
+        if (!Array.isArray(data)) return [];
+        
+        // Eğer veri zaten hiyerarşik ise direkt döndür
+        // Yoksa düz listeyi hiyerarşiye çevir
+        if (data.length > 0 && data[0].ana_kategori) {
+            return data; // Hiyerarşik yapı var
+        } else {
+            // Düz liste - hiyerarşiye çevir
+            return convertFlatToCategorized(rawData);
+        }
+    }
+
+    // Accordion Toggle Fonksiyonu
+    // Enes Doğanay | 4 Nisan 2026: Kategorileri açıp kapatmak için toggle fonksiyonu
+    const toggleCategory = (categoryKey) => {
+        const newExpanded = new Set(expandedCategories);
+        if (newExpanded.has(categoryKey)) {
+            newExpanded.delete(categoryKey);
+        } else {
+            newExpanded.add(categoryKey);
+        }
+        setExpandedCategories(newExpanded);
+    };
 
     // Menü dışı tıklamayı algılama
     useEffect(() => {
@@ -333,11 +408,86 @@ const SupplierProfile = () => {
 
                         <section id="products">
                             <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Ürün Kategorileri</h2>
-                            <div className="product-list" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                                {(degerleriDiziyeCevir(firma.urun_kategorileri) || []).map((item, i) => (
-                                    <Link key={i} to={`/firmalar?search=${encodeURIComponent(item)}`} style={{ padding: '6px 12px', background: '#eef2ff', color: '#4f46e5', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '500', border: '1px solid #c7d2fe', textDecoration: 'none' }}>
-                                        #{item}
-                                    </Link>
+                            {/* Enes Doğanay | 4 Nisan 2026: Ürün kategorilerini accordion (açılır/kapalır) şekilde göster */}
+                            <div className="accordion">
+                                {parseHiyerarsikKategoriler(firma.urun_kategorileri).map((kategori, idx) => {
+                                    const categoryKey = `cat-${idx}`;
+                                    const isExpanded = expandedCategories.has(categoryKey);
+                                    
+                                    return (
+                                        <div key={idx} className="accordion-item">
+                                            <button 
+                                                className="accordion-button"
+                                                onClick={() => toggleCategory(categoryKey)}
+                                            >
+                                                <span className="accordion-icon" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                                                    ▼
+                                                </span>
+                                                <span style={{ fontWeight: '600' }}>{kategori.ana_kategori}</span>
+                                            </button>
+                                            
+                                            {isExpanded && (
+                                                <div className="accordion-content">
+                                                    {kategori.alt_kategoriler && kategori.alt_kategoriler.length > 0 ? (
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                                            {kategori.alt_kategoriler.map((altKat, altIdx) => (
+                                                                <div key={altIdx}>
+                                                                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#137fec', fontSize: '0.95rem', fontWeight: '600' }}>
+                                                                        • {altKat.baslik}
+                                                                    </h4>
+                                                                    {altKat.urunler && altKat.urunler.length > 0 && (
+                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginLeft: '1rem' }}>
+                                                                            {/* Enes Doğanay | 4 Nisan 2026: Ürünlere tıklanınca firmalar sayfasında arama yapmasını sağla */}
+                                                                            {altKat.urunler.map((urun, urunIdx) => (
+                                                                                <Link key={urunIdx} to={`/firmalar?search=${encodeURIComponent(urun)}`} style={{ padding: '4px 10px', background: '#eef2ff', color: '#4f46e5', borderRadius: '16px', fontSize: '0.8rem', fontWeight: '500', border: '1px solid #c7d2fe', textDecoration: 'none', display: 'inline-block', cursor: 'pointer', transition: '0.2s' }} onMouseEnter={(e) => e.target.style.background = '#dbeafe'} onMouseLeave={(e) => e.target.style.background = '#eef2ff'}>
+                                                                                    {urun}
+                                                                                </Link>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>Alt kategori bulunmuyor</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </section>
+
+                        {/* İHALE/TENDER BÖLÜMÜ */}
+                        {/* Enes Doğanay | 4 Nisan 2026: Firmaya ait ihaleler/tenderler göstermek için yeni bölüm */}
+                        <section id="tenders" style={{ marginTop: '2.5rem' }}>
+                            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>İhalerimiz</h2>
+                            <div className="tenders-list">
+                                {[
+                                    { id: 1, baslik: 'Hasada Terazi Alımı İhalesi', tarih: 'Sin', durum: 'Canlı', aciklama: 'Fabrika kapasitesi için hassas ölçüm cihazları alımı' },
+                                    { id: 2, baslik: 'Endüstriyel Tezgah Kiralanması', tarih: '27 May 2026', durum: 'Yaklaşan', aciklama: 'Üretim hattı genişletmesi için malzeme işleme tezgahı' },
+                                    { id: 3, baslik: 'Forklift Hizmetleri İhalesi', tarih: '5 May 2026', durum: 'Kapalı', aciklama: 'Depo yönetimi ve malzeme taşıyıcı hizmetleri' }
+                                ].map((tender) => (
+                                    <div key={tender.id} className="tender-item">
+                                        <div className="tender-header">
+                                            <div style={{ flex: 1 }}>
+                                                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', color: '#0f172a', fontWeight: '600' }}>
+                                                    {tender.baslik}
+                                                </h3>
+                                                <p style={{ margin: '0 0 0.75rem 0', color: '#64748b', fontSize: '0.9rem' }}>
+                                                    {tender.aciklama}
+                                                </p>
+                                            </div>
+                                            <div className={`tender-status tender-status-${tender.durum.toLowerCase()}`}>
+                                                {tender.durum}
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '0.85rem' }}>
+                                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>calendar_today</span>
+                                            {tender.tarih}
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </section>
