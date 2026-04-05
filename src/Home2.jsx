@@ -3,7 +3,8 @@ import './Home2.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase } from './supabaseClient';
-import { NavLink, useNavigate } from 'react-router-dom';
+/* Enes Doğanay | 6 Nisan 2026: Kullanılmayan NavLink import kaldırıldı */
+import { useNavigate } from 'react-router-dom';
 
 /**
  * SupplierConnect Component - Home Page / Landing Page
@@ -31,32 +32,26 @@ const SupplierConnect = () => {
     };
 
     // 🏢 Rastgele Firmaları Çekme İşlemi
+    /* Enes Doğanay | 5 Nisan 2026: best=true olan firmalardan rastgele 4 tanesi çekiliyor */
     useEffect(() => {
         const fetchRandomSuppliers = async () => {
-            // 1️⃣ toplam firma sayısı
-            const { count, error: countError } = await supabase
+            const { data: bestFirmalar, error } = await supabase
                 .from('firmalar')
-                .select('*', { count: 'exact', head: true });
+                .select('firmaID, firma_adi, il_ilce, ana_sektor')
+                .eq('best', true);
 
-            if (countError || !count || count < 4) {
-                console.error('Firma sayısı alınamadı');
+            if (error || !bestFirmalar || bestFirmalar.length < 4) {
+                console.error('Best firmalar alınamadı');
                 return;
             }
 
-            // 2️⃣ rastgele offset
-            const randomOffset = Math.floor(Math.random() * (count - 4));
-
-            // 3️⃣ rastgele 4 firma çek
-            const { data, error } = await supabase
-                .from('firmalar')
-                .select('*')
-                .range(randomOffset, randomOffset + 3);
-
-            if (error) {
-                console.error(error);
-            } else {
-                setTopSuppliers(data);
+            // Fisher-Yates shuffle ile rastgele 4 firma seç
+            const shuffled = [...bestFirmalar];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
+            setTopSuppliers(shuffled.slice(0, 4));
         };
 
         fetchRandomSuppliers();
@@ -73,7 +68,8 @@ const SupplierConnect = () => {
                         <div className="sc-hero-box">
                             <div style={{ zIndex: 10 }}>
                                 <h1 className="sc-hero-title">Doğru Tedarikçiyi Hemen Bulun</h1>
-                                <p className="sc-hero-subtitle">Dünya çapındaki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.</p>
+                                {/* Enes Doğanay | 6 Nisan 2026: Türkiye odaklı alt başlık */}
+                                <p className="sc-hero-subtitle">Türkiye genelindeki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.</p>
                             </div>
 
                             <div className="sc-search-container">
@@ -105,6 +101,8 @@ const SupplierConnect = () => {
                 </section>
 
                 {/* Stats Section */}
+                {/* Enes Doğanay | 5 Nisan 2026: "Hizmet Verilen Ülke" ve "Kullanıcı Memnuniyeti" kaldırıldı.
+                 * Türkiye odaklı platform olduğu için "81 İl" ve puan sistemi olmadığı için "50+ Sektör Kategorisi" eklendi. */}
                 <section className="sc-stats">
                     <div className="container">
                         <div className="sc-stats-grid">
@@ -117,12 +115,12 @@ const SupplierConnect = () => {
                                 <span className="sc-stat-label">Listelenen Ürün</span>
                             </div>
                             <div className="sc-stat-item">
-                                <span className="sc-stat-num">180+</span>
-                                <span className="sc-stat-label">Hizmet Verilen Ülke</span>
+                                <span className="sc-stat-num">81 İl</span>
+                                <span className="sc-stat-label">Türkiye Genelinde Hizmet</span>
                             </div>
                             <div className="sc-stat-item">
-                                <span className="sc-stat-num">4.8/5</span>
-                                <span className="sc-stat-label">Kullanıcı Memnuniyeti</span>
+                                <span className="sc-stat-num">50+</span>
+                                <span className="sc-stat-label">Sektör Kategorisi</span>
                             </div>
                         </div>
                     </div>
@@ -197,12 +195,13 @@ const SupplierConnect = () => {
                 {/* Top Suppliers Section */}
                 <section className="sc-suppliers">
                     <div className="container">
-                        <h2 className="sc-section-title" style={{ marginBottom: '32px' }}>En İyi Tedarikçiler</h2>
+                        <h2 className="sc-section-title" style={{ marginBottom: '32px' }}>Örnek Tedarikçiler</h2>
                         <div className="sc-sup-grid">
 
                             {/* Tedarikçiler */}
-                            {topSuppliers.map((firma) => (
-                                <div className="sc-sup-card" key={firma.firmaID || Math.random()}>
+                            {/* Enes Doğanay | 5 Nisan 2026: key olarak index kullanıldı, rastgele çekimde tekrar eden firmaID çakışmasını önler */}
+                            {topSuppliers.map((firma, index) => (
+                                <div className="sc-sup-card" key={`supplier-${index}`}>
                                     <div className="sc-sup-header">
                                         <div className="sc-sup-avatar" style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>{firma.firma_adi?.charAt(0)}</div>
                                         <div className="sc-sup-verified"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span> Onaylı</div>
@@ -211,12 +210,7 @@ const SupplierConnect = () => {
                                         <h3 className="sc-sup-name">{firma.firma_adi}</h3>
                                         <div className="sc-sup-location"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>location_on</span> {firma.il_ilce}</div>
                                     </div>
-                                    <div className="sc-sup-rating">
-                                        <div className="sc-stars">
-                                            <span className="material-symbols-outlined icon-filled">star</span><span className="material-symbols-outlined icon-filled">star</span><span className="material-symbols-outlined icon-filled">star</span><span className="material-symbols-outlined icon-filled">star</span><span className="material-symbols-outlined icon-filled">star_half</span>
-                                        </div>
-                                        <span className="sc-rating-num">4.8</span> <span className="sc-rating-count">(210)</span>
-                                    </div>
+                                    {/* Enes Doğanay | 5 Nisan 2026: Yıldız/puan derecelendirme sistemi kaldırıldı */}
                                     <div className="sc-sup-tags">
                                         <span className="sc-tag">{firma.ana_sektor}</span>
                                     </div>
@@ -263,7 +257,8 @@ const SupplierConnect = () => {
                                     style={{ height: '60px', objectFit: 'contain' }}
                                 />
                             </div>
-                            <p>Küresel ticaret için lider B2B pazaryeri. Doğrulanmış tedarikçileri dünya genelindeki alıcılarla buluşturuyoruz.</p>
+                            {/* Enes Doğanay | 6 Nisan 2026: Türkiye odaklı footer açıklaması */}
+                            <p>Türkiye'nin lider B2B tedarikçi portalı. Doğrulanmış tedarikçileri Türkiye genelindeki alıcılarla buluşturuyoruz.</p>
                             <div className="sc-socials">
                                 <a href="#web"><span className="material-symbols-outlined">public</span></a>
                                 <a href="#mail"><span className="material-symbols-outlined">mail</span></a>
@@ -292,9 +287,10 @@ const SupplierConnect = () => {
                         <div>
                             <h4>Şirket</h4>
                             <ul>
-                                <li><a href="#link">Hakkımızda</a></li>
+                                {/* Enes Doğanay | 6 Nisan 2026: Footer linkleri gerçek sayfalara yönlendiriliyor */}
+                                <li><a href="/hakkimizda">Hakkımızda</a></li>
                                 <li><a href="#link">Kariyer</a></li>
-                                <li><a href="#link">Destek ile İletişime Geç</a></li>
+                                <li><a href="/iletisim">Destek ile İletişime Geç</a></li>
                             </ul>
                         </div>
                     </div>

@@ -25,12 +25,20 @@ import { supabase } from './supabaseClient';
  * - setSearch: optional - search input setter (only shown if provided)
  * - showSearchBar: boolean - whether to show search bar (default: false)
  * - navItems: array - custom navigation items (default: standard nav items)
+ * - suggestions: array - autocomplete suggestion list [{id, name, location}] (default: [])
+ * - onSuggestionClick: function - callback when a suggestion is clicked
+ * - onSearchSubmit: function - callback when Enter is pressed in search bar
+ * - noResults: boolean - true when search has no results, shows 'Sonuç bulunamadı' message
  */
 const SharedHeader = ({
     search,
     setSearch,
     showSearchBar = false,
-    navItems = null
+    navItems = null,
+    suggestions = [],
+    onSuggestionClick = null,
+    onSearchSubmit = null,
+    noResults = false
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -38,12 +46,18 @@ const SharedHeader = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
     const dropdownRef = useRef(null);
+    // Enes Doğanay | 5 Nisan 2026: Search bar dışına tıklayınca öneri dropdown'ını kapatmak için ref
+    const searchBarRef = useRef(null);
 
     // Handle dropdown close on click outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsDropdownOpen(false);
+            }
+            // Enes Doğanay | 5 Nisan 2026: Search öneri dropdown'ı dış tıklamada kapat
+            if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
+                if (onSuggestionClick) onSuggestionClick(null);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -93,21 +107,18 @@ const SharedHeader = ({
         <header className="shared-header">
             <div className="shared-header-inner">
                 {/* Logo */}
-                <div
-                    className="shared-logo-area"
-                    onClick={() => navigate('/')}
-                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                >
+                <Link to="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
                     <img
+                        className="shared-logo-image"
                         src="/tedport-logo.jpg"
                         alt="Tedport Logo"
-                        style={{ height: '60px', objectFit: 'contain' }}
                     />
-                </div>
+                </Link>
 
                 {/* Search Bar (optional) */}
+                {/* Enes Doğanay | 5 Nisan 2026: Autocomplete öneri dropdown desteği eklendi */}
                 {showSearchBar && search !== undefined && setSearch && (
-                    <div className="shared-search-bar">
+                    <div className="shared-search-bar" ref={searchBarRef}>
                         <div className="shared-search-icon">
                             <span className="material-symbols-outlined">search</span>
                         </div>
@@ -116,7 +127,54 @@ const SharedHeader = ({
                             placeholder="Firma, ürün ya da kategori ara..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && onSearchSubmit) {
+                                    onSearchSubmit(search);
+                                }
+                            }}
                         />
+
+                        {/* Enes Doğanay | 5 Nisan 2026: Arama kutusunu tek tıkla temizleyen X butonu */}
+                        {search && search.length > 0 && (
+                            <button
+                                className="shared-search-clear"
+                                onClick={() => setSearch('')}
+                                type="button"
+                            >
+                                <span className="material-symbols-outlined shared-search-clear-icon">close</span>
+                            </button>
+                        )}
+
+                        {/* Enes Doğanay | 5 Nisan 2026: Autocomplete öneri listesi veya sonuç bulunamadı mesajı */}
+                        {suggestions.length > 0 && (
+                            <div className="shared-search-suggestions">
+                                {suggestions.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="shared-suggestion-item"
+                                        onClick={() => onSuggestionClick && onSuggestionClick(item)}
+                                    >
+                                        <div className="shared-suggestion-avatar">
+                                            {item.name?.charAt(0)}
+                                        </div>
+                                        <div className="shared-suggestion-info">
+                                            <span className="shared-suggestion-name">{item.name}</span>
+                                            <span className="shared-suggestion-location">{item.location}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Enes Doğanay | 5 Nisan 2026: Sonuç bulunamadı mesajı */}
+                        {noResults && suggestions.length === 0 && (
+                            <div className="shared-search-suggestions">
+                                <div className="shared-suggestion-no-result">
+                                    <span className="material-symbols-outlined shared-suggestion-no-result-icon">search_off</span>
+                                    <span>Sonuç bulunamadı</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -135,11 +193,11 @@ const SharedHeader = ({
                 <div className="shared-nav">
                     <div className="shared-nav-links">
                         {items.map((item, idx) => (
-                            <a key={idx} href={item.href}>
+                            <Link key={idx} to={item.href}>
                                 {item.label}
-                            </a>
+                            </Link>
                         ))}
-                        {!userProfile && <a href="/login">Giriş Yap</a>}
+                        {!userProfile && <Link to="/login">Giriş Yap</Link>}
                     </div>
 
                     {/* User Actions */}
@@ -148,134 +206,75 @@ const SharedHeader = ({
                             <div
                                 className="shared-user-dropdown"
                                 ref={dropdownRef}
-                                style={{ position: 'relative' }}
                             >
                                 <button
                                     className="shared-user-btn"
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                    }}
+                                    type="button"
                                 >
                                     {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
-                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
+                                    <span className="material-symbols-outlined shared-user-btn-icon">
                                         {isDropdownOpen ? 'expand_less' : 'expand_more'}
                                     </span>
                                 </button>
 
                                 {isDropdownOpen && (
-                                    <div
-                                        style={{
-                                            position: 'absolute',
-                                            top: '100%',
-                                            right: '0',
-                                            marginTop: '8px',
-                                            width: '200px',
-                                            backgroundColor: '#fff',
-                                            border: '1px solid #e2e8f0',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-                                            zIndex: 100,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            overflow: 'hidden'
-                                        }}
-                                    >
-                                        <div
+                                    <div className="shared-user-menu">
+                                        <button
+                                            type="button"
+                                            className="shared-user-menu-item"
                                             onClick={() => {
                                                 setIsDropdownOpen(false);
                                                 navigate('/profile');
                                             }}
-                                            style={{
-                                                padding: '12px 16px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '10px',
-                                                cursor: 'pointer',
-                                                color: '#334155',
-                                                borderBottom: '1px solid #f1f5f9',
-                                                transition: 'background 0.2s'
-                                            }}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = '#f8fafc')}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
                                         >
-                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>
+                                            <span className="material-symbols-outlined shared-user-menu-icon">
                                                 person
                                             </span>
-                                            <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>
+                                            <span className="shared-user-menu-label">
                                                 Profil
                                             </span>
-                                        </div>
+                                        </button>
 
-                                        <div
+                                        <button
+                                            type="button"
+                                            className="shared-user-menu-item"
                                             onClick={() => {
                                                 setIsDropdownOpen(false);
                                                 navigate('/profile?tab=favorites');
                                             }}
-                                            style={{
-                                                padding: '12px 16px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '10px',
-                                                cursor: 'pointer',
-                                                color: '#334155',
-                                                borderBottom: '1px solid #f1f5f9',
-                                                transition: 'background 0.2s'
-                                            }}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = '#f8fafc')}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
                                         >
-                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>
+                                            <span className="material-symbols-outlined shared-user-menu-icon">
                                                 favorite
                                             </span>
-                                            <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>
+                                            <span className="shared-user-menu-label">
                                                 Favoriler
                                             </span>
-                                        </div>
+                                        </button>
 
-                                        <div
+                                        <button
+                                            type="button"
+                                            className="shared-user-menu-item shared-user-menu-item-danger"
                                             onClick={() => {
                                                 setIsDropdownOpen(false);
                                                 handleLogout();
                                             }}
-                                            style={{
-                                                padding: '12px 16px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '10px',
-                                                cursor: 'pointer',
-                                                color: '#ef4444',
-                                                transition: 'background 0.2s'
-                                            }}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = '#fef2f2')}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
                                         >
-                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>
+                                            <span className="material-symbols-outlined shared-user-menu-icon">
                                                 logout
                                             </span>
-                                            <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>
+                                            <span className="shared-user-menu-label">
                                                 Çıkış Yap
                                             </span>
-                                        </div>
+                                        </button>
                                     </div>
                                 )}
                             </div>
                         ) : (
                             <button
+                                className="shared-register-btn"
                                 onClick={() => navigate('/register')}
-                                style={{
-                                    background: 'white',
-                                    color: '#1d4ed8',
-                                    padding: '8px 16px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #bfdbfe',
-                                    cursor: 'pointer',
-                                    fontWeight: '500',
-                                    fontSize: '14px',
-                                    transition: 'all 0.2s ease'
-                                }}
+                                type="button"
                             >
                                 Kayıt Ol
                             </button>
@@ -288,36 +287,27 @@ const SharedHeader = ({
             {isMobileMenuOpen && (
                 <div className="shared-mobile-menu">
                     {items.map((item, idx) => (
-                        <a key={idx} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link key={idx} to={item.href} onClick={() => setIsMobileMenuOpen(false)}>
                             {item.label}
-                        </a>
+                        </Link>
                     ))}
-                    {!userProfile && <a href="/login" onClick={() => setIsMobileMenuOpen(false)}>Giriş Yap</a>}
-                    {!userProfile && <a href="/register" onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#137fec', fontWeight: '700' }}>Kayıt Ol</a>}
+                    {!userProfile && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Giriş Yap</Link>}
+                    {!userProfile && <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="shared-mobile-register">Kayıt Ol</Link>}
                     {userProfile && (
                         <>
                             {!(location.pathname === '/profile' && !location.search) && (
-                                <a href="/profile" onClick={() => setIsMobileMenuOpen(false)}>Profil</a>
+                                <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>Profil</Link>
                             )}
                             {!(location.pathname === '/profile' && location.search === '?tab=favorites') && (
-                                <a href="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>Favoriler</a>
+                                <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>Favoriler</Link>
                             )}
                             <button
+                                className="shared-mobile-logout"
                                 onClick={() => {
                                     setIsMobileMenuOpen(false);
                                     handleLogout();
                                 }}
-                                style={{
-                                    padding: '12px 0',
-                                    color: '#ef4444',
-                                    fontWeight: '500',
-                                    fontSize: '14px',
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    textAlign: 'left',
-                                    width: '100%'
-                                }}
+                                type="button"
                             >
                                 Çıkış Yap
                             </button>

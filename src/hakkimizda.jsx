@@ -15,7 +15,8 @@
  * - Mobile-first design approach
  */
 
-import React, { useState, useEffect } from 'react';
+// Enes Doğanay | 6 Nisan 2026: useState/useEffect kullanılmıyor, kaldırıldı
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './hakkimizda.css';
 import SharedHeader from './SharedHeader';
@@ -220,14 +221,10 @@ const About = () => {
                         <div className="about-footer-grid">
                             <div className="about-footer-brand">
                                 {/* FOOTER LOGO BURAYA EKLENDİ */}
-                                <div className="about-logo" style={{ display: 'flex', alignItems: 'center' }}>
-                                    <img
-                                        src="/tedport-logo.jpg"
-                                        alt="Tedport Logo"
-                                        style={{ height: '50px', objectFit: 'contain' }}
-                                    />
+                                <div className="about-footer-logo">
+                                    <img src="/tedport-logo.jpg" alt="Tedport Logo" />
                                 </div>
-                                <p style={{ marginTop: '12px' }}>Türkiye'nin en güvenilir B2B tedarik platformu. İşinizi büyütmek için doğru adres.</p>
+                                <p>Türkiye'nin en güvenilir B2B tedarik platformu. İşinizi büyütmek için doğru adres.</p>
                                 <div className="about-socials">
                                     <a href="#"></a><a href="#"></a><a href="#"></a>
                                 </div>

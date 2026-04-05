@@ -23,20 +23,8 @@
 /* 
   ===== FİRMA DETAY SAYFASI CSS =====
   Güncelleme: Enes Doğanay | Tarih: 4 Nisan 2026
+  Güncelleme: Enes Doğanay | 6 Nisan 2026: :root değişkenleri index.css'e taşındı
 */
-:root {
-  --primary: #137fec;
-  --primary-hover: #116ed1;
-  --bg-light: #f6f7f8;
-  --bg-white: #ffffff;
-  --text-dark: #101922;
-  --text-gray: #64748b;
-  --text-light: #94a3b8;
-  --border: #e2e8f0;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-}
 
 /* Layout Reset */
 html,
@@ -60,171 +48,7 @@ body {
   flex-direction: column;
 }
 
-/* Header Tasarımı */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--bg-white);
-  border-bottom: 1px solid var(--border);
-  padding: 0.75rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: var(--shadow);
-}
-
-@media (min-width: 540px) {
-  .header {
-    padding: 0.75rem 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .header {
-    padding: 0.75rem 2.5rem;
-  }
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.header-right {
-  display: none;
-  align-items: center;
-  gap: 1rem;
-}
-
-@media (min-width: 1024px) {
-  .header-right {
-    display: flex;
-  }
-}
-
-@media (min-width: 768px) {
-
-  .header-left,
-  .header-right {
-    gap: 2rem;
-  }
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.header-nav {
-  display: none;
-  gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .header-nav {
-    gap: 2rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .header-nav {
-    display: flex;
-  }
-}
-
-.header-nav a {
-  text-decoration: none;
-  color: var(--text-dark);
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.header-nav a:hover {
-  color: var(--primary);
-}
-
-/* Mobile Hamburger Menu Button
- * Responsive: Visible on mobile/tablet (< 1024px), hidden on desktop
- * Three-line hamburger icon created with flexbox and span elements
- * Smooth 0.3s transitions for animation effects
- * Author: Enes Doğanay | Date: April 4, 2026
- */
-.sc-hamburger {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 8px;
-}
-
-.sc-hamburger span {
-  width: 24px;
-  height: 2px;
-  background-color: var(--text-dark);
-  transition: 0.3s;
-  display: block;
-}
-
-@media (min-width: 1024px) {
-  .sc-hamburger {
-    display: none;
-  }
-}
-
-.user-actions {
-  display: none;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-@media (min-width: 1024px) {
-  .user-actions {
-    display: flex;
-  }
-}
-
-.user-actions button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: var(--radius-lg);
-}
-
-.user-actions button:hover {
-  background: #f0f2f4;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-weight: 700;
-  font-size: 1.125rem;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  background: var(--bg-light);
-  border-radius: var(--radius-lg);
-  padding: 0 1rem;
-  height: 40px;
-  width: 250px;
-}
-
-.search-box input {
-  border: none;
-  background: transparent;
-  outline: none;
-  padding-left: 0.5rem;
-  width: 100%;
-}
+/* Enes Doğanay | 6 Nisan 2026: Eski header CSS'leri silindi (~120 satır) — SharedHeader kendi stillerini yönetiyor */
 
 /* Hero / Üst Bilgi Alanı */
 .profile-hero {
@@ -649,19 +473,20 @@ body {
   white-space: nowrap;
 }
 
-.tender-status-canlı {
+/* Enes Doğanay | 6 Nisan 2026: Türkçe karakterler ASCII'ye dönüştürüldü (canlı→canli, yaklaşan→yaklasan, kapalı→kapali) */
+.tender-status-canli {
   background: #dcfce7;
   color: #166534;
   border: 1px solid #bbf7d0;
 }
 
-.tender-status-yaklaşan {
+.tender-status-yaklasan {
   background: #fef3c7;
   color: #92400e;
   border: 1px solid #fcd34d;
 }
 
-.tender-status-kapalı {
+.tender-status-kapali {
   background: #fee2e2;
   color: #991b1b;
   border: 1px solid #fca5a5;
@@ -672,10 +497,6 @@ body {
 @media (max-width: 768px) {
   .container {
     padding: 0 1.25rem;
-  }
-
-  .header {
-    padding: 0.75rem 1.25rem;
   }
 
   .hero-flex {
@@ -699,4 +520,424 @@ body {
   .tender-item {
     padding: 1rem;
   }
+}
+
+/* ========== Enes Doğanay | 6 Nisan 2026: Inline style'lar CSS class'larına taşındı ========== */
+
+/* Page Status (Loading / Error) */
+.page-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 20px;
+  font-size: 1.1rem;
+  color: var(--text-gray);
+}
+
+.page-status-error {
+  color: #ef4444;
+}
+
+.page-status-icon {
+  font-size: 28px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Hero Section */
+.supp-avatar2 {
+  background: #e0e7ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+  height: 100%;
+  padding: 10px;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xl);
+  min-width: 64px;
+  min-height: 64px;
+}
+
+.hero-meta {
+  color: var(--text-gray);
+  margin: 0.5rem 0;
+}
+
+/* Section Headings */
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-heading-icon {
+  color: var(--primary);
+}
+
+.card-about {
+  margin-bottom: 2rem;
+}
+
+.about-text {
+  line-height: 1.7;
+  color: #475569;
+}
+
+/* Accordion Extras */
+.accordion-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.accordion-subcategories {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subcategory-title {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.product-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: 1rem;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Inline onMouseEnter/Leave yerine CSS :hover kullanıldı */
+.product-tag {
+  padding: 4px 10px;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #c7d2fe;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.product-tag:hover {
+  background: #dbeafe;
+}
+
+.no-subcategory-text {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Tenders Section */
+.tenders-section {
+  margin-top: 2.5rem;
+}
+
+.tender-info {
+  flex: 1;
+}
+
+.tender-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.tender-desc {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.tender-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.tender-date-icon {
+  font-size: 18px;
+}
+
+/* Sidebar */
+.sidebar-heading {
+  margin-bottom: 1rem;
+}
+
+.list-selector {
+  margin-bottom: 10px;
+}
+
+.list-label {
+  font-size: 12px;
+  color: var(--text-gray);
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.list-select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+}
+
+.btn-favorite {
+  width: 100%;
+  margin-bottom: 10px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-favorite:hover {
+  background: #f1f5f9;
+}
+
+.btn-favorite--active {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+.btn-favorite--active:hover {
+  background: #fecaca;
+}
+
+.btn-full {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.contact-link-wrap {
+  display: block;
+  text-decoration: none;
+  width: 100%;
+}
+
+.btn-contact {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sidebar-divider {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-subtitle {
+  font-size: 0.875rem;
+  margin-bottom: 10px;
+}
+
+.map-link {
+  text-decoration: none;
+}
+
+.contact-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.contact-info-link {
+  text-decoration: none;
+  line-height: 1.7;
+}
+
+.contact-info-link:hover {
+  color: var(--primary);
+}
+
+.contact-info-icon {
+  margin-top: 3px;
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+/* Notes Section */
+.notes-card {
+  margin-top: 20px;
+}
+
+.notes-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.notes-header-icon {
+  color: var(--primary);
+  font-size: 24px;
+}
+
+.notes-title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  resize: vertical;
+  font-size: 14px;
+  outline: none;
+  color: #334155;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.note-textarea:focus {
+  border-color: var(--primary);
+}
+
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 15px;
+  margin-top: 12px;
+}
+
+.note-clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-gray);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.note-clear-btn:hover {
+  color: var(--text-dark);
+}
+
+.note-save-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.note-save-btn:hover {
+  background: var(--primary-hover);
+}
+
+.note-save-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.saved-note {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 20px;
+  border: 1px solid #f1f5f9;
+}
+
+.saved-note-text {
+  margin: 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.saved-note-date {
+  margin: 8px 0 0 0;
+  color: var(--text-light);
+  font-size: 12px;
+}
+
+.notes-login-prompt {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.notes-lock-icon {
+  color: #cbd5e1;
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.notes-login-text {
+  font-size: 13px;
+  color: var(--text-gray);
+  margin-bottom: 15px;
+}
+
+.notes-login-btn {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.notes-login-btn:hover {
+  background: var(--primary);
+  color: #fff;
 }

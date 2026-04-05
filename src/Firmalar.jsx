@@ -14,7 +14,7 @@
  * - Adaptive company cards layout
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Firmalar.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
@@ -44,7 +44,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
  * - Smart state reset on filter collapse (expanded count, search input)
  * - Responsive filter UI with inline search functionality
  */
-const Sidebar = ({ activeFilters, onApplyFilters }) => {
+const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
   const [cities, setCities] = useState([]);
   const [categories, setCategories] = useState([]);
 
@@ -103,6 +103,8 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
     );
   };
 
+  /* Enes Doğanay | 5 Nisan 2026: Sadece category_name sütunu çekilip client-side unique yapılıyor.
+   * İleride Supabase RPC veya view ile optimize edilebilir. */
   const fetchFilters = async () => {
     setLoading(true);
 
@@ -128,34 +130,22 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
     setLoading(false);
   };
 
-  // Filtreler seçildiği an anında güncelleme yapan ana fonksiyon
-  const updateFilter = (type, value, isAll = false, list = []) => {
+  /* Enes Doğanay | 5 Nisan 2026: Dead code (isAll) kaldırıldı, updateFilter sadeleştirildi */
+  const updateFilter = (type, value) => {
     let newCities = selectedCities;
     let newCategories = selectedCategories;
     let newSectors = selectedSectors;
 
     if (type === 'cities') {
-      if (isAll) {
-        newCities = selectedCities.length === list.length ? [] : list.map(c => c.sehir);
-      } else {
-        newCities = selectedCities.includes(value) ? selectedCities.filter(c => c !== value) : [...selectedCities, value];
-      }
+      newCities = selectedCities.includes(value) ? selectedCities.filter(c => c !== value) : [...selectedCities, value];
       setSelectedCities(newCities);
     }
     else if (type === 'sectors') {
-      if (isAll) {
-        newSectors = selectedSectors.length === list.length ? [] : list;
-      } else {
-        newSectors = selectedSectors.includes(value) ? selectedSectors.filter(s => s !== value) : [...selectedSectors, value];
-      }
+      newSectors = selectedSectors.includes(value) ? selectedSectors.filter(s => s !== value) : [...selectedSectors, value];
       setSelectedSectors(newSectors);
     }
     else if (type === 'categories') {
-      if (isAll) {
-        newCategories = selectedCategories.length === list.length ? [] : list;
-      } else {
-        newCategories = selectedCategories.includes(value) ? selectedCategories.filter(c => c !== value) : [...selectedCategories, value];
-      }
+      newCategories = selectedCategories.includes(value) ? selectedCategories.filter(c => c !== value) : [...selectedCategories, value];
       setSelectedCategories(newCategories);
     }
 
@@ -168,7 +158,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'sidebar-mobile-open' : ''}`}>
       <div className="sidebar-header">
         <h3>Filtreler</h3>
         <button
@@ -210,15 +200,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                   placeholder="Şehir ara..."
                   value={citiesSearch}
                   onChange={(e) => setCitiesSearch(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    marginBottom: '12px',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    boxSizing: 'border-box'
-                  }}
+                  className="filter-search-input"
                 />
 
                 {/* Filtered Cities List */}
@@ -240,18 +222,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                       ...expandedCount,
                       cities: expandedCount.cities + 5
                     })}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      marginTop: '8px',
-                      background: '#f1f5f9',
-                      border: '1px solid #cbd5e1',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      color: '#475569'
-                    }}
+                    className="filter-show-more-btn"
                   >
                     Daha fazla göster
                   </button>
@@ -281,15 +252,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
               placeholder="Sektör ara..."
               value={sectorsSearch}
               onChange={(e) => setSectorsSearch(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px',
-                marginBottom: '12px',
-                border: '1px solid #e2e8f0',
-                borderRadius: '6px',
-                fontSize: '13px',
-                boxSizing: 'border-box'
-              }}
+              className="filter-search-input"
             />
 
             {/* Filtered Sectors List */}
@@ -311,18 +274,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                   ...expandedCount,
                   sectors: expandedCount.sectors + 5
                 })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  marginTop: '8px',
-                  background: '#f1f5f9',
-                  border: '1px solid #cbd5e1',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  color: '#475569'
-                }}
+                className="filter-show-more-btn"
               >
                 Daha fazla göster
               </button>
@@ -355,15 +307,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                   placeholder="Kategori ara..."
                   value={categoriesSearch}
                   onChange={(e) => setCategoriesSearch(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    marginBottom: '12px',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    boxSizing: 'border-box'
-                  }}
+                  className="filter-search-input"
                 />
 
                 {/* Filtered Categories List */}
@@ -385,18 +329,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                       ...expandedCount,
                       categories: expandedCount.categories + 5
                     })}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      marginTop: '8px',
-                      background: '#f1f5f9',
-                      border: '1px solid #cbd5e1',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      color: '#475569'
-                    }}
+                    className="filter-show-more-btn"
                   >
                     Daha fazla göster
                   </button>
@@ -426,9 +359,11 @@ const SupplierCard = ({ data, onSearchTag }) => {
       </div>
 
       <div className="card-content">
-        <h3 className="supplier-name">
+        {/* Enes Doğanay | 14 Temmuz 2025: firma adına tıklayınca profil sayfasına yönlendirir */}
+        <h3 className="supplier-name" onClick={() => navigate(`/firmadetay/${data.id}`)} style={{ cursor: 'pointer' }}>
           {data.name}
-          {data.isVerified && (
+          {/* Enes Doğanay | 6 Nisan 2026: best=true firmalara onaylı rozeti gösterilir */}
+          {data.isBest && (
             <span className="material-symbols-outlined verified-icon">
               verified
             </span>
@@ -445,7 +380,7 @@ const SupplierCard = ({ data, onSearchTag }) => {
               style={{ cursor: 'pointer' }}
               onClick={() => onSearchTag(tag)}
             >
-              #{tag}
+              {tag}
             </span>
           ))}
         </div>
@@ -502,12 +437,39 @@ function App() {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
+  /* Enes Doğanay | 5 Nisan 2026: Mobilde filtre paneli aç/kapat state */
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
   const [search, setSearch] = useState(urlSearchTerm);
+  // Enes Doğanay | 5 Nisan 2026: Debounce için ayrı debouncedSearch state'i eklendi
+  const [debouncedSearch, setDebouncedSearch] = useState(urlSearchTerm);
   const [filters, setFilters] = useState({ cities: [], categories: [], sectors: [] });
+
+  // Enes Doğanay | 5 Nisan 2026: ilike özel karakterlerini escape eden yardımcı fonksiyon
+  // _ (tek karakter wildcard) ve \\ (escape karakteri) de temizlenir
+  const sanitizeSearch = (input) => {
+    return input.replace(/[\\"%#_]/g, '').trim();
+  };
+
+  // Enes Doğanay | 5 Nisan 2026: URL'deki search parametresi değiştiğinde state'i senkronize et
+  useEffect(() => {
+    const newSearch = searchParams.get('search') || '';
+    setSearch(newSearch);
+    setDebouncedSearch(newSearch);
+  }, [searchParams]);
+
+  // Enes Doğanay | 5 Nisan 2026: 300ms debounce - hızlı yazımda gereksiz API çağrılarını önler
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     fetchSuppliers();
-  }, [page, search, filters]);
+  }, [page, debouncedSearch, filters]);
+
 
   const fetchSuppliers = async () => {
     setLoading(true);
@@ -515,36 +477,40 @@ function App() {
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
 
+    /* Enes Doğanay | 6 Nisan 2026: Sadece kullanılan sütunlar çekiliyor (performans) */
     let query = supabase
       .from('firmalar')
-      .select('*', { count: 'exact' });
+      .select('firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best', { count: 'exact' });
 
-    // --- ARAMA ---
-    if (search?.trim()) {
-      const safeSearch = search.replace(/["#%]/g, '').trim();
-      query = query.or(
-        `firma_adi.ilike."%${safeSearch}%",description.ilike."%${safeSearch}%",ana_sektor.ilike."%${safeSearch}%",urun_kategorileri.ilike."%${safeSearch}%"`
-      );
+    // Enes Doğanay | 5 Nisan 2026: Minimum 2 karakter kontrolü - çok geniş sorguları engeller
+    const trimmedSearch = debouncedSearch?.trim() || '';
+    if (trimmedSearch.length >= 2) {
+      const safeSearch = sanitizeSearch(trimmedSearch);
+      if (safeSearch.length >= 2) {
+        query = query.or(
+          `firma_adi.ilike."%${safeSearch}%",description.ilike."%${safeSearch}%",ana_sektor.ilike."%${safeSearch}%",urun_kategorileri.ilike."%${safeSearch}%"`
+        );
+      }
     }
 
     // --- FİLTRELER (LIKE KULLANILARAK) ---
     if (filters.cities && filters.cities.length > 0) {
       const cityQuery = filters.cities
-        .map(city => `il_ilce.ilike."%${city.replace(/["%]/g, '')}%"`)
+        .map(city => `il_ilce.ilike."%${sanitizeSearch(city)}%"`)
         .join(',');
       query = query.or(cityQuery);
     }
 
     if (filters.sectors && filters.sectors.length > 0) {
       const sectorQuery = filters.sectors
-        .map(sector => `ana_sektor.ilike."%${sector.replace(/["%]/g, '')}%"`)
+        .map(sector => `ana_sektor.ilike."%${sanitizeSearch(sector)}%"`)
         .join(',');
       query = query.or(sectorQuery);
     }
 
     if (filters.categories && filters.categories.length > 0) {
       const categoryQuery = filters.categories
-        .map(cat => `category_name.ilike."%${cat.replace(/["%]/g, '')}%"`)
+        .map(cat => `category_name.ilike."%${sanitizeSearch(cat)}%"`)
         .join(',');
       query = query.or(categoryQuery);
     }
@@ -574,17 +540,36 @@ function App() {
     }
 
     if (!error && data) {
-      setSuppliers(
-        data.map(item => ({
-          id: item.firmaID,
-          name: item.firma_adi,
-          isVerified: item.is_verified,
-          location: item.il_ilce,
-          tags: (degerleriDiziyeCevir(item.urun_kategorileri) || []),
-          description: item.description,
-          images: item.logo_url
-        }))
-      );
+      let mappedSuppliers = data.map(item => ({
+        id: item.firmaID,
+        name: item.firma_adi,
+        /* Enes Doğanay | 6 Nisan 2026: is_verified tabloda yok, best alanı kullanılıyor */
+        isBest: item.best,
+        location: item.il_ilce,
+        tags: (degerleriDiziyeCevir(item.urun_kategorileri) || []),
+        description: item.description,
+        images: item.logo_url
+      }));
+
+      /* Enes Doğanay | 6 Nisan 2026: Sıralama önceliği: 1) best=true her zaman önce 2) Arama varsa alaka puanı
+       * Aynı best değerindeki firmalar arasında relevance skoru geçerli.
+       * best=true + yüksek relevance > best=true + düşük relevance > best=false + yüksek relevance */
+      if (trimmedSearch.length >= 2) {
+        const lowerSearch = trimmedSearch.toLowerCase();
+        mappedSuppliers.sort((a, b) => {
+          const bestA = a.isBest ? 1 : 0;
+          const bestB = b.isBest ? 1 : 0;
+          if (bestB !== bestA) return bestB - bestA;
+
+          const aName = (a.name || '').toLowerCase();
+          const bName = (b.name || '').toLowerCase();
+          const scoreA = aName === lowerSearch ? 3 : aName.startsWith(lowerSearch) ? 2 : aName.includes(lowerSearch) ? 1 : 0;
+          const scoreB = bName === lowerSearch ? 3 : bName.startsWith(lowerSearch) ? 2 : bName.includes(lowerSearch) ? 1 : 0;
+          return scoreB - scoreA;
+        });
+      }
+
+      setSuppliers(mappedSuppliers);
       setTotalCount(count);
     } else if (error) {
       setSuppliers([]);
@@ -596,7 +581,12 @@ function App() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, filters]);
+  }, [debouncedSearch, filters]);
+
+  /* Enes Doğanay | 5 Nisan 2026: Sayfa değiştiğinde scroll en üste gider */
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   const smartPages = getSmartPages(page, totalPages);
@@ -617,16 +607,8 @@ function App() {
   };
 
   return (
+    /* Enes Doğanay | 5 Nisan 2026: Font <link> etiketleri kaldırıldı, SharedHeader.css'de zaten yüklü */
     <div className="app">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet"
-      />
-
       <SharedHeader
         search={search}
         setSearch={setSearch}
@@ -647,10 +629,20 @@ function App() {
           </div>
         </div>
 
+        {/* Enes Doğanay | 5 Nisan 2026: Mobil filtre toggle butonu */}
+        <button
+          className="sidebar-mobile-toggle"
+          onClick={() => setFiltersOpen(prev => !prev)}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{filtersOpen ? 'close' : 'tune'}</span>
+          {filtersOpen ? 'Filtreleri Gizle' : 'Filtreleri Göster'}
+        </button>
+
         <div className="content-grid">
           <Sidebar
             activeFilters={filters}
             onApplyFilters={(newFilters) => setFilters(newFilters)}
+            isOpen={filtersOpen}
           />
 
           <div className="results-list">
@@ -660,21 +652,11 @@ function App() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px', alignItems: 'center' }}>
                 <span style={{ fontSize: '14px', color: '#64748b', marginRight: '4px' }}>Uygulanan Filtreler:</span>
 
+                {/* Enes Doğanay | 14 Temmuz 2025: filtre etiketleri türe göre renklenir — konum=mavi, sektör=yeşil, kategori=turuncu */}
                 {activeTags.map(tag => (
                   <span
                     key={`${tag.type}-${tag.value}`}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      backgroundColor: '#e0e7ff',
-                      color: '#4f46e5',
-                      padding: '4px 12px',
-                      borderRadius: '999px',
-                      fontSize: '13px',
-                      fontWeight: '500',
-                      border: '1px solid #c7d2fe'
-                    }}
+                    className={`filter-chip filter-chip--${tag.type}`}
                   >
                     {tag.value}
                     <span
@@ -698,10 +680,54 @@ function App() {
               </div>
             )}
 
-            {loading && <p>Yükleniyor...</p>}
+            {/* Enes Doğanay | 5 Nisan 2026:
+             * Filtre veya arama aktif olduğunda listelenen firma sayısını gösterir.
+             * Hiçbir filtre/arama yokken gizli kalır, sonuç varken "X firma listeleniyor" yazar.
+             */}
+            {!loading && (debouncedSearch?.trim().length >= 2 || activeTags.length > 0) && suppliers.length > 0 && (
+              <p style={{
+                fontSize: '14px',
+                color: '#64748b',
+                marginBottom: '12px',
+                fontWeight: '500'
+              }}>
+                <span style={{ color: '#137fec', fontWeight: '700' }}>{totalCount}</span> firma listeleniyor
+              </p>
+            )}
 
+            {/* Enes Doğanay | 5 Nisan 2026: Skeleton loading - yüklenirken kart iskeletleri gösterilir */}
+            {loading && (
+              <div className="skeleton-list">
+                {[1, 2, 3].map(i => (
+                  <div key={`skeleton-${i}`} className="skeleton-card">
+                    <div className="skeleton-avatar"></div>
+                    <div className="skeleton-content">
+                      <div className="skeleton-line skeleton-line-title"></div>
+                      <div className="skeleton-line skeleton-line-meta"></div>
+                      <div className="skeleton-line skeleton-line-desc"></div>
+                      <div className="skeleton-line skeleton-line-desc-short"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Enes Doğanay | 5 Nisan 2026: Boş sonuç mesajı ikon ve temizle butonu ile iyileştirildi */}
             {!loading && suppliers.length === 0 && (
-              <p>Arama veya filtre kriterlerinize uygun firma bulunamadı.</p>
+              <div className="empty-results">
+                <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#cbd5e1' }}>search_off</span>
+                <p>Arama veya filtre kriterlerinize uygun firma bulunamadı.</p>
+                <button
+                  className="btn-primary"
+                  style={{ marginTop: '8px', padding: '8px 20px' }}
+                  onClick={() => {
+                    setSearch('');
+                    setFilters({ cities: [], categories: [], sectors: [] });
+                  }}
+                >
+                  Filtreleri Temizle
+                </button>
+              </div>
             )}
 
             {!loading &&
@@ -723,12 +749,13 @@ function App() {
                   <span className="material-symbols-outlined">chevron_left</span>
                 </button>
 
+                {/* Enes Doğanay | 5 Nisan 2026: key çakışması düzeltildi, ellipsis ve sayfa numarası ayrı prefix ile */}
                 {smartPages.map((p, i) =>
                   p === '...' ? (
-                    <span key={i} className="page-btn dots">...</span>
+                    <span key={`dots-${i}`} className="page-btn dots">...</span>
                   ) : (
                     <button
-                      key={p}
+                      key={`page-${p}`}
                       className={`page-btn ${page === p ? 'active' : ''}`}
                       onClick={() => setPage(p)}
                     >

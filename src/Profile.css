@@ -1,146 +1,13 @@
-/**
- * Profile.css - User Profile/Favorites Management Page Styles
- * 
- * Mobile Responsive Design & Hamburger Menu Implementation
- * Date: April 5, 2026
- * Author: Enes Doğanay
- * 
- * Responsive Breakpoints:
- * - Mobile: Default (< 1024px)
- * - Desktop: >= 1024px
- * 
- * Key Features:
- * - Hamburger menu for mobile navigation (removed "Profil Bilgileri" redundancy)
- * - Sidebar hidden on mobile (< 1024px), shown on desktop
- * - Responsive header with adaptive padding
- * - Mobile-first layout adjustments
- * - Avatar and user info responsive display
- * - Header logo positioning fixed for proper spacing with hamburger menu
- * - Form fields with inline editing (Kaydet/İptal buttons align with values)
- * - Profile title sizing matches Hakkımızda page (1.875rem → 3.5rem at desktop)
- * - Favorites grid responsive (1 col mobile → 2 cols tablet → 3 cols desktop)
- */
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", sans-serif;
-}
-
-body {
-  background: #f6f7f8;
-  color: #1e293b;
-}
+/* Enes Doğanay | 6 Nisan 2026: * reset, body, dead header CSS, dead class'lar silindi */
+/* Enes Doğanay | 6 Nisan 2026: Inline style'lar CSS class'larına taşındı */
+/* Enes Doğanay | 6 Nisan 2026: Cool dokunuşlar — gradient, glassmorphism, micro-interactions */
 
 .page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 0;
-}
-
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  position: relative;
-}
-
-@media (min-width: 640px) {
-  .header {
-    padding: 1rem 2rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .header {
-    padding: 1rem 2.5rem;
-  }
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex-shrink: 0;
-  /* 
-   * flex-shrink: 0 ensures logo maintains fixed width
-   * Prevents logo from shrinking when hamburger button appears
-   * Matches Hakkımızda page header layout
-   * Layout: Logo (fixed) → Hamburger (mobile) → Nav (desktop)
-   * Author: Enes Doğanay | Date: April 5, 2026
-   */
-}
-
-/* Mobile Hamburger Menu Button
- * Responsive: Visible on mobile/tablet (< 1024px), hidden on desktop
- * Three-line hamburger icon created with flexbox and span elements
- * Smooth transitions for animation effects
- * Author: Enes Doğanay | Date: April 5, 2026
- */
-.profile-hamburger {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 8px;
-}
-
-.profile-hamburger span {
-  width: 24px;
-  height: 2px;
-  background-color: #0f172a;
-  transition: 0.3s;
-  display: block;
-}
-
-@media (min-width: 1024px) {
-  .profile-hamburger {
-    display: none;
-  }
-}
-
-.header-right {
-  display: none;
-  align-items: center;
-  gap: 15px;
-}
-
-@media (min-width: 1024px) {
-  .header-right {
-    display: flex;
-  }
-}
-
-.logo-box {
-  background: #e0f2fe;
-  color: #137fec;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.help-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #e0f2fe;
-  color: #137fec;
-  cursor: pointer;
-}
-
-.avatar-small {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #f6f7f8 40%, #fdf2f8 100%);
 }
 
 /* LAYOUT - Responsive Design
@@ -174,14 +41,10 @@ body {
   }
 }
 
-/* SIDEBAR - Responsive Display
- * Hidden on mobile (< 1024px)
- * Shown on desktop (>= 1024px) with fixed width
- * Author: Enes Doğanay | Date: April 5, 2026
- */
+/* SIDEBAR */
 .sidebar {
   display: none;
-  width: 250px;
+  width: 260px;
   flex-shrink: 0;
 }
 
@@ -191,15 +54,70 @@ body {
   }
 }
 
+.sidebar-user-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(19, 127, 236, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 12px rgba(19, 127, 236, 0.06);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.sidebar-user-card:hover {
+  box-shadow: 0 4px 20px rgba(19, 127, 236, 0.12);
+  transform: translateY(-1px);
+}
+
+.sidebar-user-name {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.sidebar-user-company {
+  color: var(--text-gray);
+  font-size: 12px;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px rgba(19, 127, 236, 0.15);
+}
+
+.sidebar-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
 .nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px;
-  border-radius: 10px;
+  padding: 10px;
+  border-radius: 8px;
   cursor: pointer;
   color: #475569;
-  transition: 0.2s;
+  transition: background 0.2s, color 0.2s;
+  font-weight: 400;
+  background: none;
+  border: none;
+  width: 100%;
+  font-size: inherit;
+  text-decoration: none;
 }
 
 .nav-item:hover {
@@ -207,20 +125,201 @@ body {
 }
 
 .nav-item.active {
-  background: #137fec;
-  color: white;
+  color: #1d4ed8;
+  background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.1);
 }
 
-.logout:hover {
+.nav-item .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.nav-item.logout {
+  color: #ef4444;
+}
+
+.nav-item.logout:hover {
   background: #fee2e2;
   color: #dc2626;
 }
 
-/* CONTENT - Responsive Design
- * Mobile: Full width layout
- * Desktop: Flexible width with max constraints
- * Author: Enes Doğanay | Date: April 5, 2026
- */
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid #f1f5f9;
+  margin: 10px 0;
+}
+
+/* SIDEBAR LISTS */
+.sidebar-lists {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-lists h4 {
+  font-size: 11px;
+  color: var(--text-light);
+  margin: 0 0 15px 0;
+  letter-spacing: 0.5px;
+}
+
+.list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #475569;
+  background: transparent;
+  font-weight: 400;
+  border: none;
+  width: 100%;
+}
+
+.list-item.active {
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-weight: 600;
+}
+
+.list-item-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-item-label .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.list-item-count {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text-gray);
+}
+
+.create-list-form {
+  margin-top: 15px;
+  display: flex;
+  gap: 5px;
+}
+
+.create-list-form input {
+  flex: 1;
+  padding: 6px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+}
+
+.create-list-form .btn-add {
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.create-list-form .btn-cancel {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.create-list-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  background: transparent;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.create-list-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* SIDEBAR STATS */
+.sidebar-stats {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
+  color: #fff;
+  padding: 24px 20px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.3);
+}
+
+.sidebar-stats::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.sidebar-stats::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.sidebar-stats-label {
+  font-size: 12px;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.sidebar-stats-value {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 4px 0 0 0;
+  background: linear-gradient(to right, #fff, #e0f2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* CONTENT */
 .content {
   flex: 1;
   width: 100%;
@@ -232,11 +331,15 @@ body {
   }
 }
 
+/* CARD */
 .card {
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
   padding: 1.5rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
 }
 
 @media (min-width: 640px) {
@@ -245,20 +348,12 @@ body {
   }
 }
 
-@media (min-width: 1024px) {
-  .card {
-    padding: 2rem;
-  }
-}
-
 .card-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
   flex-direction: column;
   gap: 1rem;
   align-items: flex-start;
+  margin-bottom: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -275,55 +370,109 @@ body {
   }
 }
 
+.card-header-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .card-header h1 {
-  font-size: 1.875rem;
+  font-size: clamp(1.25rem, 5vw, 1.625rem);
+  color: #0f172a;
   margin-bottom: 0.5rem;
-  font-weight: 900;
-  line-height: 1.1;
-  /* 
-   * Responsive Typography Sizing
-   * Matches Hakkımızda page professional heading style
-   * Mobile: 1.875rem | Tablet (640px+): 2.5rem | Desktop (1024px+): 3.5rem
-   * font-weight 900 & line-height 1.1 for visual prominence
-   * Provides consistent branding across all pages
-   * Author: Enes Doğanay | Date: April 5, 2026
-   */
 }
 
-@media (min-width: 640px) {
-  .card-header h1 {
-    font-size: 2.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .card-header h1 {
-    font-size: 3.5rem;
-  }
+.card-header p {
+  color: var(--text-gray);
+  margin: 0;
+  font-size: 0.875rem;
 }
 
 .status {
-  background: #dcfce7;
-  color: #15803d;
-  padding: 6px 12px;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #166534;
+  padding: 0.5rem 0.75rem;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.1);
+  animation: statusPulse 3s ease-in-out infinite;
+}
+
+.status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16a34a;
+  animation: dot-blink 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(22, 101, 52, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 2px 16px rgba(22, 101, 52, 0.2);
+  }
+}
+
+@keyframes dot-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* PROFILE */
 .profile-section {
   display: flex;
-  gap: 25px;
-  align-items: center;
-  margin-bottom: 30px;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  align-items: flex-start;
 }
 
 .avatar-large {
-  width: 120px;
-  height: 120px;
+  width: clamp(80px, 15vw, 120px);
+  height: clamp(80px, 15vw, 120px);
   border-radius: 50%;
   background-size: cover;
   background-position: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--primary), 0 0 0 6px rgba(19, 127, 236, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.avatar-large:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px var(--primary), 0 0 0 6px rgba(19, 127, 236, 0.2), 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.profile-name {
+  margin: 0 0 0.5rem 0;
+  font-size: clamp(1rem, 4vw, 1.125rem);
+  color: #0f172a;
+}
+
+.profile-company {
+  margin: 0 0 1rem 0;
+  color: var(--text-gray);
+  font-size: 0.875rem;
 }
 
 .profile-buttons {
@@ -333,39 +482,46 @@ body {
 }
 
 .secondary-btn {
-  padding: 8px 14px;
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  background: var(--bg-white);
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: white;
   cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
-.danger-btn {
-  padding: 8px 14px;
-  border: none;
-  background: transparent;
-  color: #dc2626;
-  cursor: pointer;
+.secondary-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(19, 127, 236, 0.15);
 }
 
-/* FIELD - Responsive Design
- * Mobile: Single column layout with label above value
- * Desktop (1024px+): Row layout with edit button on right
- * 
- * Layout Evolution:
- * - Label and value stacked vertically on mobile
- * - Inline editing with input field and Kaydet/İptal buttons
- * - Edit button placed on same line with value
- * - Field divider (border-bottom) separates each form field
- * 
- * Responsive Behavior:
- * - flex: 1 on input allows it to grow and contract
- * - flex-shrink: 0 on buttons prevents them from shrinking
- * - Mobile: All elements stack for clarity
- * - Desktop: Label-value-button aligned horizontally
- * 
- * Author: Enes Doğanay | Date: April 5, 2026
- */
+.secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* FIELD */
 .field {
   display: flex;
   justify-content: space-between;
@@ -384,9 +540,14 @@ body {
   }
 }
 
+.field-content {
+  position: relative;
+  flex: 1;
+}
+
 .field label {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-gray);
   display: block;
   margin-bottom: 0.25rem;
   text-transform: uppercase;
@@ -394,32 +555,360 @@ body {
   font-weight: 600;
 }
 
+.field-edit-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.field-input {
+  flex: 1;
+  margin-top: 4px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  min-width: 150px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.12);
+}
+
+.field-btn-save {
+  color: #10b981;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.field-btn-cancel {
+  color: #ef4444;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.field-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-width: 320px;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: var(--bg-white);
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 4px;
+}
+
+.field-suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: #334155;
+}
+
+.field-suggestion-item:hover {
+  background-color: #f8fafc;
+}
+
+.field-value-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .field p {
-  font-weight: 500;
-  font-size: 0.95rem;
   margin: 0;
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.field-extra-badge {
+  font-size: 0.8125rem;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.field-edit-btn {
+  color: #1d4ed8;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.field-edit-btn:hover {
+  color: #1e40af;
+  transform: translateX(2px);
+}
+
+/* FAVORITES */
+.favorites-section {
+  min-height: 100%;
+  border-radius: 16px;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Mobil favori paneli (listeler + istatistik) */
+.mobile-fav-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .mobile-fav-panel {
+    display: none;
+  }
+}
+
+.mobile-fav-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(29, 78, 216, 0.25);
+}
+
+.mobile-fav-stats>.material-symbols-outlined {
+  font-size: 20px;
+  opacity: 0.85;
+}
+
+.mobile-fav-stats-value {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.mobile-fav-stats-label {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.mobile-fav-lists {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mobile-fav-lists::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-fav-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.mobile-fav-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.mobile-fav-chip.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+}
+
+.mobile-fav-chip.active .chip-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.chip-count {
+  background: #f1f5f9;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-gray);
+  transition: all 0.2s;
+}
+
+.mobile-fav-chip.add-chip {
+  border-style: dashed;
+  color: var(--text-light);
+}
+
+.mobile-fav-chip.add-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.mobile-fav-chip.add-chip .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.mobile-create-list {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.mobile-create-list input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.mobile-create-list input:focus {
+  border-color: var(--primary);
+}
+
+.mobile-create-list .btn-add {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.mobile-create-list .btn-cancel {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-gray);
+  padding: 4px;
+  display: flex;
+}
+
+.mobile-create-list .btn-cancel .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.favorites-header {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.favorites-header h1 {
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+  color: #0f172a;
+  margin: 0 0 0.25rem 0;
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.favorites-header p {
+  color: var(--text-gray);
+  margin: 0;
+  font-size: clamp(0.875rem, 3vw, 0.95rem);
+}
+
+.favorites-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  border: 2px dashed rgba(203, 213, 225, 0.6);
+}
+
+.favorites-empty .material-symbols-outlined {
+  font-size: 56px;
+  color: #cbd5e1;
+  display: block;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.favorites-empty p {
+  color: var(--text-gray);
+  font-size: 15px;
+}
+
+.favorites-empty button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.favorites-empty button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 78, 216, 0.4);
 }
 
 .favorites-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  /* 
-   * Responsive Grid Layout for Favorites Cards
-   * Progressive Enhancement Approach:
-   * - Mobile (default): 1 column - full width cards
-   * - Tablet (640px+): 2 columns - side-by-side layout
-   * - Desktop (1024px+): 3 columns - full grid layout
-   * 
-   * Each card includes:
-   * - Favorite button toggle (top-right: heart icon)
-   * - Company avatar with initials
-   * - Company name, category, location
-   * - Inline notes section (editable)
-   * - Action buttons (view, contact)
-   * 
-   * Author: Enes Doğanay | Date: April 5, 2026
-   */
 }
 
 @media (min-width: 640px) {
@@ -434,29 +923,817 @@ body {
   }
 }
 
-.edit-btn {
+/* FAV CARD */
+.fav-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  padding: 24px 20px 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s, border-color 0.3s;
+}
+
+.fav-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(19, 127, 236, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-color: rgba(19, 127, 236, 0.2);
+}
+
+.favorites-grid .fav-card {
+  animation: cardFadeIn 0.35s ease-out both;
+}
+
+.favorites-grid .fav-card:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.favorites-grid .fav-card:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.favorites-grid .fav-card:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.favorites-grid .fav-card:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.favorites-grid .fav-card:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.favorites-grid .fav-card:nth-child(6) {
+  animation-delay: 0.25s;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Toolbar (search + sort) */
+.favorites-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.fav-search-wrapper {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 12px;
+  padding: 10px 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fav-search-wrapper:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
+}
+
+.fav-search-wrapper>.material-symbols-outlined {
+  color: var(--text-light);
+  font-size: 20px;
+}
+
+.fav-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text-dark);
+  font-family: inherit;
+}
+
+.fav-search-input::placeholder {
+  color: var(--text-light);
+}
+
+.fav-search-clear {
   background: none;
   border: none;
-  color: #137fec;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  color: var(--text-light);
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+}
+
+.fav-search-clear:hover {
+  color: var(--text-dark);
+  background: #f1f5f9;
+}
+
+.fav-search-clear .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.fav-sort-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 12px;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+}
+
+.fav-sort-wrapper:focus-within {
+  border-color: var(--primary);
+}
+
+.fav-sort-wrapper>.material-symbols-outlined {
+  color: var(--text-light);
+  font-size: 20px;
+}
+
+.fav-sort-select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text-dark);
+  font-family: inherit;
   cursor: pointer;
   font-weight: 500;
 }
 
-.verified {
-  display: inline-block;
-  margin-top: 5px;
-  font-size: 12px;
-  color: #16a34a;
+/* Enes Doğanay | 6 Nisan 2026: Card menu (three-dot) */
+.fav-menu-wrapper {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
 }
 
-/* FOOTER */
-.card-footer {
-  margin-top: 20px;
+.fav-menu-btn {
+  background: rgba(241, 245, 249, 0.8);
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  padding: 0;
+}
+
+.fav-menu-btn:hover {
+  background: #e2e8f0;
+  transform: scale(1.05);
+}
+
+.fav-menu-btn .material-symbols-outlined {
+  font-size: 20px;
+  color: #475569;
+}
+
+.fav-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.fav-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  z-index: 2;
+  min-width: 185px;
+  animation: menuSlideIn 0.15s ease-out;
+}
+
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fav-menu-dropdown button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: #334155;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.fav-menu-dropdown button:hover {
+  background: #f8fafc;
+}
+
+.fav-menu-dropdown button.danger {
+  color: #ef4444;
+}
+
+.fav-menu-dropdown button.danger:hover {
+  background: #fef2f2;
+}
+
+.fav-menu-dropdown button .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: List assignment overlay */
+.fav-list-assign {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  animation: assignFadeIn 0.2s ease-out;
+}
+
+@keyframes assignFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fav-list-assign-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.fav-list-assign-header>span {
+  font-weight: 600;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.fav-list-assign-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-gray);
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  transition: background 0.15s;
+}
+
+.fav-list-assign-header button:hover {
+  background: #f1f5f9;
+}
+
+.fav-list-assign-header button .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.fav-list-assign-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.fav-list-assign-options button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: none;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.fav-list-assign-options button:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.fav-list-assign-options button.active {
+  background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+  color: #1d4ed8;
+  font-weight: 600;
+  border-color: rgba(29, 78, 216, 0.15);
+}
+
+.fav-list-assign-options button .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: List badge on card */
+.fav-meta-list {
+  background: #eff6ff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  color: #1d4ed8;
+  font-weight: 500;
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.fav-meta-list .material-symbols-outlined {
+  font-size: 13px;
+  color: #1d4ed8;
+}
+
+.fav-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  margin: 0 auto 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s, border-radius 0.3s;
+  position: relative;
+}
+
+.fav-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 17px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+.fav-card:hover .fav-avatar {
+  transform: scale(1.08) rotate(-3deg);
+  border-radius: 18px;
+}
+
+.fav-body {
+  flex: 1;
+}
+
+.fav-name {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fav-name-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.fav-meta {
+  color: var(--text-gray);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.fav-meta .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.fav-meta-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* NOTE */
+.note-editing,
+.note-display {
+  background: #fef9c3;
+  border: 1px solid #fef08a;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.note-header .material-symbols-outlined {
+  font-size: 14px;
+  color: #ca8a04;
+}
+
+.note-header-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #ca8a04;
+}
+
+.note-display .note-header {
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.note-display .note-header-label {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-display .note-header-label .material-symbols-outlined {
+  font-size: 12px;
+}
+
+.note-edit-link {
+  font-size: 10px;
+  color: #a16207;
+  cursor: pointer;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #fde047;
+  background: #fffbeb;
+  font-size: 12px;
+  outline: none;
+  resize: vertical;
+  color: #854d0e;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.note-btn-cancel {
+  font-size: 11px;
+  color: #a16207;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px;
+}
+
+.note-btn-save {
+  font-size: 11px;
+  color: #fff;
+  background: #ca8a04;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.note-btn-save:disabled {
+  opacity: 0.6;
+}
+
+.note-display p {
+  margin: 0;
+  font-size: 12px;
+  color: #854d0e;
+  font-style: italic;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-empty {
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--text-light);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.25s;
+}
+
+.note-empty:hover {
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+  border-color: #fde047;
+  color: #ca8a04;
+}
+
+.note-empty .material-symbols-outlined {
+  font-size: 16px;
+}
+
+/* FAV ACTIONS */
+.fav-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.fav-btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.fav-btn-primary .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.fav-btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(29, 78, 216, 0.35);
+  transform: translateY(-1px);
+}
+
+.fav-btn-delete {
+  background: #f1f5f9;
+  color: var(--text-gray);
+  border: none;
+  border-radius: 10px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.fav-btn-delete:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.fav-btn-delete .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* LOADING */
+.page-status {
+  padding: 80px 50px;
+  text-align: center;
+  color: var(--text-gray);
+  font-size: 1rem;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* CONTENT ENTRANCE */
+.layout {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.create-list-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(19, 127, 236, 0.04);
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Custom confirm modal */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: overlayFadeIn 0.2s ease-out;
+  padding: 20px;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.confirm-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.08);
+  animation: modalSlideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.confirm-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.confirm-icon .material-symbols-outlined {
+  font-size: 28px;
+  color: #ef4444;
+}
+
+.confirm-modal h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.confirm-modal p {
+  margin: 0 0 24px;
   font-size: 14px;
   color: #64748b;
+  line-height: 1.6;
 }
 
-.divider {
-  height: 1px;
-  background: #e2e8f0;
+.confirm-modal p strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-cancel {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.confirm-cancel:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.confirm-delete {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  font-family: inherit;
+}
+
+.confirm-delete:hover {
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.list-item {
+  transition: background 0.2s, color 0.2s;
+}
+
+.list-item:hover:not(.active) {
+  background: #f8fafc;
 }

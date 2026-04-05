@@ -1,18 +1,28 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from './supabaseClient';
+import SharedHeader from './SharedHeader';
+import './SharedHeader.css';
 import './EmailConfirmation.css';
 
 const EmailConfirmation = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Register sayfasından gelen e-posta ve şifreyi yakalıyoruz
   const userEmail = location.state?.email || null;
   const userPassword = location.state?.password || null;
-  
+  const displayEmail = userEmail || 'kayıt sırasında girdiğiniz e-posta adresi';
+
   const [resendStatus, setResendStatus] = useState('');
   const pollingRef = useRef(null);
+
+  const getResendStatusType = () => {
+    if (!resendStatus) return '';
+    if (resendStatus === 'Gönderiliyor...') return 'pending';
+    if (resendStatus.includes('tekrar gönderildi')) return 'success';
+    return 'error';
+  };
 
   useEffect(() => {
     // Eğer email veya şifre yoksa (kullanıcı sayfayı yenilediyse state kaybolur) döngüyü başlatma
@@ -26,9 +36,6 @@ const EmailConfirmation = () => {
       });
 
       if (error) {
-        // Hata muhtemelen "Email not confirmed" (E-posta onaylanmadı) hatasıdır.
-        // Bu durumda hiçbir şey yapmadan bir sonraki 5 saniyeyi bekliyoruz.
-        console.log("Onay durumu kontrol ediliyor..."); 
       } else if (data.session) {
         // Hata yoksa ve oturum (session) oluştuysa onay verilmiş demektir!
         clearInterval(pollingRef.current);
@@ -57,29 +64,14 @@ const EmailConfirmation = () => {
 
       if (error) throw error;
       setResendStatus('Onay e-postası tekrar gönderildi!');
-    } catch (error) {
-      console.error("Tekrar gönderme hatası:", error.message);
+    } catch {
       setResendStatus('Gönderim başarısız. Çok fazla istek atmış olabilirsiniz.');
     }
   };
 
   return (
     <div className="ec-wrapper">
-      {/* Top Navigation Bar */}
-      <header className="ec-header">
-        {/* LOGO ALANI - Görsel olarak güncellendi */}
-        <div 
-          className="ec-header-left" 
-          onClick={() => navigate('/')} 
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-        >
-            <img 
-                src="/tedport-logo.jpg" 
-                alt="Tedport Logo" 
-                style={{ height: '50px', objectFit: 'contain' }} 
-            />
-        </div>
-      </header>
+      <SharedHeader />
 
       {/* Main Content Section */}
       <main className="ec-main">
@@ -95,14 +87,14 @@ const EmailConfirmation = () => {
           {/* Main Message */}
           <h1 className="ec-title">E-posta Onayınız Gönderildi!</h1>
           <p className="ec-description">
-            Lütfen <b>{userEmail}</b> adresine gönderdiğimiz bağlantıya tıklayın. 
-            Bu adım, güvenli bir B2B ticaret ortamı sağlamak için gereklidir. 
+            Lütfen <b>{displayEmail}</b> adresine gönderdiğimiz bağlantıya tıklayın.
+            Bu adım, güvenli bir B2B ticaret ortamı sağlamak için gereklidir.
             Onayladıktan sonra sayfa sizi otomatik olarak yönlendirecektir.
           </p>
 
           {/* Action Buttons */}
-          <button 
-            className="ec-btn-primary" 
+          <button
+            className="ec-btn-primary"
             onClick={() => navigate('/login')}
           >
             <span>Giriş Sayfasına Git</span>
@@ -112,16 +104,16 @@ const EmailConfirmation = () => {
           <div className="ec-secondary-section">
             <h2 className="ec-subtitle">E-postayı bulamadınız mı?</h2>
             <p className="ec-spam-note">Spam klasörünü kontrol etmeyi unutmayın.</p>
-            <button 
+            <button
               className="ec-btn-text"
               onClick={handleResendEmail}
             >
               Tekrar Gönder
             </button>
-            
+
             {/* Tekrar Gönderim Durum Mesajı */}
             {resendStatus && (
-              <p style={{ marginTop: '10px', fontSize: '13px', color: '#137fec', fontWeight: '500' }}>
+              <p className={`ec-status ec-status-${getResendStatusType()}`}>
                 {resendStatus}
               </p>
             )}

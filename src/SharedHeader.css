@@ -62,11 +62,14 @@
     align-items: center;
     flex-shrink: 0;
     height: 60px;
+    cursor: pointer;
+    text-decoration: none;
 }
 
-.shared-logo-area img {
+.shared-logo-image {
     max-width: 100%;
-    height: auto;
+    height: 60px;
+    object-fit: contain;
 }
 
 /* ========== SEARCH BAR ========== */
@@ -84,7 +87,7 @@
     }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .shared-search-bar {
         flex: 0 0 320px;
         max-width: 350px;
@@ -93,7 +96,7 @@
 
 .shared-search-bar input {
     width: 100%;
-    padding: 10px 10px 10px 36px;
+    padding: 10px 32px 10px 36px;
     border: none;
     background: #f0f2f4;
     border-radius: 8px;
@@ -105,7 +108,7 @@
 @media (min-width: 640px) {
     .shared-search-bar input {
         font-size: 14px;
-        padding: 10px 12px 10px 38px;
+        padding: 10px 34px 10px 38px;
     }
 }
 
@@ -126,6 +129,117 @@
     color: #617589;
     pointer-events: none;
     font-size: 18px;
+}
+
+/* Enes Doğanay | 5 Nisan 2026: Arama kutusu X temizle butonu */
+.shared-search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.2s, background 0.2s;
+}
+
+.shared-search-clear:hover {
+    color: #475569;
+    background: #e2e8f0;
+}
+
+.shared-search-clear-icon {
+    font-size: 18px;
+}
+
+/* Enes Doğanay | 5 Nisan 2026: Autocomplete öneri dropdown stilleri */
+.shared-search-suggestions {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 200;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 6px 0;
+}
+
+.shared-suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.shared-suggestion-item:hover {
+    background: #f1f5f9;
+}
+
+.shared-suggestion-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #e0e7ff;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    border: 1px solid #c7d2fe;
+}
+
+.shared-suggestion-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.shared-suggestion-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shared-suggestion-location {
+    font-size: 12px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Enes Doğanay | 5 Nisan 2026: Sonuç bulunamadı mesajı stili */
+.shared-suggestion-no-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 14px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.shared-suggestion-no-result-icon {
+    font-size: 20px;
+    color: #94a3b8;
 }
 
 @media (min-width: 640px) {
@@ -165,7 +279,8 @@
     border-radius: 2px;
 }
 
-@media (min-width: 768px) {
+/* Enes Doğanay | 5 Nisan 2026: Breakpoint 768px → 1024px, yatay/tablet görünümde hamburger menü korunur */
+@media (min-width: 1024px) {
     .shared-hamburger {
         display: none !important;
     }
@@ -180,7 +295,7 @@
     flex-shrink: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .shared-nav {
         display: flex;
     }
@@ -214,6 +329,10 @@
     flex-shrink: 0;
 }
 
+.shared-user-dropdown {
+    position: relative;
+}
+
 .shared-user-btn {
     background: white;
     color: #1d4ed8;
@@ -229,23 +348,95 @@
     gap: 6px;
 }
 
+.shared-user-btn-icon {
+    font-size: 18px;
+}
+
 .shared-user-btn:hover {
     background: #f0f7ff;
     color: #0c4a6e;
     border-color: #7dd3fc;
 }
 
-.shared-user-actions button {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 6px;
-    transition: background 0.2s;
+.shared-user-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    width: 200px;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.shared-user-actions button:hover {
-    background: #f0f2f4;
+.shared-user-menu-item {
+    width: 100%;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    color: #334155;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    background: transparent;
+    text-align: left;
+    transition: background 0.2s, color 0.2s;
+}
+
+.shared-user-menu-item:last-child {
+    border-bottom: none;
+}
+
+.shared-user-menu-item:hover,
+.shared-user-menu-item:focus-visible {
+    background: #f8fafc;
+    outline: none;
+}
+
+.shared-user-menu-item-danger {
+    color: #ef4444;
+}
+
+.shared-user-menu-item-danger:hover,
+.shared-user-menu-item-danger:focus-visible {
+    background: #fef2f2;
+}
+
+.shared-user-menu-icon {
+    font-size: 20px;
+    pointer-events: none;
+}
+
+.shared-user-menu-label {
+    pointer-events: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.shared-register-btn {
+    background: white;
+    color: #1d4ed8;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #bfdbfe;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.shared-register-btn:hover,
+.shared-register-btn:focus-visible {
+    background: #f0f7ff;
+    color: #0c4a6e;
+    border-color: #7dd3fc;
+    outline: none;
 }
 
 /* ========== MOBILE MENU ========== */
@@ -279,7 +470,7 @@
     }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .shared-mobile-menu {
         display: none !important;
     }
@@ -311,4 +502,16 @@
 .shared-mobile-menu a:active,
 .shared-mobile-menu button:active {
     background-color: #efefef;
+}
+
+.shared-mobile-register {
+    color: #137fec !important;
+    font-weight: 700 !important;
+}
+
+.shared-mobile-logout {
+    padding: 12px 0 !important;
+    color: #ef4444 !important;
+    font-weight: 500;
+    font-size: 14px;
 }

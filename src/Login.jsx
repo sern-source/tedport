@@ -10,6 +10,8 @@ const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('individual');
+  // Enes Doğanay | 6 Nisan 2026: Beni Hatırla checkbox state'e bağlandı
+  const [rememberMe, setRememberMe] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -159,23 +161,24 @@ const LoginPage = () => {
 
               <div className="form-actions">
                 <label className="remember-me">
-                  <input type="checkbox" />
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                   <span>Beni Hatırla</span>
                 </label>
-                <a href="#" className="forgot-password">
+                {/* Enes Doğanay | 6 Nisan 2026: href="#" yerine onClick ile placeholder uyarı */}
+                <button type="button" className="forgot-password" onClick={() => alert('Şifre sıfırlama özelliği yakında eklenecek.')}>
                   Şifremi Unuttum
-                </a>
+                </button>
               </div>
 
               {error && (
-                <p style={{ color: "red", marginTop: "10px" }}>
+                <p className="login-error">
                   {error}
                 </p>
               )}
 
               <button
                 type="submit"
-                className="btn btn-full btn-primary mt-4"
+                className="login-btn login-btn-full login-btn-primary mt-4"
                 disabled={loading}
               >
                 {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}

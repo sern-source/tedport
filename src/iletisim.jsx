@@ -16,15 +16,14 @@
  * - Hero section with adaptive typography
  */
 
+// Enes Doğanay | 6 Nisan 2026: useState/useEffect/useNavigate temizlendi
 import React, { useState } from 'react';
 import './iletisim.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase } from './supabaseClient';
-import { useNavigate } from 'react-router-dom';
 
 const Contact = () => {
-    const navigate = useNavigate();
 
     // Form verilerini tutacağımız state
     const [formData, setFormData] = useState({
@@ -74,7 +73,6 @@ const Contact = () => {
             setTimeout(() => setStatus('idle'), 5000);
 
         } catch (error) {
-            console.error('İletişim formu gönderilirken hata oluştu:', error);
             setStatus('error');
             setTimeout(() => setStatus('idle'), 5000);
         }
@@ -171,14 +169,15 @@ const Contact = () => {
                                             </div>
                                         </div>
 
-                                        {/* Durum Mesajları */}
                                         {status === 'success' && (
-                                            <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#dcfce7', color: '#166534', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
+                                            <div className="contact-alert contact-alert-success">
+                                                <span className="material-symbols-outlined">check_circle</span>
                                                 Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.
                                             </div>
                                         )}
                                         {status === 'error' && (
-                                            <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '0.5rem', fontSize: '0.875rem' }}>
+                                            <div className="contact-alert contact-alert-error">
+                                                <span className="material-symbols-outlined">error</span>
                                                 Mesaj gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.
                                             </div>
                                         )}
@@ -188,7 +187,6 @@ const Contact = () => {
                                                 type="submit"
                                                 className="contact-submit-btn"
                                                 disabled={status === 'loading'}
-                                                style={{ opacity: status === 'loading' ? 0.7 : 1 }}
                                             >
                                                 <span>{status === 'loading' ? 'Gönderiliyor...' : 'Gönder'}</span>
                                                 <span className="material-symbols-outlined">send</span>
@@ -272,14 +270,10 @@ const Contact = () => {
                         <div className="contact-footer-grid">
                             <div className="contact-footer-brand">
                                 {/* FOOTER LOGO BURAYA EKLENDİ */}
-                                <div className="contact-logo" style={{ display: 'flex', alignItems: 'center' }}>
-                                    <img
-                                        src="/tedport-logo.jpg"
-                                        alt="Tedport Logo"
-                                        style={{ height: '50px', objectFit: 'contain' }}
-                                    />
+                                <div className="contact-footer-logo">
+                                    <img src="/tedport-logo.jpg" alt="Tedport Logo" />
                                 </div>
-                                <p style={{ marginTop: '12px' }}>Güvenilir tedarikçilerle işinizi büyütün. Türkiye'nin en kapsamlı B2B pazar yeri.</p>
+                                <p>Güvenilir tedarikçilerle işinizi büyütün. Türkiye'nin en kapsamlı B2B pazar yeri.</p>
                                 <div className="contact-socials">
                                     <a href="#"></a><a href="#"></a><a href="#"></a>
                                 </div>

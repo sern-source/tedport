@@ -19,22 +19,15 @@
  * - "Why Us" image section removed during responsive update
  */
 
+/* Enes Doğanay | 6 Nisan 2026: Dead header CSS silindi (SharedHeader kullanılıyor) */
+/* Enes Doğanay | 6 Nisan 2026: Lokal CSS var'lar → global var'lar */
+/* Enes Doğanay | 6 Nisan 2026: Inline style'lar CSS class'larına, button reset targeted */
+
 /* Sadece .about-page-wrapper içindeki elemanlara etki eder */
 .about-page-wrapper {
-  --about-primary: #137fec;
-  --about-primary-hover: #1066c0;
-  --about-bg-light: #f6f7f8;
-  --about-bg-white: #ffffff;
-  --about-text-main: #0f172a;
-  --about-text-muted: #475569;
-  --about-text-light: #94a3b8;
-  --about-border: #e2e8f0;
-  --about-badge-bg: #eff6ff;
-  --about-badge-text: #1d4ed8;
-
   font-family: 'Inter', sans-serif;
-  background-color: var(--about-bg-light);
-  color: var(--about-text-main);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -74,8 +67,12 @@
   background-color: #f8fafc;
 }
 
-/* Butonlar */
-.about-page-wrapper button {
+/* Butonlar — sadece about-btn-* sınıflarına etki eder */
+.about-page-wrapper .about-btn-primary,
+.about-page-wrapper .about-btn-light,
+.about-page-wrapper .about-btn-outline,
+.about-page-wrapper .about-btn-white,
+.about-page-wrapper .about-btn-transparent {
   cursor: pointer;
   border: none;
   font-family: inherit;
@@ -88,26 +85,19 @@
   justify-content: center;
 }
 
-/* SharedHeader button'ları bu CSS'den etkilenmesin */
-.about-page-wrapper .shared-user-btn {
-  color: #0f172a;
-  font-weight: 500;
-  font-size: 14px;
-}
-
 .about-page-wrapper .about-btn-primary {
-  background-color: var(--about-primary);
+  background-color: var(--primary);
   color: white;
   padding: 0.5rem 1rem;
 }
 
 .about-page-wrapper .about-btn-primary:hover {
-  background-color: var(--about-primary-hover);
+  background-color: var(--primary-hover);
 }
 
 .about-page-wrapper .about-btn-light {
   background-color: #f1f5f9;
-  color: var(--about-text-main);
+  color: var(--text-dark);
   padding: 0.5rem 1rem;
 }
 
@@ -117,188 +107,14 @@
 
 .about-page-wrapper .about-btn-outline {
   background-color: white;
-  color: var(--about-text-muted);
-  border: 1px solid var(--about-border);
+  color: var(--text-gray);
+  border: 1px solid var(--border);
   padding: 0.5rem 1.5rem;
 }
 
 .about-page-wrapper .about-btn-outline:hover {
   background-color: #f8fafc;
 }
-
-/* Header */
-.about-page-wrapper .about-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background-color: var(--about-bg-white);
-  border-bottom: 1px solid var(--about-border);
-  padding: 0.75rem 1rem;
-}
-
-@media (min-width: 540px) {
-  .about-page-wrapper .about-header {
-    padding: 0.75rem 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .about-page-wrapper .about-header {
-    padding: 0.75rem 2.5rem;
-  }
-}
-
-.about-page-wrapper .about-header-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: auto;
-}
-
-.about-page-wrapper .about-header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.about-page-wrapper .about-header-right {
-  display: none;
-  align-items: center;
-  gap: 1rem;
-}
-
-@media (min-width: 1024px) {
-  .about-page-wrapper .about-header-right {
-    display: flex;
-  }
-}
-
-@media (min-width: 768px) {
-
-  .about-page-wrapper .about-header-left,
-  .about-page-wrapper .about-header-right {
-    gap: 2rem;
-  }
-}
-
-.about-page-wrapper .about-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: var(--about-text-main);
-}
-
-.about-page-wrapper .about-logo-icon {
-  width: 2rem;
-  height: 2rem;
-  color: var(--about-primary);
-}
-
-.about-page-wrapper .about-logo h2 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.about-page-wrapper .about-nav-links {
-  display: none;
-  gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .about-page-wrapper .about-nav-links {
-    gap: 2rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .about-page-wrapper .about-nav-links {
-    display: flex;
-  }
-}
-
-.about-page-wrapper .about-nav-links a {
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--about-text-main);
-  transition: color 0.2s;
-}
-
-.about-page-wrapper .about-nav-links a:hover,
-.about-page-wrapper .about-nav-links a.active {
-  color: var(--about-primary);
-}
-
-/* Mobile Hamburger Menu Button
- * Responsive: Visible on mobile/tablet (< 1024px), hidden on desktop
- * Three-line hamburger icon created with flexbox and span elements
- * Smooth 0.3s transitions for animation effects
- * Author: Enes Doğanay | Date: April 4, 2026
- */
-.about-page-wrapper .sc-hamburger {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 8px;
-}
-
-.about-page-wrapper .sc-hamburger span {
-  width: 24px;
-  height: 2px;
-  background-color: var(--about-text-main);
-  transition: 0.3s;
-  display: block;
-}
-
-@media (min-width: 1024px) {
-  .about-page-wrapper .sc-hamburger {
-    display: none;
-  }
-}
-
-.about-page-wrapper .about-actions {
-  display: none;
-  gap: 0.75rem;
-}
-
-@media (min-width: 1024px) {
-  .about-page-wrapper .about-actions {
-    display: flex;
-  }
-}
-
-.about-page-wrapper .about-search-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.about-page-wrapper .about-search-box input {
-  width: 16rem;
-  padding: 0.5rem 1rem 0.5rem 2.5rem;
-  border-radius: 0.5rem;
-  border: none;
-  background-color: #f1f5f9;
-  font-size: 0.875rem;
-  outline: none;
-}
-
-.about-page-wrapper .about-search-box input:focus {
-  box-shadow: 0 0 0 2px var(--about-primary);
-}
-
-.about-page-wrapper .search-icon {
-  position: absolute;
-  left: 0.75rem;
-  color: var(--about-text-light);
-  font-size: 1.25rem;
-}
-
 
 
 /* Hero Section */
@@ -328,8 +144,8 @@
 
 .about-page-wrapper .about-badge {
   width: fit-content;
-  background-color: var(--about-badge-bg);
-  color: var(--about-badge-text);
+  background-color: #eff6ff;
+  color: #1d4ed8;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -359,7 +175,7 @@
 
 .about-page-wrapper .about-hero-desc {
   font-size: 0.95rem;
-  color: var(--about-text-muted);
+  color: var(--text-gray);
   line-height: 1.6;
   margin: 0;
 }
@@ -448,7 +264,7 @@
 .about-page-wrapper .about-stat-num {
   font-size: 1.75rem;
   font-weight: 900;
-  color: var(--about-primary);
+  color: var(--primary);
 }
 
 @media (min-width: 768px) {
@@ -460,7 +276,7 @@
 .about-page-wrapper .about-stat-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--about-text-light);
+  color: var(--text-light);
 }
 
 /* Section Headers */
@@ -488,7 +304,7 @@
 }
 
 .about-page-wrapper .about-section-header p {
-  color: var(--about-text-muted);
+  color: var(--text-gray);
   margin: 0;
 }
 
@@ -515,7 +331,7 @@
 .about-page-wrapper .about-value-card {
   position: relative;
   background-color: white;
-  border: 1px solid var(--about-border);
+  border: 1px solid var(--border);
   padding: 1.5rem;
   border-radius: 1rem;
   display: flex;
@@ -543,8 +359,8 @@
 .about-page-wrapper .about-value-icon {
   width: 3rem;
   height: 3rem;
-  background-color: var(--about-badge-bg);
-  color: var(--about-primary);
+  background-color: #eff6ff;
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -562,7 +378,7 @@
 }
 
 .about-page-wrapper .about-value-card p {
-  color: var(--about-text-muted);
+  color: var(--text-gray);
   line-height: 1.6;
   margin: 0;
 }
@@ -639,12 +455,12 @@
   width: 2.5rem;
   height: 2.5rem;
   background-color: white;
-  border: 1px solid var(--about-border);
+  border: 1px solid var(--border);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--about-primary);
+  color: var(--primary);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
@@ -661,7 +477,7 @@
 }
 
 .about-page-wrapper .about-feature-text p {
-  color: var(--about-text-muted);
+  color: var(--text-gray);
   margin: 0;
 }
 
@@ -685,7 +501,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background-color: var(--about-border);
+  background-color: var(--border);
   transform: translateX(-50%);
 }
 
@@ -714,7 +530,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background-color: var(--about-primary);
+  background-color: var(--primary);
   border: 4px solid white;
   display: flex;
   align-items: center;
@@ -731,16 +547,16 @@
 
 .about-page-wrapper .about-timeline-dot.outline {
   background-color: white;
-  border-color: var(--about-primary);
+  border-color: var(--primary);
   border-width: 2px;
 }
 
 .about-page-wrapper .about-timeline-dot.outline div {
-  background-color: var(--about-primary);
+  background-color: var(--primary);
 }
 
 .about-page-wrapper .about-timeline-content h3 {
-  color: var(--about-primary);
+  color: var(--primary);
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
@@ -754,7 +570,7 @@
 
 .about-page-wrapper .about-timeline-content p {
   font-size: 0.875rem;
-  color: var(--about-text-muted);
+  color: var(--text-gray);
   margin: 0;
 }
 
@@ -793,7 +609,7 @@
 
 /* CTA Section */
 .about-page-wrapper .about-cta-section {
-  background-color: var(--about-primary);
+  background-color: var(--primary);
   padding: 2rem 0;
   margin-top: 2rem;
 }
@@ -853,7 +669,7 @@
 
 .about-page-wrapper .about-btn-white {
   background-color: white;
-  color: var(--about-primary);
+  color: var(--primary);
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   width: 100%;
@@ -887,7 +703,7 @@
 /* Footer */
 .about-page-wrapper .about-footer {
   background-color: white;
-  border-top: 1px solid var(--about-border);
+  border-top: 1px solid var(--border);
   padding: 4rem 0 2rem 0;
 }
 
@@ -921,8 +737,19 @@
   }
 }
 
+/* Enes Doğanay | 6 Nisan 2026: Inline style → CSS class */
+.about-page-wrapper .about-footer-logo {
+  display: flex;
+  align-items: center;
+}
+
+.about-page-wrapper .about-footer-logo img {
+  height: 50px;
+  object-fit: contain;
+}
+
 .about-page-wrapper .about-footer-brand p {
-  color: var(--about-text-light);
+  color: var(--text-light);
   font-size: 0.875rem;
   max-width: 300px;
   margin: 1rem 0 1.5rem 0;
@@ -937,7 +764,7 @@
   display: block;
   width: 1.5rem;
   height: 1.5rem;
-  background-color: var(--about-border);
+  background-color: var(--border);
   border-radius: 50%;
 }
 
@@ -960,24 +787,24 @@
 
 .about-page-wrapper .about-footer-links a {
   text-decoration: none;
-  color: var(--about-text-muted);
+  color: var(--text-gray);
   font-size: 0.875rem;
   transition: color 0.2s;
 }
 
 .about-page-wrapper .about-footer-links a:hover {
-  color: var(--about-primary);
+  color: var(--primary);
 }
 
 .about-page-wrapper .about-footer-bottom {
-  border-top: 1px solid var(--about-border);
+  border-top: 1px solid var(--border);
   margin-top: 3rem;
   padding-top: 2rem;
   text-align: center;
 }
 
 .about-page-wrapper .about-footer-bottom p {
-  color: var(--about-text-light);
+  color: var(--text-light);
   font-size: 0.875rem;
   margin: 0;
 }

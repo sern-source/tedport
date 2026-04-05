@@ -1,28 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-
-:root {
-  --primary-color: #137fec;
-  --primary-hover: #1066bd;
-  --bg-light: #f6f7f8;
-  --card-bg: #ffffff;
-  --text-main: #111418;
-  --text-muted: #617589;
-  --border-color: #dbe0e6;
-  --input-bg: #ffffff;
-  --tab-bg: #f0f2f4;
-  --font-family: 'Inter', sans-serif;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Enes Doğanay | 6 Nisan 2026: @import kaldırıldı (index.html'de <link> ile yüklü) */
+/* Enes Doğanay | 6 Nisan 2026: :root kaldırıldı (index.css'de merkezi) */
 
 body {
-  font-family: var(--font-family);
+  font-family: 'Inter', sans-serif;
   background-color: var(--bg-light);
-  color: var(--text-main);
+  color: var(--text-dark);
   min-height: 100vh;
 }
 
@@ -32,73 +14,11 @@ body {
   min-height: 100vh;
 }
 
-/* Header Styles */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background-color: var(--card-bg);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-@media (min-width: 768px) {
-  .header { padding: 12px 40px; }
-}
-
-@media (min-width: 1024px) {
-  .header { padding: 12px 160px; }
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.logo-icon {
-  color: var(--primary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo-text {
-  font-size: 1.125rem;
-  font-weight: 700;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
-
-.nav-links {
-  display: none;
-  gap: 36px;
-}
-
-@media (min-width: 768px) {
-  .nav-links { display: flex; }
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: var(--text-main);
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.nav-links a:hover {
-  color: var(--primary-color);
-}
+/* Enes Doğanay | 6 Nisan 2026: Eski header CSS'leri silindi (~45 satır) — SharedHeader kendi stillerini yönetiyor */
 
 /* Button Styles */
-.btn-primary {
-  background-color: var(--primary-color);
+.register-btn-primary {
+  background-color: var(--primary);
   color: white;
   border: none;
   border-radius: 8px;
@@ -113,11 +33,11 @@ body {
   justify-content: center;
 }
 
-.btn-primary:hover {
+.register-btn-primary:hover {
   background-color: var(--primary-hover);
 }
 
-.btn-submit {
+.register-btn-submit {
   width: 100%;
   height: 48px;
   font-size: 1rem;
@@ -125,7 +45,7 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.btn-submit:hover {
+.register-btn-submit:hover {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
@@ -139,19 +59,16 @@ body {
 }
 
 .registration-card {
-  background-color: var(--card-bg);
+  background-color: var(--bg-white);
   width: 100%;
   max-width: 512px;
   border-radius: 12px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
   overflow: hidden;
 }
 
-.card-header {
-  padding: 24px 32px 16px;
-  text-align: center;
-}
+/* Enes Doğanay | 6 Nisan 2026: Boş card-header kaldırıldı */
 
 .card-title {
   font-size: 1.875rem;
@@ -161,7 +78,7 @@ body {
 }
 
 .card-subtitle {
-  color: var(--text-muted);
+  color: var(--text-gray);
   font-size: 1rem;
 }
 
@@ -172,7 +89,7 @@ body {
 
 .tabs {
   display: flex;
-  background-color: var(--tab-bg);
+  background-color: #f0f2f4;
   border-radius: 8px;
   padding: 4px;
   height: 48px;
@@ -182,7 +99,7 @@ body {
   flex: 1;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-gray);
   font-size: 0.875rem;
   font-weight: 500;
   border-radius: 6px;
@@ -191,10 +108,10 @@ body {
 }
 
 .tab-btn.active {
-  background-color: var(--card-bg);
-  color: var(--text-main);
+  background-color: var(--bg-white);
+  color: var(--text-dark);
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Form Styles */
@@ -216,19 +133,19 @@ body {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  border: 2px dashed var(--border-color);
-  background-color: var(--tab-bg);
+  border: 2px dashed var(--border);
+  background-color: #f0f2f4;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
-  color: var(--text-muted);
+  color: var(--text-gray);
 }
 
 .photo-upload-box:hover {
   background-color: #e5e7eb;
-  color: var(--primary-color);
+  color: var(--primary);
 }
 
 .photo-label {
@@ -272,8 +189,8 @@ body {
   height: 48px;
   padding: 0 16px;
   border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background-color: var(--input-bg);
+  border: 1px solid var(--border);
+  background-color: var(--bg-white);
   font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -281,7 +198,7 @@ body {
 
 .form-input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.2);
 }
 
@@ -292,7 +209,7 @@ body {
 .input-icon {
   position: absolute;
   right: 12px;
-  color: var(--text-muted);
+  color: var(--text-gray);
   pointer-events: none;
 }
 
@@ -302,7 +219,7 @@ body {
 }
 
 .input-icon.clickable:hover {
-  color: var(--primary-color);
+  color: var(--primary);
 }
 
 /* Checkbox Styles */
@@ -322,12 +239,12 @@ body {
 
 .checkbox-label {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--text-gray);
   line-height: 1.4;
 }
 
 .text-link {
-  color: var(--primary-color);
+  color: var(--primary);
   text-decoration: none;
 }
 
@@ -341,13 +258,12 @@ body {
   text-align: center;
   align-items: center;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--text-gray);
 }
 
-.footerText
-{
-    width: 100%;
-    padding-top: 5px;
+.footerText {
+  width: 100%;
+  padding-top: 5px;
 
 }
 
@@ -355,5 +271,88 @@ body {
   text-align: center;
   padding: 24px;
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-gray);
+}
+
+/* ========== Enes Doğanay | 6 Nisan 2026: Yeni CSS class'ları ========== */
+
+/* Bildirim (Notification) */
+.register-notification {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin: 0 32px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.register-notification--success {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.register-notification--error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.register-notification-icon {
+  font-size: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Screen Reader Only (file input gizleme) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Photo Upload Icon */
+.photo-upload-icon {
+  font-size: 30px;
+}
+
+/* Text Link Button (Hizmet Şartları, Gizlilik Politikası) */
+.text-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.text-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Footer Login Link */
+.footer-login-link {
+  font-weight: 500;
 }

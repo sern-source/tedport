@@ -148,30 +148,10 @@ const RegistrationPage = () => {
       {/* Main Content */}
       <main className="main-content">
         <div className="registration-card">
-          <div className="card-header">
-            {/* Boş bırakılmış başlık alanı */}
-          </div>
-
-          {/* BİLDİRİM (MESAJ) ALANI */}
+          {/* Enes Doğanay | 6 Nisan 2026: Inline style yerine CSS class kullanıldı */}
           {notification.show && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '12px 16px',
-                marginBottom: '20px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: '500',
-                lineHeight: '1.4',
-                backgroundColor: notification.type === 'success' ? '#ecfdf5' : '#fef2f2',
-                color: notification.type === 'success' ? '#065f46' : '#991b1b',
-                border: `1px solid ${notification.type === 'success' ? '#a7f3d0' : '#fecaca'}`,
-                animation: 'fadeIn 0.3s ease-in-out'
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+            <div className={`register-notification ${notification.type === 'success' ? 'register-notification--success' : 'register-notification--error'}`}>
+              <span className="material-symbols-outlined register-notification-icon">
                 {notification.type === 'success' ? 'check_circle' : 'error'}
               </span>
               <span>{notification.message}</span>
@@ -200,13 +180,13 @@ const RegistrationPage = () => {
           <form className="form-body" onSubmit={handleSubmit}>
             <div className="photo-upload-container">
               <label className="photo-upload-box">
-                <span className="material-symbols-outlined" style={{ fontSize: '30px' }}>
+                <span className="material-symbols-outlined photo-upload-icon">
                   {profilePhoto ? 'check_circle' : 'add_a_photo'}
                 </span>
                 <input
                   type="file"
                   accept="image/*"
-                  style={{ display: 'none' }}
+                  className="sr-only"
                   onChange={handlePhotoChange}
                 />
               </label>
@@ -298,7 +278,6 @@ const RegistrationPage = () => {
                 <span
                   className="material-symbols-outlined input-icon clickable"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ cursor: 'pointer' }}
                 >
                   {showPassword ? 'visibility_off' : 'visibility'}
                 </span>
@@ -313,19 +292,20 @@ const RegistrationPage = () => {
                 onChange={(e) => setTermsAccepted(e.target.checked)}
               />
               <label htmlFor="terms" className="checkbox-label">
-                <a href="#hizmet" className="text-link">Hizmet Şartları</a>'nı ve{' '}
-                <a href="#gizlilik" className="text-link">Gizlilik Politikası</a>'nı okudum ve kabul ediyorum.
+                {/* Enes Doğanay | 6 Nisan 2026: href="#" yerine placeholder onClick */}
+                <button type="button" className="text-link-btn" onClick={() => alert('Hizmet Şartları sayfası yakında eklenecek.')}>Hizmet Şartları</button>'nı ve{' '}
+                <button type="button" className="text-link-btn" onClick={() => alert('Gizlilik Politikası sayfası yakında eklenecek.')}>Gizlilik Politikası</button>'nı okudum ve kabul ediyorum.
               </label>
             </div>
 
-            <button type="submit" className="btn-primary btn-submit" disabled={loading}>
+            <button type="submit" className="register-btn-primary register-btn-submit" disabled={loading}>
               {loading ? 'Kayıt Yapılıyor...' : 'Hesap Oluştur'}
             </button>
           </form>
 
           <div className="card-footer">
             <div className='footerText'>
-              Zaten bir hesabınız var mı? <a href="/login" className="text-link" style={{ fontWeight: 500 }}>Giriş Yap</a>
+              Zaten bir hesabınız var mı? <a href="/login" className="text-link footer-login-link">Giriş Yap</a>
             </div>
           </div>
         </div>

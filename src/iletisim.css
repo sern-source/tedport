@@ -20,20 +20,14 @@
  * - Adaptive header height and spacing
  */
 
-/* Sadece .contact-page-wrapper içindeki elemanlara etki eder */
-.contact-page-wrapper {
-  --contact-primary: #137fec;
-  --contact-primary-hover: #1066c0;
-  --contact-bg-light: #f6f7f8;
-  --contact-bg-white: #ffffff;
-  --contact-text-main: #0f172a;
-  --contact-text-muted: #475569;
-  --contact-text-light: #94a3b8;
-  --contact-border: #e2e8f0;
+/* Enes Doğanay | 6 Nisan 2026: Dead header/nav/hamburger/mobile-menu/search CSS silindi */
+/* Enes Doğanay | 6 Nisan 2026: Lokal --contact-* var'lar → global var'lar */
+/* Enes Doğanay | 6 Nisan 2026: Inline style'lar CSS class'larına, cool dokunuşlar */
 
+.contact-page-wrapper {
   font-family: 'Inter', sans-serif;
-  background-color: var(--contact-bg-light);
-  color: var(--contact-text-main);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -57,208 +51,6 @@
   .contact-page-wrapper .contact-container {
     padding: 0 2rem;
   }
-}
-
-/* Header */
-.contact-page-wrapper .contact-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background-color: var(--contact-bg-white);
-  border-bottom: 1px solid var(--contact-border);
-}
-
-.contact-page-wrapper .contact-header-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 3.5rem;
-  position: relative;
-}
-
-@media (min-width: 1024px) {
-  .contact-page-wrapper .contact-header-inner {
-    height: 4rem;
-  }
-}
-
-.contact-page-wrapper .contact-header-left,
-.contact-page-wrapper .contact-header-right {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.contact-page-wrapper .contact-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: var(--contact-text-main);
-}
-
-.contact-page-wrapper .contact-logo-icon {
-  width: 2rem;
-  height: 2rem;
-  color: var(--contact-primary);
-}
-
-.contact-page-wrapper .contact-logo h2 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.contact-page-wrapper .contact-nav-links {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.contact-page-wrapper .contact-nav-links a {
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--contact-text-main);
-  transition: color 0.2s;
-}
-
-.contact-page-wrapper .contact-nav-links a:hover,
-.contact-page-wrapper .contact-nav-links a.active {
-  color: var(--contact-primary);
-}
-
-/* Mobile Hamburger Menu Button
- * Responsive: Visible on mobile/tablet (< 1024px), hidden on desktop
- * Three-line hamburger icon created with flexbox and span elements
- * Smooth 0.3s transitions for animation effects
- * Author: Enes Doğanay | Date: April 4, 2026
- */
-.contact-page-wrapper .contact-hamburger {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 8px;
-}
-
-.contact-page-wrapper .contact-hamburger span {
-  width: 24px;
-  height: 2px;
-  background-color: var(--contact-text-main);
-  transition: 0.3s;
-  display: block;
-}
-
-@media (min-width: 1024px) {
-  .contact-page-wrapper .contact-hamburger {
-    display: none;
-  }
-}
-
-/* Header Responsive */
-.contact-page-wrapper .contact-header-right {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  .contact-page-wrapper .contact-header-right {
-    display: flex;
-  }
-}
-
-.contact-page-wrapper .contact-nav-links {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  .contact-page-wrapper .contact-nav-links {
-    display: flex;
-  }
-}
-
-/* Mobile Menu */
-.contact-page-wrapper .contact-mobile-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: var(--contact-bg-white);
-  border-bottom: 1px solid var(--contact-border);
-  flex-direction: column;
-  padding: 12px 16px;
-  gap: 8px;
-  z-index: 40;
-}
-
-.contact-page-wrapper .contact-mobile-menu a {
-  display: block;
-  color: var(--contact-text-muted);
-  padding: 12px 0;
-  font-size: 14px;
-  transition: color 0.2s;
-}
-
-.contact-page-wrapper .contact-mobile-menu a:hover {
-  color: var(--contact-primary);
-}
-
-.contact-page-wrapper .contact-mobile-menu button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 12px 0;
-  font-size: 14px;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.contact-page-wrapper .contact-search-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.contact-page-wrapper .contact-search-box input {
-  width: 100%;
-  padding: 0.5rem 1rem 0.5rem 2.5rem;
-  border-radius: 0.5rem;
-  border: none;
-  background-color: #f1f5f9;
-  font-size: 0.875rem;
-  outline: none;
-}
-
-.contact-page-wrapper .contact-search-box input:focus {
-  background-color: white;
-  box-shadow: 0 0 0 2px var(--contact-primary);
-}
-
-.contact-page-wrapper .search-icon {
-  position: absolute;
-  left: 0.75rem;
-  color: var(--contact-text-light);
-  font-size: 1.25rem;
-}
-
-.contact-page-wrapper .contact-btn-primary {
-  background-color: var(--contact-primary);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.contact-page-wrapper .contact-btn-primary:hover {
-  background-color: var(--contact-primary-hover);
 }
 
 /* Hero Section */
@@ -294,7 +86,7 @@
 .contact-page-wrapper .contact-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.4));
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 64, 175, 0.7) 50%, rgba(15, 23, 42, 0.85) 100%);
   z-index: 15;
 }
 
@@ -317,6 +109,19 @@
   font-weight: 900;
   margin: 0 0 1.5rem 0;
   letter-spacing: -0.025em;
+  animation: heroFadeIn 0.6s ease-out;
+}
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 640px) {
@@ -378,11 +183,19 @@
 
 /* Contact Form */
 .contact-page-wrapper .contact-form-card {
-  background-color: white;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--contact-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.contact-page-wrapper .contact-form-card:hover {
+  box-shadow: 0 8px 32px rgba(19, 127, 236, 0.08);
+  transform: translateY(-2px);
 }
 
 @media (min-width: 640px) {
@@ -444,8 +257,8 @@
 }
 
 .contact-page-wrapper .contact-form-control:focus {
-  border-color: var(--contact-primary);
-  box-shadow: 0 0 0 2px rgba(19, 127, 236, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.12);
 }
 
 .contact-page-wrapper .contact-form-control.textarea {
@@ -464,16 +277,17 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: var(--contact-primary);
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   padding: 0.75rem 2rem;
   font-size: 0.875rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.25s;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
   width: 100%;
 }
 
@@ -483,8 +297,14 @@
   }
 }
 
-.contact-page-wrapper .contact-submit-btn:hover {
-  background-color: var(--contact-primary-hover);
+.contact-page-wrapper .contact-submit-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(29, 78, 216, 0.35);
+  transform: translateY(-1px);
+}
+
+.contact-page-wrapper .contact-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .contact-page-wrapper .contact-submit-btn span.material-symbols-outlined {
@@ -520,7 +340,7 @@
 
 .contact-page-wrapper .contact-info-header p {
   font-size: 1rem;
-  color: var(--contact-text-muted);
+  color: var(--text-gray);
   line-height: 1.75;
   margin: 0;
 }
@@ -541,12 +361,13 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  background-color: white;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
   padding: 1.25rem;
   border-radius: 0.75rem;
-  border: 1px solid var(--contact-border);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s;
 }
 
 @media (min-width: 640px) {
@@ -556,19 +377,26 @@
 }
 
 .contact-page-wrapper .contact-info-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(19, 127, 236, 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(19, 127, 236, 0.15);
 }
 
 .contact-page-wrapper .contact-icon-box {
   width: 3rem;
   height: 3rem;
   flex-shrink: 0;
-  background-color: #eff6ff;
-  color: var(--contact-primary);
+  background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
+  transition: transform 0.3s;
+}
+
+.contact-page-wrapper .contact-info-card:hover .contact-icon-box {
+  transform: scale(1.08) rotate(-3deg);
 }
 
 .contact-page-wrapper .contact-icon-box span {
@@ -582,7 +410,7 @@
 }
 
 .contact-page-wrapper .contact-info-text p {
-  color: var(--contact-text-muted);
+  color: var(--text-gray);
   font-size: 1rem;
   line-height: 1.5;
   margin: 0;
@@ -593,7 +421,7 @@
   margin-top: 0.25rem;
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--contact-primary);
+  color: var(--primary);
   text-decoration: none;
 }
 
@@ -607,9 +435,14 @@
   width: 100%;
   border-radius: 1rem;
   overflow: hidden;
-  border: 1px solid var(--contact-border);
+  border: 1px solid rgba(226, 232, 240, 0.6);
   background-color: white;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s;
+}
+
+.contact-page-wrapper .contact-map-container:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 @media (min-width: 640px) {
@@ -627,7 +460,7 @@
 /* Footer */
 .contact-page-wrapper .contact-footer {
   background-color: white;
-  border-top: 1px solid var(--contact-border);
+  border-top: 1px solid var(--border);
   padding: 2rem 0 0 0;
 }
 
@@ -664,7 +497,7 @@
 }
 
 .contact-page-wrapper .contact-footer-brand p {
-  color: var(--contact-text-muted);
+  color: var(--text-gray);
   font-size: 0.875rem;
   margin: 1rem 0 0 0;
 }
@@ -685,14 +518,14 @@
 }
 
 .contact-page-wrapper .contact-footer-links a {
-  color: var(--contact-text-muted);
+  color: var(--text-gray);
   font-size: 0.875rem;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .contact-page-wrapper .contact-footer-links a:hover {
-  color: var(--contact-primary);
+  color: var(--primary);
 }
 
 .contact-page-wrapper .contact-socials {
@@ -701,18 +534,18 @@
 }
 
 .contact-page-wrapper .contact-socials a {
-  color: var(--contact-text-light);
+  color: var(--text-light);
   transition: color 0.2s;
   width: 1.5rem;
   height: 1.5rem;
 }
 
 .contact-page-wrapper .contact-socials a:hover {
-  color: var(--contact-primary);
+  color: var(--primary);
 }
 
 .contact-page-wrapper .contact-footer-bottom {
-  border-top: 1px solid var(--contact-border);
+  border-top: 1px solid var(--border);
   padding: 1.5rem 0;
   display: flex;
   justify-content: space-between;
@@ -726,7 +559,7 @@
 }
 
 .contact-page-wrapper .contact-footer-bottom p {
-  color: var(--contact-text-light);
+  color: var(--text-light);
   font-size: 0.875rem;
   margin: 0;
 }
@@ -735,5 +568,73 @@
 @media (max-width: 768px) {
   .contact-page-wrapper .hidden-mobile {
     display: none !important;
+  }
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Alert mesajları, footer-logo, entrance animation */
+.contact-alert {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: alertSlideIn 0.3s ease-out;
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.contact-alert .material-symbols-outlined {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.contact-alert-success {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #166534;
+  border: 1px solid rgba(22, 163, 74, 0.15);
+}
+
+.contact-alert-error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.contact-page-wrapper .contact-footer-logo {
+  display: flex;
+  align-items: center;
+}
+
+.contact-page-wrapper .contact-footer-logo img {
+  height: 50px;
+  object-fit: contain;
+}
+
+/* Content entrance animation */
+.contact-page-wrapper .contact-section {
+  animation: contactFadeIn 0.5s ease-out;
+}
+
+@keyframes contactFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
