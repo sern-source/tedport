@@ -1,181 +1,73 @@
+/**
+ * Firmalar.jsx - Companies/Suppliers Listing Page
+ * 
+ * Mobile Responsive Design & Hamburger Menu Implementation
+ * Date: April 4, 2026
+ * Author: Enes Doğanay
+ * 
+ * Features:
+ * - Responsive header with hamburger menu for mobile (< 1024px)
+ * - Full navigation bar for desktop (>= 1024px)
+ * - Advanced company search and filtering
+ * - User authentication integration
+ * - Sidebar filters (shown at 1024px+, hidden on mobile)
+ * - Adaptive company cards layout
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import './Firmalar.css';
+import SharedHeader from './SharedHeader';
+import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 
-/* ================= HEADER ================= */
-
-const Header = ({ search, setSearch, userProfile, handleLogout }) => {
-  const navigate = useNavigate();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  // Menü dışında tıklamayı algıla
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <header className="header">
-      <div className="header-left">
-        <Link to="/" className="logo-section" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
-          {/* LOGO BURAYA EKLENDİ VE 60PX OLARAK AYARLANDI */}
-          <img 
-            src="/tedport-logo.jpg" 
-            alt="Tedport Logo" 
-            style={{ height: '50px', objectFit: 'contain' }} 
-          />
-        </Link>
-        <div className="search-bar">
-          <div className="search-icon">
-            <span className="material-symbols-outlined">search</span>
-          </div>
-          <input
-            type="text"
-            placeholder="Firma, ürün ya da kategori ara..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
-      <div className="header-right">
-        <nav className="nav-links">
-          <Link to="/">Anasayfa</Link>
-          <Link to="/firmalar">Firmalar</Link>
-          <a href="/hakkimizda">Hakkımızda</a>
-          <a href="/iletisim">İletişim</a>
-          {/* Giriş yapılmamışsa linki göster */}
-          {!userProfile && <a href="/login">Giriş Yap</a>}
-        </nav>
-        
-        {/* Kullanıcı Durumuna Göre Aksiyon Alanı */}
-        <div className="user-actions">
-          {userProfile ? (
-            <div 
-              className="user-dropdown-container" 
-              ref={dropdownRef} 
-              style={{ position: 'relative' }}
-            >
-              <button 
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '6px', 
-                  background: '#1d4ed8', 
-                  color: 'white', 
-                  padding: '8px 16px', 
-                  borderRadius: '6px', 
-                  border: 'none', 
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  fontSize: '14px'
-                }}
-              >
-                
-                {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                  {isDropdownOpen ? 'expand_less' : 'expand_more'}
-                </span>
-              </button>
-
-              {/* Dropdown Menü */}
-              {isDropdownOpen && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: '0',
-                    marginTop: '8px',
-                    width: '200px',
-                    backgroundColor: '#fff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                    zIndex: 100,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden'
-                  }}
-                >
-                  <div 
-                    onClick={() => navigate('/profile')}
-                    style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>person</span>
-                    <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Profil</span>
-                  </div>
-                  
-                  <div 
-                    onClick={() => navigate('/profile?tab=favorites')}
-                    style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>favorite</span>
-                    <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Favoriler</span>
-                  </div>
-                  
-                  <div 
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      handleLogout();
-                    }}
-                    style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.2s' }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>logout</span>
-                    <span style={{ pointerEvents: 'none', fontSize: '14px', fontWeight: '500' }}>Çıkış Yap</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button 
-              onClick={() => navigate('/register')}
-              style={{ 
-                background: '#1d4ed8', 
-                color: 'white', 
-                padding: '8px 16px', 
-                borderRadius: '6px', 
-                border: 'none', 
-                cursor: 'pointer',
-                fontWeight: '500',
-                fontSize: '14px'
-              }}
-            >
-              Kayıt Ol
-            </button>
-          )}
-        </div>
-      </div>
-    </header>
-  );
-};
 
 /* ================= SIDEBAR ================= */
 
+/**
+ * Sidebar Component - Advanced Filter System
+ * 
+ * Author: Enes Doğanay
+ * Date: April 5, 2026
+ * 
+ * Updates:
+ * - Filter optimization with limited initial display (5 items per category)
+ * - Search functionality for each filter type (Konum, Sektör, Kategori)
+ * - "Daha Fazla Göster" (Show More) button to progressively load 5 more items
+ * - Auto-reset filter state when details panel is closed (onToggle handler)
+ * - Dynamic search bar in each filter section with real-time filtering
+ * 
+ * Features:
+ * - Initial display of 5 items per filter category
+ * - Progressive expansion with "Daha Fazla Göster" button
+ * - Category-specific search bars (Şehir ara, Sektör ara, Kategori ara)
+ * - Smart state reset on filter collapse (expanded count, search input)
+ * - Responsive filter UI with inline search functionality
+ */
 const Sidebar = ({ activeFilters, onApplyFilters }) => {
   const [cities, setCities] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const [selectedCities, setSelectedCities] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  
   const [selectedSectors, setSelectedSectors] = useState([]);
+
+  // Search state'leri
+  const [citiesSearch, setCitiesSearch] = useState('');
+  const [sectorsSearch, setSectorsSearch] = useState('');
+  const [categoriesSearch, setCategoriesSearch] = useState('');
+
+  // Expanded count state'leri (ilk 5'i göster, sonra daha fazla aç)
+  const [expandedCount, setExpandedCount] = useState({
+    cities: 5,
+    sectors: 5,
+    categories: 5
+  });
+
   const SEKTORLER = [
-    "Makine", "Metal", "Otomasyon", "Elektrik", "Elektronik", "Enerji", 
-    "Mekanik", "Hırdavat", "İnşaat", "Kimya", "Plastik", "Ambalaj", 
-    "Lojistik", "Tekstil", "Gıda", "Otomotiv", "Medikal", "Bilişim", 
+    "Makine", "Metal", "Otomasyon", "Elektrik", "Elektronik", "Enerji",
+    "Mekanik", "Hırdavat", "İnşaat", "Kimya", "Plastik", "Ambalaj",
+    "Lojistik", "Tekstil", "Gıda", "Otomotiv", "Medikal", "Bilişim",
     "Güvenlik", "Hizmet"
   ];
 
@@ -191,6 +83,25 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
   useEffect(() => {
     fetchFilters();
   }, []);
+
+  // Filter fonksiyonları - search'e göre listeler
+  const getFilteredCities = (searchTerm) => {
+    return cities.filter(city =>
+      city.sehir.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  const getFilteredSectors = (searchTerm) => {
+    return SEKTORLER.filter(sektor =>
+      sektor.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  const getFilteredCategories = (searchTerm) => {
+    return categories.filter(cat =>
+      cat.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
 
   const fetchFilters = async () => {
     setLoading(true);
@@ -230,7 +141,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
         newCities = selectedCities.includes(value) ? selectedCities.filter(c => c !== value) : [...selectedCities, value];
       }
       setSelectedCities(newCities);
-    } 
+    }
     else if (type === 'sectors') {
       if (isAll) {
         newSectors = selectedSectors.length === list.length ? [] : list;
@@ -238,7 +149,7 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
         newSectors = selectedSectors.includes(value) ? selectedSectors.filter(s => s !== value) : [...selectedSectors, value];
       }
       setSelectedSectors(newSectors);
-    } 
+    }
     else if (type === 'categories') {
       if (isAll) {
         newCategories = selectedCategories.length === list.length ? [] : list;
@@ -275,7 +186,14 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
 
       <div className="filter-group">
         {/* 🔵 KONUM */}
-        <details>
+        <details
+          onToggle={(e) => {
+            if (!e.target.open) {
+              setExpandedCount({ ...expandedCount, cities: 5 });
+              setCitiesSearch('');
+            }
+          }}
+        >
           <summary>
             Konum{" "}
             <span className="material-symbols-outlined">expand_more</span>
@@ -286,9 +204,25 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
               <p>Yükleniyor...</p>
             ) : (
               <>
-                
+                {/* Search Bar */}
+                <input
+                  type="text"
+                  placeholder="Şehir ara..."
+                  value={citiesSearch}
+                  onChange={(e) => setCitiesSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    marginBottom: '12px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    boxSizing: 'border-box'
+                  }}
+                />
 
-                {cities.map(city => (
+                {/* Filtered Cities List */}
+                {getFilteredCities(citiesSearch).slice(0, expandedCount.cities).map(city => (
                   <label key={city.sehir}>
                     <input
                       type="checkbox"
@@ -298,34 +232,113 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                     {city.sehir}
                   </label>
                 ))}
+
+                {/* Daha Fazla Göster Butonu */}
+                {getFilteredCities(citiesSearch).length > expandedCount.cities && (
+                  <button
+                    onClick={() => setExpandedCount({
+                      ...expandedCount,
+                      cities: expandedCount.cities + 5
+                    })}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      marginTop: '8px',
+                      background: '#f1f5f9',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: '#475569'
+                    }}
+                  >
+                    Daha fazla göster
+                  </button>
+                )}
               </>
             )}
           </div>
         </details>
 
         {/* 🔵 SEKTÖR */}
-        <details>
+        <details
+          onToggle={(e) => {
+            if (!e.target.open) {
+              setExpandedCount({ ...expandedCount, sectors: 5 });
+              setSectorsSearch('');
+            }
+          }}
+        >
           <summary>
             Sektör{" "}
             <span className="material-symbols-outlined">expand_more</span>
           </summary>
           <div className="filter-content">
-            
-            {SEKTORLER.map(sektor => (
+            {/* Search Bar */}
+            <input
+              type="text"
+              placeholder="Sektör ara..."
+              value={sectorsSearch}
+              onChange={(e) => setSectorsSearch(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '6px',
+                fontSize: '13px',
+                boxSizing: 'border-box'
+              }}
+            />
+
+            {/* Filtered Sectors List */}
+            {getFilteredSectors(sectorsSearch).slice(0, expandedCount.sectors).map(sektor => (
               <label key={sektor}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={selectedSectors.includes(sektor)}
                   onChange={() => updateFilter('sectors', sektor)}
-                /> 
+                />
                 {sektor}
               </label>
             ))}
+
+            {/* Daha Fazla Göster Butonu */}
+            {getFilteredSectors(sectorsSearch).length > expandedCount.sectors && (
+              <button
+                onClick={() => setExpandedCount({
+                  ...expandedCount,
+                  sectors: expandedCount.sectors + 5
+                })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  marginTop: '8px',
+                  background: '#f1f5f9',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  color: '#475569'
+                }}
+              >
+                Daha fazla göster
+              </button>
+            )}
           </div>
         </details>
 
         {/* 🟢 KATEGORİ */}
-        <details>
+        <details
+          onToggle={(e) => {
+            if (!e.target.open) {
+              setExpandedCount({ ...expandedCount, categories: 5 });
+              setCategoriesSearch('');
+            }
+          }}
+        >
           <summary>
             Kategori{" "}
             <span className="material-symbols-outlined">expand_more</span>
@@ -336,9 +349,25 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
               <p>Yükleniyor...</p>
             ) : (
               <>
-                
+                {/* Search Bar */}
+                <input
+                  type="text"
+                  placeholder="Kategori ara..."
+                  value={categoriesSearch}
+                  onChange={(e) => setCategoriesSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    marginBottom: '12px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    boxSizing: 'border-box'
+                  }}
+                />
 
-                {categories.map(category => (
+                {/* Filtered Categories List */}
+                {getFilteredCategories(categoriesSearch).slice(0, expandedCount.categories).map(category => (
                   <label key={category}>
                     <input
                       type="checkbox"
@@ -348,6 +377,30 @@ const Sidebar = ({ activeFilters, onApplyFilters }) => {
                     {category}
                   </label>
                 ))}
+
+                {/* Daha Fazla Göster Butonu */}
+                {getFilteredCategories(categoriesSearch).length > expandedCount.categories && (
+                  <button
+                    onClick={() => setExpandedCount({
+                      ...expandedCount,
+                      categories: expandedCount.categories + 5
+                    })}
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      marginTop: '8px',
+                      background: '#f1f5f9',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      color: '#475569'
+                    }}
+                  >
+                    Daha fazla göster
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -386,10 +439,10 @@ const SupplierCard = ({ data, onSearchTag }) => {
 
         <div className="tags">
           {(data.tags || []).map((tag, i) => (
-            <span 
-              key={i} 
-              className="tag" 
-              style={{ cursor: 'pointer' }} 
+            <span
+              key={i}
+              className="tag"
+              style={{ cursor: 'pointer' }}
               onClick={() => onSearchTag(tag)}
             >
               #{tag}
@@ -452,37 +505,6 @@ function App() {
   const [search, setSearch] = useState(urlSearchTerm);
   const [filters, setFilters] = useState({ cities: [], categories: [], sectors: [] });
 
-  // 👤 Kullanıcı Durumu State'i
-  const [userProfile, setUserProfile] = useState(null);
-
-  // Sayfa Yüklendiğinde Oturum Kontrolü
-  useEffect(() => {
-    const checkUserSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profileData) {
-          setUserProfile(profileData);
-        } else {
-          setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
-        }
-      }
-    };
-    checkUserSession();
-  }, []);
-
-  // Çıkış Yapma İşlemi
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUserProfile(null);
-  };
-
   useEffect(() => {
     fetchSuppliers();
   }, [page, search, filters]);
@@ -512,7 +534,7 @@ function App() {
         .join(',');
       query = query.or(cityQuery);
     }
-    
+
     if (filters.sectors && filters.sectors.length > 0) {
       const sectorQuery = filters.sectors
         .map(sector => `ana_sektor.ilike."%${sector.replace(/["%]/g, '')}%"`)
@@ -539,7 +561,7 @@ function App() {
       if (!rawData) return [];
       let data = rawData;
       if (typeof rawData === 'string') {
-        try { data = JSON.parse(rawData); } 
+        try { data = JSON.parse(rawData); }
         catch (e) { return []; }
       }
       if (!Array.isArray(data)) return [];
@@ -605,11 +627,15 @@ function App() {
         rel="stylesheet"
       />
 
-      <Header 
-        search={search} 
-        setSearch={setSearch} 
-        userProfile={userProfile} 
-        handleLogout={handleLogout} 
+      <SharedHeader
+        search={search}
+        setSearch={setSearch}
+        showSearchBar={true}
+        navItems={[
+          { label: 'Anasayfa', href: '/' },
+          { label: 'Hakkımızda', href: '/hakkimizda' },
+          { label: 'İletişim', href: '/iletisim' }
+        ]}
       />
 
       <main className="layout-container">
@@ -622,18 +648,18 @@ function App() {
         </div>
 
         <div className="content-grid">
-          <Sidebar 
-            activeFilters={filters} 
-            onApplyFilters={(newFilters) => setFilters(newFilters)} 
+          <Sidebar
+            activeFilters={filters}
+            onApplyFilters={(newFilters) => setFilters(newFilters)}
           />
 
           <div className="results-list">
-            
+
             {/* ETİKETLER (TAGS) ALANI */}
             {activeTags.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px', alignItems: 'center' }}>
                 <span style={{ fontSize: '14px', color: '#64748b', marginRight: '4px' }}>Uygulanan Filtreler:</span>
-                
+
                 {activeTags.map(tag => (
                   <span
                     key={`${tag.type}-${tag.value}`}
@@ -660,7 +686,7 @@ function App() {
                     </span>
                   </span>
                 ))}
-                
+
                 <button
                   onClick={() => setFilters({ cities: [], categories: [], sectors: [] })}
                   style={{
@@ -680,10 +706,10 @@ function App() {
 
             {!loading &&
               suppliers.map(supplier => (
-                <SupplierCard 
-                  key={supplier.id} 
-                  data={supplier} 
-                  onSearchTag={setSearch} 
+                <SupplierCard
+                  key={supplier.id}
+                  data={supplier}
+                  onSearchTag={setSearch}
                 />
               ))}
 

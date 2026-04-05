@@ -1,0 +1,314 @@
+/**
+ * SharedHeader.css - Reusable Header Component Styles
+ * 
+ * Author: Enes Doğanay
+ * Date: April 5, 2026
+ * 
+ * Purpose: Unified styling for SharedHeader component used across all pages
+ * Used across all pages: Home2, Firmalar, Hakkımızda, İletişim, Profile, Login, Register, FirmaDetay
+ * 
+ * Features:
+ * - Responsive header with hamburger menu for mobile (< 768px)
+ * - Desktop navigation bar (>= 768px)
+ * - User authentication dropdown with hover effects
+ * - Optional search bar for listing pages (Firmalar)
+ * - Consistent styling across all pages (unified design system)
+ * - Mobile-optimized menu animations
+ * - Accessibility-friendly navigation
+ */
+
+/* ========== HEADER STYLING ========== */
+
+.shared-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 0;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.shared-header-inner {
+    max-width: 80%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    gap: 12px;
+    position: relative;
+}
+
+@media (min-width: 640px) {
+    .shared-header-inner {
+        padding: 0 24px;
+        gap: 16px;
+    }
+}
+
+@media (min-width: 768px) {
+    .shared-header-inner {
+        padding: 0 40px;
+        gap: 32px;
+    }
+}
+
+/* ========== LOGO ========== */
+
+.shared-logo-area {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    height: 60px;
+}
+
+.shared-logo-area img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ========== SEARCH BAR ========== */
+
+.shared-search-bar {
+    position: relative;
+    flex: 1;
+    min-width: 120px;
+    max-width: 300px;
+}
+
+@media (min-width: 640px) {
+    .shared-search-bar {
+        max-width: 280px;
+    }
+}
+
+@media (min-width: 768px) {
+    .shared-search-bar {
+        flex: 0 0 320px;
+        max-width: 350px;
+    }
+}
+
+.shared-search-bar input {
+    width: 100%;
+    padding: 10px 10px 10px 36px;
+    border: none;
+    background: #f0f2f4;
+    border-radius: 8px;
+    color: #111418;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+@media (min-width: 640px) {
+    .shared-search-bar input {
+        font-size: 14px;
+        padding: 10px 12px 10px 38px;
+    }
+}
+
+.shared-search-bar input::placeholder {
+    color: #999;
+}
+
+.shared-search-bar input:focus {
+    outline: none;
+    background: #e8eaed;
+}
+
+.shared-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #617589;
+    pointer-events: none;
+    font-size: 18px;
+}
+
+@media (min-width: 640px) {
+    .shared-search-icon {
+        font-size: 20px;
+    }
+}
+
+/* ========== HAMBURGER MENU ========== */
+
+.shared-hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 12px 4px;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+}
+
+.shared-hamburger:hover {
+    opacity: 0.7;
+}
+
+.shared-hamburger:active {
+    opacity: 0.5;
+}
+
+.shared-hamburger span {
+    width: 24px;
+    height: 2.5px;
+    background-color: #111418;
+    transition: 0.3s;
+    display: block;
+    border-radius: 2px;
+}
+
+@media (min-width: 768px) {
+    .shared-hamburger {
+        display: none !important;
+    }
+}
+
+/* ========== DESKTOP NAVIGATION ========== */
+
+.shared-nav {
+    display: none;
+    align-items: center;
+    gap: 32px;
+    flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+    .shared-nav {
+        display: flex;
+    }
+}
+
+.shared-nav-links {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.shared-nav-links a {
+    text-decoration: none;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+    white-space: nowrap;
+}
+
+.shared-nav-links a:hover {
+    color: #137fec;
+}
+
+/* ========== USER ACTIONS ========== */
+
+.shared-user-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.shared-user-btn {
+    background: white;
+    color: #1d4ed8;
+    padding: 8px 16px;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.shared-user-btn:hover {
+    background: #f0f7ff;
+    color: #0c4a6e;
+    border-color: #7dd3fc;
+}
+
+.shared-user-actions button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.shared-user-actions button:hover {
+    background: #f0f2f4;
+}
+
+/* ========== MOBILE MENU ========== */
+
+.shared-mobile-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    border-top: 1px solid #f0f0f0;
+    padding: 16px;
+    gap: 4px;
+    z-index: 40;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (min-width: 768px) {
+    .shared-mobile-menu {
+        display: none !important;
+    }
+}
+
+.shared-mobile-menu a,
+.shared-mobile-menu button {
+    display: block;
+    color: #111418;
+    padding: 14px 12px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    border-radius: 6px;
+}
+
+.shared-mobile-menu a:hover,
+.shared-mobile-menu button:hover {
+    background-color: #f5f5f5;
+    color: #137fec;
+}
+
+.shared-mobile-menu a:active,
+.shared-mobile-menu button:active {
+    background-color: #efefef;
+}

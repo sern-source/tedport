@@ -1,67 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Home2.css';
+import SharedHeader from './SharedHeader';
+import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { NavLink, useNavigate } from 'react-router-dom';
 
+/**
+ * SupplierConnect Component - Home Page / Landing Page
+ * 
+ * Mobile Responsive Design & Hamburger Menu Implementation
+ * Date: April 4, 2026
+ * Author: Enes Doğanay
+ * 
+ * This component implements a responsive header with hamburger menu for mobile devices,
+ * user authentication dropdown, and search functionality. The layout automatically
+ * adapts between mobile (hamburger menu) and desktop (full navigation) views.
+ */
+
 const SupplierConnect = () => {
-
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-
     const [topSuppliers, setTopSuppliers] = useState([]);
-
-    // Kullanıcı bilgisi için state'ler
-    const [userProfile, setUserProfile] = useState(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown menü durumu
-
     const navigate = useNavigate();
-    const dropdownRef = useRef(null); // Tıklama dışı alanı algılamak için
 
     const handleSearch = () => {
         if (searchTerm.trim()) {
-            // Kelime girildiyse parametre ile yönlendir
             navigate(`/firmalar?search=${encodeURIComponent(searchTerm.trim())}`);
         } else {
-            // Kelime girilmediyse boş yönlendir
             navigate(`/firmalar`);
         }
     };
-
-    // Menü dışında bir yere tıklanınca dropdown'ı kapat
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsDropdownOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    // 👤 Oturum Kontrolü ve Profil Bilgisi Çekme İşlemi
-    useEffect(() => {
-        const checkUserSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-
-            if (session?.user) {
-                // Giriş yapılmışsa profiles tablosundan ismini çek
-                const { data: profileData } = await supabase
-                    .from('profiles')
-                    .select('first_name, last_name')
-                    .eq('id', session.user.id)
-                    .single();
-
-                if (profileData) {
-                    setUserProfile(profileData);
-                } else {
-                    // Veritabanında ismi yoksa varsayılan metin göster
-                    setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
-                }
-            }
-        };
-
-        checkUserSession();
-    }, []);
 
     // 🏢 Rastgele Firmaları Çekme İşlemi
     useEffect(() => {
@@ -95,114 +62,9 @@ const SupplierConnect = () => {
         fetchRandomSuppliers();
     }, []);
 
-    // Çıkış Yapma İşlemi
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        setUserProfile(null);
-        setIsDropdownOpen(false);
-        navigate('/'); // Opsiyonel: Çıkış yaptıktan sonra sayfayı yeniletebilirsiniz window.location.reload();
-    };
-
     return (
         <div className="supplier-connect-wrapper">
-            {/* Header */}
-            <header className="sc-header">
-                <div className="container sc-header-inner">
-                    <div className="sc-logo-area" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                        {/* LOGO BURAYA EKLENDİ */}
-                        <img
-                            src="/tedport-logo.jpg"
-                            alt="Tedport Logo"
-                            style={{ height: '60px', objectFit: 'contain' }}
-                        />
-                    </div>
-
-                    <div className="sc-nav">
-                        <div className="sc-nav-links">
-                            <a href="/firmalar">Firmalar</a>
-                            <a href="/hakkimizda">Hakkımızda</a>
-                            <a href="/iletisim">İletişim</a>
-                            {/* Sadece giriş YAPILMAMIŞSA Giriş Yap linkini göster */}
-                            {!userProfile && <a href="/login">Giriş Yap</a>}
-                        </div>
-
-                        {/* Koşullu Buton ve Dropdown Gösterimi */}
-                        {userProfile ? (
-                            <div
-                                className="user-dropdown-container"
-                                ref={dropdownRef}
-                                style={{ position: 'relative' }}
-
-                            >
-                                <button
-                                    className="sc-btn-primary"
-                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                                >
-
-                                    {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
-                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                                        {isDropdownOpen ? 'expand_less' : 'expand_more'}
-                                    </span>
-                                </button>
-
-                                {/* Dropdown Menü (Açık ise gösterilir) */}
-                                {isDropdownOpen && (
-                                    <div
-                                        style={{
-                                            position: 'absolute',
-                                            top: '100%',
-                                            right: '0',
-                                            marginTop: '8px',
-                                            width: '200px',
-                                            backgroundColor: '#fff',
-                                            border: '1px solid #e2e8f0',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-                                            zIndex: 100,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            overflow: 'hidden'
-                                        }}
-                                    >
-                                        <div
-                                            onClick={() => navigate('/profile')}
-                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
-                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
-                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                                        >
-                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>person</span>
-                                            <span style={{ pointerEvents: 'none' }}>Profil</span>
-                                        </div>
-
-                                        <div
-                                            onClick={() => navigate('/profile?tab=favorites')} // Favoriler sekmesini Profile sayfasında yönetebilirsiniz
-                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#334155', borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}
-                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
-                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                                        >
-                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>favorite</span>
-                                            <span style={{ pointerEvents: 'none' }}>Favoriler</span>
-                                        </div>
-
-                                        <div
-                                            onClick={handleLogout}
-                                            style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: '#ef4444', transition: 'background 0.2s' }}
-                                            onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
-                                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                                        >
-                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', pointerEvents: 'none' }}>logout</span>
-                                            <span style={{ pointerEvents: 'none' }}>Çıkış Yap</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <button className="sc-btn-primary" onClick={() => navigate(`/register`)}>Kayıt Ol</button>
-                        )}
-                    </div>
-                </div>
-            </header>
+            <SharedHeader />
 
             <main>
                 {/* Hero Section */}
@@ -377,8 +239,8 @@ const SupplierConnect = () => {
                         <h2>İşinizi Büyütmeye Hazır mısınız?</h2>
                         <p>Her gün uluslararası alıcılarla bağlantı kuran binlerce tedarikçiye katılın. Ücretsiz profilinizi şimdi oluşturun.</p>
                         <div className="sc-cta-buttons">
-                            <button className="sc-btn-white" onClick={() => navigate(userProfile ? '/profile' : '/register')}>
-                                {userProfile ? 'Profilime Git' : 'Tedarikçi Olarak Katıl'}
+                            <button className="sc-btn-white" onClick={() => navigate('/register')}>
+                                Tedarikçi Olarak Katıl
                             </button>
                             <button className="sc-btn-transparent" onClick={() => navigate('/firmalar')}>
                                 Ürünleri Keşfet

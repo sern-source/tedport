@@ -1,12 +1,28 @@
+/**
+ * FirmaDetay.css - Company Detail/Profile Page Styles
+ * 
+ * Mobile Responsive Design & Hamburger Menu Implementation
+ * Date: April 4, 2026
+ * Author: Enes Doğanay
+ * 
+ * Responsive Breakpoints:
+ * - Mobile: Default (< 1024px) - Single column layout, hamburger menu visible
+ * - Tablet: 540px - 1023px - Progressive layout adjustments
+ * - Desktop: >= 1024px - Two-column layout, sidebar visible, full navigation
+ * 
+ * Key Features:
+ * - Hamburger menu for mobile navigation
+ * - Accordion (açılır/kapalır) ürün kategorileri stili
+ * - İhale/Tender (Calls) bölümü stili
+ * - Responsive grid and flexbox layouts
+ * - Animate slide-down efekti accordion içeriği için
+ * - Sticky sidebar on desktop, static on mobile
+ */
+
 /* Değişkenler ve Temel Ayarlar */
 /* 
   ===== FİRMA DETAY SAYFASI CSS =====
   Güncelleme: Enes Doğanay | Tarih: 4 Nisan 2026
-  Değişiklikler:
-  - Accordion (açılır/kapalır) ürün kategorileri stili eklendi
-  - İhale/Tender (Calls) bölümü stili eklendi
-  - Responsive tasarım güncellemesi (mobilde tek sütun layout)
-  - Animate slide-down efekti accordion içeriği için
 */
 :root {
   --primary: #137fec;
@@ -48,21 +64,140 @@ body {
 .header {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
   background: var(--bg-white);
   border-bottom: 1px solid var(--border);
-  padding: 0.75rem 2.5rem;
+  padding: 0.75rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
-.header-left,
-.header-right {
+@media (min-width: 540px) {
+  .header {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header {
+    padding: 0.75rem 2.5rem;
+  }
+}
+
+.header-left {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+}
+
+.header-right {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .header-right {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+
+  .header-left,
+  .header-right {
+    gap: 2rem;
+  }
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-nav {
+  display: none;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .header-nav {
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-nav {
+    display: flex;
+  }
+}
+
+.header-nav a {
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.header-nav a:hover {
+  color: var(--primary);
+}
+
+/* Mobile Hamburger Menu Button
+ * Responsive: Visible on mobile/tablet (< 1024px), hidden on desktop
+ * Three-line hamburger icon created with flexbox and span elements
+ * Smooth 0.3s transitions for animation effects
+ * Author: Enes Doğanay | Date: April 4, 2026
+ */
+.sc-hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px;
+}
+
+.sc-hamburger span {
+  width: 24px;
+  height: 2px;
+  background-color: var(--text-dark);
+  transition: 0.3s;
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .sc-hamburger {
+    display: none;
+  }
+}
+
+.user-actions {
+  display: none;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .user-actions {
+    display: flex;
+  }
+}
+
+.user-actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: var(--radius-lg);
+}
+
+.user-actions button:hover {
+  background: #f0f2f4;
 }
 
 .brand {
@@ -91,46 +226,54 @@ body {
   width: 100%;
 }
 
-.header-nav {
-  display: flex;
-  gap: 2.25rem;
-}
-
-.header-nav a {
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-dark);
-  transition: color 0.2s;
-}
-
-.header-nav a:hover {
-  color: var(--primary);
-}
-
 /* Hero / Üst Bilgi Alanı */
 .profile-hero {
   background: var(--bg-white);
   border-bottom: 1px solid var(--border);
-  padding: 2rem 0;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 540px) {
+  .profile-hero {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .profile-hero {
+    padding: 2rem 0;
+  }
 }
 
 .container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 2.5rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 540px) {
+  .container {
+    padding: 0 1.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
   .container {
-    padding: 0 10rem;
+    padding: 0 2.5rem;
   }
 }
 
 .hero-flex {
   display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .hero-flex {
+    flex-direction: row;
+  }
 }
 
 .logo-box {
@@ -157,11 +300,18 @@ body {
 }
 
 .company-name {
-  font-size: 1.875rem;
+  font-size: 1.375rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .company-name {
+    font-size: 1.875rem;
+  }
 }
 
 .verified-badge {
@@ -197,7 +347,14 @@ body {
 /* Butonlar */
 .btn-group {
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .btn-group {
+    flex-direction: row;
+  }
 }
 
 .btn {
@@ -208,13 +365,19 @@ body {
   cursor: pointer;
   border: 1px solid transparent;
   transition: 0.2s;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .btn {
+    width: auto;
+  }
 }
 
 .btn-primary {
   background: var(--primary);
   color: white;
   box-shadow: 0 4px 6px -1px rgba(19, 127, 236, 0.2);
-  width: 200px;
 }
 
 .btn-primary:hover {
@@ -267,8 +430,15 @@ body {
 .content-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
-  padding: 2rem 0;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .content-grid {
+    gap: 2rem;
+    padding: 2rem 0;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -293,8 +463,14 @@ body {
   background: var(--bg-white);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 1.5rem;
+  padding: 1.25rem;
   box-shadow: var(--shadow);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 1.5rem;
+  }
 }
 
 /* Ürün Kartları */
@@ -324,11 +500,18 @@ body {
 
 /* Sidebar */
 .sticky-sidebar {
-  position: sticky;
-  top: 140px;
+  position: static;
+  top: auto;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .sticky-sidebar {
+    position: sticky;
+    top: 140px;
+  }
 }
 
 .map {
@@ -374,17 +557,24 @@ body {
 
 .accordion-button {
   width: 100%;
-  padding: 1rem;
+  padding: 0.875rem;
   border: none;
   background: var(--bg-white);
   color: var(--text-dark);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   transition: all 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .accordion-button {
+    padding: 1rem;
+    font-size: 1rem;
+  }
 }
 
 .accordion-button:hover {

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Login.css';
+import SharedHeader from './SharedHeader';
+import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,7 +22,7 @@ const LoginPage = () => {
     const checkSession = async () => {
       // Mevcut oturumu al
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       // Eğer kullanıcı zaten giriş yapmışsa, beklemeden profile yönlendir
       if (session) {
         navigate('/profile');
@@ -74,18 +76,14 @@ const LoginPage = () => {
     <div className="app-container">
 
       {/* HEADER */}
-      <header className="main-header">
-        <div className="header-content">
-          <div className="logo-section" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-            {/* LOGO BURAYA EKLENDİ */}
-            <img 
-                src="/tedport-logo.jpg" 
-                alt="Tedport Logo" 
-                style={{ height: '50px', objectFit: 'contain' }} 
-            />
-          </div>
-        </div>
-      </header>
+      <SharedHeader
+        navItems={[
+          { label: 'Anasayfa', href: '/' },
+          { label: 'Firmalar', href: '/firmalar' },
+          { label: 'Hakkımızda', href: '/hakkimizda' },
+          { label: 'İletişim', href: '/iletisim' }
+        ]}
+      />
 
       {/* MAIN */}
       <main className="main-content">

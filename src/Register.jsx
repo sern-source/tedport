@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Yönlendirme için eklendi
+import { useNavigate } from 'react-router-dom';
 import './Register.css';
+import SharedHeader from './SharedHeader';
+import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 
 const RegistrationPage = () => {
   const navigate = useNavigate(); // Yönlendirme fonksiyonumuzu başlatıyoruz
   const [registrationType, setRegistrationType] = useState('individual');
-  
+
   // Form State'leri
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [firstName, setFirstName] = useState('');
@@ -16,7 +18,7 @@ const RegistrationPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
-  
+
   // Arayüz kontrol state'leri
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,7 +45,7 @@ const RegistrationPage = () => {
   // Supabase Kayıt İşlemi
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!termsAccepted) {
       showMessage('error', "Lütfen hizmet şartlarını ve gizlilik politikasını kabul edin.");
       return;
@@ -72,9 +74,9 @@ const RegistrationPage = () => {
         if (profilePhoto) {
           const fileExt = profilePhoto.name.split('.').pop();
           const fileName = `${userId}-${Math.random()}.${fileExt}`;
-          
+
           const { error: uploadError } = await supabase.storage
-            .from('avatars') 
+            .from('avatars')
             .upload(fileName, profilePhoto);
 
           if (!uploadError) {
@@ -113,7 +115,7 @@ const RegistrationPage = () => {
 
     } catch (error) {
       console.error("Kayıt hatası:", error.message);
-      
+
       let trMessage = error.message;
 
       // Hata mesajlarını Türkçeleştirme ve özelleştirme
@@ -134,26 +136,14 @@ const RegistrationPage = () => {
   return (
     <div className="page-container">
       {/* Header */}
-      <header className="header">
-        <div className="logo-section" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-          {/* LOGO BURAYA EKLENDİ */}
-          <img 
-              src="/tedport-logo.jpg" 
-              alt="Tedport Logo" 
-              style={{ height: '50px', objectFit: 'contain' }} 
-          />
-        </div>
-        <div className="header-right">
-          <nav className="nav-links">
-            <a href="/">Anasayfa</a>
-            <a href="/firmalar">Firmalar</a>
-            <a href="/hakkimizda">Hakkımızda</a>
-            <a href="/iletisim">İletişim</a>
-            <a href="/login">Giriş Yap</a>
-          </nav>
-          
-        </div>
-      </header>
+      <SharedHeader
+        navItems={[
+          { label: 'Anasayfa', href: '/' },
+          { label: 'Firmalar', href: '/firmalar' },
+          { label: 'Hakkımızda', href: '/hakkimizda' },
+          { label: 'İletişim', href: '/iletisim' }
+        ]}
+      />
 
       {/* Main Content */}
       <main className="main-content">
@@ -164,7 +154,7 @@ const RegistrationPage = () => {
 
           {/* BİLDİRİM (MESAJ) ALANI */}
           {notification.show && (
-            <div 
+            <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -190,14 +180,14 @@ const RegistrationPage = () => {
 
           <div className="tabs-container">
             <div className="tabs">
-              <button 
+              <button
                 className={`tab-btn ${registrationType === 'individual' ? 'active' : ''}`}
                 onClick={() => setRegistrationType('individual')}
                 type="button"
               >
                 Bireysel Kayıt
               </button>
-              <button 
+              <button
                 className={`tab-btn ${registrationType === 'corporate' ? 'active' : ''}`}
                 onClick={() => setRegistrationType('corporate')}
                 type="button"
@@ -213,10 +203,10 @@ const RegistrationPage = () => {
                 <span className="material-symbols-outlined" style={{ fontSize: '30px' }}>
                   {profilePhoto ? 'check_circle' : 'add_a_photo'}
                 </span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  style={{ display: 'none' }} 
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
                   onChange={handlePhotoChange}
                 />
               </label>
@@ -228,10 +218,10 @@ const RegistrationPage = () => {
             <div className="form-row">
               <div className="input-group">
                 <label>Ad</label>
-                <input 
-                  className="form-input" 
-                  type="text" 
-                  placeholder="Adınızı girin" 
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="Adınızı girin"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
@@ -239,10 +229,10 @@ const RegistrationPage = () => {
               </div>
               <div className="input-group">
                 <label>Soyad</label>
-                <input 
-                  className="form-input" 
-                  type="text" 
-                  placeholder="Soyadınızı girin" 
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="Soyadınızı girin"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
@@ -253,10 +243,10 @@ const RegistrationPage = () => {
             <div className="input-group">
               <label>Şirket Adı</label>
               <div className="input-wrapper">
-                <input 
-                  className="form-input" 
-                  type="text" 
-                  placeholder="Şirket ismini girin" 
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="Şirket ismini girin"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                 />
@@ -267,10 +257,10 @@ const RegistrationPage = () => {
             <div className="input-group">
               <label>Telefon Numarası</label>
               <div className="input-wrapper">
-                <input 
-                  className="form-input" 
-                  type="tel" 
-                  placeholder="0 (5XX) XXX XX XX" 
+                <input
+                  className="form-input"
+                  type="tel"
+                  placeholder="0 (5XX) XXX XX XX"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
@@ -282,10 +272,10 @@ const RegistrationPage = () => {
             <div className="input-group">
               <label>E-posta Adresi</label>
               <div className="input-wrapper">
-                <input 
-                  className="form-input" 
-                  type="email" 
-                  placeholder="ornek@email.com" 
+                <input
+                  className="form-input"
+                  type="email"
+                  placeholder="ornek@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -297,15 +287,15 @@ const RegistrationPage = () => {
             <div className="input-group">
               <label>Şifre</label>
               <div className="input-wrapper">
-                <input 
-                  className="form-input" 
-                  type={showPassword ? "text" : "password"} 
-                  placeholder="••••••••" 
+                <input
+                  className="form-input"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <span 
+                <span
                   className="material-symbols-outlined input-icon clickable"
                   onClick={() => setShowPassword(!showPassword)}
                   style={{ cursor: 'pointer' }}
@@ -316,9 +306,9 @@ const RegistrationPage = () => {
             </div>
 
             <div className="checkbox-group">
-              <input 
-                type="checkbox" 
-                id="terms" 
+              <input
+                type="checkbox"
+                id="terms"
                 checked={termsAccepted}
                 onChange={(e) => setTermsAccepted(e.target.checked)}
               />
@@ -335,7 +325,7 @@ const RegistrationPage = () => {
 
           <div className="card-footer">
             <div className='footerText'>
-                Zaten bir hesabınız var mı? <a href="/login" className="text-link" style={{ fontWeight: 500 }}>Giriş Yap</a>
+              Zaten bir hesabınız var mı? <a href="/login" className="text-link" style={{ fontWeight: 500 }}>Giriş Yap</a>
             </div>
           </div>
         </div>
