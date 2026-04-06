@@ -926,6 +926,20 @@ body {
   box-shadow: 0 12px 24px rgba(19, 127, 236, 0.24);
 }
 
+.btn-request-quote:disabled {
+  background: #cbd5e1;
+  border-color: #cbd5e1;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-request-quote:disabled:hover {
+  background: #cbd5e1;
+  box-shadow: none;
+  transform: none;
+}
+
 .contact-link-wrap {
   display: block;
   text-decoration: none;
@@ -938,6 +952,14 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+.contact-gated-text {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .sidebar-divider {

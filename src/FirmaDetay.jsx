@@ -549,90 +549,101 @@ const SupplierProfile = () => {
                                 {/* Enes Doğanay | 6 Nisan 2026: Favori ve liste akışı iletişim kartından ayrılarak ayrı bağlama taşındı */}
                                 <h3 className="sidebar-heading">Listelere Ekle</h3>
 
-                                {userProfile && !isFavorited && (
-                                    <div className="list-selector-card">
-                                        {/* Enes Doğanay | 6 Nisan 2026: Liste secme ve yeni liste olusturma ayni blokta toplandi */}
-                                        <div className="list-selector-header">
-                                            <label className="list-label">
-                                                Hangi listeye eklensin?
-                                            </label>
-                                            {!isCreatingList && (
-                                                <button
-                                                    type="button"
-                                                    className="create-list-inline-trigger"
-                                                    onClick={() => setIsCreatingList(true)}
-                                                >
-                                                    <span className="material-symbols-outlined">add</span>
-                                                    Yeni Liste
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        <select
-                                            value={selectedListId}
-                                            onChange={(e) => setSelectedListId(e.target.value)}
-                                            className="list-select"
-                                        >
-                                            <option value="">Genel Favoriler (Tümü)</option>
-                                            {myLists.map(liste => (
-                                                <option key={liste.id} value={liste.id}>{liste.liste_adi}</option>
-                                            ))}
-                                        </select>
-
-                                        <p className="list-helper-text">
-                                            Yeni oluşturulan liste otomatik olarak seçilir.
-                                        </p>
-
-                                        {isCreatingList && (
-                                            <div className="create-list-inline create-list-inline-form">
-                                                <input
-                                                    type="text"
-                                                    value={newListName}
-                                                    onChange={(e) => setNewListName(e.target.value)}
-                                                    onKeyDown={handleListInputKeyDown}
-                                                    placeholder="Yeni liste adı"
-                                                    className="create-list-inline-input"
-                                                    maxLength={60}
-                                                    autoFocus
-                                                />
-                                                <div className="create-list-inline-actions">
-                                                    <button
-                                                        type="button"
-                                                        className="create-list-inline-submit"
-                                                        onClick={handleCreateList}
-                                                        disabled={isListCreating || !newListName.trim()}
-                                                    >
-                                                        {isListCreating ? 'Oluşturuluyor...' : 'Liste Oluştur'}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="create-list-inline-cancel"
-                                                        onClick={() => {
-                                                            setIsCreatingList(false);
-                                                            setNewListName('');
-                                                        }}
-                                                        disabled={isListCreating}
-                                                    >
-                                                        Vazgeç
-                                                    </button>
+                                {userProfile ? (
+                                    <>
+                                        {!isFavorited && (
+                                            <div className="list-selector-card">
+                                                {/* Enes Doğanay | 6 Nisan 2026: Liste secme ve yeni liste olusturma ayni blokta toplandi */}
+                                                <div className="list-selector-header">
+                                                    <label className="list-label">
+                                                        Hangi listeye eklensin?
+                                                    </label>
+                                                    {!isCreatingList && (
+                                                        <button
+                                                            type="button"
+                                                            className="create-list-inline-trigger"
+                                                            onClick={() => setIsCreatingList(true)}
+                                                        >
+                                                            <span className="material-symbols-outlined">add</span>
+                                                            Yeni Liste
+                                                        </button>
+                                                    )}
                                                 </div>
+
+                                                <select
+                                                    value={selectedListId}
+                                                    onChange={(e) => setSelectedListId(e.target.value)}
+                                                    className="list-select"
+                                                >
+                                                    <option value="">Genel Favoriler (Tümü)</option>
+                                                    {myLists.map(liste => (
+                                                        <option key={liste.id} value={liste.id}>{liste.liste_adi}</option>
+                                                    ))}
+                                                </select>
+
+                                                <p className="list-helper-text">
+                                                    Yeni oluşturulan liste otomatik olarak seçilir.
+                                                </p>
+
+                                                {isCreatingList && (
+                                                    <div className="create-list-inline create-list-inline-form">
+                                                        <input
+                                                            type="text"
+                                                            value={newListName}
+                                                            onChange={(e) => setNewListName(e.target.value)}
+                                                            onKeyDown={handleListInputKeyDown}
+                                                            placeholder="Yeni liste adı"
+                                                            className="create-list-inline-input"
+                                                            maxLength={60}
+                                                            autoFocus
+                                                        />
+                                                        <div className="create-list-inline-actions">
+                                                            <button
+                                                                type="button"
+                                                                className="create-list-inline-submit"
+                                                                onClick={handleCreateList}
+                                                                disabled={isListCreating || !newListName.trim()}
+                                                            >
+                                                                {isListCreating ? 'Oluşturuluyor...' : 'Liste Oluştur'}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="create-list-inline-cancel"
+                                                                onClick={() => {
+                                                                    setIsCreatingList(false);
+                                                                    setNewListName('');
+                                                                }}
+                                                                disabled={isListCreating}
+                                                            >
+                                                                Vazgeç
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
+
+                                        {/* Enes Doğanay | 6 Nisan 2026: Favori butonu sadeleştirildi, kalp kaldırıldı ve tek satırlı kurumsal CTA yapısı korundu */}
+                                        <button
+                                            onClick={toggleFavorite}
+                                            className={`btn-favorite ${isFavorited ? 'btn-favorite--active' : ''}`}
+                                        >
+                                            <span className="material-symbols-outlined btn-favorite-icon">
+                                                {isFavorited ? 'bookmark_remove' : 'playlist_add'}
+                                            </span>
+                                            <span>
+                                                {isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+                                            </span>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className="notes-login-prompt">
+                                        {/* Enes Doğanay | 6 Nisan 2026: Giriş yapmayan kullanıcı için favori kartında da not kartıyla aynı boş durum gösterilir */}
+                                        <span className="material-symbols-outlined notes-lock-icon">lock</span>
+                                        <p className="notes-login-text">Bu firmayı listelerinize eklemek için lütfen giriş yapın.</p>
+                                        <button onClick={() => navigate('/login')} className="notes-login-btn">Giriş Yap</button>
                                     </div>
                                 )}
-
-                                {/* Enes Doğanay | 6 Nisan 2026: Favori butonu sadeleştirildi, kalp kaldırıldı ve tek satırlı kurumsal CTA yapısı korundu */}
-                                <button
-                                    onClick={toggleFavorite}
-                                    className={`btn-favorite ${isFavorited ? 'btn-favorite--active' : ''}`}
-                                >
-                                    <span className="material-symbols-outlined btn-favorite-icon">
-                                        {isFavorited ? 'bookmark_remove' : 'playlist_add'}
-                                    </span>
-                                    <span>
-                                        {isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
-                                    </span>
-                                </button>
                             </div>
 
                             <div className="card sidebar-card sidebar-card-contact">
@@ -640,18 +651,22 @@ const SupplierProfile = () => {
                                 <h3 className="sidebar-heading">İletişime Geç</h3>
 
                                 {/* Enes Doğanay | 6 Nisan 2026: Teklif iste ana CTA olarak güçlendirildi */}
-                                <button className="btn btn-primary btn-full btn-request-quote">
+                                <button className="btn btn-primary btn-full btn-request-quote" disabled={!userProfile}>
                                     Teklif İste
                                 </button>
 
                                 {/* TELEFON, KONUM, ADRES, WEB VB. (Öncekiyle aynı) */}
-                                {firma.telefon && (
+                                {userProfile && firma.telefon && (
                                     <a href={`tel:${firma.telefon}`} className="contact-link-wrap">
                                         <button className="btn btn-outline btn-full btn-contact">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                                             {firma.telefon}
                                         </button>
                                     </a>
+                                )}
+
+                                {!userProfile && (
+                                    <p className="contact-gated-text">Teklif istemek ve telefon bilgisini görmek için giriş yapın.</p>
                                 )}
                                 {/* Enes Doğanay | 6 Nisan 2026: Konum ve firma bilgileri tek bir panel altında toparlandı */}
                                 <div className="contact-details-panel">
