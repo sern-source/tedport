@@ -120,9 +120,12 @@ const SupplierProfile = () => {
     const [userProfile, setUserProfile] = useState(null);
 
     // 📝 Kişisel Not ve Favori State'leri
+    const [noteTitle, setNoteTitle] = useState('');
     const [noteText, setNoteText] = useState('');
-    const [savedNote, setSavedNote] = useState(null);
+    const [savedNotes, setSavedNotes] = useState([]);
     const [isNoteSaving, setIsNoteSaving] = useState(false);
+    const [editingNoteId, setEditingNoteId] = useState(null);
+    const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState(null);
 
     // 💖 Favori ve Liste State'leri
     const [isFavorited, setIsFavorited] = useState(false);
@@ -228,6 +231,51 @@ const SupplierProfile = () => {
         setExpandedCategories(newExpanded);
     };
 
+    // Enes Doğanay | 6 Nisan 2026: Notlar baslik/etiket govdesiyle JSON veya eski duz metin olarak okunabilir
+    const parseNotePayload = (rawNoteText) => {
+        if (!rawNoteText) {
+            return { title: '', tag: '', body: '' };
+        }
+
+        try {
+            const parsed = JSON.parse(rawNoteText);
+            if (parsed && typeof parsed === 'object' && 'body' in parsed) {
+                return {
+                    title: parsed.title || '',
+                    tag: parsed.tag || '',
+                    body: parsed.body || ''
+                };
+            }
+        } catch (error) {
+            // Eski düz metin notlar için sessizce fallback yapılır.
+        }
+
+        return { title: '', tag: '', body: rawNoteText };
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Not verisi tek kolon icinde geriye uyumlu sekilde saklanir
+    const serializeNotePayload = (title, body) => {
+        return JSON.stringify({
+            title: title.trim(),
+            tag: '',
+            body: body.trim()
+        });
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Notlar bugun/dun/daha eski olarak gruplanir
+    const getNoteGroupLabel = (dateValue) => {
+        const noteDate = new Date(dateValue);
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const yesterdayStart = new Date(todayStart);
+        yesterdayStart.setDate(todayStart.getDate() - 1);
+        const noteStart = new Date(noteDate.getFullYear(), noteDate.getMonth(), noteDate.getDate());
+
+        if (noteStart.getTime() === todayStart.getTime()) return 'Bugün';
+        if (noteStart.getTime() === yesterdayStart.getTime()) return 'Dün';
+        return 'Daha Eski';
+    };
+
     // Firma ve Oturum/Not/Favori verilerini çekme
     useEffect(() => {
         fetchFirma();
@@ -256,15 +304,18 @@ const SupplierProfile = () => {
         if (session?.user) {
             const [profileRes, noteRes, listsRes, favRes] = await Promise.all([
                 supabase.from('profiles').select('first_name, last_name').eq('id', session.user.id).single(),
-                supabase.from('kisisel_notlar').select('*').eq('user_id', session.user.id).eq('firma_id', id).maybeSingle(),
+                supabase.from('kisisel_notlar').select('*').eq('user_id', session.user.id).eq('firma_id', id).order('updated_at', { ascending: false }),
                 supabase.from('kullanici_listeleri').select('*').eq('user_id', session.user.id).order('created_at', { ascending: true }),
                 supabase.from('kullanici_favorileri').select('*').eq('user_id', session.user.id).eq('firma_id', id).maybeSingle()
             ]);
 
             setUserProfile(profileRes.data || { first_name: 'Profilime', last_name: 'Git' });
-            if (noteRes.data) setSavedNote(noteRes.data);
+            if (noteRes.data) setSavedNotes(noteRes.data);
             if (listsRes.data) setMyLists(listsRes.data);
-            if (favRes.data) setIsFavorited(true);
+            if (favRes.data) {
+                setIsFavorited(true);
+                setSelectedListId(favRes.data.liste_id || '');
+            }
         }
     };
 
@@ -373,23 +424,84 @@ const SupplierProfile = () => {
             if (!session?.user) return alert("Lütfen önce giriş yapın.");
 
             const now = new Date().toISOString();
+            const notePayload = serializeNotePayload(noteTitle, noteText);
             let response;
 
-            if (savedNote) {
-                response = await supabase.from('kisisel_notlar').update({ not_metni: noteText, updated_at: now }).eq('id', savedNote.id).select().single();
+            if (editingNoteId) {
+                response = await supabase
+                    .from('kisisel_notlar')
+                    .update({ not_metni: notePayload, updated_at: now })
+                    .eq('id', editingNoteId)
+                    .select()
+                    .single();
             } else {
-                response = await supabase.from('kisisel_notlar').insert([{ user_id: session.user.id, firma_id: id, not_metni: noteText, updated_at: now }]).select().single();
+                response = await supabase
+                    .from('kisisel_notlar')
+                    .insert([{
+                        user_id: session.user.id,
+                        firma_id: id,
+                        not_metni: notePayload,
+                        updated_at: now
+                    }])
+                    .select()
+                    .single();
             }
 
             if (response.error) throw response.error;
-            setSavedNote(response.data);
+            if (editingNoteId) {
+                setSavedNotes((prev) => prev.map((savedNote) => savedNote.id === editingNoteId ? response.data : savedNote));
+            } else {
+                setSavedNotes((prev) => [response.data, ...prev]);
+            }
+            setNoteTitle('');
             setNoteText('');
+            setEditingNoteId(null);
+            setPendingDeleteNoteId(null);
         } catch (error) {
             console.error("Not kaydedilemedi:", error);
             alert("Not kaydedilirken bir hata oluştu.");
         } finally {
             setIsNoteSaving(false);
         }
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Not kartindan duzenleme akisi ana form alanina tasinir
+    const handleEditNote = (savedNote) => {
+        const parsedNote = parseNotePayload(savedNote.not_metni);
+        setEditingNoteId(savedNote.id);
+        setPendingDeleteNoteId(null);
+        setNoteTitle(parsedNote.title);
+        setNoteText(parsedNote.body);
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Duzenleme iptal edilince form temizlenir
+    const handleCancelNoteEditing = () => {
+        setEditingNoteId(null);
+        setNoteTitle('');
+        setNoteText('');
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Kullanicinin ekledigi notlari kart ici onayla silebilmesi icin aksiyon eklendi
+    const handleDeleteNote = async (noteId) => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        const { error } = await supabase
+            .from('kisisel_notlar')
+            .delete()
+            .eq('id', noteId)
+            .eq('user_id', session.user.id);
+
+        if (error) {
+            alert('Not silinemedi.');
+            return;
+        }
+
+        setSavedNotes((prev) => prev.filter((savedNote) => savedNote.id !== noteId));
+        if (editingNoteId === noteId) {
+            handleCancelNoteEditing();
+        }
+        setPendingDeleteNoteId(null);
     };
 
     // Enes Doğanay | 6 Nisan 2026: Inline style yerine CSS class kullanıldı
@@ -400,6 +512,20 @@ const SupplierProfile = () => {
     const encodedAddress = encodeURIComponent(adresText);
     const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodedAddress}&zoom=14&size=600x300&markers=color:red|${encodedAddress}&key=YOUR_GOOGLE_MAPS_API_KEY`.replace(/\s/g, '');
     const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    // Enes Doğanay | 6 Nisan 2026: Favorinin kayitli oldugu liste adini aktif durumda gostermek icin hesaplanir
+    const activeFavoriteListName = selectedListId
+        ? myLists.find((liste) => String(liste.id) === String(selectedListId))?.liste_adi || 'Özel Liste'
+        : 'Genel Favoriler';
+    const groupedSavedNotes = savedNotes.reduce((groups, savedNote) => {
+        const groupLabel = getNoteGroupLabel(savedNote.updated_at || savedNote.created_at);
+        if (!groups[groupLabel]) {
+            groups[groupLabel] = [];
+        }
+
+        groups[groupLabel].push(savedNote);
+        return groups;
+    }, {});
+    const orderedNoteGroups = ['Bugün', 'Dün', 'Daha Eski'].filter((groupLabel) => groupedSavedNotes[groupLabel]?.length);
 
     return (
         <>
@@ -635,6 +761,12 @@ const SupplierProfile = () => {
                                                 {isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
                                             </span>
                                         </button>
+
+                                        {isFavorited && (
+                                            <p className="favorite-list-status">
+                                                Bu firma şu anda <strong>{activeFavoriteListName}</strong> listesinde kayıtlı.
+                                            </p>
+                                        )}
                                     </>
                                 ) : (
                                     <div className="notes-login-prompt">
@@ -652,6 +784,7 @@ const SupplierProfile = () => {
 
                                 {/* Enes Doğanay | 6 Nisan 2026: Teklif iste ana CTA olarak güçlendirildi */}
                                 <button className="btn btn-primary btn-full btn-request-quote" disabled={!userProfile}>
+                                    {!userProfile && <span className="material-symbols-outlined btn-request-quote-icon">lock</span>}
                                     Teklif İste
                                 </button>
 
@@ -666,7 +799,10 @@ const SupplierProfile = () => {
                                 )}
 
                                 {!userProfile && (
-                                    <p className="contact-gated-text">Teklif istemek ve telefon bilgisini görmek için giriş yapın.</p>
+                                    <div className="contact-gated-panel">
+                                        <p className="contact-gated-text">Teklif istemek ve telefon bilgisini görmek için giriş yapın.</p>
+                                        <button onClick={() => navigate('/login')} className="notes-login-btn contact-login-btn">Giriş Yap</button>
+                                    </div>
                                 )}
                                 {/* Enes Doğanay | 6 Nisan 2026: Konum ve firma bilgileri tek bir panel altında toparlandı */}
                                 <div className="contact-details-panel">
@@ -711,19 +847,86 @@ const SupplierProfile = () => {
                                 <div className="notes-header">
                                     <span className="material-symbols-outlined notes-header-icon">edit_note</span>
                                     <h3 className="notes-title">Kişisel Notlarım</h3>
+                                    {userProfile && savedNotes.length > 0 && <span className="notes-count-badge">{savedNotes.length}</span>}
                                 </div>
 
                                 {userProfile ? (
                                     <>
+                                        {/* Enes Doğanay | 6 Nisan 2026: Coklu not deneyimi icin baslik ve etiket alanlari eklendi */}
+                                        <div className="note-meta-row">
+                                            <input
+                                                type="text"
+                                                value={noteTitle}
+                                                onChange={(event) => setNoteTitle(event.target.value)}
+                                                placeholder="Kısa başlık"
+                                                className="note-meta-input"
+                                                maxLength={50}
+                                            />
+                                        </div>
                                         <textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} placeholder="Bu tedarikçi hakkında not al..." className="note-textarea" />
                                         <div className="note-actions">
-                                            <button onClick={() => setNoteText('')} className="note-clear-btn">Temizle</button>
-                                            <button onClick={handleSaveNote} disabled={isNoteSaving} className="note-save-btn">{isNoteSaving ? 'Kaydediliyor...' : 'Notu Kaydet'}</button>
+                                            {editingNoteId ? (
+                                                <button onClick={handleCancelNoteEditing} className="note-clear-btn">Vazgeç</button>
+                                            ) : (
+                                                <button onClick={() => { setNoteTitle(''); setNoteText(''); }} className="note-clear-btn">Temizle</button>
+                                            )}
+                                            <button onClick={handleSaveNote} disabled={isNoteSaving} className="note-save-btn">{isNoteSaving ? 'Kaydediliyor...' : editingNoteId ? 'Notu Güncelle' : 'Notu Kaydet'}</button>
                                         </div>
-                                        {savedNote && savedNote.not_metni && (
-                                            <div className="saved-note">
-                                                <p className="saved-note-text">{savedNote.not_metni}</p>
-                                                <p className="saved-note-date">Kaydedildi: {new Date(savedNote.updated_at).toLocaleDateString('tr-TR')}</p>
+                                        {savedNotes.length > 0 ? (
+                                            <div className="notes-feed">
+                                                {orderedNoteGroups.map((groupLabel) => (
+                                                    <section key={groupLabel} className="notes-group">
+                                                        <div className="notes-group-header">
+                                                            <h4 className="notes-group-title">{groupLabel}</h4>
+                                                            <span className="notes-group-line" />
+                                                        </div>
+
+                                                        <div className="notes-group-list">
+                                                            {groupedSavedNotes[groupLabel].map((savedNote) => {
+                                                                const parsedNote = parseNotePayload(savedNote.not_metni);
+                                                                const isPendingDelete = pendingDeleteNoteId === savedNote.id;
+                                                                return (
+                                                                    <article key={savedNote.id} className="saved-note">
+                                                                        <div className="saved-note-top">
+                                                                            <div className="saved-note-meta">
+                                                                                <p className="saved-note-date">
+                                                                                    {new Date(savedNote.updated_at || savedNote.created_at).toLocaleDateString('tr-TR')} • {new Date(savedNote.updated_at || savedNote.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                                                                </p>
+                                                                            </div>
+                                                                            {isPendingDelete ? (
+                                                                                <div className="saved-note-delete-confirm">
+                                                                                    <span className="saved-note-delete-text">Silinsin mi?</span>
+                                                                                    <button type="button" className="saved-note-delete-cancel" onClick={() => setPendingDeleteNoteId(null)} aria-label="Silmeyi iptal et" title="Vazgeç">
+                                                                                        <span className="material-symbols-outlined saved-note-action-icon">close</span>
+                                                                                    </button>
+                                                                                    <button type="button" className="saved-note-delete-approve" onClick={() => handleDeleteNote(savedNote.id)} aria-label="Notu sil" title="Sil">
+                                                                                        <span className="material-symbols-outlined saved-note-action-icon">delete</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="saved-note-actions">
+                                                                                    {/* Enes Doğanay | 6 Nisan 2026: Not karti aksiyonlari ikonlu ve daha minimal hale getirildi */}
+                                                                                    <button type="button" className="saved-note-edit" onClick={() => handleEditNote(savedNote)} aria-label="Notu düzenle" title="Düzenle">
+                                                                                        <span className="material-symbols-outlined saved-note-action-icon">edit</span>
+                                                                                    </button>
+                                                                                    <button type="button" className="saved-note-delete" onClick={() => setPendingDeleteNoteId(savedNote.id)} aria-label="Notu sil" title="Sil">
+                                                                                        <span className="material-symbols-outlined saved-note-action-icon">delete</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        {parsedNote.title && <h5 className="saved-note-title">{parsedNote.title}</h5>}
+                                                                        <p className="saved-note-text">{parsedNote.body}</p>
+                                                                    </article>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </section>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="notes-empty-state">
+                                                Henüz not eklenmedi. İlk notunu ekleyerek bu tedarikçiyle ilgili gözlemlerini kaydedebilirsin.
                                             </div>
                                         )}
                                     </>

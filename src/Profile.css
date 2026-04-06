@@ -909,6 +909,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
+  align-items: start;
 }
 
 @media (min-width: 640px) {
@@ -1365,12 +1366,13 @@
 /* NOTE */
 .note-editing,
 .note-display {
-  background: #fef9c3;
-  border: 1px solid #fef08a;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #ece8df;
+  border-radius: 14px;
   padding: 12px;
   margin-top: 16px;
   margin-bottom: 20px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
 }
 
 .note-header {
@@ -1407,29 +1409,96 @@
   font-size: 12px;
 }
 
+/* Enes Doğanay | 6 Nisan 2026: Favori kartinda tum notlari kompakt bir akista gosteren alan */
+.note-display-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.note-count-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #f6efe2;
+  color: #9a6b1f;
+  font-size: 10px;
+  font-weight: 800;
+}
+
 .note-edit-link {
   font-size: 10px;
-  color: #a16207;
+  color: #8b5e17;
   cursor: pointer;
-  font-weight: 500;
-  background: none;
-  border: none;
-  padding: 0;
+  font-weight: 700;
+  background: #fffaf0;
+  border: 1px solid #efe2ba;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Profilde not basligi alani ve kaydedildi geri bildirimi eklendi */
+.note-meta-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.note-meta-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid #ead48f;
+  background: linear-gradient(180deg, #fffaf0 0%, #fff6df 100%);
+  color: #7c5613;
+  font-size: 12px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.note-meta-input:focus {
+  border-color: #d8b24d;
+  box-shadow: 0 0 0 3px rgba(216, 178, 77, 0.14);
+}
+
+.note-save-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.note-save-feedback .material-symbols-outlined {
+  font-size: 14px;
 }
 
 .note-textarea {
   width: 100%;
   min-height: 60px;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #fde047;
-  background: #fffbeb;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #ead48f;
+  background: linear-gradient(180deg, #fffaf0 0%, #fff4d6 100%);
   font-size: 12px;
   outline: none;
   resize: vertical;
-  color: #854d0e;
+  color: #7c5613;
   font-family: inherit;
   box-sizing: border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 14px rgba(202, 138, 4, 0.05);
 }
 
 .note-actions {
@@ -1441,23 +1510,24 @@
 
 .note-btn-cancel {
   font-size: 11px;
-  color: #a16207;
-  background: none;
-  border: none;
+  color: #6b7280;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
   cursor: pointer;
-  font-weight: 600;
-  padding: 4px;
+  font-weight: 700;
+  padding: 6px 10px;
 }
 
 .note-btn-save {
   font-size: 11px;
-  color: #fff;
-  background: #ca8a04;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 12px;
+  color: #7c5613;
+  background: #fff7d6;
+  border: 1px solid #efd17c;
+  border-radius: 999px;
+  padding: 6px 12px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .note-btn-save:disabled {
@@ -1467,39 +1537,158 @@
 .note-display p {
   margin: 0;
   font-size: 12px;
-  color: #854d0e;
+  color: #7c5613;
   font-style: italic;
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
-.note-empty {
-  border: 1px dashed #cbd5e1;
-  border-radius: 10px;
-  padding: 12px;
-  margin-top: 16px;
-  margin-bottom: 20px;
-  text-align: center;
-  cursor: pointer;
-  color: var(--text-light);
-  font-size: 13px;
+.note-stack {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.note-stack-item {
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffaf0 0%, #fff4d6 100%);
+  border: 1px solid #ead48f;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62), 0 6px 14px rgba(202, 138, 4, 0.05);
+}
+
+.note-stack-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.note-stack-date {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(133, 77, 14, 0.8);
+}
+
+.note-stack-actions,
+.note-stack-delete-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.note-stack-action {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(255, 255, 255, 0.82);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.note-stack-action .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.note-stack-action-edit {
+  color: #2563eb;
+}
+
+.note-stack-action-edit:hover {
+  background: #eff6ff;
+  border-color: rgba(96, 165, 250, 0.45);
+  transform: translateY(-1px);
+}
+
+.note-stack-action-delete {
+  color: #dc2626;
+}
+
+.note-stack-action-delete:hover {
+  background: #fff1f2;
+  border-color: rgba(252, 165, 165, 0.52);
+  transform: translateY(-1px);
+}
+
+.note-stack-action-cancel {
+  color: #64748b;
+}
+
+.note-stack-delete-text {
+  font-size: 10px;
+  font-weight: 700;
+  color: #8b5e17;
+}
+
+.note-stack-title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #6b4100;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Profilde bir not yuksekligine geri donebilen ac-kapa kontrolu eklendi */
+.note-stack-toggle {
+  width: 100%;
+  margin-top: 10px;
+  border: 1px dashed #e6dcc4;
+  border-radius: 10px;
+  background: #fffdfa;
+  color: #8b5e17;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 9px 12px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.note-stack-toggle:hover {
+  background: #fff8eb;
+  border-color: #e8cf87;
+  transform: translateY(-1px);
+}
+
+.note-stack-toggle .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.note-add-trigger {
+  margin-top: 14px;
+  margin-bottom: 20px;
+  border: 1px dashed #e6dcc4;
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: #8b5e17;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fffdfa;
   transition: all 0.25s;
 }
 
-.note-empty:hover {
-  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
-  border-color: #fde047;
-  color: #ca8a04;
+.note-add-trigger:hover {
+  background: #fff8eb;
+  border-color: #e8cf87;
+  color: #9a6b1f;
 }
 
-.note-empty .material-symbols-outlined {
+.note-add-trigger .material-symbols-outlined {
   font-size: 16px;
 }
 
@@ -1507,7 +1696,7 @@
 .fav-actions {
   display: flex;
   gap: 10px;
-  margin-top: auto;
+  margin-top: 4px;
 }
 
 .fav-btn-primary {
