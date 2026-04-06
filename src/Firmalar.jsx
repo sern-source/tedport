@@ -350,9 +350,21 @@ const SupplierCard = ({ data, onSearchTag }) => {
 
   return (
     <div className="supplier-card">
+      {/* Enes Doğanay | 6 Nisan 2026: logo_url varsa gerçek logo gösterilir, yoksa baş harf avatar */}
       <div className="card-images">
         <div className="main-image">
-          <div className='supp-avatar2' style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '90%' }}>
+          {data.images ? (
+            <img
+              src={data.images}
+              alt={data.name}
+              style={{ width: '100%', height: '90%', objectFit: 'contain', borderRadius: '8px', background: '#fff' }}
+              onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
+            />
+          ) : null}
+          <div
+            className='supp-avatar2'
+            style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '90%', display: data.images ? 'none' : 'flex' }}
+          >
             {data.name?.charAt(0)}
           </div>
         </div>

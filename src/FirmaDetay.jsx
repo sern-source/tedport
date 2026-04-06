@@ -741,7 +741,20 @@ const SupplierProfile = () => {
                 <section className="profile-hero">
                     <div className="container">
                         <div className="hero-flex">
-                            <div className="supp-avatar2">{firma.firma_adi?.charAt(0)}</div>
+                            {/* Enes Doğanay | 6 Nisan 2026: logo_url varsa gerçek logo gösterilir, yoksa baş harf avatar */}
+                            {firma.logo_url ? (
+                                <img
+                                    src={firma.logo_url}
+                                    alt={firma.firma_adi}
+                                    className="supp-avatar2"
+                                    style={{ objectFit: 'contain', background: '#fff', padding: '6px' }}
+                                    onError={e => {
+                                        e.currentTarget.outerHTML = `<div class="supp-avatar2">${firma.firma_adi?.charAt(0) ?? ''}</div>`;
+                                    }}
+                                />
+                            ) : (
+                                <div className="supp-avatar2">{firma.firma_adi?.charAt(0)}</div>
+                            )}
 
                             <div className="info-content">
                                 <div className="title-row">

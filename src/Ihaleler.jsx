@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './Ihaleler.css';
 import './SharedHeader.css';
 import SharedHeader from './SharedHeader';
 import { supabase } from './supabaseClient';
 import { formatTenderBudget, formatTenderDate, getTenderStatusMeta } from './tenderUtils';
+// Enes Doğanay | 6 Nisan 2026: Kurumsal giriş için ihale CRUD API'si eklendi
+import { getManagedCompanyId } from './companyManagementApi';
+import { listMyTenders, createTender, updateTender, deleteTender } from './ihaleManagementApi';
 
 // Enes Doğanay | 6 Nisan 2026: Ihale tablosu henuz kurulmamissa ekran kirilmasin diye iliski hatasi yumusatilir
 const isMissingRelationError = (error) => error?.code === '42P01' || error?.message?.toLowerCase().includes('relation');
+
+const EMPTY_FORM = {
+    baslik: '', aciklama: '', kategori: '', ihale_tipi: '',
+    butce_notu: '', yayin_tarihi: '', son_basvuru_tarihi: '',
+    durum: 'canli', basvuru_email: '', referans_no: '', il_ilce: ''
+};
 
 const IhalelerPage = () => {
     const navigate = useNavigate();
@@ -22,67 +31,160 @@ const IhalelerPage = () => {
     const [selectedFirmaName, setSelectedFirmaName] = useState('');
     const [tableMissing, setTableMissing] = useState(false);
 
+    // Enes Doğanay | 6 Nisan 2026: Kurumsal kullanıcı state'leri
+    const [managedFirmaId, setManagedFirmaId] = useState(null);
+    const [myTenders, setMyTenders] = useState([]);
+    const [myTendersLoading, setMyTendersLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [editingTender, setEditingTender] = useState(null); // null = yeni, obje = düzenle
+    const [form, setForm] = useState(EMPTY_FORM);
+    const [formSaving, setFormSaving] = useState(false);
+    const [formError, setFormError] = useState('');
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
+    // Kurumsal giriş kontrolü
     useEffect(() => {
-        const fetchTenders = async () => {
-            setLoading(true);
+        getManagedCompanyId().then(id => setManagedFirmaId(id || null));
+    }, []);
 
-            try {
-                const tenderQuery = supabase
-                    .from('firma_ihaleleri')
-                    .select('*')
-                    .neq('durum', 'draft')
-                    .order('is_featured', { ascending: false })
-                    .order('yayin_tarihi', { ascending: false });
+    // Kendi ihalelerini çek (sadece kurumsal kullanıcılar için)
+    const fetchMyTenders = useCallback(async () => {
+        if (!managedFirmaId) return;
+        setMyTendersLoading(true);
+        try {
+            const data = await listMyTenders();
+            setMyTenders(data);
+        } catch {
+            setMyTenders([]);
+        } finally {
+            setMyTendersLoading(false);
+        }
+    }, [managedFirmaId]);
 
-                if (firmaFilter) {
-                    tenderQuery.eq('firma_id', firmaFilter);
-                }
+    useEffect(() => { fetchMyTenders(); }, [fetchMyTenders]);
 
-                const { data: tenderData, error: tenderError } = await tenderQuery;
+    const openCreate = () => {
+        setEditingTender(null);
+        setForm(EMPTY_FORM);
+        setFormError('');
+        setShowModal(true);
+    };
 
-                if (tenderError) {
-                    if (isMissingRelationError(tenderError)) {
-                        setTableMissing(true);
-                        setTenders([]);
-                        setLoading(false);
-                        return;
-                    }
+    // Enes Doğanay | 6 Nisan 2026: DB'den gelen tarih ISO formatında olabilir, <input type="date"> için YYYY-MM-DD'ye çevir
+    const toDateInput = (v) => {
+        if (!v) return '';
+        const s = String(v);
+        if (s.includes('T')) return s.split('T')[0];
+        return s.length >= 10 ? s.slice(0, 10) : s;
+    };
 
-                    throw tenderError;
-                }
+    const openEdit = (tender) => {
+        setEditingTender(tender);
+        setForm({
+            baslik: tender.baslik || '',
+            aciklama: tender.aciklama || '',
+            kategori: tender.kategori || '',
+            ihale_tipi: tender.ihale_tipi || '',
+            butce_notu: tender.butce_notu || '',
+            yayin_tarihi: toDateInput(tender.yayin_tarihi),
+            son_basvuru_tarihi: toDateInput(tender.son_basvuru_tarihi),
+            durum: tender.durum || 'canli',
+            basvuru_email: tender.basvuru_email || '',
+            referans_no: tender.referans_no || '',
+            il_ilce: tender.il_ilce || '',
+        });
+        setFormError('');
+        setShowModal(true);
+    };
 
-                const firmaIds = [...new Set((tenderData || []).map((tender) => tender.firma_id).filter(Boolean))];
-                const { data: firmsData, error: firmsError } = firmaIds.length > 0
-                    ? await supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
-                    : { data: [], error: null };
-
-                if (firmsError) {
-                    throw firmsError;
-                }
-
-                const mappedTenders = (tenderData || []).map((tender) => {
-                    const firm = (firmsData || []).find((firma) => String(firma.firmaID) === String(tender.firma_id)) || {};
-                    return {
-                        ...tender,
-                        firma_adi: firm.firma_adi || tender.firma_adi || 'Firma bilgisi bulunamadı',
-                        firma_kategori: firm.category_name || '',
-                        firma_konum: firm.il_ilce || tender.il_ilce || 'Konum belirtilmedi'
-                    };
-                });
-
-                setTenders(mappedTenders);
-                setSelectedFirmaName(firmaFilter ? mappedTenders[0]?.firma_adi || '' : '');
-                setTableMissing(false);
-            } catch (error) {
-                console.error('İhaleler alınamadı:', error);
-                setTenders([]);
-            } finally {
-                setLoading(false);
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        setFormSaving(true);
+        setFormError('');
+        try {
+            if (editingTender) {
+                await updateTender(editingTender.id, form);
+            } else {
+                await createTender(form);
             }
-        };
+            setShowModal(false);
+            // Enes Doğanay | 6 Nisan 2026: Hem kendi listemizi hem public listeyi yenile
+            await fetchMyTenders();
+            await fetchPublicTenders();
+        } catch (err) {
+            setFormError(err.message || 'Kaydedilemedi.');
+        } finally {
+            setFormSaving(false);
+        }
+    };
 
-        fetchTenders();
+    const handleDelete = async (id) => {
+        try {
+            await deleteTender(id);
+            setDeleteConfirmId(null);
+            await fetchMyTenders();
+            await fetchPublicTenders();
+        } catch (err) {
+            alert(err.message || 'Silinemedi.');
+        }
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Public ihale listesini çeken fonksiyon (useEffect dışına alındı, CRUD sonrası da çağrılır)
+    const fetchPublicTenders = useCallback(async () => {
+        setLoading(true);
+        try {
+            const tenderQuery = supabase
+                .from('firma_ihaleleri')
+                .select('*')
+                .neq('durum', 'draft')
+                .order('is_featured', { ascending: false })
+                .order('yayin_tarihi', { ascending: false });
+
+            if (firmaFilter) {
+                tenderQuery.eq('firma_id', firmaFilter);
+            }
+
+            const { data: tenderData, error: tenderError } = await tenderQuery;
+
+            if (tenderError) {
+                if (isMissingRelationError(tenderError)) {
+                    setTableMissing(true);
+                    setTenders([]);
+                    setLoading(false);
+                    return;
+                }
+                throw tenderError;
+            }
+
+            const firmaIds = [...new Set((tenderData || []).map((tender) => tender.firma_id).filter(Boolean))];
+            const { data: firmsData, error: firmsError } = firmaIds.length > 0
+                ? await supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
+                : { data: [], error: null };
+
+            if (firmsError) throw firmsError;
+
+            const mappedTenders = (tenderData || []).map((tender) => {
+                const firm = (firmsData || []).find((firma) => String(firma.firmaID) === String(tender.firma_id)) || {};
+                return {
+                    ...tender,
+                    firma_adi: firm.firma_adi || tender.firma_adi || 'Firma bilgisi bulunamadı',
+                    firma_kategori: firm.category_name || '',
+                    firma_konum: firm.il_ilce || tender.il_ilce || 'Konum belirtilmedi'
+                };
+            });
+
+            setTenders(mappedTenders);
+            setSelectedFirmaName(firmaFilter ? mappedTenders[0]?.firma_adi || '' : '');
+            setTableMissing(false);
+        } catch (error) {
+            console.error('İhaleler alınamadı:', error);
+            setTenders([]);
+        } finally {
+            setLoading(false);
+        }
     }, [firmaFilter]);
+
+    useEffect(() => { fetchPublicTenders(); }, [fetchPublicTenders]);
 
     const filteredTenders = tenders
         .filter((tender) => {
@@ -122,6 +224,140 @@ const IhalelerPage = () => {
             <SharedHeader />
 
             <main className="tenders-page-main">
+
+                {/* ── Enes Doğanay | 6 Nisan 2026: Kurumsal kullanıcıya özel ihale yönetim paneli ── */}
+                {managedFirmaId && (
+                    <section className="my-tenders-panel">
+                        <div className="my-tenders-panel__head">
+                            <div>
+                                <h2><span className="material-symbols-outlined">gavel</span> Benim İhalelerim</h2>
+                                <p>Firmanız adına yayınladığınız ihaleleri buradan yönetin.</p>
+                            </div>
+                            <button type="button" className="my-tenders-add-btn" onClick={openCreate}>
+                                <span className="material-symbols-outlined">add_circle</span>
+                                Yeni İhale Oluştur
+                            </button>
+                        </div>
+
+                        {myTendersLoading ? (
+                            <p className="my-tenders-loading">Yükleniyor…</p>
+                        ) : myTenders.length === 0 ? (
+                            <div className="my-tenders-empty">
+                                <span className="material-symbols-outlined">inbox</span>
+                                <p>Henüz ihale oluşturmadınız.</p>
+                            </div>
+                        ) : (
+                            <div className="my-tenders-list">
+                                {myTenders.map(t => {
+                                    const sm = getTenderStatusMeta(t);
+                                    return (
+                                        <div key={t.id} className="my-tender-row">
+                                            <div className="my-tender-row__info">
+                                                <span className={`tender-card-status tender-card-status-${sm.className}`}>{sm.label}</span>
+                                                <strong>{t.baslik}</strong>
+                                                {t.son_basvuru_tarihi && <span className="my-tender-row__date">Son: {formatTenderDate(t.son_basvuru_tarihi)}</span>}
+                                            </div>
+                                            <div className="my-tender-row__actions">
+                                                <button type="button" className="my-tender-btn my-tender-btn--edit" onClick={() => openEdit(t)}>
+                                                    <span className="material-symbols-outlined">edit</span>
+                                                </button>
+                                                {deleteConfirmId === t.id ? (
+                                                    <>
+                                                        <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => handleDelete(t.id)}>Evet, Sil</button>
+                                                        <button type="button" className="my-tender-btn my-tender-btn--cancel" onClick={() => setDeleteConfirmId(null)}>İptal</button>
+                                                    </>
+                                                ) : (
+                                                    <button type="button" className="my-tender-btn my-tender-btn--delete" onClick={() => setDeleteConfirmId(t.id)}>
+                                                        <span className="material-symbols-outlined">delete</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                {/* ── Modal: İhale Oluştur / Düzenle ── */}
+                {showModal && (
+                    <div className="ihale-modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
+                        <div className="ihale-modal">
+                            <div className="ihale-modal__head">
+                                <h3>{editingTender ? 'İhaleyi Düzenle' : 'Yeni İhale Oluştur'}</h3>
+                                <button type="button" className="ihale-modal__close" onClick={() => setShowModal(false)}>
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <form className="ihale-modal__form" onSubmit={handleFormSubmit}>
+                                <label className="ihale-field">
+                                    <span>Başlık *</span>
+                                    <input type="text" required value={form.baslik} onChange={e => setForm(p => ({ ...p, baslik: e.target.value }))} placeholder="Örn. Çelik Boru Alım İhalesi" />
+                                </label>
+                                <label className="ihale-field ihale-field--full">
+                                    <span>Açıklama</span>
+                                    <textarea rows={3} value={form.aciklama} onChange={e => setForm(p => ({ ...p, aciklama: e.target.value }))} placeholder="İhale kapsamı, teknik gereksinimler…" />
+                                </label>
+                                <div className="ihale-modal__grid">
+                                    <label className="ihale-field">
+                                        <span>Kategori</span>
+                                        <input type="text" value={form.kategori} onChange={e => setForm(p => ({ ...p, kategori: e.target.value }))} placeholder="Örn. Metal, İnşaat…" />
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>İhale Tipi</span>
+                                        <select value={form.ihale_tipi} onChange={e => setForm(p => ({ ...p, ihale_tipi: e.target.value }))}>
+                                            <option value="">Seçin</option>
+                                            <option>Açık İhale</option>
+                                            <option>Davetli İhale</option>
+                                            <option>Pazarlık Usulü</option>
+                                        </select>
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>Bütçe Notu</span>
+                                        <input type="text" value={form.butce_notu} onChange={e => setForm(p => ({ ...p, butce_notu: e.target.value }))} placeholder="Örn. 100.000 - 250.000 TL" />
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>Durum</span>
+                                        <select value={form.durum} onChange={e => setForm(p => ({ ...p, durum: e.target.value }))}>
+                                            <option value="canli">Canlı</option>
+                                            <option value="draft">Taslak</option>
+                                            <option value="kapali">Kapalı</option>
+                                        </select>
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>Yayın Tarihi</span>
+                                        <input type="date" value={form.yayin_tarihi} onChange={e => setForm(p => ({ ...p, yayin_tarihi: e.target.value }))} />
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>Son Başvuru Tarihi</span>
+                                        <input type="date" value={form.son_basvuru_tarihi} onChange={e => setForm(p => ({ ...p, son_basvuru_tarihi: e.target.value }))} />
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>Başvuru E-postası</span>
+                                        <input type="email" value={form.basvuru_email} onChange={e => setForm(p => ({ ...p, basvuru_email: e.target.value }))} placeholder="ihale@firma.com" />
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>Referans No</span>
+                                        <input type="text" value={form.referans_no} onChange={e => setForm(p => ({ ...p, referans_no: e.target.value }))} placeholder="Örn. TDP-2026-001" />
+                                    </label>
+                                    <label className="ihale-field">
+                                        <span>İl / İlçe</span>
+                                        <input type="text" value={form.il_ilce} onChange={e => setForm(p => ({ ...p, il_ilce: e.target.value }))} placeholder="Örn. İstanbul / Kadıköy" />
+                                    </label>
+                                </div>
+                                {formError && <p className="ihale-form-error">{formError}</p>}
+                                <div className="ihale-modal__footer">
+                                    <button type="button" className="ihale-btn-cancel" onClick={() => setShowModal(false)}>İptal</button>
+                                    <button type="submit" className="ihale-btn-save" disabled={formSaving}>
+                                        {formSaving ? 'Kaydediliyor…' : (editingTender ? 'Güncelle' : 'Yayınla')}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
                 <section className="tenders-hero">
                     <div className="tenders-hero-copy">
                         <h1>{selectedFirmaName ? `${selectedFirmaName} İhaleleri` : 'İhaleler'}</h1>

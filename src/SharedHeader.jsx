@@ -50,6 +50,8 @@ const SharedHeader = ({
     const [userProfile, setUserProfile] = useState(null);
     const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
     const [managedCompanyId, setManagedCompanyId] = useState(null);
+    // Enes Doğanay | 6 Nisan 2026: Kurumsal kullanıcı için header'da firma adı gösterilir
+    const [managedCompanyName, setManagedCompanyName] = useState(null);
     const dropdownRef = useRef(null);
     // Enes Doğanay | 5 Nisan 2026: Search bar dışına tıklayınca öneri dropdown'ını kapatmak için ref
     const searchBarRef = useRef(null);
@@ -76,7 +78,21 @@ const SharedHeader = ({
 
             if (session?.user) {
                 setIsCurrentUserAdmin(await resolveIsAdminUser(session.user.email, isAdminEmail));
-                setManagedCompanyId(await getManagedCompanyId());
+
+                // Enes Doğanay | 6 Nisan 2026: Kurumsal ise firma adı çekilir
+                const companyId = await getManagedCompanyId();
+                setManagedCompanyId(companyId);
+                if (companyId) {
+                    const { data: firmData } = await supabase
+                        .from('firmalar')
+                        .select('firma_adi')
+                        .eq('firmaID', companyId)
+                        .single();
+                    setManagedCompanyName(firmData?.firma_adi || null);
+                } else {
+                    setManagedCompanyName(null);
+                }
+
                 const { data: profileData } = await supabase
                     .from('profiles')
                     .select('first_name, last_name')
@@ -92,6 +108,7 @@ const SharedHeader = ({
                 setUserProfile(null);
                 setIsCurrentUserAdmin(false);
                 setManagedCompanyId(null);
+                setManagedCompanyName(null);
             }
         };
         checkUserSession();
@@ -225,7 +242,8 @@ const SharedHeader = ({
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                     type="button"
                                 >
-                                    {`${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                                    {/* Enes Doğanay | 6 Nisan 2026: Kurumsal hesapta firma adı, bireysel hesapta kullanıcı adı */}
+                                    {managedCompanyName || `${userProfile.first_name} ${userProfile.last_name}`.trim()}
                                     <span className="material-symbols-outlined shared-user-btn-icon">
                                         {isDropdownOpen ? 'expand_less' : 'expand_more'}
                                     </span>

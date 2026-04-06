@@ -1,4 +1,4 @@
-/* Enes Doğanay | 6 Nisan 2026: Dinamik ihaleler sayfasi icin modern listeleme arayuzu eklendi */
+﻿/* Enes Doğanay | 6 Nisan 2026: Dinamik ihaleler sayfasi icin modern listeleme arayuzu eklendi */
 .tenders-page {
     min-height: 100vh;
     background: linear-gradient(180deg, #f8fbff 0%, #ffffff 28%, #f9fafb 100%);
@@ -244,6 +244,12 @@
     color: #b91c1c;
 }
 
+/* Enes Doğanay | 6 Nisan 2026: Taslak durum badge rengi */
+.tender-card-status-draft {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
 .tender-card-tags {
     display: flex;
     flex-wrap: wrap;
@@ -394,5 +400,346 @@
 
     .tender-card-top {
         flex-direction: column;
+    }
+}
+
+/* Enes Do�anay | 6 Nisan 2026: Kurumsal ihale y�netim paneli ve modal stilleri */
+
+/* �� Benim �halelerim Paneli ����������������������������������������������� */
+.my-tenders-panel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.my-tenders-panel__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.my-tenders-panel__head h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px;
+}
+
+.my-tenders-panel__head h2 .material-symbols-outlined {
+    font-size: 22px;
+    color: #3b82f6;
+}
+
+.my-tenders-panel__head p {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+}
+
+.my-tenders-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.my-tenders-add-btn:hover {
+    background: #1d4ed8;
+}
+
+.my-tenders-add-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.my-tenders-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 28px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.my-tenders-empty .material-symbols-outlined {
+    font-size: 40px;
+}
+
+.my-tenders-loading {
+    color: #94a3b8;
+    font-size: 14px;
+    padding: 12px 0;
+}
+
+.my-tenders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.my-tender-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.my-tender-row__info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.my-tender-row__info strong {
+    font-weight: 600;
+}
+
+.my-tender-row__date {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.my-tender-row__actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.my-tender-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 10px;
+    transition: background 0.15s;
+}
+
+.my-tender-btn .material-symbols-outlined {
+    font-size: 17px;
+}
+
+.my-tender-btn--edit {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.my-tender-btn--edit:hover {
+    background: #dbeafe;
+}
+
+.my-tender-btn--delete {
+    background: #fff1f2;
+    color: #e11d48;
+}
+
+.my-tender-btn--delete:hover {
+    background: #ffe4e6;
+}
+
+.my-tender-btn--confirm {
+    background: #e11d48;
+    color: #fff;
+}
+
+.my-tender-btn--cancel {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* �� Modal ����������������������������������������������������������������� */
+.ihale-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.ihale-modal {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.ihale-modal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 16px;
+}
+
+.ihale-modal__head h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: #0f172a;
+}
+
+.ihale-modal__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    padding: 4px;
+}
+
+.ihale-modal__close:hover {
+    color: #0f172a;
+}
+
+.ihale-modal__form {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ihale-modal__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ihale-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ihale-field--full {
+    grid-column: 1 / -1;
+}
+
+.ihale-field span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.ihale-field input,
+.ihale-field select,
+.ihale-field textarea {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #111827;
+    background: #f9fafb;
+    transition: border-color 0.15s;
+    font-family: inherit;
+}
+
+.ihale-field input:focus,
+.ihale-field select:focus,
+.ihale-field textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: #fff;
+}
+
+.ihale-form-error {
+    color: #e11d48;
+    font-size: 13px;
+    background: #fff1f2;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0;
+}
+
+.ihale-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.ihale-btn-cancel {
+    padding: 9px 18px;
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ihale-btn-cancel:hover {
+    background: #e2e8f0;
+}
+
+.ihale-btn-save {
+    padding: 9px 22px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ihale-btn-save:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.ihale-btn-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .ihale-modal__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .my-tenders-panel__head {
+        flex-direction: column;
+    }
+
+    .my-tenders-add-btn {
+        width: 100%;
+        justify-content: center;
     }
 }

@@ -1,4 +1,5 @@
 // Enes Doğanay | 6 Nisan 2026: Ihale durumlari tum ekranlarda ayni kuralla hesaplanir
+// Enes Doğanay | 6 Nisan 2026: draft ve kapali DB değerleri eklendi
 export const getTenderStatusMeta = (tender) => {
     const normalizedStatus = (tender?.durum || '').toLowerCase();
     const isActive = tender?.is_active !== false;
@@ -6,7 +7,11 @@ export const getTenderStatusMeta = (tender) => {
     const deadlineDate = tender?.son_basvuru_tarihi ? new Date(tender.son_basvuru_tarihi) : null;
     const now = new Date();
 
-    if (!isActive || normalizedStatus === 'cancelled' || normalizedStatus === 'completed' || normalizedStatus === 'closed') {
+    if (normalizedStatus === 'draft') {
+        return { key: 'draft', label: 'Taslak', className: 'draft' };
+    }
+
+    if (!isActive || normalizedStatus === 'kapali' || normalizedStatus === 'cancelled' || normalizedStatus === 'completed' || normalizedStatus === 'closed') {
         return { key: 'kapali', label: 'Kapalı', className: 'kapali' };
     }
 

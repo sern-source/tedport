@@ -1,10 +1,11 @@
-﻿// Enes Doğanay | 6 Nisan 2026: Firma yönetim paneli tamamen yeniden yazıldı — public FirmaDetay görünümüyle birebir örtüşen hiyerarşik editör
+﻿// Enes Doğanay | 6 Nisan 2026: Firma yönetim paneli — public FirmaDetay görünümüyle birebir örtüşen hiyerarşik editör
+// Enes Doğanay | 6 Nisan 2026: ana_sektor/firma_turu kaldırıldı, logo localden yükleniyor, ilçeler turkeyDistricts.js'den geliyor
 import React, { useEffect, useMemo, useState } from 'react';
 import './CompanyManagementPanel.css';
 import { supabase } from './supabaseClient';
 import { updateManagedCompany } from './companyManagementApi';
+import { TURKEY_DISTRICTS } from './turkeyDistricts';
 
-// küçük yard. fonksiyonlar
 const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 // ── serileştirme / geri okuma ──────────────────────────────────────────────
@@ -51,9 +52,11 @@ const buildLocation = ({ city, district }) => {
     return (d && c) ? `${d}/${c}` : (c || d);
 };
 
-// kataloğu güncelleyen yardımcılar
 const mapCat = (cats, cid, fn) => cats.map(c => c.id === cid ? fn(c) : c);
 const mapSub = (cats, cid, sid, fn) => mapCat(cats, cid, c => ({ ...c, subs: c.subs.map(s => s.id === sid ? fn(s) : s) }));
+
+// Enes Doğanay | 6 Nisan 2026: İl listesi turkeyDistricts objesinin key'lerinden alınır (sehirler tablosuna gerek kalmaz)
+const ALL_CITIES = Object.keys(TURKEY_DISTRICTS).sort((a, b) => a.localeCompare(b, 'tr'));
 
 // ── bileşen ───────────────────────────────────────────────────────────────
 const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
@@ -61,41 +64,16 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
 
     const [fields, setFields] = useState({
         firma_adi: '', category_name: '', city: '', district: '',
-        web_sitesi: '', telefon: '', eposta: '',
-        ana_sektor: '', firma_turu: '', logo_url: '',
+        web_sitesi: '', telefon: '', eposta: '', logo_url: '',
         latitude: '', longitude: '', adres: '', description: ''
     });
     const [catalog, setCatalog] = useState([]);
-    const [productDraft, setProductDraft] = useState({}); // { [subId]: string }
-    const [cities, setCities] = useState([]);
-    const [districtMap, setDistrictMap] = useState({});
+    const [productDraft, setProductDraft] = useState({});
     const [saving, setSaving] = useState(false);
     const [feedback, setFeedback] = useState({ type: '', msg: '' });
-
-    // il/ilçe yardım verisi yükle
-    useEffect(() => {
-        let alive = true;
-        const load = async () => {
-            const [cr, fr] = await Promise.all([
-                supabase.from('sehirler').select('sehir').order('sehir'),
-                supabase.from('firmalar').select('il_ilce').limit(5000)
-            ]);
-            if (!alive) return;
-            setCities((cr.data || []).map(r => r.sehir).filter(Boolean));
-            const dm = (fr.data || []).reduce((acc, row) => {
-                const { city, district } = parseLocation(row.il_ilce);
-                if (city && district) {
-                    const set = new Set(acc[city] || []);
-                    set.add(district);
-                    acc[city] = Array.from(set).sort((a, b) => a.localeCompare(b, 'tr'));
-                }
-                return acc;
-            }, {});
-            setDistrictMap(dm);
-        };
-        load();
-        return () => { alive = false; };
-    }, []);
+    // Enes Doğanay | 6 Nisan 2026: Logo dosyası localden yükleme state'leri
+    const [logoUploading, setLogoUploading] = useState(false);
+    const [logoPreview, setLogoPreview] = useState('');
 
     // şirket verisi ile formu doldur
     useEffect(() => {
@@ -108,23 +86,70 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
             web_sitesi: company.web_sitesi || '',
             telefon: company.telefon || '',
             eposta: company.eposta || '',
-            ana_sektor: company.ana_sektor || '',
-            firma_turu: company.firma_turu || '',
             logo_url: company.logo_url || '',
             latitude: company.latitude ?? '',
             longitude: company.longitude ?? '',
             adres: company.adres || '',
             description: company.description || ''
         });
+        setLogoPreview(company.logo_url || '');
         setCatalog(parseCatalog(company.urun_kategorileri));
     }, [company, parsedLoc.city, parsedLoc.district]);
 
-    // alan değiştirici
+    // alan değiştiriciler
     const set = (k, v) => setFields(p => ({ ...p, [k]: v }));
     const setCity = city => setFields(p => ({
         ...p, city,
-        district: districtMap[city]?.includes(p.district) ? p.district : ''
+        district: (TURKEY_DISTRICTS[city] || []).includes(p.district) ? p.district : ''
     }));
+
+    // Enes Doğanay | 6 Nisan 2026: Logo dosyası seçilince Supabase Storage'a yüklenir ve logo_url güncellenir
+    const handleLogoUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const maxSize = 2 * 1024 * 1024; // 2 MB
+        if (file.size > maxSize) {
+            setFeedback({ type: 'err', msg: 'Logo dosyası en fazla 2 MB olabilir.' });
+            return;
+        }
+
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+        if (!allowedTypes.includes(file.type)) {
+            setFeedback({ type: 'err', msg: 'Yalnızca PNG, JPG, WebP veya SVG yüklenebilir.' });
+            return;
+        }
+
+        setLogoUploading(true);
+        setFeedback({ type: '', msg: '' });
+
+        try {
+            const ext = file.name.split('.').pop();
+            const filePath = `logos/${company.firmaID || 'temp'}_${Date.now()}.${ext}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('firma-logolari')
+                .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data: publicUrlData } = supabase.storage
+                .from('firma-logolari')
+                .getPublicUrl(filePath);
+
+            const publicUrl = publicUrlData?.publicUrl;
+            if (!publicUrl) throw new Error('Public URL alınamadı.');
+
+            set('logo_url', publicUrl);
+            setLogoPreview(publicUrl);
+            setFeedback({ type: 'ok', msg: 'Logo yüklendi! Kaydetmeyi unutmayın.' });
+        } catch (err) {
+            console.error('Logo yükleme hatası:', err);
+            setFeedback({ type: 'err', msg: err.message || 'Logo yüklenemedi.' });
+        } finally {
+            setLogoUploading(false);
+        }
+    };
 
     // katalog değiştiriciler
     const addCategory = () => setCatalog(p => [...p, { id: uid(), name: '', subs: [] }]);
@@ -145,11 +170,8 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
         if (e.key === 'Enter') { e.preventDefault(); addProduct(cid, sid, productDraft[sid]); }
     };
 
-    // metrik hesapla
-    const totalCats = catalog.length;
-    const totalSubs = catalog.reduce((a, c) => a + c.subs.length, 0);
-    const totalProducts = catalog.reduce((a, c) => a + c.subs.reduce((b, s) => b + s.products.filter(p => p.name.trim()).length, 0), 0);
-    const previewLoc = buildLocation({ city: fields.city, district: fields.district });
+    // Enes Doğanay | 6 Nisan 2026: banner kaldırıldı
+    const districtOptions = TURKEY_DISTRICTS[fields.city] || [];
 
     // kaydet
     const handleSubmit = async (e) => {
@@ -164,8 +186,6 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                 web_sitesi: fields.web_sitesi,
                 telefon: fields.telefon,
                 eposta: fields.eposta,
-                ana_sektor: fields.ana_sektor,
-                firma_turu: fields.firma_turu,
                 logo_url: fields.logo_url,
                 latitude: fields.latitude === '' ? null : Number(fields.latitude),
                 longitude: fields.longitude === '' ? null : Number(fields.longitude),
@@ -182,28 +202,8 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
         }
     };
 
-    const districtOptions = districtMap[fields.city] || [];
-
     return (
         <section className="cmp-workspace">
-
-            {/* ── BANNER ── */}
-            <div className="cmp-banner">
-                <div className="cmp-banner__left">
-                    <span className="cmp-banner__badge">Firma Yönetim Paneli</span>
-                    <h2 className="cmp-banner__title">{fields.firma_adi || 'Firma Adı Girilmedi'}</h2>
-                    <p className="cmp-banner__sub">
-                        {fields.category_name && <span>{fields.category_name}</span>}
-                        {previewLoc && <span>📍 {previewLoc}</span>}
-                        {fields.firma_turu && <span>{fields.firma_turu}</span>}
-                    </p>
-                </div>
-                <div className="cmp-banner__metrics">
-                    <div className="cmp-metric"><strong>{totalCats}</strong><span>Kategori</span></div>
-                    <div className="cmp-metric"><strong>{totalSubs}</strong><span>Alt Kategori</span></div>
-                    <div className="cmp-metric"><strong>{totalProducts}</strong><span>Ürün</span></div>
-                </div>
-            </div>
 
             {/* ── FORM ── */}
             <form className="cmp-form" onSubmit={handleSubmit}>
@@ -227,21 +227,37 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                             <input type="text" value={fields.category_name} onChange={e => set('category_name', e.target.value)} placeholder="Örn. Boru ve Profil Üreticisi" />
                         </label>
                         <label className="cmp-field">
-                            <span>Ana Sektör</span>
-                            <input type="text" value={fields.ana_sektor} onChange={e => set('ana_sektor', e.target.value)} placeholder="Örn. Metal Sanayi" />
-                        </label>
-                        <label className="cmp-field">
-                            <span>Firma Türü</span>
-                            <input type="text" value={fields.firma_turu} onChange={e => set('firma_turu', e.target.value)} placeholder="Üretici · Tedarikçi · Distribütör" />
-                        </label>
-                        <label className="cmp-field">
                             <span>Web Sitesi</span>
                             <input type="text" value={fields.web_sitesi} onChange={e => set('web_sitesi', e.target.value)} placeholder="www.ornekfirma.com" />
                         </label>
-                        <label className="cmp-field">
-                            <span>Logo URL</span>
-                            <input type="text" value={fields.logo_url} onChange={e => set('logo_url', e.target.value)} placeholder="https://cdn.firma.com/logo.svg" />
-                        </label>
+                    </div>
+
+                    {/* Enes Doğanay | 6 Nisan 2026: Logo artık localden dosya seçilerek yükleniyor */}
+                    <div className="cmp-logo-upload">
+                        <div className="cmp-logo-upload__preview">
+                            {logoPreview ? (
+                                <img src={logoPreview} alt="Firma logosu" />
+                            ) : (
+                                <div className="cmp-logo-upload__placeholder">
+                                    <span className="material-symbols-outlined">image</span>
+                                </div>
+                            )}
+                        </div>
+                        <div className="cmp-logo-upload__info">
+                            <strong>Firma Logosu</strong>
+                            <p>PNG, JPG, WebP veya SVG — maks. 2 MB.</p>
+                            <label className="cmp-btn cmp-btn--ghost cmp-btn--sm cmp-logo-upload__btn">
+                                <span className="material-symbols-outlined">upload</span>
+                                {logoUploading ? 'Yükleniyor…' : 'Fotoğraf Seç'}
+                                <input
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                                    onChange={handleLogoUpload}
+                                    disabled={logoUploading}
+                                    hidden
+                                />
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -251,7 +267,6 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                         <span className="material-symbols-outlined">location_on</span>
                         <div>
                             <h3>İletişim ve Konum</h3>
-                            <p>İl yardımlı seçim, ilçe alanı seçilen ile göre otomatik öneri verir.</p>
                         </div>
                     </div>
                     <div className="cmp-grid cmp-grid--3">
@@ -267,21 +282,15 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                             <span>İl</span>
                             <select value={fields.city} onChange={e => setCity(e.target.value)}>
                                 <option value="">İl seçin</option>
-                                {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                                {ALL_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                         </label>
                         <label className="cmp-field">
                             <span>İlçe</span>
-                            <input
-                                list="cmp-districts"
-                                type="text"
-                                value={fields.district}
-                                onChange={e => set('district', e.target.value)}
-                                placeholder={fields.city ? 'Seçin veya yazın' : 'Önce il seçin'}
-                            />
-                            <datalist id="cmp-districts">
-                                {districtOptions.map(d => <option key={d} value={d} />)}
-                            </datalist>
+                            <select value={fields.district} onChange={e => set('district', e.target.value)} disabled={!fields.city}>
+                                <option value="">{fields.city ? 'İlçe seçin' : 'Önce il seçin'}</option>
+                                {districtOptions.map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
                         </label>
                         <label className="cmp-field cmp-field--span2">
                             <span>Açık Adres</span>
@@ -319,7 +328,6 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                             <p>
                                 Aşağısı, firma detay sayfasındaki accordion yapısıyla <strong>birebir aynıdır</strong>.
                                 Her kategori bir accordion başlığı, alt kategoriler kendi içinde, ürünler ise etiket (pill) olarak görünür.
-                                Kaydettiğinizde değişiklikler anında canlıya yansır.
                             </p>
                         </div>
                         <button type="button" className="cmp-btn cmp-btn--add-category" onClick={addCategory}>
@@ -337,11 +345,8 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                             </div>
                         )}
 
-                        {/* Kategori → accordion-item */}
                         {catalog.map((cat, catIdx) => (
                             <div key={cat.id} className="cmp-cat-card">
-
-                                {/* accordion-button benzeri başlık */}
                                 <div className="cmp-cat-header">
                                     <span className="cmp-cat-chevron">▼</span>
                                     <input
@@ -362,13 +367,10 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                                     </div>
                                 </div>
 
-                                {/* accordion-content benzeri içerik */}
                                 {cat.subs.length > 0 && (
                                     <div className="cmp-cat-content">
                                         {cat.subs.map((sub, subIdx) => (
                                             <div key={sub.id} className="cmp-sub">
-
-                                                {/* subcategory-title benzeri başlık */}
                                                 <div className="cmp-sub-header">
                                                     <span className="cmp-sub-bullet">•</span>
                                                     <input
@@ -383,21 +385,14 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                                                     </button>
                                                 </div>
 
-                                                {/* product-tags-wrap benzeri ürün pilleri */}
                                                 <div className="cmp-products-wrap">
                                                     {sub.products.map(prod => (
                                                         <span key={prod.id} className="cmp-pill">
                                                             {prod.name}
-                                                            <button
-                                                                type="button"
-                                                                className="cmp-pill__x"
-                                                                onClick={() => removeProduct(cat.id, sub.id, prod.id)}
-                                                                title="Ürünü Kaldır"
-                                                            >×</button>
+                                                            <button type="button" className="cmp-pill__x" onClick={() => removeProduct(cat.id, sub.id, prod.id)} title="Ürünü Kaldır">×</button>
                                                         </span>
                                                     ))}
 
-                                                    {/* inline ürün ekleme */}
                                                     <label className="cmp-pill-add">
                                                         <input
                                                             type="text"
@@ -432,7 +427,6 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                     </div>
                 </div>
 
-                {/* Geri bildirim */}
                 {feedback.msg && (
                     <div className={`cmp-feedback cmp-feedback--${feedback.type === 'ok' ? 'ok' : 'err'}`}>
                         <span className="material-symbols-outlined">{feedback.type === 'ok' ? 'check_circle' : 'error'}</span>
@@ -440,7 +434,6 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                     </div>
                 )}
 
-                {/* Kaydet çubuğu */}
                 <div className="cmp-actions">
                     <p className="cmp-actions__hint">Değişiklikler kaydedildikten hemen sonra firma detay sayfanızda canlıya geçer.</p>
                     <button type="submit" className="cmp-btn cmp-btn--save" disabled={saving}>
