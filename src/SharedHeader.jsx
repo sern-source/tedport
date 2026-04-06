@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from './supabaseClient';
+import { isAdminEmail } from './adminAccess';
+import { resolveIsAdminUser } from './corporateApplicationsApi';
+import { getManagedCompanyId } from './companyManagementApi';
 
 /**
  * SharedHeader Component - Reusable Header for All Pages
@@ -15,7 +18,7 @@ import { supabase } from './supabaseClient';
  * - Reusable header for all pages (Home2, Firmalar, Hakkımızda, İletişim, etc.)
  * - User session management via Supabase
  * - Mobile hamburger menu with responsive navigation
- * - User dropdown menu (Profil, Favoriler, Çıkış Yap)
+ * - User dropdown menu (Profil, Favoriler, Bildirimler, Çıkış Yap)
  * - Optional search bar (configurable per page)
  * - Custom navigation items (configurable per page)
  * - Logout redirect to home page (KVKK compliant security)
@@ -45,6 +48,8 @@ const SharedHeader = ({
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
+    const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
+    const [managedCompanyId, setManagedCompanyId] = useState(null);
     const dropdownRef = useRef(null);
     // Enes Doğanay | 5 Nisan 2026: Search bar dışına tıklayınca öneri dropdown'ını kapatmak için ref
     const searchBarRef = useRef(null);
@@ -70,6 +75,8 @@ const SharedHeader = ({
             const { data: { session } } = await supabase.auth.getSession();
 
             if (session?.user) {
+                setIsCurrentUserAdmin(await resolveIsAdminUser(session.user.email, isAdminEmail));
+                setManagedCompanyId(await getManagedCompanyId());
                 const { data: profileData } = await supabase
                     .from('profiles')
                     .select('first_name, last_name')
@@ -81,6 +88,10 @@ const SharedHeader = ({
                 } else {
                     setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
                 }
+            } else {
+                setUserProfile(null);
+                setIsCurrentUserAdmin(false);
+                setManagedCompanyId(null);
             }
         };
         checkUserSession();
@@ -89,6 +100,7 @@ const SharedHeader = ({
     const handleLogout = async () => {
         await supabase.auth.signOut();
         setUserProfile(null);
+        setIsCurrentUserAdmin(false);
         setIsDropdownOpen(false);
         setIsMobileMenuOpen(false);
         navigate('/');
@@ -97,6 +109,7 @@ const SharedHeader = ({
     // Default navigation items
     const defaultNavItems = [
         { label: 'Firmalar', href: '/firmalar' },
+        { label: 'İhaleler', href: '/ihaleler' },
         { label: 'Hakkımızda', href: '/hakkimizda' },
         { label: 'İletişim', href: '/iletisim' }
     ];
@@ -220,37 +233,93 @@ const SharedHeader = ({
 
                                 {isDropdownOpen && (
                                     <div className="shared-user-menu">
-                                        <button
-                                            type="button"
-                                            className="shared-user-menu-item"
-                                            onClick={() => {
-                                                setIsDropdownOpen(false);
-                                                navigate('/profile');
-                                            }}
-                                        >
-                                            <span className="material-symbols-outlined shared-user-menu-icon">
-                                                person
-                                            </span>
-                                            <span className="shared-user-menu-label">
-                                                Profil
-                                            </span>
-                                        </button>
+                                        {managedCompanyId ? (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate(`/firmadetay/${managedCompanyId}`);
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    storefront
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Firma Paneli
+                                                </span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/profile');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    person
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Profil
+                                                </span>
+                                            </button>
+                                        )}
 
-                                        <button
-                                            type="button"
-                                            className="shared-user-menu-item"
-                                            onClick={() => {
-                                                setIsDropdownOpen(false);
-                                                navigate('/profile?tab=favorites');
-                                            }}
-                                        >
-                                            <span className="material-symbols-outlined shared-user-menu-icon">
-                                                favorite
-                                            </span>
-                                            <span className="shared-user-menu-label">
-                                                Favoriler
-                                            </span>
-                                        </button>
+                                        {isCurrentUserAdmin && (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/admin/kurumsal-basvurular');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    admin_panel_settings
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Kurumsal Başvurular
+                                                </span>
+                                            </button>
+                                        )}
+
+                                        {!managedCompanyId && (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="shared-user-menu-item"
+                                                    onClick={() => {
+                                                        setIsDropdownOpen(false);
+                                                        navigate('/profile?tab=favorites');
+                                                    }}
+                                                >
+                                                    <span className="material-symbols-outlined shared-user-menu-icon">
+                                                        favorite
+                                                    </span>
+                                                    <span className="shared-user-menu-label">
+                                                        Favoriler
+                                                    </span>
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="shared-user-menu-item"
+                                                    onClick={() => {
+                                                        setIsDropdownOpen(false);
+                                                        navigate('/profile?tab=notifications');
+                                                    }}
+                                                >
+                                                    <span className="material-symbols-outlined shared-user-menu-icon">
+                                                        notifications
+                                                    </span>
+                                                    <span className="shared-user-menu-label">
+                                                        Bildirimler
+                                                    </span>
+                                                </button>
+                                            </>
+                                        )}
 
                                         <button
                                             type="button"
@@ -295,11 +364,25 @@ const SharedHeader = ({
                     {!userProfile && <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="shared-mobile-register">Kayıt Ol</Link>}
                     {userProfile && (
                         <>
-                            {!(location.pathname === '/profile' && !location.search) && (
-                                <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>Profil</Link>
+                            {managedCompanyId ? (
+                                location.pathname !== `/firmadetay/${managedCompanyId}` && (
+                                    <Link to={`/firmadetay/${managedCompanyId}`} onClick={() => setIsMobileMenuOpen(false)}>Firma Paneli</Link>
+                                )
+                            ) : (
+                                <>
+                                    {!(location.pathname === '/profile' && !location.search) && (
+                                        <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>Profil</Link>
+                                    )}
+                                    {!(location.pathname === '/profile' && location.search === '?tab=favorites') && (
+                                        <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>Favoriler</Link>
+                                    )}
+                                    {!(location.pathname === '/profile' && location.search === '?tab=notifications') && (
+                                        <Link to="/profile?tab=notifications" onClick={() => setIsMobileMenuOpen(false)}>Bildirimler</Link>
+                                    )}
+                                </>
                             )}
-                            {!(location.pathname === '/profile' && location.search === '?tab=favorites') && (
-                                <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>Favoriler</Link>
+                            {isCurrentUserAdmin && location.pathname !== '/admin/kurumsal-basvurular' && (
+                                <Link to="/admin/kurumsal-basvurular" onClick={() => setIsMobileMenuOpen(false)}>Kurumsal Başvurular</Link>
                             )}
                             <button
                                 className="shared-mobile-logout"

@@ -3,13 +3,15 @@ import './Login.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase, setAuthPersistenceMode } from './supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { getManagedCompanyId } from './companyManagementApi';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState('individual');
+  const [activeTab, setActiveTab] = useState(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
   // Enes Doğanay | 6 Nisan 2026: Beni Hatırla checkbox state'e bağlandı
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -21,15 +23,24 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  useEffect(() => {
+    setActiveTab(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
+  }, [searchParams]);
+
   // Sayfa yüklendiğinde oturum kontrolü yap
   useEffect(() => {
+    const redirectAuthenticatedUser = async () => {
+      const managedCompanyId = await getManagedCompanyId();
+      navigate(managedCompanyId ? `/firmadetay/${managedCompanyId}` : '/');
+    };
+
     const checkSession = async () => {
       // Mevcut oturumu al
       const { data: { session } } = await supabase.auth.getSession();
 
       // Eğer kullanıcı zaten giriş yapmışsa, beklemeden profile yönlendir
       if (session) {
-        navigate('/profile');
+        redirectAuthenticatedUser();
       }
     };
 
@@ -38,7 +49,7 @@ const LoginPage = () => {
     // Opsiyonel: Anlık oturum değişikliklerini dinle (Aynı tarayıcıda sekme arası vs.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        navigate('/profile');
+        redirectAuthenticatedUser();
       }
     });
 
@@ -49,6 +60,12 @@ const LoginPage = () => {
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  // Enes Doğanay | 6 Nisan 2026: Login sekmesi URL ile senkron kalir, kurumsal yonlendirmeler korunur
+  const handleTabChange = (nextTab) => {
+    setActiveTab(nextTab);
+    setSearchParams(nextTab === 'corporate' ? { type: 'corporate' } : {});
   };
 
   const handleLogin = async (e) => {
@@ -76,7 +93,8 @@ const LoginPage = () => {
       }
     } else {
       console.log("Giriş başarılı:", data.user);
-      navigate('/');
+      const managedCompanyId = await getManagedCompanyId();
+      navigate(managedCompanyId ? `/firmadetay/${managedCompanyId}` : '/');
     }
   };
 
@@ -115,6 +133,7 @@ const LoginPage = () => {
         navItems={[
           { label: 'Anasayfa', href: '/' },
           { label: 'Firmalar', href: '/firmalar' },
+          { label: 'İhaleler', href: '/ihaleler' },
           { label: 'Hakkımızda', href: '/hakkimizda' },
           { label: 'İletişim', href: '/iletisim' }
         ]}
@@ -128,7 +147,7 @@ const LoginPage = () => {
           <div className="login-tabs">
             <button
               className={`tab-item ${activeTab === 'individual' ? 'active' : ''}`}
-              onClick={() => setActiveTab('individual')}
+              onClick={() => handleTabChange('individual')}
             >
               <span className="material-symbols-outlined">person</span>
               <span>Bireysel Giriş</span>
@@ -136,7 +155,7 @@ const LoginPage = () => {
 
             <button
               className={`tab-item ${activeTab === 'corporate' ? 'active' : ''}`}
-              onClick={() => setActiveTab('corporate')}
+              onClick={() => handleTabChange('corporate')}
             >
               <span className="material-symbols-outlined">business</span>
               <span>Kurumsal Giriş</span>
@@ -145,8 +164,8 @@ const LoginPage = () => {
 
           <div className="card-body">
             <div className="card-header-text">
-              <h1>Hoş Geldiniz</h1>
-              <p>Hesabınıza erişmek için bilgilerinizi girin.</p>
+              <h1>{activeTab === 'corporate' ? 'Kurumsal Giriş' : 'Hoş Geldiniz'}</h1>
+              <p>{activeTab === 'corporate' ? 'Onaylanan kurumsal hesabınıza şirket e-postanızla giriş yapın.' : 'Hesabınıza erişmek için bilgilerinizi girin.'}</p>
             </div>
 
             {/* FORM */}
@@ -225,9 +244,18 @@ const LoginPage = () => {
 
             </form>
 
+            {activeTab === 'corporate' && (
+              <div className="corporate-login-callout">
+                {/* Enes Doğanay | 6 Nisan 2026: Kurumsal hesaplar onay sonrasi acildigi icin basvuru yonlendirmesi eklendi */}
+                <strong>Kurumsal hesabın henüz yok mu?</strong>
+                <p>Önce başvuru formunu doldurun. Firma doğrulaması tamamlanınca size şifre belirleme bağlantısı gönderilir.</p>
+                <Link to="/register?type=corporate" className="corporate-login-link">Kurumsal Başvuru Formuna Git</Link>
+              </div>
+            )}
+
             <div className="signup-prompt">
               <p>
-                Henüz hesabın yok mu? <a href="/register">Kayıt Ol</a>
+                Henüz hesabın yok mu? <Link to={activeTab === 'corporate' ? '/register?type=corporate' : '/register'}>Kayıt Ol</Link>
               </p>
             </div>
           </div>

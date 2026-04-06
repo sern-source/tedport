@@ -4,6 +4,7 @@ import SharedHeader from "./SharedHeader";
 import "./SharedHeader.css";
 import { supabase } from "./supabaseClient";
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getManagedCompanyId } from './companyManagementApi';
 
 // Enes Doğanay | 6 Nisan 2026: Deterministik renk üretimi (firma_id hash)
 const hashColor = (str) => {
@@ -60,6 +61,34 @@ const serializeNotePayload = (title, tag, body) => {
   });
 };
 
+// Enes Doğanay | 6 Nisan 2026: Yeni tablo kurulumu eksikse profil ekrani kirilmasin diye iliski hatasi yumusatilir
+const isMissingRelationError = (error) => error?.code === '42P01' || error?.message?.toLowerCase().includes('relation');
+
+// Enes Doğanay | 6 Nisan 2026: Hatirlatici ve bildirim zamanlari ayni formatta gosterilir
+const formatReminderLabel = (isoValue) => {
+  if (!isoValue) return '';
+
+  const date = new Date(isoValue);
+  return `${date.toLocaleDateString('tr-TR')} • ${date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+};
+
+// Enes Doğanay | 6 Nisan 2026: Bildirim kartlarinda ozet zaman metni kullanilir
+const formatRelativeNotificationTime = (isoValue) => {
+  if (!isoValue) return '';
+
+  const date = new Date(isoValue);
+  const diffMinutes = Math.round((Date.now() - date.getTime()) / 60000);
+
+  if (Math.abs(diffMinutes) < 1) return 'Az önce';
+  if (Math.abs(diffMinutes) < 60) return `${Math.abs(diffMinutes)} dk ${diffMinutes >= 0 ? 'önce' : 'sonra'}`;
+
+  const diffHours = Math.round(diffMinutes / 60);
+  if (Math.abs(diffHours) < 24) return `${Math.abs(diffHours)} sa ${diffHours >= 0 ? 'önce' : 'sonra'}`;
+
+  const diffDays = Math.round(diffHours / 24);
+  return `${Math.abs(diffDays)} gün ${diffDays >= 0 ? 'önce' : 'sonra'}`;
+};
+
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -99,6 +128,11 @@ const ProfilePage = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [assigningListId, setAssigningListId] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  // Enes Doğanay | 6 Nisan 2026: Favori listesi silme onayi ve hedef liste bilgisi tutulur
+  const [confirmDeleteList, setConfirmDeleteList] = useState(null);
+  // Enes Doğanay | 6 Nisan 2026: Profilde bildirim merkezi ve yaklasan hatirlaticilar tutulur
+  const [notifications, setNotifications] = useState([]);
+  const [upcomingReminders, setUpcomingReminders] = useState([]);
 
   // Enes Doğanay | 6 Nisan 2026: select('*') → spesifik sütunlar, console.log temizlendi, is_verified/premium kaldırıldı
   useEffect(() => {
@@ -114,13 +148,21 @@ const ProfilePage = () => {
           return;
         }
 
+        const managedCompanyId = await getManagedCompanyId();
+        if (managedCompanyId) {
+          navigate(`/firmadetay/${managedCompanyId}`);
+          return;
+        }
+
         setUser(userData.user);
 
-        const [profileResult, cityResult, listsResult, favsResult] = await Promise.all([
+        const [profileResult, cityResult, listsResult, favsResult, notificationsResult, remindersResult] = await Promise.all([
           supabase.from("profiles").select("id, first_name, last_name, company_name, phone, location, avatar, email").eq("id", userData.user.id).single(),
           supabase.from("sehirler").select("sehir").order("sehir", { ascending: true }),
           supabase.from('kullanici_listeleri').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: true }),
-          supabase.from('kullanici_favorileri').select('*').eq('user_id', userData.user.id)
+          supabase.from('kullanici_favorileri').select('*').eq('user_id', userData.user.id),
+          supabase.from('bildirimler').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: false }).limit(30),
+          supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userData.user.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true })
         ]);
 
         const { data: profileData } = profileResult;
@@ -130,11 +172,20 @@ const ProfilePage = () => {
         if (cityData) setCities(cityData.map((c) => c.sehir));
 
         if (listsResult.data) setMyLists(listsResult.data);
+        if (notificationsResult.error && !isMissingRelationError(notificationsResult.error)) {
+          console.error('Bildirimler alınamadı:', notificationsResult.error);
+        }
+        if (remindersResult.error && !isMissingRelationError(remindersResult.error)) {
+          console.error('Hatırlatıcılar alınamadı:', remindersResult.error);
+        }
+        setNotifications(notificationsResult.data || []);
+        setUpcomingReminders((remindersResult.data || []).filter((reminder) => reminder.status === 'pending'));
 
         setLoading(false);
 
         if (favsResult.data && favsResult.data.length > 0) {
           const firmaIds = favsResult.data.map(f => f.firma_id);
+          const reminderMap = new Map((remindersResult.data || []).map((reminder) => [String(reminder.note_id), reminder]));
 
           const [firmsData, notesData] = await Promise.all([
             supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
@@ -163,7 +214,8 @@ const ProfilePage = () => {
                   title: parsedSavedNote.title,
                   body: parsedSavedNote.body,
                   updated_at: savedNote.updated_at,
-                  created_at: savedNote.created_at
+                  created_at: savedNote.created_at,
+                  reminder: reminderMap.get(String(savedNote.id)) || null
                 };
               }),
               color: hashColor(fav.firma_id)
@@ -185,15 +237,24 @@ const ProfilePage = () => {
 
   // Enes Doğanay | 6 Nisan 2026: Promise.all paralel sorgular
   const fetchListsAndFavorites = async (userId) => {
-    const [listsResult, favsResult] = await Promise.all([
+    const [listsResult, favsResult, remindersResult, notificationsResult] = await Promise.all([
       supabase.from('kullanici_listeleri').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
-      supabase.from('kullanici_favorileri').select('*').eq('user_id', userId)
+      supabase.from('kullanici_favorileri').select('*').eq('user_id', userId),
+      supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userId).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true }),
+      supabase.from('bildirimler').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30)
     ]);
 
     if (listsResult.data) setMyLists(listsResult.data);
+    if (!remindersResult.error || isMissingRelationError(remindersResult.error)) {
+      setUpcomingReminders((remindersResult.data || []).filter((reminder) => reminder.status === 'pending'));
+    }
+    if (!notificationsResult.error || isMissingRelationError(notificationsResult.error)) {
+      setNotifications(notificationsResult.data || []);
+    }
 
     if (favsResult.data && favsResult.data.length > 0) {
       const firmaIds = favsResult.data.map(f => f.firma_id);
+      const reminderMap = new Map((remindersResult.data || []).map((reminder) => [String(reminder.note_id), reminder]));
 
       const [firmsData, notesData] = await Promise.all([
         supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
@@ -222,7 +283,8 @@ const ProfilePage = () => {
               title: parsedSavedNote.title,
               body: parsedSavedNote.body,
               updated_at: savedNote.updated_at,
-              created_at: savedNote.created_at
+              created_at: savedNote.created_at,
+              reminder: reminderMap.get(String(savedNote.id)) || null
             };
           }),
           color: hashColor(fav.firma_id)
@@ -235,6 +297,32 @@ const ProfilePage = () => {
     }
   };
 
+  // Enes Doğanay | 6 Nisan 2026: Profilde tekil bildirimler okunduya alinabilir
+  const handleMarkNotificationRead = async (notificationId) => {
+    const { error } = await supabase.from('bildirimler').update({ is_read: true }).eq('id', notificationId).eq('user_id', user.id);
+    if (error && !isMissingRelationError(error)) {
+      alert('Bildirim güncellenemedi.');
+      return;
+    }
+
+    setNotifications((prev) => prev.map((notification) => notification.id === notificationId ? { ...notification, is_read: true } : notification));
+  };
+
+  // Enes Doğanay | 6 Nisan 2026: Bildirim merkezi icin tum bildirimler tek tikla okundu yapilabilir
+  const handleMarkAllNotificationsRead = async () => {
+    const unreadNotifications = notifications.filter((notification) => !notification.is_read);
+    if (unreadNotifications.length === 0) return;
+
+    const unreadNotificationIds = unreadNotifications.map((notification) => notification.id);
+    const { error } = await supabase.from('bildirimler').update({ is_read: true }).eq('user_id', user.id).in('id', unreadNotificationIds);
+    if (error && !isMissingRelationError(error)) {
+      alert('Bildirimler güncellenemedi.');
+      return;
+    }
+
+    setNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })));
+  };
+
   const handleCreateList = async () => {
     if (!newListName.trim()) return;
     const { data, error } = await supabase.from('kullanici_listeleri').insert([{ user_id: user.id, liste_adi: newListName }]).select().single();
@@ -244,6 +332,38 @@ const ProfilePage = () => {
       setIsCreatingList(false);
     } else {
       alert("Liste oluşturulamadı.");
+    }
+  };
+
+  // Enes Doğanay | 6 Nisan 2026: Silinen listedeki favoriler korunur ve listesiz duruma alinip liste kaydi kaldirilir
+  const handleDeleteList = async (listId) => {
+    try {
+      const { error: favoritesUpdateError } = await supabase
+        .from('kullanici_favorileri')
+        .update({ liste_id: null })
+        .eq('user_id', user.id)
+        .eq('liste_id', listId);
+
+      if (favoritesUpdateError) {
+        throw favoritesUpdateError;
+      }
+
+      const { error: listDeleteError } = await supabase
+        .from('kullanici_listeleri')
+        .delete()
+        .eq('id', listId)
+        .eq('user_id', user.id);
+
+      if (listDeleteError) {
+        throw listDeleteError;
+      }
+
+      setMyLists((prev) => prev.filter((liste) => liste.id !== listId));
+      setFavorites((prev) => prev.map((favorite) => favorite.liste_id === listId ? { ...favorite, liste_id: null } : favorite));
+      setSelectedListId((currentListId) => currentListId === listId ? null : currentListId);
+      setConfirmDeleteList(null);
+    } catch (error) {
+      alert('Liste silinirken bir hata oluştu.');
     }
   };
 
@@ -427,6 +547,10 @@ const ProfilePage = () => {
       case 'newest': default: return [...result].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
     }
   })();
+  const unreadNotificationsCount = notifications.filter((notification) => !notification.is_read).length;
+  // Enes Doğanay | 6 Nisan 2026: Zamani gecen ancak henuz server tarafinda islenmemis hatirlaticilar yaklasan olarak gosterilmez
+  const futureUpcomingReminders = upcomingReminders.filter((reminder) => new Date(reminder.reminder_at).getTime() > Date.now());
+  const overduePendingReminders = upcomingReminders.filter((reminder) => new Date(reminder.reminder_at).getTime() <= Date.now());
 
   return (
     <>
@@ -434,6 +558,7 @@ const ProfilePage = () => {
         navItems={[
           { label: 'Anasayfa', href: '/' },
           { label: 'Firmalar', href: '/firmalar' },
+          { label: 'İhaleler', href: '/ihaleler' },
           { label: 'Hakkımızda', href: '/hakkimizda' },
           { label: 'İletişim', href: '/iletisim' }
         ]}
@@ -459,8 +584,9 @@ const ProfilePage = () => {
               <a className={`nav-item ${currentTab === 'favorites' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'favorites' })}>
                 <span className="material-symbols-outlined">collections_bookmark</span> Favorilerim
               </a>
-              <a className="nav-item">
+              <a className={`nav-item ${currentTab === 'notifications' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'notifications' })}>
                 <span className="material-symbols-outlined">notifications</span> Bildirimler
+                {unreadNotificationsCount > 0 && <span className="nav-item-badge">{unreadNotificationsCount}</span>}
               </a>
               <hr className="sidebar-divider" />
               <a className="nav-item logout" onClick={handleLogout}>
@@ -483,7 +609,22 @@ const ProfilePage = () => {
                     return (
                       <div key={liste.id} className={`list-item ${selectedListId === liste.id ? 'active' : ''}`} onClick={() => setSelectedListId(liste.id)}>
                         <span className="list-item-label"><span className="material-symbols-outlined">folder</span> {liste.liste_adi}</span>
-                        <span className="list-item-count">{listCount}</span>
+                        {/* Enes Doğanay | 6 Nisan 2026: Profil favori listelerine satir ici silme aksiyonu eklendi */}
+                        <span className="list-item-actions">
+                          <span className="list-item-count">{listCount}</span>
+                          <button
+                            type="button"
+                            className="list-item-delete"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setConfirmDeleteList({ id: liste.id, name: liste.liste_adi, count: listCount });
+                            }}
+                            aria-label={`${liste.liste_adi} listesini sil`}
+                            title="Listeyi sil"
+                          >
+                            <span className="material-symbols-outlined">delete</span>
+                          </button>
+                        </span>
                       </div>
                     );
                   })}
@@ -491,9 +632,17 @@ const ProfilePage = () => {
 
                 {isCreatingList ? (
                   <div className="create-list-form">
+                    {/* Enes Doğanay | 6 Nisan 2026: Dar sidebar genisliginde tasmayi engellemek icin input ve aksiyonlar ayrildi */}
                     <input type="text" autoFocus value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="Liste Adı" />
-                    <button className="btn-add" onClick={handleCreateList}>Ekle</button>
-                    <button className="btn-cancel" onClick={() => setIsCreatingList(false)}>X</button>
+                    <div className="create-list-form-actions">
+                      <button className="btn-add" onClick={handleCreateList}>
+                        <span className="material-symbols-outlined">add</span>
+                        <span>Ekle</span>
+                      </button>
+                      <button className="btn-cancel" onClick={() => { setIsCreatingList(false); setNewListName(''); }} aria-label="Liste oluşturmayı iptal et" title="Vazgeç">
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <button className="create-list-btn" onClick={() => setIsCreatingList(true)}>
@@ -574,7 +723,21 @@ const ProfilePage = () => {
                       const listCount = favorites.filter(f => f.liste_id === liste.id).length;
                       return (
                         <div key={liste.id} className={`mobile-fav-chip ${selectedListId === liste.id ? 'active' : ''}`} onClick={() => setSelectedListId(liste.id)}>
-                          {liste.liste_adi} <span className="chip-count">{listCount}</span>
+                          <span className="mobile-fav-chip-label">{liste.liste_adi}</span>
+                          <span className="chip-count">{listCount}</span>
+                          {/* Enes Doğanay | 6 Nisan 2026: Mobil listelerde de silme butonu eklendi */}
+                          <button
+                            type="button"
+                            className="mobile-fav-chip-delete"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setConfirmDeleteList({ id: liste.id, name: liste.liste_adi, count: listCount });
+                            }}
+                            aria-label={`${liste.liste_adi} listesini sil`}
+                            title="Listeyi sil"
+                          >
+                            <span className="material-symbols-outlined">close</span>
+                          </button>
                         </div>
                       );
                     })}
@@ -586,8 +749,11 @@ const ProfilePage = () => {
                   {isCreatingList && (
                     <div className="mobile-create-list">
                       <input type="text" autoFocus value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="Liste adı yazın..." />
-                      <button className="btn-add" onClick={handleCreateList}>Ekle</button>
-                      <button className="btn-cancel" onClick={() => setIsCreatingList(false)}>
+                      <button className="btn-add" onClick={handleCreateList}>
+                        <span className="material-symbols-outlined">add</span>
+                        <span>Ekle</span>
+                      </button>
+                      <button className="btn-cancel" onClick={() => { setIsCreatingList(false); setNewListName(''); }}>
                         <span className="material-symbols-outlined">close</span>
                       </button>
                     </div>
@@ -755,9 +921,17 @@ const ProfilePage = () => {
                                 {(expandedNoteIds.includes(fav.id) ? fav.notes : fav.notes.slice(0, 1)).map((savedNote) => (
                                   <article key={savedNote.id} className="note-stack-item">
                                     <div className="note-stack-meta">
-                                      <span className="note-stack-date">
-                                        {new Date(savedNote.updated_at || savedNote.created_at).toLocaleDateString('tr-TR')} • {new Date(savedNote.updated_at || savedNote.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                                      </span>
+                                      <div className="note-stack-meta-main">
+                                        <span className="note-stack-date">
+                                          {new Date(savedNote.updated_at || savedNote.created_at).toLocaleDateString('tr-TR')} • {new Date(savedNote.updated_at || savedNote.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                        {savedNote.reminder && (
+                                          <span className={`note-stack-reminder ${savedNote.reminder.status === 'sent' ? 'sent' : ''}`}>
+                                            <span className="material-symbols-outlined">notifications</span>
+                                            <span>{savedNote.reminder.status === 'sent' ? 'Mail gönderildi' : formatReminderLabel(savedNote.reminder.reminder_at)}</span>
+                                          </span>
+                                        )}
+                                      </div>
                                       {pendingDeleteNoteId === savedNote.id ? (
                                         <div className="note-stack-delete-confirm">
                                           <span className="note-stack-delete-text">Silinsin mi?</span>
@@ -821,6 +995,136 @@ const ProfilePage = () => {
               </div>
             )}
 
+            {currentTab === 'notifications' && (
+              <div className="notifications-section">
+                <div className="notifications-hero">
+                  <div>
+                    <h1>Bildirimler</h1>
+                    <p>Zamanlanan hatırlatmaları ve gönderilmiş bildirimleri buradan takip edebilirsiniz.</p>
+                  </div>
+                  <button className="notifications-mark-all" onClick={handleMarkAllNotificationsRead} disabled={unreadNotificationsCount === 0}>
+                    Tümünü Okundu Yap
+                  </button>
+                </div>
+
+                <div className="notifications-stats-grid">
+                  <div className="notification-stat-card notification-stat-card-unread">
+                    <span className="material-symbols-outlined">mark_email_unread</span>
+                    <strong>{unreadNotificationsCount}</strong>
+                    <span>Okunmamış Bildirim</span>
+                  </div>
+                  <div className="notification-stat-card notification-stat-card-reminders">
+                    <span className="material-symbols-outlined">alarm</span>
+                    <strong>{futureUpcomingReminders.length}</strong>
+                    <span>Yaklaşan Hatırlatma</span>
+                  </div>
+                </div>
+
+                <div className="notifications-grid">
+                  <section className="notifications-panel notifications-panel-reminders">
+                    <div className="notifications-panel-header">
+                      <div>
+                        <h3>Yaklaşan Hatırlatmalar</h3>
+                        <p>Profil mail adresinize gönderilecek planlı hatırlatmalar.</p>
+                      </div>
+                    </div>
+
+                    {futureUpcomingReminders.length === 0 ? (
+                      <div className="notifications-empty-state">
+                        <span className="material-symbols-outlined">alarm_off</span>
+                        <p>Planlanmış hatırlatma yok.</p>
+                      </div>
+                    ) : (
+                      <div className="upcoming-reminders-list">
+                        {futureUpcomingReminders.map((reminder) => (
+                          <article key={reminder.id} className="upcoming-reminder-card">
+                            <div className="upcoming-reminder-top">
+                              <span className="upcoming-reminder-time">{formatReminderLabel(reminder.reminder_at)}</span>
+                              <span className="upcoming-reminder-badge">Planlandı</span>
+                            </div>
+                            <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
+                            <p>{reminder.note_body || 'Hatırlatıcı not içeriği burada görünecek.'}</p>
+                            <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                              <span className="material-symbols-outlined">open_in_new</span>
+                              <span>Notun Olduğu Firmaya Git</span>
+                            </button>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+
+                    {overduePendingReminders.length > 0 && (
+                      <div className="overdue-reminders-block">
+                        <div className="notifications-panel-subheader">
+                          <h4>İşlenmeyi Bekleyen Hatırlatmalar</h4>
+                          <p>Bu kayıtların zamanı geçti. Arka plan mail servisi kurulmadıysa burada beklemesi normaldir.</p>
+                        </div>
+                        <div className="upcoming-reminders-list">
+                          {overduePendingReminders.map((reminder) => (
+                            <article key={reminder.id} className="upcoming-reminder-card overdue">
+                              <div className="upcoming-reminder-top">
+                                <span className="upcoming-reminder-time overdue">{formatReminderLabel(reminder.reminder_at)}</span>
+                                <span className="upcoming-reminder-badge overdue">İşlenmedi</span>
+                              </div>
+                              <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
+                              <p>{reminder.note_body || 'Hatırlatıcı not içeriği burada görünecek.'}</p>
+                              <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                                <span className="material-symbols-outlined">open_in_new</span>
+                                <span>Notun Olduğu Firmaya Git</span>
+                              </button>
+                            </article>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="notifications-panel notifications-panel-feed">
+                    <div className="notifications-panel-header">
+                      <div>
+                        <h3>Bildirim Akışı</h3>
+                        <p>Gönderilen hatırlatmalar ve sistem olayları burada listelenir.</p>
+                      </div>
+                    </div>
+
+                    {notifications.length === 0 ? (
+                      <div className="notifications-empty-state">
+                        <span className="material-symbols-outlined">notifications_none</span>
+                        <p>Henüz bildirim oluşmadı.</p>
+                      </div>
+                    ) : (
+                      <div className="notifications-feed-list">
+                        {notifications.map((notification) => (
+                          <article key={notification.id} className={`notification-feed-card ${notification.is_read ? '' : 'unread'}`}>
+                            <div className="notification-feed-top">
+                              <div>
+                                <span className="notification-feed-type">{notification.type === 'reminder' ? 'Hatırlatma Maili' : 'Bildirim'}</span>
+                                <h4>{notification.title}</h4>
+                              </div>
+                              <span className="notification-feed-time">{formatRelativeNotificationTime(notification.created_at)}</span>
+                            </div>
+                            <p>{notification.message}</p>
+                            <div className="notification-feed-actions">
+                              {!notification.is_read && (
+                                <button type="button" className="notification-read-btn" onClick={() => handleMarkNotificationRead(notification.id)}>
+                                  Okundu Yap
+                                </button>
+                              )}
+                              {notification.firma_id && (
+                                <button type="button" className="notification-open-btn" onClick={() => navigate(`/firmadetay/${notification.firma_id}`)}>
+                                  Firmayı Aç
+                                </button>
+                              )}
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                </div>
+              </div>
+            )}
+
           </main>
         </div>
       </div>
@@ -837,6 +1141,25 @@ const ProfilePage = () => {
             <div className="confirm-actions">
               <button className="confirm-cancel" onClick={() => setConfirmDelete(null)}>Vazgeç</button>
               <button className="confirm-delete" onClick={() => handleRemoveFavorite(confirmDelete.id)}>Evet, Çıkar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enes Doğanay | 6 Nisan 2026: Favori listesi silme onayi ayrica gosterilir */}
+      {confirmDeleteList && (
+        <div className="confirm-overlay" onClick={() => setConfirmDeleteList(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-icon danger">
+              <span className="material-symbols-outlined">folder_delete</span>
+            </div>
+            <h3>Listeyi Sil</h3>
+            <p>
+              <strong>{confirmDeleteList.name}</strong> listesi silinecek. İçindeki {confirmDeleteList.count} favori firma korunacak ve <strong>Tüm Favoriler</strong> alanında kalacak.
+            </p>
+            <div className="confirm-actions">
+              <button className="confirm-cancel" onClick={() => setConfirmDeleteList(null)}>Vazgeç</button>
+              <button className="confirm-delete" onClick={() => handleDeleteList(confirmDeleteList.id)}>Evet, Sil</button>
             </div>
           </div>
         </div>

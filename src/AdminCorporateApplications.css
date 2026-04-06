@@ -1,0 +1,357 @@
+/* Enes Doğanay | 6 Nisan 2026: Kurumsal basvuru admin ekraninin temel yerlesim ve kart stilleri eklendi */
+.corporate-admin-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 34%, #f8fafc 100%);
+}
+
+.corporate-admin-main {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 32px 20px 56px;
+}
+
+.corporate-admin-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 28px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%);
+    color: #fff;
+    box-shadow: 0 22px 46px rgba(30, 58, 138, 0.18);
+}
+
+.corporate-admin-hero h1 {
+    margin: 0 0 10px;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.corporate-admin-hero p {
+    margin: 0;
+    max-width: 700px;
+    color: rgba(255, 255, 255, 0.84);
+    line-height: 1.7;
+}
+
+.corporate-admin-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.corporate-admin-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.corporate-admin-stat {
+    padding: 20px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.corporate-admin-stat strong {
+    font-size: 1.8rem;
+    color: #0f172a;
+}
+
+.corporate-admin-stat span {
+    color: #64748b;
+    font-size: 0.88rem;
+}
+
+.corporate-admin-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    margin: 22px 0 18px;
+}
+
+.corporate-admin-search,
+.corporate-admin-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 54px;
+    padding: 0 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.corporate-admin-search input,
+.corporate-admin-filters select,
+.corporate-admin-review-note textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #0f172a;
+    font-family: inherit;
+}
+
+.corporate-admin-search .material-symbols-outlined,
+.corporate-admin-filters .material-symbols-outlined {
+    color: #94a3b8;
+}
+
+.corporate-admin-message {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.corporate-admin-message.success {
+    background: #ecfdf5;
+    color: #166534;
+    border: 1px solid #a7f3d0;
+}
+
+.corporate-admin-message.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.corporate-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.corporate-admin-card {
+    padding: 22px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.92);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
+}
+
+.corporate-admin-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.corporate-admin-card-top h2 {
+    margin: 0 0 8px;
+    color: #0f172a;
+    font-size: 1.25rem;
+}
+
+.corporate-admin-card-top p,
+.corporate-admin-card-meta-item span,
+.corporate-admin-card-note,
+.corporate-admin-empty p,
+.corporate-admin-guard p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.65;
+}
+
+.corporate-admin-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 116px;
+    padding: 9px 12px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.corporate-admin-status.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.corporate-admin-status.approved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.corporate-admin-status.rejected {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.corporate-admin-status.needs_info {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.corporate-admin-card-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.corporate-admin-card-meta-item {
+    padding: 14px;
+    border-radius: 16px;
+    background: rgba(248, 250, 252, 0.94);
+    border: 1px solid rgba(226, 232, 240, 0.84);
+}
+
+.corporate-admin-card-meta-item strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #0f172a;
+    font-size: 0.86rem;
+}
+
+.corporate-admin-card-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+    gap: 16px;
+}
+
+.corporate-admin-card-section,
+.corporate-admin-review {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(226, 232, 240, 0.86);
+}
+
+.corporate-admin-card-section h3,
+.corporate-admin-review h3 {
+    margin: 0 0 10px;
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+.corporate-admin-card-section a {
+    color: #1d4ed8;
+    text-decoration: none;
+}
+
+.corporate-admin-card-section a:hover {
+    text-decoration: underline;
+}
+
+.corporate-admin-review-note {
+    min-height: 130px;
+    padding: 14px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.corporate-admin-review-note textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.corporate-admin-review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.corporate-admin-btn {
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-weight: 800;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.corporate-admin-btn:hover {
+    transform: translateY(-1px);
+}
+
+.corporate-admin-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.corporate-admin-btn.approve {
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+    color: #fff;
+    box-shadow: 0 12px 22px rgba(22, 163, 74, 0.18);
+}
+
+.corporate-admin-btn.needs-info {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.corporate-admin-btn.reject {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.corporate-admin-empty,
+.corporate-admin-guard {
+    min-height: 320px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px dashed rgba(203, 213, 225, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    padding: 28px;
+}
+
+.corporate-admin-guard .material-symbols-outlined,
+.corporate-admin-empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #94a3b8;
+}
+
+.corporate-admin-guard h2,
+.corporate-admin-empty h2 {
+    margin: 0;
+    color: #0f172a;
+}
+
+@media (max-width: 1100px) {
+
+    .corporate-admin-stats,
+    .corporate-admin-card-meta,
+    .corporate-admin-card-grid,
+    .corporate-admin-toolbar {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .corporate-admin-main {
+        padding: 24px 16px 40px;
+    }
+
+    .corporate-admin-hero,
+    .corporate-admin-card-top {
+        flex-direction: column;
+    }
+}

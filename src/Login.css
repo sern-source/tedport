@@ -276,6 +276,42 @@ body {
   text-decoration: underline;
 }
 
+/* Enes Doğanay | 6 Nisan 2026: Kurumsal giris sekmesine basvuru bilgilendirme kutusu eklendi */
+.corporate-login-callout {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  border: 1px solid #dbeafe;
+  text-align: left;
+}
+
+.corporate-login-callout strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #0f172a;
+}
+
+.corporate-login-callout p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.corporate-login-link {
+  display: inline-flex;
+  margin-top: 0.9rem;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.corporate-login-link:hover {
+  text-decoration: underline;
+}
+
 /* Secure Badge */
 .secure-badge {
   background-color: #f9fafb;

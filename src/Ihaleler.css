@@ -1,0 +1,398 @@
+/* Enes Doğanay | 6 Nisan 2026: Dinamik ihaleler sayfasi icin modern listeleme arayuzu eklendi */
+.tenders-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 28%, #f9fafb 100%);
+}
+
+.tenders-page-main {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 32px 20px 56px;
+}
+
+.tenders-hero {
+    display: grid;
+    grid-template-columns: 1.2fr 0.95fr;
+    gap: 20px;
+    align-items: stretch;
+    margin-bottom: 24px;
+}
+
+.tenders-hero-copy {
+    padding: 28px;
+    border-radius: 28px;
+    background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 38%), linear-gradient(135deg, #0f172a 0%, #1e3a8a 52%, #1d4ed8 100%);
+    color: #fff;
+    box-shadow: 0 24px 46px rgba(30, 58, 138, 0.18);
+}
+
+.tenders-hero-eyebrow {
+    display: inline-flex;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.tenders-hero-copy h1 {
+    margin: 16px 0 10px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.05;
+}
+
+.tenders-hero-copy p {
+    margin: 0;
+    max-width: 720px;
+    color: rgba(255, 255, 255, 0.84);
+    line-height: 1.75;
+    font-size: 0.98rem;
+}
+
+.tenders-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.tenders-stat-card {
+    min-height: 148px;
+    border-radius: 24px;
+    padding: 22px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+}
+
+.tenders-stat-card .material-symbols-outlined {
+    font-size: 24px;
+    opacity: 0.95;
+}
+
+.tenders-stat-card strong {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.tenders-stat-card span:last-child {
+    font-size: 0.92rem;
+    opacity: 0.92;
+}
+
+.tenders-stat-card-live {
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+}
+
+.tenders-stat-card-upcoming {
+    background: linear-gradient(135deg, #d29a42 0%, #be7c20 100%);
+}
+
+.tenders-stat-card-closed {
+    background: linear-gradient(135deg, #475569 0%, #0f172a 100%);
+}
+
+.tenders-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) auto auto;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.tenders-search-box,
+.tenders-sort-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.tenders-search-box .material-symbols-outlined,
+.tenders-sort-box .material-symbols-outlined {
+    color: #94a3b8;
+}
+
+.tenders-search-box input,
+.tenders-sort-box select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #0f172a;
+    font-size: 0.94rem;
+    font-family: inherit;
+}
+
+.tenders-filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tenders-filter-pill {
+    min-height: 48px;
+    border: 1px solid rgba(219, 234, 254, 0.9);
+    background: rgba(255, 255, 255, 0.9);
+    color: #64748b;
+    border-radius: 999px;
+    padding: 0 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.tenders-filter-pill.active,
+.tenders-filter-pill:hover {
+    color: #1d4ed8;
+    border-color: #93c5fd;
+    box-shadow: 0 10px 18px rgba(37, 99, 235, 0.09);
+    transform: translateY(-1px);
+}
+
+.tenders-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.tender-card {
+    border-radius: 24px;
+    padding: 22px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(226, 232, 240, 0.94);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.05);
+}
+
+.tender-card-skeleton {
+    min-height: 340px;
+    background: linear-gradient(90deg, #eef2f7 0%, #f8fafc 50%, #eef2f7 100%);
+    background-size: 200% 100%;
+    animation: tenderPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes tenderPulse {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.tender-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.tender-card-company {
+    margin-bottom: 8px;
+    color: #2563eb;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.tender-card h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.28rem;
+    line-height: 1.2;
+}
+
+.tender-card-desc {
+    margin: 0 0 16px;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.tender-card-status {
+    height: fit-content;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.tender-card-status-canli {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.tender-card-status-yaklasan {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.tender-card-status-kapali {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.tender-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.tender-card-tags span {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.tender-card-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.tender-card-meta-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(248, 250, 252, 0.94);
+    border: 1px solid rgba(226, 232, 240, 0.78);
+}
+
+.tender-card-meta-item .material-symbols-outlined {
+    color: #64748b;
+    font-size: 18px;
+}
+
+.tender-card-meta-item strong,
+.tender-card-meta-item span {
+    display: block;
+}
+
+.tender-card-meta-item strong {
+    margin-bottom: 4px;
+    color: #0f172a;
+    font-size: 0.82rem;
+}
+
+.tender-card-meta-item span {
+    color: #64748b;
+    line-height: 1.5;
+    font-size: 0.83rem;
+}
+
+.tender-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tender-card-primary,
+.tender-card-secondary {
+    min-height: 46px;
+    border-radius: 999px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tender-card-primary {
+    border: none;
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+    color: #fff;
+    box-shadow: 0 12px 22px rgba(37, 99, 235, 0.18);
+}
+
+.tender-card-secondary {
+    border: 1px solid rgba(226, 232, 240, 0.92);
+    background: #fff;
+    color: #334155;
+}
+
+.tender-card-primary:hover,
+.tender-card-secondary:hover {
+    transform: translateY(-1px);
+}
+
+.tenders-empty-state {
+    min-height: 320px;
+    border-radius: 28px;
+    border: 1px dashed rgba(203, 213, 225, 0.9);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 28px;
+    color: #64748b;
+}
+
+.tenders-empty-state .material-symbols-outlined {
+    font-size: 40px;
+    margin-bottom: 12px;
+    color: #94a3b8;
+}
+
+.tenders-empty-state h2 {
+    margin: 0 0 8px;
+    color: #0f172a;
+}
+
+.tenders-empty-state p {
+    margin: 0;
+    max-width: 560px;
+    line-height: 1.7;
+}
+
+@media (max-width: 1200px) {
+
+    .tenders-hero,
+    .tenders-toolbar,
+    .tenders-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tenders-stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .tenders-page-main {
+        padding: 24px 16px 40px;
+    }
+
+    .tenders-stats-grid,
+    .tender-card-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tender-card-top {
+        flex-direction: column;
+    }
+}

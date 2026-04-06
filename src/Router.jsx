@@ -9,8 +9,10 @@ import Register from './Register';
 import Home2 from './Home2';
 import Hakkimizda from './hakkimizda';
 import Iletisim from './iletisim';
+import Ihaleler from './Ihaleler';
 import EmailConfirm from './EmailConfirmation';
 import ResetPassword from './ResetPassword';
+import AdminCorporateApplications from './AdminCorporateApplications';
 
 export default function Router() {
   return (
@@ -19,6 +21,7 @@ export default function Router() {
         <Route path="/" element={<Home2 />} />
         <Route path="/home2" element={<Home2 />} />
         <Route path="/firmalar" element={<Firmalar />} />
+        <Route path="/ihaleler" element={<Ihaleler />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/register" element={<Register />} />
@@ -26,6 +29,8 @@ export default function Router() {
         <Route path="/iletisim" element={<Iletisim />} />
         <Route path="/emailconfirmation" element={<EmailConfirm />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/admin/kurumsal-basvurular" element={<AdminCorporateApplications />} />
+        <Route path="/admin/kurumsal-başvurular" element={<AdminCorporateApplications />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />
       </Route>
     </Routes>

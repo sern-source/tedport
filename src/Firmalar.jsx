@@ -615,6 +615,7 @@ function App() {
         showSearchBar={true}
         navItems={[
           { label: 'Anasayfa', href: '/' },
+          { label: 'İhaleler', href: '/ihaleler' },
           { label: 'Hakkımızda', href: '/hakkimizda' },
           { label: 'İletişim', href: '/iletisim' }
         ]}

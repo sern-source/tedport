@@ -84,6 +84,7 @@ const Contact = () => {
                 navItems={[
                     { label: 'Anasayfa', href: '/' },
                     { label: 'Firmalar', href: '/firmalar' },
+                    { label: 'İhaleler', href: '/ihaleler' },
                     { label: 'Hakkımızda', href: '/hakkimizda' }
                 ]}
             />

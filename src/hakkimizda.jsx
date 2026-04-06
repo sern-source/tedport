@@ -31,6 +31,7 @@ const About = () => {
                 navItems={[
                     { label: 'Anasayfa', href: '/' },
                     { label: 'Firmalar', href: '/firmalar' },
+                    { label: 'İhaleler', href: '/ihaleler' },
                     { label: 'İletişim', href: '/iletisim' }
                 ]}
             />

@@ -1,0 +1,653 @@
+﻿/* Enes Doğanay | 6 Nisan 2026: Firma yönetim paneli CSS — FirmaDetay site değişkenleri ve accordion/pill stilleriyle uyumlu */
+
+/* ── WORKSPACE ───────────────────────────────────────────────────────────── */
+.cmp-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+/* ── BANNER ──────────────────────────────────────────────────────────────── */
+.cmp-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+    border-radius: var(--radius-xl);
+    color: #fff;
+}
+
+.cmp-banner__badge {
+    display: inline-flex;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #bfdbfe;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.cmp-banner__title {
+    margin: 0 0 8px;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.cmp-banner__sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+}
+
+.cmp-banner__metrics {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.cmp-metric {
+    padding: 14px 18px;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    text-align: center;
+    min-width: 72px;
+}
+
+.cmp-metric strong {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.cmp-metric span {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── FORM WRAPPER ────────────────────────────────────────────────────────── */
+.cmp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── CARD — matches FirmaDetay .card style ───────────────────────────────── */
+.cmp-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cmp-card__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.cmp-card__head .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 24px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.cmp-card__head h3 {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.cmp-card__head p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-gray);
+    line-height: 1.6;
+}
+
+/* Push the "Kategori Ekle" button to the right inside the head */
+.cmp-card__head>.cmp-btn--add-category {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ── GRID ────────────────────────────────────────────────────────────────── */
+.cmp-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.cmp-grid--3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* ── FIELD ───────────────────────────────────────────────────────────────── */
+.cmp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cmp-field--span2 {
+    grid-column: span 2;
+}
+
+.cmp-field span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.cmp-field input,
+.cmp-field textarea,
+.cmp-field select {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: #fafbfd;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cmp-field input:focus,
+.cmp-field textarea:focus,
+.cmp-field select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.12);
+    background: #fff;
+}
+
+.cmp-field textarea {
+    resize: vertical;
+}
+
+/* ── CATALOG ─────────────────────────────────────────────────────────────── */
+.cmp-catalog {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cmp-catalog__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 40px 24px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-gray);
+    text-align: center;
+}
+
+.cmp-catalog__empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #c7d2fe;
+}
+
+.cmp-catalog__empty strong {
+    color: var(--text-dark);
+}
+
+/* ── CATEGORY CARD — mirrors .accordion-item ─────────────────────────────── */
+.cmp-cat-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg-white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cmp-cat-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(19, 127, 236, 0.1);
+}
+
+/* mirrors .accordion-button */
+.cmp-cat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--bg-white);
+}
+
+.cmp-cat-chevron {
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.cmp-cat-name {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    padding: 3px 6px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.cmp-cat-name:focus {
+    outline: none;
+    background: #eff6ff;
+}
+
+.cmp-cat-name::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.cmp-cat-header__btns {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cmp-cat-empty {
+    padding: 10px 14px 14px 34px;
+    font-size: 13px;
+    color: var(--text-gray);
+    font-style: italic;
+}
+
+/* mirrors .accordion-content */
+.cmp-cat-content {
+    padding: 0 14px 16px 14px;
+    background: rgba(239, 242, 255, 0.45);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── SUBCATEGORY — mirrors .subcategory-title ────────────────────────────── */
+.cmp-sub {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 14px;
+}
+
+.cmp-sub-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cmp-sub-bullet {
+    color: var(--primary);
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* mirrors .subcategory-title text */
+.cmp-sub-name {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.cmp-sub-name:focus {
+    outline: none;
+    background: #eff6ff;
+}
+
+.cmp-sub-name::placeholder {
+    color: #93c5fd;
+    font-weight: 400;
+}
+
+/* ── PRODUCTS — mirrors .product-tags-wrap + .product-tag ────────────────── */
+.cmp-products-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: 20px;
+    /* indent under the bullet */
+}
+
+/* EXACT match of public .product-tag */
+.cmp-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #eef2ff;
+    color: #4f46e5;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid #c7d2fe;
+    transition: background 0.15s;
+}
+
+.cmp-pill:hover {
+    background: #e0e7ff;
+}
+
+.cmp-pill__x {
+    border: none;
+    background: transparent;
+    color: #818cf8;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    margin-left: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+}
+
+.cmp-pill__x:hover {
+    color: #4f46e5;
+}
+
+/* inline add-product — styled as a dashed pill */
+.cmp-pill-add {
+    display: inline-flex;
+    align-items: center;
+    border: 1px dashed #c7d2fe;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+    cursor: text;
+    transition: border-color 0.15s;
+}
+
+.cmp-pill-add:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(19, 127, 236, 0.1);
+}
+
+.cmp-pill-add__input {
+    border: none;
+    background: transparent;
+    padding: 4px 10px;
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    width: 160px;
+    min-width: 80px;
+}
+
+.cmp-pill-add__input:focus {
+    outline: none;
+}
+
+.cmp-pill-add__btn {
+    border: none;
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 3px 8px;
+    display: flex;
+    align-items: center;
+    transition: background 0.15s;
+    border-left: 1px solid #e0e7ff;
+}
+
+.cmp-pill-add__btn:hover:not(:disabled) {
+    background: #eff6ff;
+}
+
+.cmp-pill-add__btn:disabled {
+    color: #c7d2fe;
+    cursor: default;
+}
+
+.cmp-pill-add__btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────────────────────── */
+.cmp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    color: var(--text-dark);
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.cmp-btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.cmp-btn--sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.cmp-btn--icon {
+    padding: 5px 8px;
+}
+
+.cmp-btn--ghost {
+    background: #f0f6fd;
+    border-color: #bfdbfe;
+    color: var(--primary);
+}
+
+.cmp-btn--ghost:hover {
+    background: #dbeafe;
+    border-color: var(--primary);
+}
+
+.cmp-btn--danger {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #e11d48;
+}
+
+.cmp-btn--danger:hover {
+    background: #ffe4e6;
+    border-color: #fca5a5;
+}
+
+.cmp-btn--add-category {
+    background: #f0f6fd;
+    border-color: #bfdbfe;
+    color: var(--primary);
+}
+
+.cmp-btn--add-category:hover {
+    background: #dbeafe;
+    border-color: var(--primary);
+}
+
+.cmp-btn--save {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(19, 127, 236, 0.35);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.cmp-btn--save:hover:not(:disabled) {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 18px rgba(19, 127, 236, 0.4);
+}
+
+.cmp-btn--save:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+/* ── FEEDBACK ────────────────────────────────────────────────────────────── */
+.cmp-feedback {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 18px;
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cmp-feedback .material-symbols-outlined {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.cmp-feedback--ok {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.cmp-feedback--err {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+/* ── ACTIONS BAR ─────────────────────────────────────────────────────────── */
+.cmp-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background: rgba(248, 250, 252, 0.96);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    bottom: 16px;
+    z-index: 10;
+    box-shadow: 0 -2px 12px rgba(15, 23, 42, 0.06);
+}
+
+.cmp-actions__hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-gray);
+    line-height: 1.5;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .cmp-grid--3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cmp-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px 24px;
+    }
+
+    .cmp-banner__metrics {
+        width: 100%;
+    }
+
+    .cmp-metric {
+        flex: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .cmp-grid--3 {
+        grid-template-columns: 1fr;
+    }
+
+    .cmp-field--span2 {
+        grid-column: 1;
+    }
+
+    .cmp-banner {
+        padding: 18px 20px;
+    }
+
+    .cmp-banner__title {
+        font-size: 20px;
+    }
+
+    .cmp-card {
+        padding: 16px;
+    }
+
+    .cmp-card__head {
+        flex-wrap: wrap;
+    }
+
+    .cmp-card__head>.cmp-btn--add-category {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cmp-cat-header {
+        flex-wrap: wrap;
+    }
+
+    .cmp-cat-header__btns {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .cmp-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cmp-btn--save {
+        width: 100%;
+        justify-content: center;
+    }
+}

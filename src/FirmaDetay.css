@@ -657,6 +657,31 @@ body {
   margin-top: 2.5rem;
 }
 
+.tenders-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Firma detay ihale bloguna liste sayfasina gecis baglantisi eklendi */
+.tenders-section-link {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.84rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.tenders-section-link .material-symbols-outlined {
+  font-size: 18px;
+}
+
 .tender-info {
   flex: 1;
 }
@@ -684,6 +709,55 @@ body {
 
 .tender-date-icon {
   font-size: 18px;
+}
+
+.tender-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tender-meta-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.tenders-empty-state-inline {
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px dashed #d7dee8;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.tenders-list-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tender-item-skeleton {
+  min-height: 128px;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #eef2f7 0%, #f8fafc 50%, #eef2f7 100%);
+  background-size: 200% 100%;
+  animation: tenderSkeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes tenderSkeleton {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* Sidebar */
@@ -1087,28 +1161,64 @@ body {
 /* Notes Section */
 .notes-card {
   margin-top: 20px;
-  background: #ffffff;
-  border: 1px solid #efeae2;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.04);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fffdfa 0%, #fffaf1 100%);
+  border: 1px solid rgba(233, 223, 205, 0.8);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06);
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Not kartina ustte ince bir vurgu seridi eklendi */
+.notes-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #d4a34d 0%, #f2d08d 45%, #f7efe0 100%);
 }
 
 .notes-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 15px;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
   flex-wrap: wrap;
 }
 
 .notes-header-icon {
-  color: #b8893f;
-  font-size: 24px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #b7791f;
+  font-size: 22px;
+  background: linear-gradient(180deg, #fff5da 0%, #ffefc7 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 8px 18px rgba(212, 163, 77, 0.16);
+}
+
+.notes-header-copy {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .notes-title {
   margin: 0;
-  font-size: 1.1rem;
-  color: #6a4f24;
+  font-size: 1.08rem;
+  color: #2f2417;
+}
+
+.notes-subtitle {
+  margin: 0;
+  color: #8b7355;
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Coklu not deneyimi icin not sayaci ve feed gorunumu eklendi */
@@ -1121,9 +1231,46 @@ body {
   height: 28px;
   padding: 0 10px;
   border-radius: 999px;
-  background: #f6efe2;
-  color: #9a6b1f;
+  background: linear-gradient(180deg, #fff4db 0%, #f8e6bf 100%);
+  color: #8a5d16;
   font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.notes-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(227, 214, 191, 0.9);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 249, 238, 0.96) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 10px 24px rgba(92, 63, 20, 0.05);
+  margin-bottom: 18px;
+}
+
+.notes-composer-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notes-composer-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #a86a1c;
+  background: rgba(249, 221, 167, 0.34);
+}
+
+.notes-composer-label {
+  color: #7a603c;
+  font-size: 0.85rem;
   font-weight: 700;
 }
 
@@ -1136,80 +1283,218 @@ body {
 
 .note-meta-input {
   width: 100%;
-  height: 42px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #e8dcc0;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid #e7d7bc;
   font-size: 0.9rem;
-  color: #7c5613;
+  color: #5a4528;
   outline: none;
-  background: linear-gradient(180deg, #fffdf7 0%, #fbf5e6 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86), 0 4px 10px rgba(146, 118, 67, 0.04);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 6px 14px rgba(146, 118, 67, 0.03);
 }
 
 .note-meta-input:focus {
-  border-color: #d2bb88;
-  box-shadow: 0 0 0 3px rgba(210, 187, 136, 0.12);
+  border-color: #ddb469;
+  box-shadow: 0 0 0 4px rgba(221, 180, 105, 0.12);
 }
 
 .note-textarea {
   width: 100%;
-  min-height: 90px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #e8dcc0;
+  min-height: 110px;
+  padding: 14px 15px;
+  border-radius: 16px;
+  border: 1px solid #e7d7bc;
   resize: vertical;
   font-size: 14px;
   outline: none;
-  color: #7c5613;
+  color: #5a4528;
   box-sizing: border-box;
   font-family: inherit;
-  background: linear-gradient(180deg, #fffdf7 0%, #fbf5e6 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86), 0 4px 10px rgba(146, 118, 67, 0.04);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 6px 14px rgba(146, 118, 67, 0.03);
 }
 
 .note-textarea:focus {
-  border-color: #d2bb88;
-  box-shadow: 0 0 0 3px rgba(210, 187, 136, 0.12);
+  border-color: #ddb469;
+  box-shadow: 0 0 0 4px rgba(221, 180, 105, 0.12);
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Not formunda tarih-saat bazli hatirlatici paneli eklendi */
+.reminder-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminder-toggle {
+  align-self: flex-start;
+  border: 1px solid #eadfc6;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #8b5e17;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.reminder-toggle:hover,
+.reminder-toggle.active {
+  background: #fff7e6;
+  border-color: #d9ba74;
+  transform: translateY(-1px);
+}
+
+.reminder-toggle .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.reminder-panel {
+  padding: 13px;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 214, 192, 0.95);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 248, 233, 0.98) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+.reminder-panel-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #7a603c;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.reminder-panel-header .material-symbols-outlined {
+  font-size: 16px;
+  color: #be7c20;
+}
+
+.reminder-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.reminder-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reminder-field span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8b7355;
+}
+
+.reminder-field input {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid #e7d7bc;
+  padding: 0 12px;
+  background: #fff;
+  color: #5a4528;
+  font-family: inherit;
+  outline: none;
+}
+
+.reminder-field input:focus {
+  border-color: #ddb469;
+  box-shadow: 0 0 0 4px rgba(221, 180, 105, 0.12);
+}
+
+.reminder-summary {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(255, 244, 219, 0.9);
+  color: #8a5d16;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.reminder-summary .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.reminder-error {
+  margin-top: 10px;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .note-actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 15px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 2px;
+  flex-wrap: wrap;
 }
 
 .note-clear-btn {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #e2e8f0;
   border-radius: 999px;
   color: #6b7280;
   font-weight: 700;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.note-clear-btn .material-symbols-outlined {
+  font-size: 15px;
 }
 
 .note-clear-btn:hover {
   color: #374151;
+  border-color: #cbd5e1;
+  background: #fff;
+  transform: translateY(-1px);
 }
 
 .note-save-btn {
-  background: #faf3df;
-  color: #6f5529;
-  border: 1px solid #e4d6b3;
+  background: linear-gradient(135deg, #d29a42 0%, #be7c20 100%);
+  color: #fffdf9;
+  border: 1px solid rgba(167, 102, 21, 0.28);
   border-radius: 999px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   font-weight: 800;
   cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 8px 16px rgba(190, 124, 32, 0.18);
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.note-save-btn .material-symbols-outlined {
+  font-size: 15px;
 }
 
 .note-save-btn:hover {
-  background: #f6ecd2;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(190, 124, 32, 0.22);
+  filter: brightness(1.03);
 }
 
 .note-save-btn:disabled {
@@ -1220,8 +1505,8 @@ body {
 .notes-feed {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 14px;
+  margin-top: 8px;
 }
 
 .notes-group {
@@ -1238,17 +1523,17 @@ body {
 
 .notes-group-title {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(106, 79, 36, 0.78);
+  color: rgba(116, 90, 53, 0.72);
 }
 
 .notes-group-line {
   height: 1px;
   flex: 1;
-  background: rgba(210, 187, 136, 0.22);
+  background: linear-gradient(90deg, rgba(221, 180, 105, 0.26) 0%, rgba(221, 180, 105, 0.02) 100%);
 }
 
 .notes-group-list {
@@ -1258,11 +1543,23 @@ body {
 }
 
 .saved-note {
-  background: linear-gradient(180deg, #fffdf7 0%, #fbf5e6 100%);
-  border-radius: 12px;
-  padding: 14px;
-  border: 1px solid #e8dcc0;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66), 0 4px 10px rgba(146, 118, 67, 0.04);
+  position: relative;
+  background: linear-gradient(180deg, #fffefd 0%, #fffaf2 100%);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(230, 216, 193, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 18px rgba(92, 63, 20, 0.045);
+}
+
+.saved-note::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 0;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, #d8a34f 0%, #f0d59e 100%);
 }
 
 .saved-note-top {
@@ -1293,12 +1590,12 @@ body {
 .saved-note-delete,
 .saved-note-delete-cancel,
 .saved-note-delete-approve {
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(10px);
   border-radius: 999px;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -1367,38 +1664,91 @@ body {
 }
 
 .saved-note-title {
-  margin: 0 0 6px;
-  color: #6b4100;
-  font-size: 0.95rem;
+  margin: 0 0 8px;
+  color: #674824;
+  font-size: 0.96rem;
   font-weight: 700;
 }
 
 .saved-note-text {
   margin: 0;
-  color: #6f5529;
+  color: #5b4a33;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
   white-space: pre-wrap;
 }
 
 .saved-note-date {
   margin: 0;
-  color: rgba(106, 79, 36, 0.62);
+  color: rgba(104, 82, 48, 0.72);
   font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(251, 241, 217, 0.7);
+}
+
+.saved-note-reminder {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(239, 246, 255, 0.9);
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.saved-note-reminder.sent {
+  background: rgba(240, 253, 244, 0.95);
+  color: #15803d;
+}
+
+.saved-note-reminder .material-symbols-outlined {
+  font-size: 13px;
 }
 
 .notes-empty-state {
-  margin-top: 18px;
-  padding: 14px;
-  border: 1px dashed #e8ddd0;
-  border-radius: 12px;
-  background: #fdfcf9;
+  margin-top: 12px;
+  padding: 18px 16px;
+  border: 1px dashed #e6d7bf;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffdf8 0%, #fff8ec 100%);
   color: #8a6a36;
   font-size: 0.9rem;
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.notes-empty-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(249, 221, 167, 0.34);
+  color: #b7791f;
+  font-size: 22px;
 }
 
 @media (max-width: 480px) {
+  .reminder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-header {
+    align-items: stretch;
+  }
+
+  .notes-count-badge {
+    margin-left: 54px;
+  }
+
   .saved-note-top {
     align-items: flex-start;
   }
