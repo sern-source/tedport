@@ -33,13 +33,13 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
  * Updates:
  * - Filter optimization with limited initial display (5 items per category)
  * - Search functionality for each filter type (Konum, Sektör, Kategori)
- * - "Daha Fazla Göster" (Show More) button to progressively load 5 more items
+ * - "Daha Fazla Göster" (Show More) button opens the full remaining list in one click
  * - Auto-reset filter state when details panel is closed (onToggle handler)
  * - Dynamic search bar in each filter section with real-time filtering
  * 
  * Features:
  * - Initial display of 5 items per filter category
- * - Progressive expansion with "Daha Fazla Göster" button
+ * - One-click full expansion with "Daha Fazla Göster" button
  * - Category-specific search bars (Şehir ara, Sektör ara, Kategori ara)
  * - Smart state reset on filter collapse (expanded count, search input)
  * - Responsive filter UI with inline search functionality
@@ -57,7 +57,7 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
   const [sectorsSearch, setSectorsSearch] = useState('');
   const [categoriesSearch, setCategoriesSearch] = useState('');
 
-  // Expanded count state'leri (ilk 5'i göster, sonra daha fazla aç)
+  // Expanded count state'leri (ilk 5'i göster, sonra tek tikla tamamini ac)
   const [expandedCount, setExpandedCount] = useState({
     cities: 5,
     sectors: 5,
@@ -220,7 +220,7 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
                   <button
                     onClick={() => setExpandedCount({
                       ...expandedCount,
-                      cities: expandedCount.cities + 5
+                      cities: getFilteredCities(citiesSearch).length
                     })}
                     className="filter-show-more-btn"
                   >
@@ -272,7 +272,7 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
               <button
                 onClick={() => setExpandedCount({
                   ...expandedCount,
-                  sectors: expandedCount.sectors + 5
+                  sectors: getFilteredSectors(sectorsSearch).length
                 })}
                 className="filter-show-more-btn"
               >
@@ -327,7 +327,7 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
                   <button
                     onClick={() => setExpandedCount({
                       ...expandedCount,
-                      categories: expandedCount.categories + 5
+                      categories: getFilteredCategories(categoriesSearch).length
                     })}
                     className="filter-show-more-btn"
                   >

@@ -10,6 +10,7 @@ import Home2 from './Home2';
 import Hakkimizda from './hakkimizda';
 import Iletisim from './iletisim';
 import EmailConfirm from './EmailConfirmation';
+import ResetPassword from './ResetPassword';
 
 export default function Router() {
   return (
@@ -24,6 +25,7 @@ export default function Router() {
         <Route path="/hakkimizda" element={<Hakkimizda />} />
         <Route path="/iletisim" element={<Iletisim />} />
         <Route path="/emailconfirmation" element={<EmailConfirm />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />
       </Route>
     </Routes>

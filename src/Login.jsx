@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Login.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
-import { supabase } from './supabaseClient';
+import { supabase, setAuthPersistenceMode } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
@@ -17,7 +17,9 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Sayfa yüklendiğinde oturum kontrolü yap
   useEffect(() => {
@@ -52,7 +54,11 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
     setLoading(true);
+
+    // Enes Doğanay | 6 Nisan 2026: Beni Hatirla secimine gore auth storage login oncesi belirlenir
+    setAuthPersistenceMode(rememberMe);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -72,6 +78,33 @@ const LoginPage = () => {
       console.log("Giriş başarılı:", data.user);
       navigate('/');
     }
+  };
+
+  // Enes Doğanay | 6 Nisan 2026: Sifre sifirlama maili gonderme akisi eklendi
+  const handleForgotPassword = async () => {
+    setError('');
+    setSuccessMessage('');
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError('Şifre sıfırlama bağlantısı göndermek için önce e-posta adresinizi girin.');
+      return;
+    }
+
+    setForgotPasswordLoading(true);
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+      redirectTo: `${window.location.origin}/reset-password`
+    });
+
+    setForgotPasswordLoading(false);
+
+    if (resetError) {
+      setError('Şifre sıfırlama bağlantısı gönderilemedi. Lütfen tekrar deneyin.');
+      return;
+    }
+
+    setSuccessMessage('Şifre yenileme bağlantısı e-posta adresinize gönderildi. Gelen kutunuzu kontrol edin.');
   };
 
   return (
@@ -164,8 +197,8 @@ const LoginPage = () => {
                   <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                   <span>Beni Hatırla</span>
                 </label>
-                {/* Enes Doğanay | 6 Nisan 2026: href="#" yerine onClick ile placeholder uyarı */}
-                <button type="button" className="forgot-password" onClick={() => alert('Şifre sıfırlama özelliği yakında eklenecek.')}>
+                {/* Enes Doğanay | 6 Nisan 2026: Şifre yenileme linki e-posta adresine gönderilir */}
+                <button type="button" className="forgot-password" onClick={handleForgotPassword} disabled={forgotPasswordLoading}>
                   Şifremi Unuttum
                 </button>
               </div>
@@ -173,6 +206,12 @@ const LoginPage = () => {
               {error && (
                 <p className="login-error">
                   {error}
+                </p>
+              )}
+
+              {successMessage && (
+                <p className="login-success">
+                  {successMessage}
                 </p>
               )}
 

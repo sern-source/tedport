@@ -128,6 +128,9 @@ const SupplierProfile = () => {
     const [isFavorited, setIsFavorited] = useState(false);
     const [myLists, setMyLists] = useState([]); // Kullanıcının oluşturduğu listeler
     const [selectedListId, setSelectedListId] = useState(""); // Seçilen liste
+    const [isCreatingList, setIsCreatingList] = useState(false);
+    const [newListName, setNewListName] = useState('');
+    const [isListCreating, setIsListCreating] = useState(false);
 
     // 📂 Accordion State'leri - Açık/Kapalı kategoriler
     // Enes Doğanay | 4 Nisan 2026: Ürün kategorilerini accordion olarak göstermek için state eklendi
@@ -254,7 +257,7 @@ const SupplierProfile = () => {
             const [profileRes, noteRes, listsRes, favRes] = await Promise.all([
                 supabase.from('profiles').select('first_name, last_name').eq('id', session.user.id).single(),
                 supabase.from('kisisel_notlar').select('*').eq('user_id', session.user.id).eq('firma_id', id).maybeSingle(),
-                supabase.from('kullanici_listeleri').select('*').eq('user_id', session.user.id),
+                supabase.from('kullanici_listeleri').select('*').eq('user_id', session.user.id).order('created_at', { ascending: true }),
                 supabase.from('kullanici_favorileri').select('*').eq('user_id', session.user.id).eq('firma_id', id).maybeSingle()
             ]);
 
@@ -302,6 +305,61 @@ const SupplierProfile = () => {
         } catch (error) {
             console.error("Favori işlemi sırasında hata:", error);
             alert("İşlem gerçekleştirilemedi.");
+        }
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Firma detay sayfasından yeni favori listesi oluşturma
+    const handleCreateList = async () => {
+        const trimmedListName = newListName.trim();
+        if (!trimmedListName) return;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+            alert('Lütfen önce giriş yapın.');
+            return;
+        }
+
+        const isDuplicate = myLists.some((liste) => (liste.liste_adi || '').trim().toLocaleLowerCase('tr-TR') === trimmedListName.toLocaleLowerCase('tr-TR'));
+        if (isDuplicate) {
+            alert('Bu isimde bir listeniz zaten var.');
+            return;
+        }
+
+        setIsListCreating(true);
+
+        try {
+            const { data, error } = await supabase
+                .from('kullanici_listeleri')
+                .insert([{ user_id: session.user.id, liste_adi: trimmedListName }])
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            setMyLists((prev) => [...prev, data]);
+            setSelectedListId(data.id);
+            setNewListName('');
+            setIsCreatingList(false);
+        } catch (error) {
+            console.error('Liste oluşturulamadı:', error);
+            alert('Liste oluşturulamadı.');
+        } finally {
+            setIsListCreating(false);
+        }
+    };
+
+    // Enes Doğanay | 6 Nisan 2026: Yeni liste alaninda Enter ile olustur, Escape ile kapat
+    const handleListInputKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (!isListCreating && newListName.trim()) {
+                handleCreateList();
+            }
+        }
+
+        if (event.key === 'Escape' && !isListCreating) {
+            setIsCreatingList(false);
+            setNewListName('');
         }
     };
 
@@ -487,15 +545,29 @@ const SupplierProfile = () => {
 
                         {/* RIGHT COLUMN (Sidebar) */}
                         <aside className="sticky-sidebar">
-                            <div className="card">
-                                <h3 className="sidebar-heading">İletişime Geç</h3>
+                            <div className="card sidebar-card sidebar-card-favorites">
+                                {/* Enes Doğanay | 6 Nisan 2026: Favori ve liste akışı iletişim kartından ayrılarak ayrı bağlama taşındı */}
+                                <h3 className="sidebar-heading">Listelere Ekle</h3>
 
-                                {/* 📁 HANGİ LİSTEYE EKLENECEK SEÇİMİ */}
-                                {userProfile && !isFavorited && myLists.length > 0 && (
-                                    <div className="list-selector">
-                                        <label className="list-label">
-                                            Hangi listeye eklensin?
-                                        </label>
+                                {userProfile && !isFavorited && (
+                                    <div className="list-selector-card">
+                                        {/* Enes Doğanay | 6 Nisan 2026: Liste secme ve yeni liste olusturma ayni blokta toplandi */}
+                                        <div className="list-selector-header">
+                                            <label className="list-label">
+                                                Hangi listeye eklensin?
+                                            </label>
+                                            {!isCreatingList && (
+                                                <button
+                                                    type="button"
+                                                    className="create-list-inline-trigger"
+                                                    onClick={() => setIsCreatingList(true)}
+                                                >
+                                                    <span className="material-symbols-outlined">add</span>
+                                                    Yeni Liste
+                                                </button>
+                                            )}
+                                        </div>
+
                                         <select
                                             value={selectedListId}
                                             onChange={(e) => setSelectedListId(e.target.value)}
@@ -506,19 +578,69 @@ const SupplierProfile = () => {
                                                 <option key={liste.id} value={liste.id}>{liste.liste_adi}</option>
                                             ))}
                                         </select>
+
+                                        <p className="list-helper-text">
+                                            Yeni oluşturulan liste otomatik olarak seçilir.
+                                        </p>
+
+                                        {isCreatingList && (
+                                            <div className="create-list-inline create-list-inline-form">
+                                                <input
+                                                    type="text"
+                                                    value={newListName}
+                                                    onChange={(e) => setNewListName(e.target.value)}
+                                                    onKeyDown={handleListInputKeyDown}
+                                                    placeholder="Yeni liste adı"
+                                                    className="create-list-inline-input"
+                                                    maxLength={60}
+                                                    autoFocus
+                                                />
+                                                <div className="create-list-inline-actions">
+                                                    <button
+                                                        type="button"
+                                                        className="create-list-inline-submit"
+                                                        onClick={handleCreateList}
+                                                        disabled={isListCreating || !newListName.trim()}
+                                                    >
+                                                        {isListCreating ? 'Oluşturuluyor...' : 'Liste Oluştur'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="create-list-inline-cancel"
+                                                        onClick={() => {
+                                                            setIsCreatingList(false);
+                                                            setNewListName('');
+                                                        }}
+                                                        disabled={isListCreating}
+                                                    >
+                                                        Vazgeç
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
-                                {/* 💖 FAVORİYE EKLE BUTONU */}
+                                {/* Enes Doğanay | 6 Nisan 2026: Favori butonu sadeleştirildi, kalp kaldırıldı ve tek satırlı kurumsal CTA yapısı korundu */}
                                 <button
                                     onClick={toggleFavorite}
                                     className={`btn-favorite ${isFavorited ? 'btn-favorite--active' : ''}`}
                                 >
-                                    <span className="material-symbols-outlined" style={{ fontVariationSettings: isFavorited ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
-                                    {isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+                                    <span className="material-symbols-outlined btn-favorite-icon">
+                                        {isFavorited ? 'bookmark_remove' : 'playlist_add'}
+                                    </span>
+                                    <span>
+                                        {isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+                                    </span>
                                 </button>
+                            </div>
 
-                                <button className="btn btn-primary btn-full">
+                            <div className="card sidebar-card sidebar-card-contact">
+                                {/* Enes Doğanay | 6 Nisan 2026: Teklif ve firma iletişim bilgileri ayrı iletişim kartında toplandı */}
+                                <h3 className="sidebar-heading">İletişime Geç</h3>
+
+                                {/* Enes Doğanay | 6 Nisan 2026: Teklif iste ana CTA olarak güçlendirildi */}
+                                <button className="btn btn-primary btn-full btn-request-quote">
                                     Teklif İste
                                 </button>
 
@@ -531,23 +653,42 @@ const SupplierProfile = () => {
                                         </button>
                                     </a>
                                 )}
-                                {/* ... (Harita ve diğer iletişim bilgileri aynı şekilde devam ediyor) ... */}
-                                <hr className="sidebar-divider" />
-                                <h4 className="sidebar-subtitle">Konum</h4>
-                                <a href={googleMapsLink} target="_blank" rel="noopener noreferrer" className="map-link">
-                                    <div className="map" style={{ backgroundImage: `url(${mapImageUrl})` }}>
-                                        <div className="map-label">{firma.il_ilce}</div>
+                                {/* Enes Doğanay | 6 Nisan 2026: Konum ve firma bilgileri tek bir panel altında toparlandı */}
+                                <div className="contact-details-panel">
+                                    <div className="contact-details-header">
+                                        <h4 className="sidebar-subtitle">Konum</h4>
+                                        <a href={googleMapsLink} target="_blank" rel="noopener noreferrer" className="contact-map-action">Haritada Aç</a>
                                     </div>
-                                </a>
-                                {firma.adres && (
-                                    <><hr className="sidebar-divider" /><div className="contact-info-row"><svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg><span>{firma.adres}</span></div></>
-                                )}
-                                {firma.web_sitesi && (
-                                    <><hr className="sidebar-divider" /><a href={firma.web_sitesi.startsWith("http") ? firma.web_sitesi : `https://${firma.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-info-row contact-info-link"><svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20z" /></svg>{firma.web_sitesi}</a></>
-                                )}
-                                {firma.eposta && (
-                                    <><hr className="sidebar-divider" /><a href={`mailto:${firma.eposta}`} className="contact-info-row contact-info-link"><svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v16H4z" /><polyline points="22,6 12,13 2,6" /></svg>{firma.eposta}</a></>
-                                )}
+
+                                    <a href={googleMapsLink} target="_blank" rel="noopener noreferrer" className="map-link">
+                                        <div className="map" style={{ backgroundImage: `url(${mapImageUrl})` }}>
+                                            <div className="map-label">{firma.il_ilce}</div>
+                                        </div>
+                                    </a>
+
+                                    {(firma.adres || firma.web_sitesi || firma.eposta) && (
+                                        <div className="contact-info-stack">
+                                            {firma.adres && (
+                                                <div className="contact-info-row">
+                                                    <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                                                    <span>{firma.adres}</span>
+                                                </div>
+                                            )}
+                                            {firma.web_sitesi && (
+                                                <a href={firma.web_sitesi.startsWith("http") ? firma.web_sitesi : `https://${firma.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-info-row contact-info-link">
+                                                    <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20z" /></svg>
+                                                    {firma.web_sitesi}
+                                                </a>
+                                            )}
+                                            {firma.eposta && (
+                                                <a href={`mailto:${firma.eposta}`} className="contact-info-row contact-info-link">
+                                                    <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v16H4z" /><polyline points="22,6 12,13 2,6" /></svg>
+                                                    {firma.eposta}
+                                                </a>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {/* 📝 KİŞİSEL NOTLAR BÖLÜMÜ */}

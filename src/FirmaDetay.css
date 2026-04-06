@@ -687,26 +687,54 @@ body {
 }
 
 /* Sidebar */
-.sidebar-heading {
-  margin-bottom: 1rem;
+/* Enes Doğanay | 6 Nisan 2026: Sidebar aksiyonlari ayri kartlara bolunerek gorsel hiyerarsi guclendirildi */
+.sidebar-card {
+  display: flex;
+  flex-direction: column;
 }
 
-.list-selector {
-  margin-bottom: 10px;
+.sidebar-card-favorites {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border-color: #e3edf9;
+}
+
+.sidebar-card-contact {
+  background: #ffffff;
+}
+
+.sidebar-heading {
+  margin-bottom: 1rem;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.list-selector-card {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.list-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 .list-label {
   font-size: 12px;
   color: var(--text-gray);
   display: block;
-  margin-bottom: 4px;
   font-weight: 500;
 }
 
 .list-select {
   width: 100%;
-  padding: 8px;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid #cbd5e1;
   color: #334155;
   font-size: 13px;
@@ -714,40 +742,188 @@ body {
   background: #fff;
 }
 
+.list-select:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.16);
+}
+
+.list-helper-text {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Firma detay sayfasında inline yeni liste oluşturma alanı eklendi */
+.create-list-inline {
+  margin-top: 10px;
+}
+
+.create-list-inline-trigger {
+  flex-shrink: 0;
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #475569;
+  border-radius: 999px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.78rem;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.create-list-inline-trigger:hover {
+  border-color: #93c5fd;
+  background: #dbeafe;
+  color: #0f172a;
+}
+
+.create-list-inline-trigger .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.create-list-inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.create-list-inline-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.92rem;
+  color: #0f172a;
+  outline: none;
+}
+
+.create-list-inline-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.16);
+}
+
+.create-list-inline-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.create-list-inline-submit,
+.create-list-inline-cancel {
+  flex: 1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.create-list-inline-submit {
+  border: 1px solid #137fec;
+  background: #137fec;
+  color: #fff;
+}
+
+.create-list-inline-submit:hover:not(:disabled) {
+  background: #0f6dd0;
+  border-color: #0f6dd0;
+}
+
+.create-list-inline-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.create-list-inline-cancel {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #475569;
+}
+
+.create-list-inline-cancel:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+@media (max-width: 480px) {
+  .list-selector-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .create-list-inline-trigger {
+    width: 100%;
+    border-radius: 10px;
+  }
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Favori butonu sade, tek satırlı ve kurumsal CTA olarak düzenlendi */
 .btn-favorite {
   width: 100%;
   margin-bottom: 10px;
   background: #f8fafc;
-  color: #475569;
+  color: #0f172a;
   border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   font-weight: 600;
-  transition: 0.2s;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .btn-favorite:hover {
   background: #f1f5f9;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.btn-favorite-icon {
+  font-size: 20px;
+  color: #334155;
 }
 
 .btn-favorite--active {
-  background: #fee2e2;
-  color: #ef4444;
-  border-color: #fca5a5;
+  background: #eaf2ff;
+  border-color: #93c5fd;
+  color: #0b3b75;
 }
 
 .btn-favorite--active:hover {
-  background: #fecaca;
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+.btn-favorite--active .btn-favorite-icon {
+  color: #1d4ed8;
 }
 
 .btn-full {
   width: 100%;
   margin-bottom: 10px;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Teklif iste butonu ana CTA olarak buyutuldu */
+.btn-request-quote {
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow: 0 10px 22px rgba(19, 127, 236, 0.2);
+}
+
+.btn-request-quote:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(19, 127, 236, 0.24);
 }
 
 .contact-link-wrap {
@@ -773,10 +949,40 @@ body {
 .sidebar-subtitle {
   font-size: 0.875rem;
   margin-bottom: 10px;
+  margin-top: 0.25rem;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Konum ve iletisim bilgileri tek panelde kompaktlastirildi */
+.contact-details-panel {
+  margin-top: 4px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.contact-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.contact-map-action {
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.contact-map-action:hover {
+  color: var(--primary-hover);
 }
 
 .map-link {
   text-decoration: none;
+  display: block;
 }
 
 .contact-info-row {
@@ -786,6 +992,19 @@ body {
   color: #475569;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+.contact-info-stack {
+  margin-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.contact-info-stack .contact-info-row {
+  padding: 14px 0;
+}
+
+.contact-info-stack .contact-info-row+.contact-info-row {
+  border-top: 1px solid #e2e8f0;
 }
 
 .contact-info-link {
@@ -801,6 +1020,13 @@ body {
   margin-top: 3px;
   min-width: 24px;
   flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .contact-details-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* Notes Section */
