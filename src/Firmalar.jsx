@@ -20,6 +20,7 @@ import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { getManagedCompanyId } from './companyManagementApi';
 
 
 /* ================= SIDEBAR ================= */
@@ -347,8 +348,75 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
 
 const SupplierCard = ({ data, onSearchTag }) => {
   const navigate = useNavigate();
+  // Enes Doğanay | 7 Nisan 2026: İletişime Geç popup state'i
+  const [showContact, setShowContact] = useState(false);
+
+  // Enes Doğanay | 8 Nisan 2026: Teklif iste popup state'leri (Firmalar sayfasından doğrudan)
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [quoteForm, setQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+  const [quoteSending, setQuoteSending] = useState(false);
+  const [quoteSent, setQuoteSent] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+
+  // Enes Doğanay | 8 Nisan 2026: Modal açıldığında kullanıcı profili çek
+  useEffect(() => {
+    if (!showQuoteModal) return;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data: profile } = await supabase.from('profiles').select('first_name, last_name, email').eq('id', session.user.id).single();
+      setUserProfile(profile || { email: session.user.email });
+    })();
+  }, [showQuoteModal]);
+
+  // Enes Doğanay | 8 Nisan 2026: Teklif talebi gönderme (bireysel + kurumsal)
+  const handleSendQuoteRequest = async () => {
+    if (!quoteForm.konu.trim() || !quoteForm.mesaj.trim()) return;
+    setQuoteSending(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { alert('Lütfen önce giriş yapın.'); return; }
+
+      let senderFirmaId = null;
+      let senderFirmaAdi = '';
+      const managedId = await getManagedCompanyId();
+      if (managedId) {
+        senderFirmaId = managedId;
+        const { data: senderFirma } = await supabase.from('firmalar').select('firma_adi').eq('firmaID', managedId).single();
+        senderFirmaAdi = senderFirma?.firma_adi || '';
+      }
+
+      const { error } = await supabase.from('teklif_talepleri').insert([{
+        firma_id: String(data.id),
+        user_id: session.user.id,
+        gonderen_firma_id: senderFirmaId,
+        ad_soyad: `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim(),
+        email: userProfile?.email || session.user.email,
+        telefon: '',
+        firma_adi: senderFirmaAdi,
+        konu: quoteForm.konu.trim(),
+        mesaj: quoteForm.mesaj.trim(),
+        miktar: quoteForm.miktar.trim() || null,
+        teslim_tarihi: quoteForm.teslim_tarihi || null
+      }]);
+      if (error) throw error;
+
+      setQuoteSent(true);
+      setTimeout(() => {
+        setShowQuoteModal(false);
+        setQuoteSent(false);
+        setQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+      }, 2000);
+    } catch (error) {
+      console.error('Teklif talebi gönderilemedi:', error);
+      alert('Teklif talebi gönderilemedi: ' + (error?.message || JSON.stringify(error)));
+    } finally {
+      setQuoteSending(false);
+    }
+  };
 
   return (
+    <>
     <div className="supplier-card">
       {/* Enes Doğanay | 6 Nisan 2026: logo_url varsa gerçek logo gösterilir, yoksa baş harf avatar */}
       <div className="card-images">
@@ -374,8 +442,8 @@ const SupplierCard = ({ data, onSearchTag }) => {
         {/* Enes Doğanay | 14 Temmuz 2025: firma adına tıklayınca profil sayfasına yönlendirir */}
         <h3 className="supplier-name" onClick={() => navigate(`/firmadetay/${data.id}`)} style={{ cursor: 'pointer' }}>
           {data.name}
-          {/* Enes Doğanay | 6 Nisan 2026: best=true firmalara onaylı rozeti gösterilir */}
-          {data.isBest && (
+          {/* Enes Doğanay | 7 Nisan 2026: Verified = kurumsal yöneticisi olan firmalar */}
+          {data.isVerified && (
             <span className="material-symbols-outlined verified-icon">
               verified
             </span>
@@ -401,7 +469,45 @@ const SupplierCard = ({ data, onSearchTag }) => {
 
         <div className="card-footer">
           <div className="actions">
-            <button className="btn-outline">İletişime Geç</button>
+            {/* Enes Doğanay | 7 Nisan 2026: İletişime Geç — butona yapışık minimal dropdown */}
+            <div className="contact-dropdown-wrap">
+              <button className="btn-outline" onClick={() => setShowContact(!showContact)}>İletişime Geç</button>
+              {showContact && (
+                <>
+                  <div className="contact-dropdown-backdrop" onClick={() => setShowContact(false)} />
+                  <div className="contact-dropdown">
+                    {data.isVerified && (
+                      <button className="contact-dropdown-item contact-dropdown-teklif" onClick={() => { setShowContact(false); setShowQuoteModal(true); }}>
+                        <span className="material-symbols-outlined">request_quote</span>Teklif İste
+                      </button>
+                    )}
+                    {data.telefon && (
+                      <a href={`tel:${data.telefon}`} className="contact-dropdown-item">
+                        <span className="material-symbols-outlined">call</span>{data.telefon}
+                      </a>
+                    )}
+                    {data.eposta && (
+                      <a href={`mailto:${data.eposta}`} className="contact-dropdown-item">
+                        <span className="material-symbols-outlined">mail</span>{data.eposta}
+                      </a>
+                    )}
+                    {data.web_sitesi && (
+                      <a href={data.web_sitesi.startsWith('http') ? data.web_sitesi : `https://${data.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                        <span className="material-symbols-outlined">language</span>{data.web_sitesi.replace(/^https?:\/\//, '')}
+                      </a>
+                    )}
+                    {(data.adres || data.location) && (
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.adres || data.location)}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                        <span className="material-symbols-outlined">location_on</span>{data.location || data.adres}
+                      </a>
+                    )}
+                    {!data.telefon && !data.eposta && !data.web_sitesi && !data.adres && !data.isVerified && (
+                      <span className="contact-dropdown-empty">İletişim bilgisi yok</span>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
             <button
               className="btn-primary"
               onClick={() => navigate(`/firmadetay/${data.id}`)}
@@ -412,6 +518,99 @@ const SupplierCard = ({ data, onSearchTag }) => {
         </div>
       </div>
     </div>
+
+      {/* Enes Doğanay | 8 Nisan 2026: Teklif İste popup modal — Firmalar sayfasından doğrudan */}
+      {showQuoteModal && (
+        <div className="quote-modal-overlay" onClick={() => { if (!quoteSending) { setShowQuoteModal(false); setQuoteSent(false); } }}>
+          <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
+            {quoteSent ? (
+              <div className="quote-modal-success">
+                <span className="material-symbols-outlined quote-success-icon">check_circle</span>
+                <h3>Teklif Talebiniz Gönderildi!</h3>
+                <p>Firma en kısa sürede talebinizi inceleyecektir.</p>
+              </div>
+            ) : (
+              <>
+                <div className="quote-modal-header">
+                  <div>
+                    <h3>Teklif İste</h3>
+                    <p className="quote-modal-subtitle">{data.name}</p>
+                  </div>
+                  <button className="quote-modal-close" onClick={() => setShowQuoteModal(false)} type="button">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+
+                <div className="quote-modal-body">
+                  <div className="quote-form-group">
+                    <label>Konu *</label>
+                    <input
+                      type="text"
+                      placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi"
+                      value={quoteForm.konu}
+                      onChange={(e) => setQuoteForm(prev => ({ ...prev, konu: e.target.value }))}
+                      maxLength={200}
+                    />
+                  </div>
+
+                  <div className="quote-form-row">
+                    <div className="quote-form-group">
+                      <label>Miktar / Adet</label>
+                      <input
+                        type="text"
+                        placeholder="Ör: 500 metre, 100 adet"
+                        value={quoteForm.miktar}
+                        onChange={(e) => setQuoteForm(prev => ({ ...prev, miktar: e.target.value }))}
+                        maxLength={100}
+                      />
+                    </div>
+                    <div className="quote-form-group">
+                      <label>Termin Tarihi</label>
+                      <input
+                        type="date"
+                        value={quoteForm.teslim_tarihi}
+                        onChange={(e) => setQuoteForm(prev => ({ ...prev, teslim_tarihi: e.target.value }))}
+                        min={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="quote-form-group">
+                    <label>Mesajınız *</label>
+                    <textarea
+                      placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi, teslimat adresi vb.)"
+                      value={quoteForm.mesaj}
+                      onChange={(e) => setQuoteForm(prev => ({ ...prev, mesaj: e.target.value }))}
+                      rows={4}
+                      maxLength={2000}
+                    />
+                  </div>
+
+                  <div className="quote-form-info">
+                    <span className="material-symbols-outlined">info</span>
+                    <span>İletişim bilgileriniz ({userProfile?.email}) taleple birlikte paylaşılacaktır.</span>
+                  </div>
+                </div>
+
+                <div className="quote-modal-footer">
+                  <button className="btn btn-outline quote-btn-cancel" onClick={() => setShowQuoteModal(false)} type="button">
+                    İptal
+                  </button>
+                  <button
+                    className="btn btn-primary quote-btn-send"
+                    onClick={handleSendQuoteRequest}
+                    disabled={quoteSending || !quoteForm.konu.trim() || !quoteForm.mesaj.trim()}
+                    type="button"
+                  >
+                    {quoteSending ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -492,7 +691,7 @@ function App() {
     /* Enes Doğanay | 6 Nisan 2026: Sadece kullanılan sütunlar çekiliyor (performans) */
     let query = supabase
       .from('firmalar')
-      .select('firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best', { count: 'exact' });
+      .select('firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres', { count: 'exact' });
 
     // Enes Doğanay | 5 Nisan 2026: Minimum 2 karakter kontrolü - çok geniş sorguları engeller
     const trimmedSearch = debouncedSearch?.trim() || '';
@@ -552,15 +751,28 @@ function App() {
     }
 
     if (!error && data) {
+      /* Enes Doğanay | 7 Nisan 2026: Verified = kurumsal yöneticisi olan firmalar */
+      const firmaIds = data.map(item => String(item.firmaID));
+      const { data: managersData } = await supabase
+        .from('kurumsal_firma_yoneticileri')
+        .select('firma_id')
+        .in('firma_id', firmaIds);
+      const verifiedSet = new Set((managersData || []).map(m => String(m.firma_id)));
+
       let mappedSuppliers = data.map(item => ({
         id: item.firmaID,
         name: item.firma_adi,
-        /* Enes Doğanay | 6 Nisan 2026: is_verified tabloda yok, best alanı kullanılıyor */
+        /* Enes Doğanay | 7 Nisan 2026: Verified artık kurumsal yöneticiye göre belirleniyor */
         isBest: item.best,
+        isVerified: verifiedSet.has(String(item.firmaID)),
         location: item.il_ilce,
         tags: (degerleriDiziyeCevir(item.urun_kategorileri) || []),
         description: item.description,
-        images: item.logo_url
+        images: item.logo_url,
+        telefon: item.telefon || '',
+        eposta: item.eposta || '',
+        web_sitesi: item.web_sitesi || '',
+        adres: item.adres || ''
       }));
 
       /* Enes Doğanay | 6 Nisan 2026: Sıralama önceliği: 1) best=true her zaman önce 2) Arama varsa alaka puanı

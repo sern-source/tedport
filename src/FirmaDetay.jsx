@@ -32,7 +32,6 @@ import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { formatTenderDate, getTenderStatusMeta } from './tenderUtils';
-import CompanyManagementPanel from './CompanyManagementPanel';
 import { getManagedCompanyId } from './companyManagementApi';
 
 // ===== FİRMA DETAY SAYFASI =====
@@ -175,6 +174,15 @@ const SupplierProfile = () => {
     const [isCreatingList, setIsCreatingList] = useState(false);
     const [newListName, setNewListName] = useState('');
     const [isListCreating, setIsListCreating] = useState(false);
+
+    // Enes Doğanay | 7 Nisan 2026: Firma verified kontrolü — kurumsal yöneticisi var mı
+    const [isVerified, setIsVerified] = useState(false);
+
+    // Enes Doğanay | 7 Nisan 2026: Teklif iste popup formu state'leri
+    const [showQuoteModal, setShowQuoteModal] = useState(false);
+    const [quoteForm, setQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+    const [quoteSending, setQuoteSending] = useState(false);
+    const [quoteSent, setQuoteSent] = useState(false);
 
     // 📂 Accordion State'leri - Açık/Kapalı kategoriler
     // Enes Doğanay | 4 Nisan 2026: Ürün kategorilerini accordion olarak göstermek için state eklendi
@@ -375,6 +383,13 @@ const SupplierProfile = () => {
             setFirma(firmaResult.data);
         }
 
+        // Enes Doğanay | 7 Nisan 2026: Firma verified = kurumsal yöneticisi var mı kontrol
+        const { count: managerCount } = await supabase
+            .from('kurumsal_firma_yoneticileri')
+            .select('id', { count: 'exact', head: true })
+            .eq('firma_id', id);
+        setIsVerified(managerCount > 0);
+
         if (tenderResult.error) {
             if (isMissingRelationError(tenderResult.error)) {
                 setIsTendersTableMissing(true);
@@ -515,6 +530,54 @@ const SupplierProfile = () => {
         if (event.key === 'Escape' && !isListCreating) {
             setIsCreatingList(false);
             setNewListName('');
+        }
+    };
+
+    // Enes Doğanay | 7 Nisan 2026: Teklif talebi gönderme fonksiyonu (bireysel + kurumsal destek)
+    const handleSendQuoteRequest = async () => {
+        if (!quoteForm.konu.trim() || !quoteForm.mesaj.trim()) return;
+        setQuoteSending(true);
+
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user) { alert('Lütfen önce giriş yapın.'); return; }
+
+            // Enes Doğanay | 7 Nisan 2026: Kurumsal gönderici bilgisi — firma adı ve id
+            let senderFirmaId = null;
+            let senderFirmaAdi = '';
+            if (managedCompanyId) {
+                senderFirmaId = managedCompanyId;
+                const { data: senderFirma } = await supabase.from('firmalar').select('firma_adi').eq('firmaID', managedCompanyId).single();
+                senderFirmaAdi = senderFirma?.firma_adi || '';
+            }
+
+            const { error } = await supabase.from('teklif_talepleri').insert([{
+                firma_id: String(id),
+                user_id: session.user.id,
+                gonderen_firma_id: senderFirmaId,
+                ad_soyad: `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim(),
+                email: userProfile?.email || session.user.email,
+                telefon: '',
+                firma_adi: senderFirmaAdi,
+                konu: quoteForm.konu.trim(),
+                mesaj: quoteForm.mesaj.trim(),
+                miktar: quoteForm.miktar.trim() || null,
+                teslim_tarihi: quoteForm.teslim_tarihi || null
+            }]);
+
+            if (error) throw error;
+
+            setQuoteSent(true);
+            setTimeout(() => {
+                setShowQuoteModal(false);
+                setQuoteSent(false);
+                setQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+            }, 2000);
+        } catch (error) {
+            console.error('Teklif talebi gönderilemedi:', error);
+            alert('Teklif talebi gönderilemedi: ' + (error?.message || JSON.stringify(error)));
+        } finally {
+            setQuoteSending(false);
         }
     };
 
@@ -761,10 +824,13 @@ const SupplierProfile = () => {
                                     <div>
                                         <h1 className="company-name">
                                             {firma.firma_adi}
-                                            <span className="verified-badge">
-                                                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span>
-                                                Doğrulanmış
-                                            </span>
+                                            {/* Enes Doğanay | 7 Nisan 2026: Sadece kurumsal yöneticisi olan verified firmalar badge gösterir */}
+                                            {isVerified && (
+                                                <span className="verified-badge">
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span>
+                                                    Doğrulanmış
+                                                </span>
+                                            )}
                                         </h1>
                                         <p className="hero-meta">• {firma.category_name} • 📍 {firma.il_ilce}</p>
                                     </div>
@@ -776,15 +842,21 @@ const SupplierProfile = () => {
 
                 {/* MAIN CONTENT */}
                 <main className="container">
+                    {/* Enes Doğanay | 7 Nisan 2026: Yönetici de public görünümü görür, düzenleme /firma-profil sayfasında */}
                     {isCurrentUserCompanyManager && (
-                        <CompanyManagementPanel
-                            company={firma}
-                            onCompanyUpdated={(updatedCompany) => setFirma(updatedCompany)}
-                        />
+                        <div style={{ marginBottom: '16px' }}>
+                            <button
+                                className="teklif-iste-btn"
+                                onClick={() => navigate('/firma-profil?tab=panel')}
+                                style={{ background: 'linear-gradient(135deg, #0f172a, #1e40af)', border: 'none' }}
+                            >
+                                <span className="material-symbols-outlined" style={{ marginRight: '6px' }}>edit</span>
+                                Firma Bilgilerini Düzenle
+                            </button>
+                        </div>
                     )}
 
-                    {!isCurrentUserCompanyManager && (
-                        <div className="content-grid">
+                    <div className="content-grid">
                             {/* LEFT COLUMN */}
                             <div className="main-info">
                                 <article id="about" className="card card-about">
@@ -1019,11 +1091,20 @@ const SupplierProfile = () => {
                                     {/* Enes Doğanay | 6 Nisan 2026: Teklif ve firma iletişim bilgileri ayrı iletişim kartında toplandı */}
                                     <h3 className="sidebar-heading">İletişime Geç</h3>
 
-                                    {/* Enes Doğanay | 6 Nisan 2026: Teklif iste ana CTA olarak güçlendirildi */}
-                                    <button className="btn btn-primary btn-full btn-request-quote" disabled={!userProfile}>
+                                    {/* Enes Doğanay | 7 Nisan 2026: Teklif iste butonu — verified değilse veya giriş yapılmamışsa deaktif */}
+                                    <button
+                                        className="btn btn-primary btn-full btn-request-quote"
+                                        disabled={!userProfile || !isVerified}
+                                        onClick={() => setShowQuoteModal(true)}
+                                        title={!isVerified ? 'Bu firma henüz kurumsal profilini yönetmiyor' : ''}
+                                    >
                                         {!userProfile && <span className="material-symbols-outlined btn-request-quote-icon">lock</span>}
+                                        {!isVerified && userProfile && <span className="material-symbols-outlined btn-request-quote-icon">block</span>}
                                         Teklif İste
                                     </button>
+                                    {!isVerified && userProfile && (
+                                        <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '6px', textAlign: 'center' }}>Bu firma henüz profilini yönetmiyor.</p>
+                                    )}
 
                                     {/* TELEFON, KONUM, ADRES, WEB VB. (Öncekiyle aynı) */}
                                     {userProfile && firma.telefon && (
@@ -1251,9 +1332,100 @@ const SupplierProfile = () => {
 
                             </aside>
                         </div>
-                    )}
                 </main>
             </div>
+
+            {/* Enes Doğanay | 7 Nisan 2026: Teklif İste popup modal */}
+            {showQuoteModal && (
+                <div className="quote-modal-overlay" onClick={() => { if (!quoteSending) { setShowQuoteModal(false); setQuoteSent(false); } }}>
+                    <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
+                        {quoteSent ? (
+                            <div className="quote-modal-success">
+                                <span className="material-symbols-outlined quote-success-icon">check_circle</span>
+                                <h3>Teklif Talebiniz Gönderildi!</h3>
+                                <p>Firma en kısa sürede talebinizi inceleyecektir.</p>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="quote-modal-header">
+                                    <div>
+                                        <h3>Teklif İste</h3>
+                                        <p className="quote-modal-subtitle">{firma?.firma_adi}</p>
+                                    </div>
+                                    <button className="quote-modal-close" onClick={() => setShowQuoteModal(false)} type="button">
+                                        <span className="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+
+                                <div className="quote-modal-body">
+                                    <div className="quote-form-group">
+                                        <label>Konu *</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi"
+                                            value={quoteForm.konu}
+                                            onChange={(e) => setQuoteForm(prev => ({ ...prev, konu: e.target.value }))}
+                                            maxLength={200}
+                                        />
+                                    </div>
+
+                                    <div className="quote-form-row">
+                                        <div className="quote-form-group">
+                                            <label>Miktar / Adet</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Ör: 500 metre, 100 adet"
+                                                value={quoteForm.miktar}
+                                                onChange={(e) => setQuoteForm(prev => ({ ...prev, miktar: e.target.value }))}
+                                                maxLength={100}
+                                            />
+                                        </div>
+                                        <div className="quote-form-group">
+                                            <label>Termin Tarihi</label>
+                                            <input
+                                                type="date"
+                                                value={quoteForm.teslim_tarihi}
+                                                onChange={(e) => setQuoteForm(prev => ({ ...prev, teslim_tarihi: e.target.value }))}
+                                                min={new Date().toISOString().split('T')[0]}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="quote-form-group">
+                                        <label>Mesajınız *</label>
+                                        <textarea
+                                            placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi, teslimat adresi vb.)"
+                                            value={quoteForm.mesaj}
+                                            onChange={(e) => setQuoteForm(prev => ({ ...prev, mesaj: e.target.value }))}
+                                            rows={4}
+                                            maxLength={2000}
+                                        />
+                                    </div>
+
+                                    <div className="quote-form-info">
+                                        <span className="material-symbols-outlined">info</span>
+                                        <span>İletişim bilgileriniz ({userProfile?.email}) taleple birlikte paylaşılacaktır.</span>
+                                    </div>
+                                </div>
+
+                                <div className="quote-modal-footer">
+                                    <button className="btn btn-outline quote-btn-cancel" onClick={() => setShowQuoteModal(false)} type="button">
+                                        İptal
+                                    </button>
+                                    <button
+                                        className="btn btn-primary quote-btn-send"
+                                        onClick={handleSendQuoteRequest}
+                                        disabled={quoteSending || !quoteForm.konu.trim() || !quoteForm.mesaj.trim()}
+                                        type="button"
+                                    >
+                                        {quoteSending ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </>
     );
 };

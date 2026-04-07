@@ -13,6 +13,7 @@ import Ihaleler from './Ihaleler';
 import EmailConfirm from './EmailConfirmation';
 import ResetPassword from './ResetPassword';
 import AdminCorporateApplications from './AdminCorporateApplications';
+import FirmaProfil from './FirmaProfil';
 
 export default function Router() {
   return (
@@ -31,6 +32,8 @@ export default function Router() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin/kurumsal-basvurular" element={<AdminCorporateApplications />} />
         <Route path="/admin/kurumsal-başvurular" element={<AdminCorporateApplications />} />
+        {/* Enes Doğanay | 7 Nisan 2026: Kurumsal firma profil sayfası — panel + teklifler + bildirimler */}
+        <Route path="/firma-profil" element={<FirmaProfil />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />
       </Route>
     </Routes>

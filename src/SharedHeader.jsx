@@ -252,12 +252,14 @@ const SharedHeader = ({
                                 {isDropdownOpen && (
                                     <div className="shared-user-menu">
                                         {managedCompanyId ? (
+                                            <>
+                                            {/* Enes Doğanay | 7 Nisan 2026: Firma profil sayfasına yönlendirme — panel, teklifler, bildirimler */}
                                             <button
                                                 type="button"
                                                 className="shared-user-menu-item"
                                                 onClick={() => {
                                                     setIsDropdownOpen(false);
-                                                    navigate(`/firmadetay/${managedCompanyId}`);
+                                                    navigate('/firma-profil?tab=panel');
                                                 }}
                                             >
                                                 <span className="material-symbols-outlined shared-user-menu-icon">
@@ -267,6 +269,37 @@ const SharedHeader = ({
                                                     Firma Paneli
                                                 </span>
                                             </button>
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/firma-profil?tab=teklifler');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    request_quote
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Teklif Yönetimi
+                                                </span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/firma-profil?tab=bildirimler');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    notifications
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Bildirimler
+                                                </span>
+                                            </button>
+                                            </>
                                         ) : (
                                             <button
                                                 type="button"
@@ -305,6 +338,23 @@ const SharedHeader = ({
 
                                         {!managedCompanyId && (
                                             <>
+                                                {/* Enes Doğanay | 7 Nisan 2026: Bireysel menüye Tekliflerim linki */}
+                                                <button
+                                                    type="button"
+                                                    className="shared-user-menu-item"
+                                                    onClick={() => {
+                                                        setIsDropdownOpen(false);
+                                                        navigate('/profile?tab=quotes');
+                                                    }}
+                                                >
+                                                    <span className="material-symbols-outlined shared-user-menu-icon">
+                                                        request_quote
+                                                    </span>
+                                                    <span className="shared-user-menu-label">
+                                                        Tekliflerim
+                                                    </span>
+                                                </button>
+
                                                 <button
                                                     type="button"
                                                     className="shared-user-menu-item"

@@ -31,7 +31,18 @@ const LoginPage = () => {
   useEffect(() => {
     const redirectAuthenticatedUser = async () => {
       const managedCompanyId = await getManagedCompanyId();
-      navigate(managedCompanyId ? `/firmadetay/${managedCompanyId}` : '/');
+      // Enes Doğanay | 7 Nisan 2026: İlk girişte firma profil paneline, sonraki girişlerde ana sayfaya yönlendir
+      if (managedCompanyId) {
+        const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
+        if (!localStorage.getItem(visitedKey)) {
+          localStorage.setItem(visitedKey, '1');
+          navigate('/firma-profil?tab=panel');
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
     };
 
     const checkSession = async () => {
@@ -94,7 +105,18 @@ const LoginPage = () => {
     } else {
       console.log("Giriş başarılı:", data.user);
       const managedCompanyId = await getManagedCompanyId();
-      navigate(managedCompanyId ? `/firmadetay/${managedCompanyId}` : '/');
+      // Enes Doğanay | 7 Nisan 2026: İlk girişte firma profil paneline, sonraki girişlerde ana sayfaya yönlendir
+      if (managedCompanyId) {
+        const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
+        if (!localStorage.getItem(visitedKey)) {
+          localStorage.setItem(visitedKey, '1');
+          navigate('/firma-profil?tab=panel');
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
     }
   };
 

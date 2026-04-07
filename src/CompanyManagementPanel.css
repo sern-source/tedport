@@ -735,3 +735,633 @@
 .cmp-logo-upload__btn .material-symbols-outlined {
     font-size: 18px;
 }
+
+/* Enes Doğanay | 7 Nisan 2026: Teklif Talepleri paneli stilleri */
+
+.cmp-quotes-card {
+    margin-bottom: 1.5rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.cmp-quotes-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 1.25rem 1.5rem;
+    user-select: none;
+    transition: background 0.15s;
+}
+
+.cmp-quotes-header:hover {
+    background: #f9fafb;
+}
+
+.cmp-quotes-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cmp-quotes-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #137fec;
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+
+.cmp-quotes-chevron {
+    transition: transform 0.25s;
+    color: #9ca3af;
+}
+
+.cmp-quotes-chevron.expanded {
+    transform: rotate(180deg);
+}
+
+.cmp-quotes-body {
+    border-top: 1px solid #f3f4f6;
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.cmp-quotes-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.cmp-quotes-empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #9ca3af;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.cmp-quotes-empty-state .material-symbols-outlined {
+    font-size: 40px;
+    color: #d1d5db;
+}
+
+.cmp-quotes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cmp-quote-card {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cmp-quote-card.expanded {
+    border-color: #137fec;
+    box-shadow: 0 2px 12px rgba(19, 127, 236, 0.08);
+}
+
+.cmp-quote-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    gap: 12px;
+    transition: background 0.15s;
+}
+
+.cmp-quote-top:hover {
+    background: #f9fafb;
+}
+
+.cmp-quote-top-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.cmp-quote-subject {
+    font-size: 0.9rem;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cmp-quote-date {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.cmp-quote-status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.cmp-quote-status--pending { background: #fef3c7; color: #92400e; }
+.cmp-quote-status--read { background: #dbeafe; color: #1e40af; }
+.cmp-quote-status--replied { background: #d1fae5; color: #065f46; }
+.cmp-quote-status--rejected { background: #fee2e2; color: #991b1b; }
+.cmp-quote-status--closed { background: #f3f4f6; color: #6b7280; }
+
+.cmp-quote-details {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: quoteDetailIn 0.2s ease;
+}
+
+@keyframes quoteDetailIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cmp-quote-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.cmp-quote-meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.cmp-quote-meta-item .material-symbols-outlined {
+    font-size: 18px;
+    color: #137fec;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.cmp-quote-meta-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cmp-quote-meta-item small {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+}
+
+.cmp-quote-meta-item span,
+.cmp-quote-meta-item a {
+    font-size: 0.85rem;
+    color: #111827;
+}
+
+.cmp-quote-meta-item a {
+    color: #137fec;
+    text-decoration: none;
+}
+
+.cmp-quote-meta-item a:hover {
+    text-decoration: underline;
+}
+
+.cmp-quote-message {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.cmp-quote-message small {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.cmp-quote-message p {
+    font-size: 0.88rem;
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.cmp-quote-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cmp-btn--sm {
+    padding: 6px 14px !important;
+    font-size: 0.78rem !important;
+    border-radius: 8px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+
+.cmp-btn--sm .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.cmp-btn--read {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.cmp-btn--read:hover { background: #dbeafe; }
+
+.cmp-btn--replied {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+
+.cmp-btn--replied:hover { background: #d1fae5; }
+
+.cmp-btn--rejected {
+    background: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.cmp-btn--rejected:hover { background: #fee2e2; }
+
+.cmp-btn--closed {
+    background: #f9fafb;
+    color: #6b7280;
+    border-color: #e5e7eb;
+}
+
+.cmp-btn--closed:hover { background: #f3f4f6; }
+
+/* Enes Doğanay | 7 Nisan 2026: Teklif Yönetimi — gelen/giden tab switcher + chat */
+
+.cmp-quotes-tabs {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.cmp-quotes-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: #f9fafb;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+
+.cmp-quotes-tab .material-symbols-outlined { font-size: 18px; }
+
+.cmp-quotes-tab:first-child { border-right: 1.5px solid #e5e7eb; }
+
+.cmp-quotes-tab.active {
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+.cmp-quotes-tab:hover:not(.active) {
+    background: #f3f4f6;
+}
+
+.cmp-quote-top-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.cmp-quote-sender {
+    font-size: 0.82rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* ── Chat view inside Company Panel ─────────────────────────────────────── */
+
+.cmp-quote-chat-view {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.quote-chat-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #137fec;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: color 0.15s;
+}
+
+.quote-chat-back:hover { color: #0c5fc0; }
+
+.quote-chat-back .material-symbols-outlined { font-size: 18px; }
+
+.quote-chat-header-card {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.quote-chat-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.quote-chat-header-top h2 {
+    margin: 0;
+    font-size: 1rem;
+    color: #111827;
+}
+
+.quote-chat-firma {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+.quote-chat-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.my-quote-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    color: #4b5563;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 3px 8px;
+}
+
+.my-quote-tag .material-symbols-outlined { font-size: 14px; color: #9ca3af; }
+
+.quote-chat-initial-msg {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.quote-chat-initial-msg small {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.quote-chat-initial-msg p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #374151;
+    line-height: 1.55;
+    white-space: pre-wrap;
+}
+
+.quote-chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.quote-chat-loading,
+.quote-chat-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 2rem 0;
+    font-size: 0.88rem;
+}
+
+.quote-chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.quote-chat-empty .material-symbols-outlined {
+    font-size: 32px;
+    color: #d1d5db;
+}
+
+.quote-chat-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+}
+
+.quote-chat-bubble.mine {
+    align-self: flex-end;
+    background: #137fec;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.quote-chat-bubble.theirs {
+    align-self: flex-start;
+    background: #f1f5f9;
+    color: #1e293b;
+    border-bottom-left-radius: 4px;
+}
+
+.quote-chat-bubble-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.quote-chat-bubble-header strong {
+    font-size: 0.75rem;
+    opacity: 0.85;
+}
+
+.quote-chat-bubble-header span {
+    font-size: 0.7rem;
+    opacity: 0.65;
+}
+
+.quote-chat-bubble.mine .quote-chat-bubble-header strong,
+.quote-chat-bubble.mine .quote-chat-bubble-header span { color: #fff; }
+
+.quote-chat-bubble p { margin: 0; white-space: pre-wrap; }
+
+.quote-chat-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 8px 0 0;
+}
+
+.quote-chat-input-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 0.88rem;
+    color: #111827;
+    background: #fff;
+    transition: border-color 0.15s;
+}
+
+.quote-chat-input-row input:focus {
+    outline: none;
+    border-color: #137fec;
+    box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
+}
+
+.quote-chat-input-row button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 10px;
+    background: #137fec;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.quote-chat-input-row button:hover:not(:disabled) { background: #0c5fc0; }
+
+.quote-chat-input-row button:disabled { opacity: 0.5; cursor: default; }
+
+.quote-chat-input-row button .material-symbols-outlined { font-size: 20px; }
+
+.quote-chat-closed-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.quote-chat-closed-banner .material-symbols-outlined { font-size: 18px; }
+
+/* Enes Doğanay | 7 Nisan 2026: Teklif Yönetimi ayrı sayfa stilleri */
+.teklif-page {
+    max-width: 900px;
+    margin: 32px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.teklif-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.teklif-page-header h1 {
+    margin: 0 0 4px;
+    font-size: 1.6rem;
+    color: #111827;
+}
+
+.teklif-page-header p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.teklif-page-loading {
+    text-align: center;
+    padding: 4rem;
+    color: #9ca3af;
+    font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+    .teklif-page { margin: 16px auto; }
+    .teklif-page-header { flex-direction: column; align-items: flex-start; }
+    .teklif-page-header h1 { font-size: 1.3rem; }
+}
+
+@media (max-width: 540px) {
+    .cmp-quotes-header {
+        padding: 1rem;
+    }
+    .cmp-quotes-body {
+        padding: 0.75rem 1rem 1rem;
+    }
+    .cmp-quote-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
