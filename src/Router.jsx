@@ -1,22 +1,26 @@
+// Enes Doğanay | 7 Nisan 2026: Sayfa geçişlerinde logolu yükleniyor ekranı göstermek için lazy + Suspense eklendi
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
-import Home from './Home';
-import Firmalar from './Firmalar';
-import FirmaDetay from './FirmaDetay';
-import Login from './Login';
-import Profile from './Profile';
-import Register from './Register';
-import Home2 from './Home2';
-import Hakkimizda from './hakkimizda';
-import Iletisim from './iletisim';
-import Ihaleler from './Ihaleler';
-import EmailConfirm from './EmailConfirmation';
-import ResetPassword from './ResetPassword';
-import AdminCorporateApplications from './AdminCorporateApplications';
-import FirmaProfil from './FirmaProfil';
+import PageLoader from './PageLoader';
+
+const Home2 = lazy(() => import('./Home2'));
+const Firmalar = lazy(() => import('./Firmalar'));
+const FirmaDetay = lazy(() => import('./FirmaDetay'));
+const Login = lazy(() => import('./Login'));
+const Profile = lazy(() => import('./Profile'));
+const Register = lazy(() => import('./Register'));
+const Hakkimizda = lazy(() => import('./hakkimizda'));
+const Iletisim = lazy(() => import('./iletisim'));
+const Ihaleler = lazy(() => import('./Ihaleler'));
+const EmailConfirm = lazy(() => import('./EmailConfirmation'));
+const ResetPassword = lazy(() => import('./ResetPassword'));
+const AdminCorporateApplications = lazy(() => import('./AdminCorporateApplications'));
+const FirmaProfil = lazy(() => import('./FirmaProfil'));
 
 export default function Router() {
   return (
+    <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home2 />} />
@@ -37,5 +41,6 @@ export default function Router() {
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />
       </Route>
     </Routes>
+    </Suspense>
   );
 }

@@ -55,6 +55,15 @@ const RegistrationPage = () => {
     }, 5000);
   };
 
+  // Enes Doğanay | 7 Nisan 2026: Kayit oncesi e-posta musaitlik kontrolu, auth.users ve kurumsal_basvurular tablosunu kontrol eder
+  const checkEmailAvailability = async (emailToCheck) => {
+    const { data, error } = await supabase.rpc('check_email_availability', { p_email: emailToCheck });
+    if (error) {
+      return null;
+    }
+    return data;
+  };
+
   const handlePhotoChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       setProfilePhoto(event.target.files[0]);
@@ -89,6 +98,14 @@ const RegistrationPage = () => {
     setNotification({ show: false, type: '', message: '' });
 
     try {
+      // Enes Doğanay | 7 Nisan 2026: Bireysel kayit oncesi e-posta musaitlik kontrolu
+      const emailCheck = await checkEmailAvailability(email);
+      if (emailCheck && !emailCheck.available) {
+        showMessage('error', emailCheck.reason);
+        setLoading(false);
+        return;
+      }
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password
@@ -166,6 +183,14 @@ const RegistrationPage = () => {
     setNotification({ show: false, type: '', message: '' });
 
     try {
+      // Enes Doğanay | 7 Nisan 2026: Kurumsal kayit oncesi e-posta musaitlik kontrolu
+      const emailCheck = await checkEmailAvailability(corporateForm.corporateEmail);
+      if (emailCheck && !emailCheck.available) {
+        showMessage('error', emailCheck.reason);
+        setLoading(false);
+        return;
+      }
+
       const result = await submitCorporateApplication(corporateForm);
       setCorporateSubmittedApplication(result.application || null);
       setCorporateForm(initialCorporateForm);

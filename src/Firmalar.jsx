@@ -85,22 +85,22 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
     fetchFilters();
   }, []);
 
-  // Filter fonksiyonları - search'e göre listeler
+  // Enes Doğanay | 7 Nisan 2026: Filtre arama fonksiyonlari toLocaleLowerCase ile Türkçe harf duyarsız hale getirildi
   const getFilteredCities = (searchTerm) => {
     return cities.filter(city =>
-      city.sehir.toLowerCase().includes(searchTerm.toLowerCase())
+      city.sehir.toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR'))
     );
   };
 
   const getFilteredSectors = (searchTerm) => {
     return SEKTORLER.filter(sektor =>
-      sektor.toLowerCase().includes(searchTerm.toLowerCase())
+      sektor.toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR'))
     );
   };
 
   const getFilteredCategories = (searchTerm) => {
     return categories.filter(cat =>
-      cat.toLowerCase().includes(searchTerm.toLowerCase())
+      cat.toLocaleLowerCase('tr-TR').includes(searchTerm.toLocaleLowerCase('tr-TR'))
     );
   };
 
@@ -508,12 +508,7 @@ const SupplierCard = ({ data, onSearchTag }) => {
                 </>
               )}
             </div>
-            <button
-              className="btn-primary"
-              onClick={() => navigate(`/firmadetay/${data.id}`)}
-            >
-              Profili Görüntüle
-            </button>
+            {/* Enes Doğanay | 8 Nisan 2026: Profili Görüntüle butonu geçici olarak kaldırıldı */}
           </div>
         </div>
       </div>
@@ -639,22 +634,114 @@ const getSmartPages = (current, total) => {
 
 function App() {
   const PAGE_SIZE = 10;
+  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const urlSearchTerm = searchParams.get('search') || '';
 
+  // Enes Doğanay | 7 Nisan 2026: sessionStorage'dan önceki arama/filtre/sayfa durumunu oku (geri tuşunda korunsun)
+  const savedState = (() => {
+    try {
+      const raw = sessionStorage.getItem('tedport_firmalar_state');
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  })();
+
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(savedState?.page || 1);
   const [totalCount, setTotalCount] = useState(0);
 
   /* Enes Doğanay | 5 Nisan 2026: Mobilde filtre paneli aç/kapat state */
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const [search, setSearch] = useState(urlSearchTerm);
+  const [search, setSearch] = useState(urlSearchTerm || savedState?.search || '');
   // Enes Doğanay | 5 Nisan 2026: Debounce için ayrı debouncedSearch state'i eklendi
-  const [debouncedSearch, setDebouncedSearch] = useState(urlSearchTerm);
-  const [filters, setFilters] = useState({ cities: [], categories: [], sectors: [] });
+  const [debouncedSearch, setDebouncedSearch] = useState(urlSearchTerm || savedState?.search || '');
+  const [filters, setFilters] = useState(savedState?.filters || { cities: [], categories: [], sectors: [] });
+
+  // Enes Doğanay | 8 Nisan 2026: Grid/Liste görünüm toggle (sessionStorage > localStorage)
+  const [viewMode, setViewMode] = useState(() => {
+    try { return savedState?.viewMode || localStorage.getItem('tedport_firmalar_view') || 'grid'; } catch { return 'grid'; }
+  });
+  // Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişim dropdown hangi satırda açık
+  const [openContactId, setOpenContactId] = useState(null);
+  // Enes Doğanay | 8 Nisan 2026: Liste görünümü - teklif iste modal state
+  const [listQuoteSupplier, setListQuoteSupplier] = useState(null);
+  const [listQuoteForm, setListQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+  const [listQuoteSending, setListQuoteSending] = useState(false);
+  const [listQuoteSent, setListQuoteSent] = useState(false);
+  const [listUserProfile, setListUserProfile] = useState(null);
+
+  useEffect(() => {
+    if (!listQuoteSupplier) return;
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data: profile } = await supabase.from('profiles').select('first_name, last_name, email').eq('id', session.user.id).single();
+      setListUserProfile(profile || { email: session.user.email });
+    })();
+  }, [listQuoteSupplier]);
+
+  const handleListQuoteRequest = async () => {
+    if (!listQuoteForm.konu.trim() || !listQuoteForm.mesaj.trim() || !listQuoteSupplier) return;
+    setListQuoteSending(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { alert('Lütfen önce giriş yapın.'); return; }
+      let senderFirmaId = null;
+      let senderFirmaAdi = '';
+      const managedId = await getManagedCompanyId();
+      if (managedId) {
+        senderFirmaId = managedId;
+        const { data: senderFirma } = await supabase.from('firmalar').select('firma_adi').eq('firmaID', managedId).single();
+        senderFirmaAdi = senderFirma?.firma_adi || '';
+      }
+      const { error } = await supabase.from('teklif_talepleri').insert([{
+        firma_id: String(listQuoteSupplier.id),
+        user_id: session.user.id,
+        gonderen_firma_id: senderFirmaId,
+        ad_soyad: `${listUserProfile?.first_name || ''} ${listUserProfile?.last_name || ''}`.trim(),
+        email: listUserProfile?.email || session.user.email,
+        telefon: '',
+        firma_adi: senderFirmaAdi,
+        konu: listQuoteForm.konu.trim(),
+        mesaj: listQuoteForm.mesaj.trim(),
+        miktar: listQuoteForm.miktar.trim() || null,
+        teslim_tarihi: listQuoteForm.teslim_tarihi || null
+      }]);
+      if (error) throw error;
+      setListQuoteSent(true);
+      setTimeout(() => {
+        setListQuoteSupplier(null);
+        setListQuoteSent(false);
+        setListQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+      }, 2000);
+    } catch (error) {
+      console.error('Teklif talebi gönderilemedi:', error);
+      alert('Teklif talebi gönderilemedi: ' + (error?.message || JSON.stringify(error)));
+    } finally {
+      setListQuoteSending(false);
+    }
+  };
+
+  const toggleViewMode = () => {
+    const next = viewMode === 'grid' ? 'list' : 'grid';
+    setViewMode(next);
+    try { localStorage.setItem('tedport_firmalar_view', next); } catch {}
+  };
+
+  // Enes Doğanay | 7 Nisan 2026: Arama, filtre ve sayfa değiştiğinde sessionStorage'a kaydet
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('tedport_firmalar_state', JSON.stringify({
+        search: search,
+        filters: filters,
+        page: page,
+        viewMode: viewMode
+      }));
+    } catch {}
+  }, [search, filters, page, viewMode]);
 
   // Enes Doğanay | 5 Nisan 2026: ilike özel karakterlerini escape eden yardımcı fonksiyon
   // _ (tek karakter wildcard) ve \\ (escape karakteri) de temizlenir
@@ -665,8 +752,10 @@ function App() {
   // Enes Doğanay | 5 Nisan 2026: URL'deki search parametresi değiştiğinde state'i senkronize et
   useEffect(() => {
     const newSearch = searchParams.get('search') || '';
-    setSearch(newSearch);
-    setDebouncedSearch(newSearch);
+    if (newSearch) {
+      setSearch(newSearch);
+      setDebouncedSearch(newSearch);
+    }
   }, [searchParams]);
 
   // Enes Doğanay | 5 Nisan 2026: 300ms debounce - hızlı yazımda gereksiz API çağrılarını önler
@@ -846,13 +935,6 @@ function App() {
       />
 
       <main className="layout-container">
-        <div className="breadcrumb-row">
-          <div className="breadcrumb">
-            <Link to="/">Anasayfa</Link>
-            <span className="material-symbols-outlined">chevron_right</span>
-            <span>Firmalar</span>
-          </div>
-        </div>
 
         {/* Enes Doğanay | 5 Nisan 2026: Mobil filtre toggle butonu */}
         <button
@@ -863,7 +945,7 @@ function App() {
           {filtersOpen ? 'Filtreleri Gizle' : 'Filtreleri Göster'}
         </button>
 
-        <div className="content-grid">
+        <div className="firmalar-grid">
           <Sidebar
             activeFilters={filters}
             onApplyFilters={(newFilters) => setFilters(newFilters)}
@@ -905,19 +987,23 @@ function App() {
               </div>
             )}
 
-            {/* Enes Doğanay | 5 Nisan 2026:
-             * Filtre veya arama aktif olduğunda listelenen firma sayısını gösterir.
-             * Hiçbir filtre/arama yokken gizli kalır, sonuç varken "X firma listeleniyor" yazar.
-             */}
-            {!loading && (debouncedSearch?.trim().length >= 2 || activeTags.length > 0) && suppliers.length > 0 && (
-              <p style={{
-                fontSize: '14px',
-                color: '#64748b',
-                marginBottom: '12px',
-                fontWeight: '500'
-              }}>
-                <span style={{ color: '#137fec', fontWeight: '700' }}>{totalCount}</span> firma listeleniyor
-              </p>
+            {/* Enes Doğanay | 8 Nisan 2026: Sonuç sayısı + Grid/Liste toggle */}
+            {!loading && suppliers.length > 0 && (
+              <div className="firmalar-toolbar-row">
+                {(debouncedSearch?.trim().length >= 2 || activeTags.length > 0) && (
+                  <p className="firmalar-result-count">
+                    <span>{totalCount}</span> firma listeleniyor
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className="firmalar-view-toggle"
+                  onClick={toggleViewMode}
+                  title={viewMode === 'grid' ? 'Liste görünümüne geç' : 'Kart görünümüne geç'}
+                >
+                  <span className="material-symbols-outlined">{viewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
+                </button>
+              </div>
             )}
 
             {/* Enes Doğanay | 5 Nisan 2026: Skeleton loading - yüklenirken kart iskeletleri gösterilir */}
@@ -955,14 +1041,88 @@ function App() {
               </div>
             )}
 
-            {!loading &&
-              suppliers.map(supplier => (
-                <SupplierCard
-                  key={supplier.id}
-                  data={supplier}
-                  onSearchTag={setSearch}
-                />
-              ))}
+            {!loading && suppliers.length > 0 && viewMode === 'list' ? (
+              /* Enes Doğanay | 8 Nisan 2026: Liste görünümü */
+              <section className="firmalar-list-view">
+                <div className="firmalar-list-header">
+                  <span className="firmalar-list-col firmalar-list-col--logo"></span>
+                  <span className="firmalar-list-col firmalar-list-col--name">Firma Adı</span>
+                  <span className="firmalar-list-col firmalar-list-col--sector">Sektör</span>
+                  <span className="firmalar-list-col firmalar-list-col--location">Konum</span>
+                  <span className="firmalar-list-col firmalar-list-col--action"></span>
+                </div>
+                {suppliers.map(supplier => (
+                  <div key={supplier.id} className="firmalar-list-row">
+                    <span className="firmalar-list-col firmalar-list-col--logo" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>
+                      {supplier.images ? (
+                        <img src={supplier.images} alt="" className="firmalar-list-avatar-img" onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }} />
+                      ) : null}
+                      <span className="firmalar-list-avatar-placeholder" style={{ display: supplier.images ? 'none' : 'flex' }}>
+                        {supplier.name?.charAt(0)}
+                      </span>
+                    </span>
+                    <span className="firmalar-list-col firmalar-list-col--name" onClick={() => navigate(`/firmadetay/${supplier.id}`)}>
+                      {supplier.name}
+                      {supplier.isVerified && <span className="material-symbols-outlined verified-icon" style={{ fontSize: '16px', marginLeft: '4px', verticalAlign: 'middle' }}>verified</span>}
+                    </span>
+                    <span className="firmalar-list-col firmalar-list-col--sector" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{(supplier.tags || []).slice(0, 2).join(', ') || '—'}</span>
+                    <span className="firmalar-list-col firmalar-list-col--location" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{supplier.location || '—'}</span>
+                    {/* Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişime geç (kart ile birebir aynı, küçük boyut) */}
+                    <span className="firmalar-list-col firmalar-list-col--action" onClick={e => e.stopPropagation()}>
+                      <div className="contact-dropdown-wrap">
+                        <button className="btn-outline firmalar-list-contact-btn" onClick={() => setOpenContactId(openContactId === supplier.id ? null : supplier.id)}>İletişime Geç</button>
+                        {openContactId === supplier.id && (
+                          <>
+                            <div className="contact-dropdown-backdrop" onClick={() => setOpenContactId(null)} />
+                            <div className="contact-dropdown firmalar-list-contact-dropdown">
+                              {supplier.isVerified && (
+                                <button className="contact-dropdown-item contact-dropdown-teklif" onClick={() => { setOpenContactId(null); setListQuoteSupplier(supplier); }}>
+                                  <span className="material-symbols-outlined">request_quote</span>Teklif İste
+                                </button>
+                              )}
+                              {supplier.telefon && (
+                                <a href={`tel:${supplier.telefon}`} className="contact-dropdown-item">
+                                  <span className="material-symbols-outlined">call</span>{supplier.telefon}
+                                </a>
+                              )}
+                              {supplier.eposta && (
+                                <a href={`mailto:${supplier.eposta}`} className="contact-dropdown-item">
+                                  <span className="material-symbols-outlined">mail</span>{supplier.eposta}
+                                </a>
+                              )}
+                              {supplier.web_sitesi && (
+                                <a href={supplier.web_sitesi.startsWith('http') ? supplier.web_sitesi : `https://${supplier.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                                  <span className="material-symbols-outlined">language</span>{supplier.web_sitesi.replace(/^https?:\/\//, '')}
+                                </a>
+                              )}
+                              {(supplier.adres || supplier.location) && (
+                                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(supplier.adres || supplier.location)}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                                  <span className="material-symbols-outlined">location_on</span>{supplier.location || supplier.adres}
+                                </a>
+                              )}
+                              {!supplier.telefon && !supplier.eposta && !supplier.web_sitesi && !supplier.adres && !supplier.isVerified && (
+                                <span className="contact-dropdown-empty">İletişim bilgisi yok</span>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </span>
+                  </div>
+                ))}
+              </section>
+            ) : (
+              <>
+                {!loading &&
+                  suppliers.map(supplier => (
+                    <SupplierCard
+                      key={supplier.id}
+                      data={supplier}
+                      onSearchTag={setSearch}
+                    />
+                  ))}
+              </>
+            )}
 
             {totalPages > 1 && (
               <div className="pagination">
@@ -1001,6 +1161,63 @@ function App() {
           </div>
         </div>
       </main>
+
+      {/* Enes Doğanay | 8 Nisan 2026: Liste görünümü - Teklif İste modal (kart ile birebir aynı) */}
+      {listQuoteSupplier && (
+        <div className="quote-modal-overlay" onClick={() => { if (!listQuoteSending) { setListQuoteSupplier(null); setListQuoteSent(false); } }}>
+          <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
+            {listQuoteSent ? (
+              <div className="quote-modal-success">
+                <span className="material-symbols-outlined quote-success-icon">check_circle</span>
+                <h3>Teklif Talebiniz Gönderildi!</h3>
+                <p>Firma en kısa sürede talebinizi inceleyecektir.</p>
+              </div>
+            ) : (
+              <>
+                <div className="quote-modal-header">
+                  <div>
+                    <h3>Teklif İste</h3>
+                    <p className="quote-modal-subtitle">{listQuoteSupplier.name}</p>
+                  </div>
+                  <button className="quote-modal-close" onClick={() => setListQuoteSupplier(null)} type="button">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+                <div className="quote-modal-body">
+                  <div className="quote-form-group">
+                    <label>Konu *</label>
+                    <input type="text" placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi" value={listQuoteForm.konu} onChange={(e) => setListQuoteForm(prev => ({ ...prev, konu: e.target.value }))} maxLength={200} />
+                  </div>
+                  <div className="quote-form-row">
+                    <div className="quote-form-group">
+                      <label>Miktar / Adet</label>
+                      <input type="text" placeholder="Ör: 500 metre, 100 adet" value={listQuoteForm.miktar} onChange={(e) => setListQuoteForm(prev => ({ ...prev, miktar: e.target.value }))} maxLength={100} />
+                    </div>
+                    <div className="quote-form-group">
+                      <label>Termin Tarihi</label>
+                      <input type="date" value={listQuoteForm.teslim_tarihi} onChange={(e) => setListQuoteForm(prev => ({ ...prev, teslim_tarihi: e.target.value }))} min={new Date().toISOString().split('T')[0]} />
+                    </div>
+                  </div>
+                  <div className="quote-form-group">
+                    <label>Mesajınız *</label>
+                    <textarea placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi, teslimat adresi vb.)" value={listQuoteForm.mesaj} onChange={(e) => setListQuoteForm(prev => ({ ...prev, mesaj: e.target.value }))} rows={4} maxLength={2000} />
+                  </div>
+                  <div className="quote-form-info">
+                    <span className="material-symbols-outlined">info</span>
+                    <span>İletişim bilgileriniz ({listUserProfile?.email}) taleple birlikte paylaşılacaktır.</span>
+                  </div>
+                </div>
+                <div className="quote-modal-footer">
+                  <button className="btn btn-outline quote-btn-cancel" onClick={() => setListQuoteSupplier(null)} type="button">İptal</button>
+                  <button className="btn btn-primary quote-btn-send" onClick={handleListQuoteRequest} disabled={listQuoteSending || !listQuoteForm.konu.trim() || !listQuoteForm.mesaj.trim()} type="button">
+                    {listQuoteSending ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

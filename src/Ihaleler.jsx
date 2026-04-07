@@ -31,6 +31,11 @@ const IhalelerPage = () => {
     const [selectedFirmaName, setSelectedFirmaName] = useState('');
     const [tableMissing, setTableMissing] = useState(false);
 
+    // Enes Doğanay | 7 Nisan 2026: Görünüm tercihi localStorage'dan okunur ve kullanıcıya özgü kalır
+    const [viewMode, setViewMode] = useState(() => {
+        try { return localStorage.getItem('tedport_ihale_view') || 'grid'; } catch { return 'grid'; }
+    });
+
     // Enes Doğanay | 6 Nisan 2026: Kurumsal kullanıcı state'leri
     const [managedFirmaId, setManagedFirmaId] = useState(null);
     const [myTenders, setMyTenders] = useState([]);
@@ -219,6 +224,13 @@ const IhalelerPage = () => {
     const upcomingCount = tenders.filter((tender) => getTenderStatusMeta(tender).key === 'yaklasan').length;
     const closedCount = tenders.filter((tender) => getTenderStatusMeta(tender).key === 'kapali').length;
 
+    // Enes Doğanay | 7 Nisan 2026: Görünüm değiştirme ve localStorage'a kaydetme
+    const toggleViewMode = () => {
+        const next = viewMode === 'grid' ? 'list' : 'grid';
+        setViewMode(next);
+        try { localStorage.setItem('tedport_ihale_view', next); } catch {}
+    };
+
     return (
         <div className="tenders-page">
             <SharedHeader />
@@ -396,6 +408,15 @@ const IhalelerPage = () => {
                             value={searchTerm}
                             onChange={(event) => setSearchTerm(event.target.value)}
                         />
+                        {/* Enes Doğanay | 7 Nisan 2026: Grid/Liste görünüm toggle butonu */}
+                        <button
+                            type="button"
+                            className="tenders-view-toggle"
+                            onClick={toggleViewMode}
+                            title={viewMode === 'grid' ? 'Liste görünümüne geç' : 'Kart görünümüne geç'}
+                        >
+                            <span className="material-symbols-outlined">{viewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
+                        </button>
                     </div>
 
                     <div className="tenders-filter-pills">
@@ -445,6 +466,40 @@ const IhalelerPage = () => {
                         <p>Arama ifadenizi veya filtreleri değiştirerek farklı ihaleleri görüntüleyebilirsiniz.</p>
                     </section>
                 ) : (
+                    <>
+                        {/* Enes Doğanay | 7 Nisan 2026: Arama veya filtre aktifken listelenen ihale sayısı */}
+                        {(searchTerm.trim().length >= 2 || statusFilter !== 'all') && (
+                            <p className="tenders-result-count">
+                                <span>{filteredTenders.length}</span> ihale listeleniyor
+                            </p>
+                        )}
+
+                        {viewMode === 'list' ? (
+                            /* Enes Doğanay | 7 Nisan 2026: Minimal liste görünümü */
+                            <section className="tenders-list-view">
+                                <div className="tenders-list-header">
+                                    <span className="tenders-list-col tenders-list-col--firma">Firma</span>
+                                    <span className="tenders-list-col tenders-list-col--baslik">Başlık</span>
+                                    <span className="tenders-list-col tenders-list-col--kod">Referans</span>
+                                    <span className="tenders-list-col tenders-list-col--tarih">Açılış</span>
+                                    <span className="tenders-list-col tenders-list-col--tarih">Kapanış</span>
+                                    <span className="tenders-list-col tenders-list-col--durum">Durum</span>
+                                </div>
+                                {filteredTenders.map((tender) => {
+                                    const statusMeta = getTenderStatusMeta(tender);
+                                    return (
+                                        <div key={tender.id} className="tenders-list-row" onClick={() => navigate(`/firmadetay/${tender.firma_id}`)}>
+                                            <span className="tenders-list-col tenders-list-col--firma">{tender.firma_adi}</span>
+                                            <span className="tenders-list-col tenders-list-col--baslik">{tender.baslik}</span>
+                                            <span className="tenders-list-col tenders-list-col--kod">{tender.referans_no || '—'}</span>
+                                            <span className="tenders-list-col tenders-list-col--tarih">{formatTenderDate(tender.yayin_tarihi)}</span>
+                                            <span className="tenders-list-col tenders-list-col--tarih">{formatTenderDate(tender.son_basvuru_tarihi)}</span>
+                                            <span className={`tenders-list-col tenders-list-col--durum tender-card-status tender-card-status-${statusMeta.className}`}>{statusMeta.label}</span>
+                                        </div>
+                                    );
+                                })}
+                            </section>
+                        ) : (
                     <section className="tenders-grid">
                         {filteredTenders.map((tender) => {
                             const statusMeta = getTenderStatusMeta(tender);
@@ -513,8 +568,8 @@ const IhalelerPage = () => {
                                 </article>
                             );
                         })}
-                    </section>
-                )}
+                    </section>                        )}
+                    </>                )}
             </main>
         </div>
     );

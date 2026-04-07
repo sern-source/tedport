@@ -1,11 +1,14 @@
-import { createAnonClient, createAdminClient } from '../_shared/supabaseAdmin.ts';
-import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import {
+    createAdminClient,
+    createAnonClient,
+} from "../_shared/supabaseAdmin.ts";
+import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
-type CorporateAction = 'submit' | 'list' | 'review';
+type CorporateAction = "submit" | "list" | "review";
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal basvuru payload'lari edge function icinde tiplenir
 type CorporateSubmitPayload = {
-    action: 'submit';
+    action: "submit";
     applicantFirstName: string;
     applicantLastName: string;
     applicantTitle?: string;
@@ -21,14 +24,14 @@ type CorporateSubmitPayload = {
 };
 
 type CorporateReviewPayload = {
-    action: 'review';
+    action: "review";
     applicationId: number;
-    decision: 'approve' | 'reject' | 'needs_info';
+    decision: "approve" | "reject" | "needs_info";
     reviewNote?: string;
 };
 
 type CorporateListPayload = {
-    action: 'list';
+    action: "list";
 };
 
 const toError = (error: unknown, fallbackMessage: string) => {
@@ -36,8 +39,10 @@ const toError = (error: unknown, fallbackMessage: string) => {
         return error;
     }
 
-    if (error && typeof error === 'object' && 'message' in error) {
-        return new Error(String((error as { message?: unknown }).message || fallbackMessage));
+    if (error && typeof error === "object" && "message" in error) {
+        return new Error(
+            String((error as { message?: unknown }).message || fallbackMessage),
+        );
     }
 
     return new Error(fallbackMessage);
@@ -53,42 +58,46 @@ const normalizeWebsiteUrl = (value?: string) => {
         return null;
     }
 
-    return /^https?:\/\//i.test(trimmedValue) ? trimmedValue : `https://${trimmedValue}`;
+    return /^https?:\/\//i.test(trimmedValue)
+        ? trimmedValue
+        : `https://${trimmedValue}`;
 };
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal e-posta ve zorunlu alanlar function seviyesinde de dogrulanir
 const validateCorporateSubmission = (payload: CorporateSubmitPayload) => {
     const requiredFields: Array<[string, string]> = [
-        [payload.applicantFirstName, 'Ad alanı zorunludur.'],
-        [payload.applicantLastName, 'Soyad alanı zorunludur.'],
-        [payload.companyName, 'Şirket adı zorunludur.'],
-        [payload.corporateEmail, 'Kurumsal e-posta zorunludur.'],
-        [payload.phone, 'Telefon alanı zorunludur.']
+        [payload.applicantFirstName, "Ad alanı zorunludur."],
+        [payload.applicantLastName, "Soyad alanı zorunludur."],
+        [payload.companyName, "Şirket adı zorunludur."],
+        [payload.corporateEmail, "Kurumsal e-posta zorunludur."],
+        [payload.phone, "Telefon alanı zorunludur."],
     ];
 
     for (const [value, message] of requiredFields) {
-        if (!String(value || '').trim()) {
+        if (!String(value || "").trim()) {
             return message;
         }
     }
 
-    if (!String(payload.corporateEmail || '').includes('@')) {
-        return 'Geçerli bir e-posta adresi girin.';
+    if (!String(payload.corporateEmail || "").includes("@")) {
+        return "Geçerli bir e-posta adresi girin.";
     }
 
-    return '';
+    return "";
 };
 
 const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
     application: Record<string, unknown>;
-    decision: 'approve' | 'reject' | 'needs_info';
+    decision: "approve" | "reject" | "needs_info";
     actionLink?: string;
     reviewNote?: string;
 }) => {
-    const companyName = String(application.company_name || 'Şirketiniz');
-    const applicantName = `${String(application.applicant_first_name || '')} ${String(application.applicant_last_name || '')}`.trim();
+    const companyName = String(application.company_name || "Şirketiniz");
+    const applicantName = `${String(application.applicant_first_name || "")} ${
+        String(application.applicant_last_name || "")
+    }`.trim();
 
-    if (decision === 'approve') {
+    if (decision === "approve") {
         return {
             subject: `Tedport Kurumsal Başvurunuz Onaylandı | ${companyName}`,
             html: `
@@ -99,20 +108,29 @@ const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
               <p style="margin: 8px 0 0; opacity: 0.9;">${companyName} için Tedport kurumsal hesabınız hazırlandı.</p>
             </div>
             <div style="padding: 24px;">
-              <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${applicantName || 'Tedport kullanıcısı'}, başvurunuz incelendi ve onaylandı. Bu e-posta adresi için kurumsal hesabınız oluşturuldu.</p>
+              <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${
+                applicantName || "Tedport kullanıcısı"
+            }, başvurunuz incelendi ve onaylandı. Bu e-posta adresi için kurumsal hesabınız oluşturuldu.</p>
               <p style="margin: 0 0 20px; line-height: 1.7; color: #475569;">Aşağıdaki bağlantıya tıklayarak yeni şifrenizi belirleyin. Şifrenizi oluşturduktan sonra bu e-posta adresiyle kurumsal giriş yapabilirsiniz.</p>
-              <a href="${actionLink || '#'}" style="display: inline-block; padding: 14px 18px; border-radius: 999px; background: #1d4ed8; color: #fff; text-decoration: none; font-weight: 700;">Şifremi Belirle</a>
-              ${reviewNote ? `<p style="margin: 20px 0 0; line-height: 1.7; color: #475569;"><strong>Not:</strong> ${reviewNote}</p>` : ''}
+              <a href="${
+                actionLink || "#"
+            }" style="display: inline-block; padding: 14px 18px; border-radius: 999px; background: #1d4ed8; color: #fff; text-decoration: none; font-weight: 700;">Şifremi Belirle</a>
+              ${
+                reviewNote
+                    ? `<p style="margin: 20px 0 0; line-height: 1.7; color: #475569;"><strong>Not:</strong> ${reviewNote}</p>`
+                    : ""
+            }
             </div>
           </div>
         </div>
-      `
+      `,
         };
     }
 
-    if (decision === 'needs_info') {
+    if (decision === "needs_info") {
         return {
-            subject: `Tedport Kurumsal Başvurunuz İçin Ek Bilgi Gerekli | ${companyName}`,
+            subject:
+                `Tedport Kurumsal Başvurunuz İçin Ek Bilgi Gerekli | ${companyName}`,
             html: `
         <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
           <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
@@ -120,12 +138,17 @@ const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
               <h1 style="margin: 0; font-size: 24px;">Başvurunuz İçin Ek Bilgi Gerekli</h1>
             </div>
             <div style="padding: 24px;">
-              <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${applicantName || 'Tedport kullanıcısı'}, ${companyName} adına yaptığınız kurumsal başvuru incelendi.</p>
-              <p style="margin: 0; line-height: 1.7; color: #475569;">İncelemeyi tamamlayabilmemiz için ek bilgi gerekiyor. ${reviewNote || 'Lütfen bize yanıt vererek gerekli detayları paylaşın.'}</p>
+              <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${
+                applicantName || "Tedport kullanıcısı"
+            }, ${companyName} adına yaptığınız kurumsal başvuru incelendi.</p>
+              <p style="margin: 0; line-height: 1.7; color: #475569;">İncelemeyi tamamlayabilmemiz için ek bilgi gerekiyor. ${
+                reviewNote ||
+                "Lütfen bize yanıt vererek gerekli detayları paylaşın."
+            }</p>
             </div>
           </div>
         </div>
-      `
+      `,
         };
     }
 
@@ -138,42 +161,55 @@ const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
             <h1 style="margin: 0; font-size: 24px;">Kurumsal Başvurunuz Şu An İçin Onaylanmadı</h1>
           </div>
           <div style="padding: 24px;">
-            <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${applicantName || 'Tedport kullanıcısı'}, ${companyName} adına yaptığınız kurumsal başvuru değerlendirildi.</p>
-            <p style="margin: 0; line-height: 1.7; color: #475569;">Bu aşamada başvurunuzu onaylayamadık. ${reviewNote || 'Dilerseniz eksik bilgilerle birlikte yeniden başvurabilirsiniz.'}</p>
+            <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${
+            applicantName || "Tedport kullanıcısı"
+        }, ${companyName} adına yaptığınız kurumsal başvuru değerlendirildi.</p>
+            <p style="margin: 0; line-height: 1.7; color: #475569;">Bu aşamada başvurunuzu onaylayamadık. ${
+            reviewNote ||
+            "Dilerseniz eksik bilgilerle birlikte yeniden başvurabilirsiniz."
+        }</p>
           </div>
         </div>
       </div>
-    `
+    `,
     };
 };
 
-const sendDecisionEmail = async ({ to, decision, application, actionLink, reviewNote }: {
-    to: string;
-    decision: 'approve' | 'reject' | 'needs_info';
-    application: Record<string, unknown>;
-    actionLink?: string;
-    reviewNote?: string;
-}) => {
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    const fromEmail = Deno.env.get('CORPORATE_FROM_EMAIL') || Deno.env.get('REMINDER_FROM_EMAIL');
+const sendDecisionEmail = async (
+    { to, decision, application, actionLink, reviewNote }: {
+        to: string;
+        decision: "approve" | "reject" | "needs_info";
+        application: Record<string, unknown>;
+        actionLink?: string;
+        reviewNote?: string;
+    },
+) => {
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const fromEmail = Deno.env.get("CORPORATE_FROM_EMAIL") ||
+        Deno.env.get("REMINDER_FROM_EMAIL");
 
     if (!resendApiKey || !fromEmail) {
         return false;
     }
 
-    const emailPayload = renderReviewEmail({ application, decision, actionLink, reviewNote });
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
+    const emailPayload = renderReviewEmail({
+        application,
+        decision,
+        actionLink,
+        reviewNote,
+    });
+    const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
         headers: {
             Authorization: `Bearer ${resendApiKey}`,
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
             from: fromEmail,
             to: [to],
             subject: emailPayload.subject,
-            html: emailPayload.html
-        })
+            html: emailPayload.html,
+        }),
     });
 
     if (!response.ok) {
@@ -184,26 +220,28 @@ const sendDecisionEmail = async ({ to, decision, application, actionLink, review
 };
 
 const createTemporaryPassword = () => {
-    return `Tedport!${crypto.randomUUID().replace(/-/g, '').slice(0, 18)}`;
+    return `Tedport!${crypto.randomUUID().replace(/-/g, "").slice(0, 18)}`;
 };
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal onayda firma kaydi icin stabil ve okunur firmaID uretilir
 const slugifyCompanyName = (value: string) => {
-    return String(value || '')
-        .toLocaleLowerCase('tr-TR')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
+    return String(value || "")
+        .toLocaleLowerCase("tr-TR")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
         .slice(0, 48);
 };
 
 const isUuid = (value: string) => {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || '').trim());
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        .test(String(value || "").trim());
 };
 
 const buildManagedFirmaId = (application: Record<string, unknown>) => {
-    const existingManagedFirmaId = String(application.managed_firma_id || '').trim();
+    const existingManagedFirmaId = String(application.managed_firma_id || "")
+        .trim();
     if (isUuid(existingManagedFirmaId)) {
         return existingManagedFirmaId;
     }
@@ -211,48 +249,66 @@ const buildManagedFirmaId = (application: Record<string, unknown>) => {
     return crypto.randomUUID();
 };
 
-const buildDefaultProductCatalog = () => ([
+const buildDefaultProductCatalog = () => [
     {
-        ana_kategori: 'Tüm Ürünler',
+        ana_kategori: "Tüm Ürünler",
         alt_kategoriler: [
             {
-                baslik: 'Ürün Listesi',
-                urunler: []
-            }
-        ]
-    }
-]);
+                baslik: "Ürün Listesi",
+                urunler: [],
+            },
+        ],
+    },
+];
 
-const buildManagedFirmaPayload = (application: Record<string, unknown>, firmaId: string) => {
-    const addressText = String(application.company_address || '').trim();
+const buildManagedFirmaPayload = (
+    application: Record<string, unknown>,
+    firmaId: string,
+) => {
+    const addressText = String(application.company_address || "").trim();
 
     return {
         firmaID: firmaId,
-        firma_adi: String(application.listed_company_name || application.company_name || 'Kurumsal Firma').trim(),
-        web_sitesi: String(application.website_url || '').trim() || null,
-        category_name: 'Kurumsal Üye',
-        description: String(application.verification_note || `${String(application.company_name || 'Firma')} için oluşturulan kurumsal firma profili.`).trim(),
-        firma_turu: 'Kurumsal Hesap',
-        telefon: String(application.phone || '').trim() || null,
-        eposta: String(application.corporate_email || '').trim().toLowerCase() || null,
+        firma_adi: String(
+            application.listed_company_name || application.company_name ||
+                "Kurumsal Firma",
+        ).trim(),
+        web_sitesi: String(application.website_url || "").trim() || null,
+        category_name: "Kurumsal Üye",
+        description: String(
+            application.verification_note ||
+                `${
+                    String(application.company_name || "Firma")
+                } için oluşturulan kurumsal firma profili.`,
+        ).trim(),
+        firma_turu: "Kurumsal Hesap",
+        telefon: String(application.phone || "").trim() || null,
+        eposta:
+            String(application.corporate_email || "").trim().toLowerCase() ||
+            null,
         adres: addressText || null,
         latitude: null,
         longitude: null,
-        ana_sektor: String(application.tax_office || application.applicant_title || '').trim() || 'Belirtilmedi',
+        ana_sektor:
+            String(application.tax_office || application.applicant_title || "")
+                .trim() || "Belirtilmedi",
         urun_kategorileri: JSON.stringify(buildDefaultProductCatalog()),
         logo_url: null,
-        il_ilce: addressText || 'Belirtilmedi',
-        best: false
+        il_ilce: addressText || "Belirtilmedi",
+        best: false,
     };
 };
 
-const ensureManagedFirmaRecord = async (supabaseAdmin: ReturnType<typeof createAdminClient>, application: Record<string, unknown>) => {
+const ensureManagedFirmaRecord = async (
+    supabaseAdmin: ReturnType<typeof createAdminClient>,
+    application: Record<string, unknown>,
+) => {
     const managedFirmaId = buildManagedFirmaId(application);
 
     const { data: existingFirm, error: existingFirmError } = await supabaseAdmin
-        .from('firmalar')
-        .select('firmaID')
-        .eq('firmaID', managedFirmaId)
+        .from("firmalar")
+        .select("firmaID")
+        .eq("firmaID", managedFirmaId)
         .maybeSingle();
 
     if (existingFirmError) {
@@ -264,13 +320,13 @@ const ensureManagedFirmaRecord = async (supabaseAdmin: ReturnType<typeof createA
     }
 
     const { data: insertedFirm, error: insertFirmError } = await supabaseAdmin
-        .from('firmalar')
+        .from("firmalar")
         .insert([buildManagedFirmaPayload(application, managedFirmaId)])
-        .select('firmaID')
+        .select("firmaID")
         .single();
 
     if (insertFirmError || !insertedFirm?.firmaID) {
-        throw toError(insertFirmError, 'Firma kaydı oluşturulamadı.');
+        throw toError(insertFirmError, "Firma kaydı oluşturulamadı.");
     }
 
     return { firmaId: insertedFirm.firmaID, created: true };
@@ -280,7 +336,7 @@ const ensureManagedFirmaLink = async ({
     supabaseAdmin,
     applicationId,
     userId,
-    firmaId
+    firmaId,
 }: {
     supabaseAdmin: ReturnType<typeof createAdminClient>;
     applicationId: number;
@@ -288,29 +344,32 @@ const ensureManagedFirmaLink = async ({
     firmaId: string;
 }) => {
     const { error } = await supabaseAdmin
-        .from('kurumsal_firma_yoneticileri')
+        .from("kurumsal_firma_yoneticileri")
         .upsert([
             {
                 user_id: userId,
                 firma_id: firmaId,
                 application_id: applicationId,
-                role: 'owner'
-            }
-        ], { onConflict: 'user_id' });
+                role: "owner",
+            },
+        ], { onConflict: "user_id" });
 
     if (error) {
-        throw toError(error, 'Firma sahipliği kaydedilemedi.');
+        throw toError(error, "Firma sahipliği kaydedilemedi.");
     }
 };
 
-const findExistingUserByEmail = async (supabaseAdmin: ReturnType<typeof createAdminClient>, email: string) => {
-    const normalizedEmail = String(email || '').trim().toLowerCase();
+const findExistingUserByEmail = async (
+    supabaseAdmin: ReturnType<typeof createAdminClient>,
+    email: string,
+) => {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
     let page = 1;
 
     while (page <= 20) {
         const { data, error } = await supabaseAdmin.auth.admin.listUsers({
             page,
-            perPage: 200
+            perPage: 200,
         });
 
         if (error) {
@@ -318,7 +377,9 @@ const findExistingUserByEmail = async (supabaseAdmin: ReturnType<typeof createAd
         }
 
         const users = data?.users || [];
-        const matchedUser = users.find((user) => String(user.email || '').trim().toLowerCase() === normalizedEmail);
+        const matchedUser = users.find((user) =>
+            String(user.email || "").trim().toLowerCase() === normalizedEmail
+        );
         if (matchedUser) {
             return matchedUser;
         }
@@ -333,33 +394,40 @@ const findExistingUserByEmail = async (supabaseAdmin: ReturnType<typeof createAd
     return null;
 };
 
-const getAuthenticatedAdmin = async (authorizationHeader: string | null, supabaseAdmin: ReturnType<typeof createAdminClient>) => {
+const getAuthenticatedAdmin = async (
+    authorizationHeader: string | null,
+    supabaseAdmin: ReturnType<typeof createAdminClient>,
+) => {
     if (!authorizationHeader) {
-        return { error: 'Unauthorized', status: 401 as const };
+        return { error: "Unauthorized", status: 401 as const };
     }
 
-    const accessToken = authorizationHeader.replace('Bearer ', '');
+    const accessToken = authorizationHeader.replace("Bearer ", "");
     const { data, error } = await supabaseAdmin.auth.getUser(accessToken);
     if (error || !data.user) {
-        return { error: 'Unauthorized', status: 401 as const };
+        return { error: "Unauthorized", status: 401 as const };
     }
 
     const { data: adminRow, error: adminError } = await supabaseAdmin
-        .from('admin_epostalari')
-        .select('email')
-        .eq('email', (data.user.email || '').trim().toLowerCase())
+        .from("admin_epostalari")
+        .select("email")
+        .eq("email", (data.user.email || "").trim().toLowerCase())
         .maybeSingle();
 
     if (adminError || !adminRow) {
-        return { error: 'Forbidden', status: 403 as const };
+        return { error: "Forbidden", status: 403 as const };
     }
 
     return { user: data.user };
 };
 
-const upsertCorporateProfile = async (supabaseAdmin: ReturnType<typeof createAdminClient>, userId: string, application: Record<string, unknown>) => {
+const upsertCorporateProfile = async (
+    supabaseAdmin: ReturnType<typeof createAdminClient>,
+    userId: string,
+    application: Record<string, unknown>,
+) => {
     const { error } = await supabaseAdmin
-        .from('profiles')
+        .from("profiles")
         .upsert([
             {
                 id: userId,
@@ -367,9 +435,9 @@ const upsertCorporateProfile = async (supabaseAdmin: ReturnType<typeof createAdm
                 last_name: application.applicant_last_name,
                 company_name: application.company_name,
                 phone: application.phone,
-                email: application.corporate_email
-            }
-        ], { onConflict: 'id' });
+                email: application.corporate_email,
+            },
+        ], { onConflict: "id" });
 
     if (error) {
         throw error;
@@ -377,28 +445,37 @@ const upsertCorporateProfile = async (supabaseAdmin: ReturnType<typeof createAdm
 };
 
 Deno.serve(async (request) => {
-    if (request.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders });
+    if (request.method === "OPTIONS") {
+        return new Response("ok", { headers: corsHeaders });
     }
 
-    if (request.method !== 'POST') {
-        return jsonResponse({ error: 'Method not allowed' }, 405);
+    if (request.method !== "POST") {
+        return jsonResponse({ error: "Method not allowed" }, 405);
     }
 
     const supabaseAdmin = createAdminClient();
-    const authorizationHeader = request.headers.get('Authorization');
-    const payload = await request.json() as CorporateSubmitPayload | CorporateReviewPayload | CorporateListPayload;
+    const authorizationHeader = request.headers.get("Authorization");
+    const payload = await request.json() as
+        | CorporateSubmitPayload
+        | CorporateReviewPayload
+        | CorporateListPayload;
 
-    if (payload.action === 'list') {
-        const adminResult = await getAuthenticatedAdmin(authorizationHeader, supabaseAdmin);
-        if ('error' in adminResult) {
-            return jsonResponse({ error: adminResult.error }, adminResult.status);
+    if (payload.action === "list") {
+        const adminResult = await getAuthenticatedAdmin(
+            authorizationHeader,
+            supabaseAdmin,
+        );
+        if ("error" in adminResult) {
+            return jsonResponse(
+                { error: adminResult.error },
+                adminResult.status,
+            );
         }
 
         const { data, error } = await supabaseAdmin
-            .from('kurumsal_basvurular')
-            .select('*')
-            .order('created_at', { ascending: false })
+            .from("kurumsal_basvurular")
+            .select("*")
+            .order("created_at", { ascending: false })
             .limit(200);
 
         if (error) {
@@ -408,74 +485,99 @@ Deno.serve(async (request) => {
         return jsonResponse({ applications: data || [] });
     }
 
-    if (payload.action === 'review') {
-        const adminResult = await getAuthenticatedAdmin(authorizationHeader, supabaseAdmin);
-        if ('error' in adminResult) {
-            return jsonResponse({ error: adminResult.error }, adminResult.status);
+    if (payload.action === "review") {
+        const adminResult = await getAuthenticatedAdmin(
+            authorizationHeader,
+            supabaseAdmin,
+        );
+        if ("error" in adminResult) {
+            return jsonResponse(
+                { error: adminResult.error },
+                adminResult.status,
+            );
         }
 
-        if (!['approve', 'reject', 'needs_info'].includes(payload.decision)) {
-            return jsonResponse({ error: 'Geçersiz karar tipi.' }, 400);
+        if (!["approve", "reject", "needs_info"].includes(payload.decision)) {
+            return jsonResponse({ error: "Geçersiz karar tipi." }, 400);
         }
 
-        const { data: application, error: applicationError } = await supabaseAdmin
-            .from('kurumsal_basvurular')
-            .select('*')
-            .eq('id', payload.applicationId)
-            .single();
+        const { data: application, error: applicationError } =
+            await supabaseAdmin
+                .from("kurumsal_basvurular")
+                .select("*")
+                .eq("id", payload.applicationId)
+                .single();
 
         if (applicationError || !application) {
-            return jsonResponse({ error: 'Başvuru bulunamadı.' }, 404);
+            return jsonResponse({ error: "Başvuru bulunamadı." }, 404);
         }
 
         const now = new Date().toISOString();
-        const reviewNote = String(payload.reviewNote || '').trim();
+        const reviewNote = String(payload.reviewNote || "").trim();
         let approvedUserId = application.approved_user_id || null;
-        let managedFirmaId = String(application.managed_firma_id || '').trim() || null;
-        let actionLink = '';
+        let managedFirmaId =
+            String(application.managed_firma_id || "").trim() || null;
+        let actionLink = "";
         let createdUserIdForRollback: string | null = null;
         let createdManagedFirmaIdForRollback: string | null = null;
         let activationPending = false;
 
-        if (payload.decision === 'approve') {
-            const resendApiKey = Deno.env.get('RESEND_API_KEY');
-            const fromEmail = Deno.env.get('CORPORATE_FROM_EMAIL') || Deno.env.get('REMINDER_FROM_EMAIL');
-            const appBaseUrl = Deno.env.get('APP_BASE_URL');
+        if (payload.decision === "approve") {
+            const resendApiKey = Deno.env.get("RESEND_API_KEY");
+            const fromEmail = Deno.env.get("CORPORATE_FROM_EMAIL") ||
+                Deno.env.get("REMINDER_FROM_EMAIL");
+            const appBaseUrl = Deno.env.get("APP_BASE_URL");
 
             if (!resendApiKey || !fromEmail || !appBaseUrl) {
                 activationPending = true;
             } else {
                 const temporaryPassword = createTemporaryPassword();
-                const existingUser = await findExistingUserByEmail(supabaseAdmin, String(application.corporate_email || ''));
+                const existingUser = await findExistingUserByEmail(
+                    supabaseAdmin,
+                    String(application.corporate_email || ""),
+                );
 
                 if (existingUser) {
-                    const { data: updatedExistingUser, error: updateExistingUserError } = await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
-                        email_confirm: true,
-                        user_metadata: {
-                            ...(existingUser.user_metadata || {}),
-                            account_type: 'corporate',
-                            company_name: application.company_name
-                        }
-                    });
+                    const {
+                        data: updatedExistingUser,
+                        error: updateExistingUserError,
+                    } = await supabaseAdmin.auth.admin.updateUserById(
+                        existingUser.id,
+                        {
+                            email_confirm: true,
+                            user_metadata: {
+                                ...(existingUser.user_metadata || {}),
+                                account_type: "corporate",
+                                company_name: application.company_name,
+                            },
+                        },
+                    );
 
                     if (updateExistingUserError || !updatedExistingUser.user) {
-                        return jsonResponse({ error: updateExistingUserError?.message || 'Mevcut kullanıcı kurumsal hesaba dönüştürülemedi.' }, 400);
+                        return jsonResponse({
+                            error: updateExistingUserError?.message ||
+                                "Mevcut kullanıcı kurumsal hesaba dönüştürülemedi.",
+                        }, 400);
                     }
 
                     approvedUserId = updatedExistingUser.user.id;
                 } else {
-                    const { data: createdUserResult, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
-                        email: String(application.corporate_email || ''),
-                        password: temporaryPassword,
-                        email_confirm: true,
-                        user_metadata: {
-                            account_type: 'corporate',
-                            company_name: application.company_name
-                        }
-                    });
+                    const { data: createdUserResult, error: createUserError } =
+                        await supabaseAdmin.auth.admin.createUser({
+                            email: String(application.corporate_email || ""),
+                            password: temporaryPassword,
+                            email_confirm: true,
+                            user_metadata: {
+                                account_type: "corporate",
+                                company_name: application.company_name,
+                            },
+                        });
 
                     if (createUserError || !createdUserResult.user) {
-                        return jsonResponse({ error: createUserError?.message || 'Kurumsal kullanıcı oluşturulamadı.' }, 400);
+                        return jsonResponse({
+                            error: createUserError?.message ||
+                                "Kurumsal kullanıcı oluşturulamadı.",
+                        }, 400);
                     }
 
                     approvedUserId = createdUserResult.user.id;
@@ -483,123 +585,184 @@ Deno.serve(async (request) => {
                 }
 
                 try {
-                    await upsertCorporateProfile(supabaseAdmin, approvedUserId, application as Record<string, unknown>);
+                    await upsertCorporateProfile(
+                        supabaseAdmin,
+                        approvedUserId,
+                        application as Record<string, unknown>,
+                    );
                 } catch (error) {
                     if (createdUserIdForRollback) {
-                        await supabaseAdmin.auth.admin.deleteUser(createdUserIdForRollback);
+                        await supabaseAdmin.auth.admin.deleteUser(
+                            createdUserIdForRollback,
+                        );
                     }
-                    return jsonResponse({ error: toError(error, 'Profil oluşturulamadı.').message }, 500);
+                    return jsonResponse({
+                        error: toError(error, "Profil oluşturulamadı.").message,
+                    }, 500);
                 }
 
                 try {
-                    const managedFirmaResult = await ensureManagedFirmaRecord(supabaseAdmin, application as Record<string, unknown>);
+                    const managedFirmaResult = await ensureManagedFirmaRecord(
+                        supabaseAdmin,
+                        application as Record<string, unknown>,
+                    );
                     managedFirmaId = managedFirmaResult.firmaId;
-                    createdManagedFirmaIdForRollback = managedFirmaResult.created ? managedFirmaResult.firmaId : null;
+                    createdManagedFirmaIdForRollback =
+                        managedFirmaResult.created
+                            ? managedFirmaResult.firmaId
+                            : null;
 
                     await ensureManagedFirmaLink({
                         supabaseAdmin,
                         applicationId: Number(application.id),
                         userId: approvedUserId,
-                        firmaId: managedFirmaId
+                        firmaId: managedFirmaId,
                     });
                 } catch (error) {
                     if (createdManagedFirmaIdForRollback) {
-                        await supabaseAdmin.from('firmalar').delete().eq('firmaID', createdManagedFirmaIdForRollback);
+                        await supabaseAdmin.from("firmalar").delete().eq(
+                            "firmaID",
+                            createdManagedFirmaIdForRollback,
+                        );
                     }
                     if (createdUserIdForRollback) {
-                        await supabaseAdmin.auth.admin.deleteUser(createdUserIdForRollback);
+                        await supabaseAdmin.auth.admin.deleteUser(
+                            createdUserIdForRollback,
+                        );
                     }
-                    return jsonResponse({ error: toError(error, 'Firma kaydı oluşturulamadı.').message }, 500);
+                    return jsonResponse({
+                        error:
+                            toError(error, "Firma kaydı oluşturulamadı.")
+                                .message,
+                    }, 500);
                 }
 
-                const { data: generatedLinkData, error: generatedLinkError } = await supabaseAdmin.auth.admin.generateLink({
-                    type: 'recovery',
-                    email: String(application.corporate_email || ''),
-                    options: {
-                        redirectTo: `${appBaseUrl}/reset-password`
-                    }
-                });
+                const { data: generatedLinkData, error: generatedLinkError } =
+                    await supabaseAdmin.auth.admin.generateLink({
+                        type: "recovery",
+                        email: String(application.corporate_email || ""),
+                        options: {
+                            redirectTo: `${appBaseUrl}/reset-password`,
+                        },
+                    });
 
                 if (generatedLinkError) {
-                    await supabaseAdmin.from('kurumsal_firma_yoneticileri').delete().eq('user_id', approvedUserId);
+                    await supabaseAdmin.from("kurumsal_firma_yoneticileri")
+                        .delete().eq("user_id", approvedUserId);
                     if (createdManagedFirmaIdForRollback) {
-                        await supabaseAdmin.from('firmalar').delete().eq('firmaID', createdManagedFirmaIdForRollback);
+                        await supabaseAdmin.from("firmalar").delete().eq(
+                            "firmaID",
+                            createdManagedFirmaIdForRollback,
+                        );
                     }
                     if (createdUserIdForRollback) {
-                        await supabaseAdmin.auth.admin.deleteUser(createdUserIdForRollback);
+                        await supabaseAdmin.auth.admin.deleteUser(
+                            createdUserIdForRollback,
+                        );
                     }
-                    return jsonResponse({ error: generatedLinkError.message || 'Şifre belirleme bağlantısı üretilemedi.' }, 500);
+                    return jsonResponse({
+                        error: generatedLinkError.message ||
+                            "Şifre belirleme bağlantısı üretilemedi.",
+                    }, 500);
                 }
 
-                actionLink = generatedLinkData?.properties?.action_link || generatedLinkData?.action_link || '';
+                actionLink = generatedLinkData?.properties?.action_link ||
+                    generatedLinkData?.action_link || "";
                 if (!actionLink) {
-                    await supabaseAdmin.from('kurumsal_firma_yoneticileri').delete().eq('user_id', approvedUserId);
+                    await supabaseAdmin.from("kurumsal_firma_yoneticileri")
+                        .delete().eq("user_id", approvedUserId);
                     if (createdManagedFirmaIdForRollback) {
-                        await supabaseAdmin.from('firmalar').delete().eq('firmaID', createdManagedFirmaIdForRollback);
+                        await supabaseAdmin.from("firmalar").delete().eq(
+                            "firmaID",
+                            createdManagedFirmaIdForRollback,
+                        );
                     }
                     if (createdUserIdForRollback) {
-                        await supabaseAdmin.auth.admin.deleteUser(createdUserIdForRollback);
+                        await supabaseAdmin.auth.admin.deleteUser(
+                            createdUserIdForRollback,
+                        );
                     }
-                    return jsonResponse({ error: 'Şifre belirleme bağlantısı üretilemedi.' }, 500);
+                    return jsonResponse({
+                        error: "Şifre belirleme bağlantısı üretilemedi.",
+                    }, 500);
                 }
 
                 try {
                     await sendDecisionEmail({
-                        to: String(application.corporate_email || ''),
+                        to: String(application.corporate_email || ""),
                         decision: payload.decision,
                         application: application as Record<string, unknown>,
                         actionLink,
-                        reviewNote
+                        reviewNote,
                     });
                 } catch (error) {
-                    await supabaseAdmin.from('kurumsal_firma_yoneticileri').delete().eq('user_id', approvedUserId);
+                    await supabaseAdmin.from("kurumsal_firma_yoneticileri")
+                        .delete().eq("user_id", approvedUserId);
                     if (createdManagedFirmaIdForRollback) {
-                        await supabaseAdmin.from('firmalar').delete().eq('firmaID', createdManagedFirmaIdForRollback);
+                        await supabaseAdmin.from("firmalar").delete().eq(
+                            "firmaID",
+                            createdManagedFirmaIdForRollback,
+                        );
                     }
                     if (createdUserIdForRollback) {
-                        await supabaseAdmin.auth.admin.deleteUser(createdUserIdForRollback);
+                        await supabaseAdmin.auth.admin.deleteUser(
+                            createdUserIdForRollback,
+                        );
                     }
-                    return jsonResponse({ error: toError(error, 'Karar e-postası gönderilemedi.').message }, 500);
+                    return jsonResponse({
+                        error:
+                            toError(error, "Karar e-postası gönderilemedi.")
+                                .message,
+                    }, 500);
                 }
             }
         } else {
             try {
                 await sendDecisionEmail({
-                    to: String(application.corporate_email || ''),
+                    to: String(application.corporate_email || ""),
                     decision: payload.decision,
                     application: application as Record<string, unknown>,
-                    reviewNote
+                    reviewNote,
                 });
             } catch (error) {
-                return jsonResponse({ error: toError(error, 'Karar e-postası gönderilemedi.').message }, 500);
+                return jsonResponse({
+                    error:
+                        toError(error, "Karar e-postası gönderilemedi.")
+                            .message,
+                }, 500);
             }
         }
 
-        const nextStatus = payload.decision === 'approve' ? 'approved' : payload.decision === 'needs_info' ? 'needs_info' : 'rejected';
+        const nextStatus = payload.decision === "approve"
+            ? "approved"
+            : payload.decision === "needs_info"
+            ? "needs_info"
+            : "rejected";
         const metadata = {
             ...(application.metadata || {}),
             activation_pending: activationPending,
             activation_completed: Boolean(approvedUserId),
-            activation_link_generated: Boolean(actionLink)
+            activation_link_generated: Boolean(actionLink),
         };
 
-        const { data: updatedApplication, error: updateError } = await supabaseAdmin
-            .from('kurumsal_basvurular')
-            .update({
-                status: nextStatus,
-                review_note: reviewNote || null,
-                reviewed_by_email: adminResult.user.email,
-                reviewed_at: now,
-                approved_user_id: approvedUserId,
-                managed_firma_id: managedFirmaId,
-                approved_at: payload.decision === 'approve' ? now : null,
-                rejected_at: payload.decision === 'reject' ? now : null,
-                metadata,
-                updated_at: now
-            })
-            .eq('id', application.id)
-            .select('*')
-            .single();
+        const { data: updatedApplication, error: updateError } =
+            await supabaseAdmin
+                .from("kurumsal_basvurular")
+                .update({
+                    status: nextStatus,
+                    review_note: reviewNote || null,
+                    reviewed_by_email: adminResult.user.email,
+                    reviewed_at: now,
+                    approved_user_id: approvedUserId,
+                    managed_firma_id: managedFirmaId,
+                    approved_at: payload.decision === "approve" ? now : null,
+                    rejected_at: payload.decision === "reject" ? now : null,
+                    metadata,
+                    updated_at: now,
+                })
+                .eq("id", application.id)
+                .select("*")
+                .single();
 
         if (updateError) {
             return jsonResponse({ error: updateError.message }, 500);
@@ -614,42 +777,65 @@ Deno.serve(async (request) => {
         return jsonResponse({ error: validationError }, 400);
     }
 
-    const corporateEmail = String(submitPayload.corporateEmail || '').trim().toLowerCase();
-    const { data: existingPendingApplication, error: existingPendingError } = await supabaseAdmin
-        .from('kurumsal_basvurular')
-        .select('id')
-        .eq('status', 'pending')
-        .eq('corporate_email', corporateEmail)
-        .maybeSingle();
+    const corporateEmail = String(submitPayload.corporateEmail || "").trim()
+        .toLowerCase();
+
+    // Enes Doğanay | 7 Nisan 2026: Kurumsal basvuruda auth.users tablosunda mevcut kullanici kontrolu
+    const existingAuthUser = await findExistingUserByEmail(
+        supabaseAdmin,
+        corporateEmail,
+    );
+    if (existingAuthUser) {
+        return jsonResponse({
+            error: "Bu e-posta adresi zaten kullanılmaktadır.",
+        }, 409);
+    }
+
+    const { data: existingPendingApplication, error: existingPendingError } =
+        await supabaseAdmin
+            .from("kurumsal_basvurular")
+            .select("id")
+            .eq("status", "pending")
+            .eq("corporate_email", corporateEmail)
+            .maybeSingle();
 
     if (existingPendingError) {
         return jsonResponse({ error: existingPendingError.message }, 500);
     }
 
     if (existingPendingApplication) {
-        return jsonResponse({ error: 'Bu e-posta adresi için zaten bekleyen bir kurumsal başvuru var.' }, 409);
+        return jsonResponse({
+            error:
+                "Bu e-posta adresi için zaten bekleyen bir kurumsal başvuru var.",
+        }, 409);
     }
 
     const { data: createdApplication, error: insertError } = await supabaseAdmin
-        .from('kurumsal_basvurular')
+        .from("kurumsal_basvurular")
         .insert([{
-            applicant_first_name: String(submitPayload.applicantFirstName || '').trim(),
-            applicant_last_name: String(submitPayload.applicantLastName || '').trim(),
-            applicant_title: String(submitPayload.applicantTitle || '').trim() || null,
-            company_name: String(submitPayload.companyName || '').trim(),
-            listed_company_name: String(submitPayload.listedCompanyName || '').trim() || null,
+            applicant_first_name: String(submitPayload.applicantFirstName || "")
+                .trim(),
+            applicant_last_name: String(submitPayload.applicantLastName || "")
+                .trim(),
+            applicant_title:
+                String(submitPayload.applicantTitle || "").trim() || null,
+            company_name: String(submitPayload.companyName || "").trim(),
+            listed_company_name:
+                String(submitPayload.listedCompanyName || "").trim() || null,
             website_url: normalizeWebsiteUrl(submitPayload.websiteUrl),
             corporate_email: corporateEmail,
-            phone: String(submitPayload.phone || '').trim(),
-            tax_office: String(submitPayload.taxOffice || '').trim() || null,
-            tax_number: String(submitPayload.taxNumber || '').trim() || null,
-            company_address: String(submitPayload.companyAddress || '').trim() || null,
-            verification_note: String(submitPayload.verificationNote || '').trim() || null,
+            phone: String(submitPayload.phone || "").trim(),
+            tax_office: String(submitPayload.taxOffice || "").trim() || null,
+            tax_number: String(submitPayload.taxNumber || "").trim() || null,
+            company_address:
+                String(submitPayload.companyAddress || "").trim() || null,
+            verification_note:
+                String(submitPayload.verificationNote || "").trim() || null,
             metadata: {
-                source: 'supabase-edge-function'
-            }
+                source: "supabase-edge-function",
+            },
         }])
-        .select('*')
+        .select("*")
         .single();
 
     if (insertError) {

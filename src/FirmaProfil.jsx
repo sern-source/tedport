@@ -8,6 +8,7 @@ import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import './Profile.css';
 import './CompanyManagementPanel.css';
+import PageLoader from './PageLoader';
 
 // Enes Doğanay | 7 Nisan 2026: Bildirim kartlarında özet zaman metni
 const formatRelativeTime = (isoValue) => {
@@ -21,6 +22,18 @@ const formatRelativeTime = (isoValue) => {
     const diffDays = Math.round(diffHours / 24);
     return `${Math.abs(diffDays)} gün ${diffDays >= 0 ? 'önce' : 'sonra'}`;
 };
+
+// Enes Doğanay | 8 Nisan 2026: Favoriler için yardımcı fonksiyonlar (Profile.jsx ile aynı)
+const hashColor = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    return `hsl(${Math.abs(hash) % 360}, 55%, 50%)`;
+};
+const getLatestNote = (notes, firmaId) => (notes || []).filter(n => n.firma_id === firmaId).sort((a, b) => (b.updated_at || b.created_at || '').localeCompare(a.updated_at || a.created_at || ''))[0];
+const getAllNotesForFirma = (notes, firmaId) => (notes || []).filter(n => n.firma_id === firmaId).sort((a, b) => (b.updated_at || b.created_at || '').localeCompare(a.updated_at || a.created_at || ''));
+const parseNotePayload = (raw) => { if (!raw) return { title: '', tag: '', body: '' }; try { const p = JSON.parse(raw); if (p && typeof p === 'object' && 'body' in p) return { title: p.title || '', tag: p.tag || '', body: p.body || '' }; } catch {} return { title: '', tag: '', body: raw }; };
+const serializeNotePayload = (title, tag, body) => JSON.stringify({ title: title || '', tag: tag || '', body: body || '' });
+const formatReminderLabel = (v) => { if (!v) return ''; const d = new Date(v); return `${d.toLocaleDateString('tr-TR')} • ${d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`; };
 
 const FirmaProfil = () => {
     const navigate = useNavigate();
@@ -47,6 +60,27 @@ const FirmaProfil = () => {
     // Enes Doğanay | 7 Nisan 2026: Bildirim state'leri
     const [notifications, setNotifications] = useState([]);
 
+    // Enes Doğanay | 8 Nisan 2026: Favoriler state'leri (bireysel profildeki yapının kurumsal kopyası)
+    const [myLists, setMyLists] = useState([]);
+    const [favorites, setFavorites] = useState([]);
+    const [selectedListId, setSelectedListId] = useState(null);
+    const [isCreatingList, setIsCreatingList] = useState(false);
+    const [newListName, setNewListName] = useState('');
+    const [favSearch, setFavSearch] = useState('');
+    const [favSort, setFavSort] = useState('newest');
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const [assigningListId, setAssigningListId] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState(null);
+    const [confirmDeleteList, setConfirmDeleteList] = useState(null);
+    const [editingNoteId, setEditingNoteId] = useState(null);
+    const [editingSavedNoteId, setEditingSavedNoteId] = useState(null);
+    const [tempNoteTitle, setTempNoteTitle] = useState('');
+    const [tempNoteText, setTempNoteText] = useState('');
+    const [isSavingNote, setIsSavingNote] = useState(false);
+    const [expandedNoteIds, setExpandedNoteIds] = useState([]);
+    const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState(null);
+    const [saveFeedbackFavoriteId, setSaveFeedbackFavoriteId] = useState(null);
+
     // ── İlk yükleme ──
     useEffect(() => {
         const init = async () => {
@@ -58,13 +92,46 @@ const FirmaProfil = () => {
             if (!userData?.user) { navigate('/login'); return; }
             setUserId(userData.user.id);
 
-            const [firmaRes, notifRes] = await Promise.all([
+            const [firmaRes, notifRes, listsRes, favsRes, remindersRes] = await Promise.all([
                 supabase.from('firmalar').select('*').eq('firmaID', cid).single(),
-                supabase.from('bildirimler').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: false }).limit(50)
+                supabase.from('bildirimler').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: false }).limit(50),
+                // Enes Doğanay | 8 Nisan 2026: Favoriler için listeler ve kayıtlar çekilir
+                supabase.from('kullanici_listeleri').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: true }),
+                supabase.from('kullanici_favorileri').select('*').eq('user_id', userData.user.id),
+                supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userData.user.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true })
             ]);
 
             setFirma(firmaRes.data);
             setNotifications(notifRes.data || []);
+            if (listsRes.data) setMyLists(listsRes.data);
+
+            // Enes Doğanay | 8 Nisan 2026: Favori firma detaylarını birleştir
+            if (favsRes.data && favsRes.data.length > 0) {
+                const firmaIds = favsRes.data.map(f => f.firma_id);
+                const reminderMap = new Map((remindersRes.data || []).map(r => [String(r.note_id), r]));
+                const [firmsData, notesData] = await Promise.all([
+                    supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
+                    supabase.from('kisisel_notlar').select('*').eq('user_id', userData.user.id).in('firma_id', firmaIds)
+                ]);
+                setFavorites(favsRes.data.map(fav => {
+                    const firm = firmsData.data?.find(f => f.firmaID === fav.firma_id) || {};
+                    const allNotes = getAllNotesForFirma(notesData.data, fav.firma_id);
+                    const note = getLatestNote(notesData.data, fav.firma_id);
+                    const parsedNote = parseNotePayload(note?.not_metni || '');
+                    return {
+                        id: fav.id, firma_id: fav.firma_id, liste_id: fav.liste_id, created_at: fav.created_at,
+                        name: firm.firma_adi || 'Bilinmeyen Firma', category: firm.category_name || 'Kategori Yok',
+                        location: firm.il_ilce || 'Konum Yok', note: parsedNote.body,
+                        notes: allNotes.map(n => {
+                            const p = parseNotePayload(n.not_metni);
+                            return { id: n.id, title: p.title, body: p.body, created_at: n.created_at, updated_at: n.updated_at, reminder: reminderMap.get(String(n.id)) || null };
+                        }),
+                        color: hashColor(fav.firma_id)
+                    };
+                }));
+            } else {
+                setFavorites([]);
+            }
             setLoading(false);
         };
         init();
@@ -160,16 +227,98 @@ const FirmaProfil = () => {
         if (!notification.is_read) handleMarkNotificationRead(notification.id);
     };
 
+    // Enes Doğanay | 8 Nisan 2026: Favoriler CRUD fonksiyonları (bireysel profildeki yapının kopyası)
+    const handleCreateList = async () => {
+        if (!newListName.trim()) return;
+        const { data, error } = await supabase.from('kullanici_listeleri').insert([{ user_id: userId, liste_adi: newListName }]).select().single();
+        if (!error && data) { setMyLists([...myLists, data]); setNewListName(''); setIsCreatingList(false); }
+        else alert('Liste oluşturulamadı.');
+    };
+    const handleDeleteList = async (listId) => {
+        try {
+            await supabase.from('kullanici_favorileri').update({ liste_id: null }).eq('user_id', userId).eq('liste_id', listId);
+            await supabase.from('kullanici_listeleri').delete().eq('id', listId).eq('user_id', userId);
+            setMyLists(prev => prev.filter(l => l.id !== listId));
+            setFavorites(prev => prev.map(f => f.liste_id === listId ? { ...f, liste_id: null } : f));
+            setSelectedListId(cur => cur === listId ? null : cur);
+            setConfirmDeleteList(null);
+        } catch { alert('Liste silinirken bir hata oluştu.'); }
+    };
+    const handleRemoveFavorite = async (favoriteId) => {
+        const { error } = await supabase.from('kullanici_favorileri').delete().eq('id', favoriteId);
+        if (!error) { setFavorites(favorites.filter(fav => fav.id !== favoriteId)); setConfirmDelete(null); }
+        else alert('Silme işlemi başarısız oldu.');
+    };
+    const handleAssignList = async (favoriteId, listId) => {
+        const { error } = await supabase.from('kullanici_favorileri').update({ liste_id: listId }).eq('id', favoriteId);
+        if (!error) { setFavorites(prev => prev.map(f => f.id === favoriteId ? { ...f, liste_id: listId } : f)); setAssigningListId(null); }
+        else alert('Liste güncellenemedi.');
+    };
+    const updateFavoriteNotesState = (favoriteId, nextNotes) => {
+        const ordered = [...nextNotes].sort((a, b) => (b.updated_at || b.created_at || '').localeCompare(a.updated_at || a.created_at || ''));
+        setFavorites(prev => prev.map(f => f.id !== favoriteId ? f : { ...f, note: ordered[0]?.body || '', notes: ordered }));
+    };
+    const handleStartEditingSavedNote = (favoriteId, savedNote) => {
+        setEditingNoteId(favoriteId); setEditingSavedNoteId(savedNote.id); setTempNoteTitle(savedNote.title || ''); setTempNoteText(savedNote.body || ''); setPendingDeleteNoteId(null);
+    };
+    const resetInlineNoteEditor = () => { setEditingNoteId(null); setEditingSavedNoteId(null); setTempNoteTitle(''); setTempNoteText(''); };
+    const handleInlineNoteSave = async (firmaId, favId) => {
+        setIsSavingNote(true);
+        try {
+            const now = new Date().toISOString();
+            let nextNotes = [];
+            if (editingSavedNoteId) {
+                const target = favorites.find(f => f.id === favId);
+                const saved = target?.notes?.find(n => n.id === editingSavedNoteId);
+                await supabase.from('kisisel_notlar').update({ not_metni: serializeNotePayload(tempNoteTitle.trim() || saved?.title || '', '', tempNoteText.trim()), updated_at: now }).eq('id', editingSavedNoteId);
+                nextNotes = (target?.notes || []).map(n => n.id === editingSavedNoteId ? { ...n, title: tempNoteTitle.trim(), body: tempNoteText.trim(), updated_at: now } : n);
+            } else if (tempNoteText.trim()) {
+                const { data: inserted } = await supabase.from('kisisel_notlar').insert([{ user_id: userId, firma_id: firmaId, not_metni: serializeNotePayload(tempNoteTitle.trim(), '', tempNoteText.trim()), updated_at: now }]).select().single();
+                const target = favorites.find(f => f.id === favId);
+                nextNotes = [{ id: inserted?.id || `${firmaId}-${now}`, title: tempNoteTitle.trim(), body: tempNoteText.trim(), updated_at: now, created_at: now }, ...(target?.notes || [])];
+            }
+            updateFavoriteNotesState(favId, nextNotes);
+            resetInlineNoteEditor();
+            setSaveFeedbackFavoriteId(favId);
+            setTimeout(() => setSaveFeedbackFavoriteId(cur => cur === favId ? null : cur), 1800);
+        } catch { alert('Not kaydedilirken bir hata oluştu.'); }
+        finally { setIsSavingNote(false); }
+    };
+    const handleDeleteSavedNote = async (favoriteId, noteId) => {
+        try {
+            await supabase.from('kisisel_notlar').delete().eq('id', noteId);
+            const target = favorites.find(f => f.id === favoriteId);
+            updateFavoriteNotesState(favoriteId, (target?.notes || []).filter(n => n.id !== noteId));
+            if (editingSavedNoteId === noteId) resetInlineNoteEditor();
+            setPendingDeleteNoteId(null);
+        } catch { alert('Not silinirken bir hata oluştu.'); }
+    };
+
     // ── Çıkış ──
     const handleLogout = async () => {
         await supabase.auth.signOut();
         navigate('/login');
     };
 
-    if (loading) return <div className="page-status">Yükleniyor...</div>;
+    if (loading) return <PageLoader />;
 
     const pendingCount = incomingQuotes.filter(q => q.durum === 'pending').length;
     const unreadNotifCount = notifications.filter(n => !n.is_read).length;
+
+    // Enes Doğanay | 8 Nisan 2026: Favori filtreleme + sıralama
+    const displayedFavorites = (() => {
+        let result = selectedListId ? favorites.filter(fav => fav.liste_id === selectedListId) : [...favorites];
+        if (favSearch.trim()) {
+            const q = favSearch.toLocaleLowerCase('tr-TR');
+            result = result.filter(fav => fav.name.toLocaleLowerCase('tr-TR').includes(q) || fav.category.toLocaleLowerCase('tr-TR').includes(q) || fav.location.toLocaleLowerCase('tr-TR').includes(q));
+        }
+        switch (favSort) {
+            case 'alpha': return [...result].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+            case 'alpha-desc': return [...result].sort((a, b) => b.name.localeCompare(a.name, 'tr'));
+            case 'oldest': return [...result].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+            case 'newest': default: return [...result].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+        }
+    })();
 
     return (
         <>
@@ -215,11 +364,60 @@ const FirmaProfil = () => {
                                 <span className="material-symbols-outlined">notifications</span> Bildirimler
                                 {unreadNotifCount > 0 && <span className="nav-item-badge">{unreadNotifCount}</span>}
                             </a>
+                            {/* Enes Doğanay | 8 Nisan 2026: Kurumsal kullanıcıya da favoriler sekmesi eklendi */}
+                            <a className={`nav-item ${currentTab === 'favoriler' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'favoriler' })}>
+                                <span className="material-symbols-outlined">collections_bookmark</span> Favorilerim
+                            </a>
                             <hr className="sidebar-divider" />
                             <a className="nav-item logout" onClick={handleLogout}>
                                 <span className="material-symbols-outlined">logout</span> Çıkış Yap
                             </a>
                         </nav>
+
+                        {/* Enes Doğanay | 8 Nisan 2026: Favoriler sekmesinde sidebar listeleri + istatistik */}
+                        {currentTab === 'favoriler' && (
+                            <div className="sidebar-lists">
+                                <h4>LİSTELERİM</h4>
+                                <div className="list-items">
+                                    <div className={`list-item ${selectedListId === null ? 'active' : ''}`} onClick={() => setSelectedListId(null)}>
+                                        <span className="list-item-label"><span className="material-symbols-outlined">folder_special</span> Tüm Favoriler</span>
+                                        <span className="list-item-count">{favorites.length}</span>
+                                    </div>
+                                    {myLists.map(liste => {
+                                        const listCount = favorites.filter(f => f.liste_id === liste.id).length;
+                                        return (
+                                            <div key={liste.id} className={`list-item ${selectedListId === liste.id ? 'active' : ''}`} onClick={() => setSelectedListId(liste.id)}>
+                                                <span className="list-item-label"><span className="material-symbols-outlined">folder</span> {liste.liste_adi}</span>
+                                                <span className="list-item-actions">
+                                                    <span className="list-item-count">{listCount}</span>
+                                                    <button type="button" className="list-item-delete" onClick={(e) => { e.stopPropagation(); setConfirmDeleteList({ id: liste.id, name: liste.liste_adi, count: listCount }); }} title="Listeyi sil">
+                                                        <span className="material-symbols-outlined">delete</span>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {isCreatingList ? (
+                                    <div className="create-list-form">
+                                        <input type="text" autoFocus value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="Liste Adı" />
+                                        <div className="create-list-form-actions">
+                                            <button className="btn-add" onClick={handleCreateList}><span className="material-symbols-outlined">add</span><span>Ekle</span></button>
+                                            <button className="btn-cancel" onClick={() => { setIsCreatingList(false); setNewListName(''); }} title="Vazgeç"><span className="material-symbols-outlined">close</span></button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button className="create-list-btn" onClick={() => setIsCreatingList(true)}>
+                                        <span className="material-symbols-outlined">add_circle</span> YENİ LİSTE OLUŞTUR
+                                    </button>
+                                )}
+                            </div>
+                        )}
+
+                        <div className="sidebar-stats">
+                            <div className="sidebar-stats-label">Kayıtlı Tedarikçi</div>
+                            <div className="sidebar-stats-value">{favorites.length}</div>
+                        </div>
                     </aside>
 
                     {/* ── CONTENT ── */}
@@ -471,6 +669,262 @@ const FirmaProfil = () => {
                                                 </div>
                                             </article>
                                         ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Enes Doğanay | 8 Nisan 2026: Tab → Favoriler (bireysel profildeki yapının kurumsal kopyası) */}
+                        {currentTab === 'favoriler' && (
+                            <div className="favorites-section">
+                                <div className="favorites-header">
+                                    <div>
+                                        <h1>{selectedListId === null ? 'Tüm Favoriler' : myLists.find(l => l.id === selectedListId)?.liste_adi}</h1>
+                                        <p>{displayedFavorites.length} tedarikçi{favSearch.trim() ? ` · "${favSearch}" araması` : ''}</p>
+                                    </div>
+                                </div>
+
+                                {/* Mobilde listeler + istatistik */}
+                                <div className="mobile-fav-panel">
+                                    <div className="mobile-fav-stats">
+                                        <span className="material-symbols-outlined">bookmark</span>
+                                        <span className="mobile-fav-stats-value">{favorites.length}</span>
+                                        <span className="mobile-fav-stats-label">Kayıtlı Tedarikçi</span>
+                                    </div>
+                                    <div className="mobile-fav-lists">
+                                        <div className={`mobile-fav-chip ${selectedListId === null ? 'active' : ''}`} onClick={() => setSelectedListId(null)}>
+                                            Tümü <span className="chip-count">{favorites.length}</span>
+                                        </div>
+                                        {myLists.map(liste => {
+                                            const listCount = favorites.filter(f => f.liste_id === liste.id).length;
+                                            return (
+                                                <div key={liste.id} className={`mobile-fav-chip ${selectedListId === liste.id ? 'active' : ''}`} onClick={() => setSelectedListId(liste.id)}>
+                                                    <span className="mobile-fav-chip-label">{liste.liste_adi}</span>
+                                                    <span className="chip-count">{listCount}</span>
+                                                    <button type="button" className="mobile-fav-chip-delete" onClick={(e) => { e.stopPropagation(); setConfirmDeleteList({ id: liste.id, name: liste.liste_adi, count: listCount }); }} title="Listeyi sil">
+                                                        <span className="material-symbols-outlined">close</span>
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                        <div className="mobile-fav-chip add-chip" onClick={() => setIsCreatingList(true)}>
+                                            <span className="material-symbols-outlined">add</span> Yeni Liste
+                                        </div>
+                                    </div>
+                                    {isCreatingList && (
+                                        <div className="mobile-create-list">
+                                            <input type="text" autoFocus value={newListName} onChange={(e) => setNewListName(e.target.value)} placeholder="Liste adı yazın..." />
+                                            <button className="btn-add" onClick={handleCreateList}><span className="material-symbols-outlined">add</span><span>Ekle</span></button>
+                                            <button className="btn-cancel" onClick={() => { setIsCreatingList(false); setNewListName(''); }}><span className="material-symbols-outlined">close</span></button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="favorites-toolbar">
+                                    <div className="fav-search-wrapper">
+                                        <span className="material-symbols-outlined">search</span>
+                                        <input type="text" className="fav-search-input" placeholder="Firma, kategori veya konum ara..." value={favSearch} onChange={e => setFavSearch(e.target.value)} />
+                                        {favSearch && (
+                                            <button className="fav-search-clear" onClick={() => setFavSearch('')}>
+                                                <span className="material-symbols-outlined">close</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="fav-sort-wrapper">
+                                        <span className="material-symbols-outlined">swap_vert</span>
+                                        <select className="fav-sort-select" value={favSort} onChange={e => setFavSort(e.target.value)}>
+                                            <option value="newest">Son Eklenen</option>
+                                            <option value="oldest">İlk Eklenen</option>
+                                            <option value="alpha">A → Z</option>
+                                            <option value="alpha-desc">Z → A</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {displayedFavorites.length === 0 ? (
+                                    <div className="favorites-empty">
+                                        <span className="material-symbols-outlined">{favSearch.trim() ? 'search_off' : 'bookmark_border'}</span>
+                                        <p>{favSearch.trim() ? `"${favSearch}" için sonuç bulunamadı.` : 'Bu listede henüz favori firma bulunmuyor.'}</p>
+                                        <button onClick={() => favSearch.trim() ? setFavSearch('') : navigate('/firmalar')}>
+                                            {favSearch.trim() ? 'Aramayı Temizle' : 'Firmaları Keşfet'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="favorites-grid">
+                                        {displayedFavorites.map((fav) => (
+                                            <div key={fav.id} className="fav-card">
+                                                <div className="fav-menu-wrapper">
+                                                    <button className="fav-menu-btn" onClick={() => setOpenMenuId(openMenuId === fav.id ? null : fav.id)}>
+                                                        <span className="material-symbols-outlined">more_vert</span>
+                                                    </button>
+                                                    {openMenuId === fav.id && (
+                                                        <>
+                                                            <div className="fav-menu-backdrop" onClick={() => setOpenMenuId(null)} />
+                                                            <div className="fav-menu-dropdown">
+                                                                <button onClick={() => { setAssigningListId(fav.id); setOpenMenuId(null); }}>
+                                                                    <span className="material-symbols-outlined">drive_file_move</span> Listeye Taşı
+                                                                </button>
+                                                                <button className="danger" onClick={() => { setConfirmDelete({ id: fav.id, name: fav.name }); setOpenMenuId(null); }}>
+                                                                    <span className="material-symbols-outlined">delete_outline</span> Favorilerden Çıkar
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+
+                                                {assigningListId === fav.id && (
+                                                    <div className="fav-list-assign">
+                                                        <div className="fav-list-assign-header">
+                                                            <span>Listeye Taşı</span>
+                                                            <button onClick={() => setAssigningListId(null)}><span className="material-symbols-outlined">close</span></button>
+                                                        </div>
+                                                        <div className="fav-list-assign-options">
+                                                            <button className={!fav.liste_id ? 'active' : ''} onClick={() => handleAssignList(fav.id, null)}>
+                                                                <span className="material-symbols-outlined">folder_special</span> Genel (Listesiz)
+                                                            </button>
+                                                            {myLists.map(list => (
+                                                                <button key={list.id} className={fav.liste_id === list.id ? 'active' : ''} onClick={() => handleAssignList(fav.id, list.id)}>
+                                                                    <span className="material-symbols-outlined">folder</span> {list.liste_adi}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="fav-avatar" style={{ background: fav.color }}>
+                                                    {fav.name.substring(0, 2).toUpperCase()}
+                                                </div>
+
+                                                <div className="fav-body">
+                                                    <h3 className="fav-name">
+                                                        <span className="fav-name-text" title={fav.name}>{fav.name}</span>
+                                                    </h3>
+                                                    <div className="fav-meta">
+                                                        <span className="material-symbols-outlined">category</span>
+                                                        <span className="fav-meta-text">{fav.category}</span>
+                                                    </div>
+                                                    <div className="fav-meta">
+                                                        <span className="material-symbols-outlined">location_on</span>
+                                                        <span className="fav-meta-text">{fav.location}</span>
+                                                    </div>
+                                                    {fav.liste_id && (
+                                                        <div className="fav-meta fav-meta-list">
+                                                            <span className="material-symbols-outlined">folder</span>
+                                                            <span className="fav-meta-text">{myLists.find(l => l.id === fav.liste_id)?.liste_adi || 'Liste'}</span>
+                                                        </div>
+                                                    )}
+
+                                                    {editingNoteId === fav.id ? (
+                                                        <div className="note-editing">
+                                                            <div className="note-header">
+                                                                <span className="material-symbols-outlined">edit_note</span>
+                                                                <span className="note-header-label">{editingSavedNoteId ? 'NOTU DÜZENLE' : 'YENİ NOT EKLE'}</span>
+                                                            </div>
+                                                            <div className="note-meta-row">
+                                                                <input type="text" className="note-meta-input" value={tempNoteTitle} onChange={(e) => setTempNoteTitle(e.target.value)} placeholder="Kısa başlık" maxLength={50} />
+                                                            </div>
+                                                            <textarea className="note-textarea" value={tempNoteText} onChange={(e) => setTempNoteText(e.target.value)} placeholder="Bu firma hakkında notunuz..." autoFocus />
+                                                            <div className="note-actions">
+                                                                <button className="note-btn-cancel" onClick={resetInlineNoteEditor}>İptal</button>
+                                                                <button className="note-btn-save" onClick={() => handleInlineNoteSave(fav.firma_id, fav.id)} disabled={isSavingNote}>{isSavingNote ? '...' : 'Kaydet'}</button>
+                                                            </div>
+                                                        </div>
+                                                    ) : fav.notes && fav.notes.length > 0 ? (
+                                                        <div className="note-display">
+                                                            <div className="note-header">
+                                                                <span className="note-header-label">
+                                                                    <span className="material-symbols-outlined">edit_note</span> NOTLARIM
+                                                                </span>
+                                                                <div className="note-display-actions">
+                                                                    <span className="note-count-chip">{fav.notes.length}</span>
+                                                                    <button className="note-edit-link" onClick={() => { setEditingNoteId(fav.id); setEditingSavedNoteId(null); setTempNoteTitle(''); setTempNoteText(''); setPendingDeleteNoteId(null); }}>Yeni Not</button>
+                                                                </div>
+                                                            </div>
+                                                            {saveFeedbackFavoriteId === fav.id && (
+                                                                <div className="note-save-feedback">
+                                                                    <span className="material-symbols-outlined">check_circle</span> Not kaydedildi
+                                                                </div>
+                                                            )}
+                                                            <div className="note-stack">
+                                                                {(expandedNoteIds.includes(fav.id) ? fav.notes : fav.notes.slice(0, 1)).map((savedNote) => (
+                                                                    <article key={savedNote.id} className="note-stack-item">
+                                                                        <div className="note-stack-meta">
+                                                                            <div className="note-stack-meta-main">
+                                                                                <span className="note-stack-date">
+                                                                                    {new Date(savedNote.updated_at || savedNote.created_at).toLocaleDateString('tr-TR')} • {new Date(savedNote.updated_at || savedNote.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                                                                </span>
+                                                                                {savedNote.reminder && (
+                                                                                    <span className={`note-stack-reminder ${savedNote.reminder.status === 'sent' ? 'sent' : ''}`}>
+                                                                                        <span className="material-symbols-outlined">notifications</span>
+                                                                                        <span>{savedNote.reminder.status === 'sent' ? 'Mail gönderildi' : formatReminderLabel(savedNote.reminder.reminder_at)}</span>
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                            {pendingDeleteNoteId === savedNote.id ? (
+                                                                                <div className="note-stack-delete-confirm">
+                                                                                    <span className="note-stack-delete-text">Silinsin mi?</span>
+                                                                                    <button type="button" className="note-stack-action note-stack-action-cancel" onClick={() => setPendingDeleteNoteId(null)} title="Vazgeç"><span className="material-symbols-outlined">close</span></button>
+                                                                                    <button type="button" className="note-stack-action note-stack-action-delete" onClick={() => handleDeleteSavedNote(fav.id, savedNote.id)} title="Sil"><span className="material-symbols-outlined">delete</span></button>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="note-stack-actions">
+                                                                                    <button type="button" className="note-stack-action note-stack-action-edit" onClick={() => handleStartEditingSavedNote(fav.id, savedNote)} title="Düzenle"><span className="material-symbols-outlined">edit</span></button>
+                                                                                    <button type="button" className="note-stack-action note-stack-action-delete" onClick={() => setPendingDeleteNoteId(savedNote.id)} title="Sil"><span className="material-symbols-outlined">delete</span></button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                        {savedNote.title && <h4 className="note-stack-title">{savedNote.title}</h4>}
+                                                                        <p>{savedNote.body}</p>
+                                                                    </article>
+                                                                ))}
+                                                            </div>
+                                                            {fav.notes.length > 1 && (
+                                                                <button type="button" className="note-stack-toggle" onClick={() => setExpandedNoteIds(prev => prev.includes(fav.id) ? prev.filter(id => id !== fav.id) : [...prev, fav.id])}>
+                                                                    <span className="material-symbols-outlined">{expandedNoteIds.includes(fav.id) ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</span>
+                                                                    {expandedNoteIds.includes(fav.id) ? 'Özet Görünüme Dön' : `${fav.notes.length - 1} Not Daha Gör`}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <button type="button" className="note-add-trigger" onClick={() => { setEditingNoteId(fav.id); setEditingSavedNoteId(null); setTempNoteTitle(''); setTempNoteText(''); setPendingDeleteNoteId(null); }}>
+                                                            <span className="material-symbols-outlined">add_circle</span> İlk Notu Ekle
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                <div className="fav-actions">
+                                                    <button className="fav-btn-primary" onClick={() => navigate(`/firmadetay/${fav.firma_id}`)}>
+                                                        <span className="material-symbols-outlined">visibility</span> Profili Gör
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Favori silme onay dialog'u */}
+                                {confirmDelete && (
+                                    <div className="fav-confirm-overlay">
+                                        <div className="fav-confirm-card">
+                                            <p><strong>{confirmDelete.name}</strong> favorilerden çıkarılsın mı?</p>
+                                            <div className="fav-confirm-actions">
+                                                <button className="btn-cancel" onClick={() => setConfirmDelete(null)}>Vazgeç</button>
+                                                <button className="btn-danger" onClick={() => handleRemoveFavorite(confirmDelete.id)}>Çıkar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Liste silme onay dialog'u */}
+                                {confirmDeleteList && (
+                                    <div className="fav-confirm-overlay">
+                                        <div className="fav-confirm-card">
+                                            <p><strong>{confirmDeleteList.name}</strong> listesi silinsin mi?{confirmDeleteList.count > 0 ? ` (${confirmDeleteList.count} favori listesiz kalacak)` : ''}</p>
+                                            <div className="fav-confirm-actions">
+                                                <button className="btn-cancel" onClick={() => setConfirmDeleteList(null)}>Vazgeç</button>
+                                                <button className="btn-danger" onClick={() => handleDeleteList(confirmDeleteList.id)}>Sil</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>

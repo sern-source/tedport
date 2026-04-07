@@ -100,17 +100,16 @@ export const submitCorporateApplication = async (formData) => {
       throw new Error('Bu e-posta adresi için zaten bekleyen bir kurumsal başvuru var.');
     }
 
-    const { data, error: insertError } = await supabase
+    // Enes Doğanay | 7 Nisan 2026: .select('*') kaldirildi, anonim kullanicinin SELECT RLS yetkisi yok, RETURNING ile RLS hatasi veriyordu
+    const { error: insertError } = await supabase
       .from('kurumsal_basvurular')
-      .insert([databasePayload])
-      .select('*')
-      .single();
+      .insert([databasePayload]);
 
     if (insertError) {
       throw new Error(insertError.message || 'Kurumsal başvuru oluşturulamadı.');
     }
 
-    return { application: data, mode: 'database', fallbackReason };
+    return { application: databasePayload, mode: 'database', fallbackReason };
   }
 };
 

@@ -21,3 +21,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Enes Doğanay | 8 Nisan 2026: PageLoader nokta animasyonu — inline style ile birlikte çalışır */
+@keyframes pageLoaderBounce {
+    0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

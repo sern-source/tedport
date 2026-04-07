@@ -153,5 +153,29 @@ on public.kurumsal_firma_yoneticileri
 for select
 using (auth.uid() = user_id or public.is_current_user_admin());
 
+-- Enes Doğanay | 7 Nisan 2026: Kayit formlarinda e-posta musaitlik kontrolu icin RPC fonksiyonu
+create or replace function public.check_email_availability(p_email text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  normalized_email text;
+begin
+  normalized_email := lower(trim(p_email));
+
+  if exists (select 1 from auth.users where lower(email) = normalized_email) then
+    return jsonb_build_object('available', false, 'reason', 'Bu e-posta adresi zaten kullanılmaktadır.');
+  end if;
+
+  if exists (select 1 from public.kurumsal_basvurular where lower(corporate_email) = normalized_email and status in ('pending', 'approved')) then
+    return jsonb_build_object('available', false, 'reason', 'Bu e-posta adresi zaten kullanılmaktadır.');
+  end if;
+
+  return jsonb_build_object('available', true);
+end;
+$$;
+
 -- Enes Doğanay | 6 Nisan 2026: Env yoksa admin tanimi icin kendi e-postanizi bir kez ekleyin
 -- insert into public.admin_epostalari (email) values ('yonetici@ornek.com') on conflict (email) do nothing;

@@ -5,6 +5,7 @@ import "./SharedHeader.css";
 import { supabase } from "./supabaseClient";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getManagedCompanyId } from './companyManagementApi';
+import PageLoader from './PageLoader';
 
 // Enes Doğanay | 6 Nisan 2026: Deterministik renk üretimi (firma_id hash)
 const hashColor = (str) => {
@@ -597,7 +598,7 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading) return <div className="page-status">Yükleniyor...</div>;
+  if (loading) return <PageLoader />;
 
   // Enes Doğanay | 6 Nisan 2026: Arama + sıralama ile filtreleme
   const displayedFavorites = (() => {

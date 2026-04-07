@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { supabase } from './supabaseClient';
-import { isAdminEmail } from './adminAccess';
-import { resolveIsAdminUser } from './corporateApplicationsApi';
-import { getManagedCompanyId } from './companyManagementApi';
+import { useAuth } from './AuthContext';
 
 /**
  * SharedHeader Component - Reusable Header for All Pages
@@ -45,13 +42,10 @@ const SharedHeader = ({
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    // Enes Doğanay | 8 Nisan 2026: AuthContext'ten gelen global auth state kullanımı (her sayfada tekrar sorgu atılmaz)
+    const { authChecked, userProfile, isCurrentUserAdmin, managedCompanyId, managedCompanyName, unreadNotifCount, pendingQuoteCount, logout } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [userProfile, setUserProfile] = useState(null);
-    const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
-    const [managedCompanyId, setManagedCompanyId] = useState(null);
-    // Enes Doğanay | 6 Nisan 2026: Kurumsal kullanıcı için header'da firma adı gösterilir
-    const [managedCompanyName, setManagedCompanyName] = useState(null);
     const dropdownRef = useRef(null);
     // Enes Doğanay | 5 Nisan 2026: Search bar dışına tıklayınca öneri dropdown'ını kapatmak için ref
     const searchBarRef = useRef(null);
@@ -71,53 +65,9 @@ const SharedHeader = ({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Check user session and fetch profile
-    useEffect(() => {
-        const checkUserSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-
-            if (session?.user) {
-                setIsCurrentUserAdmin(await resolveIsAdminUser(session.user.email, isAdminEmail));
-
-                // Enes Doğanay | 6 Nisan 2026: Kurumsal ise firma adı çekilir
-                const companyId = await getManagedCompanyId();
-                setManagedCompanyId(companyId);
-                if (companyId) {
-                    const { data: firmData } = await supabase
-                        .from('firmalar')
-                        .select('firma_adi')
-                        .eq('firmaID', companyId)
-                        .single();
-                    setManagedCompanyName(firmData?.firma_adi || null);
-                } else {
-                    setManagedCompanyName(null);
-                }
-
-                const { data: profileData } = await supabase
-                    .from('profiles')
-                    .select('first_name, last_name')
-                    .eq('id', session.user.id)
-                    .single();
-
-                if (profileData) {
-                    setUserProfile(profileData);
-                } else {
-                    setUserProfile({ first_name: 'Profilime', last_name: 'Git' });
-                }
-            } else {
-                setUserProfile(null);
-                setIsCurrentUserAdmin(false);
-                setManagedCompanyId(null);
-                setManagedCompanyName(null);
-            }
-        };
-        checkUserSession();
-    }, []);
-
+    // Enes Doğanay | 8 Nisan 2026: Auth artık AuthContext üzerinden yönetiliyor, SharedHeader'da sorgu yok
     const handleLogout = async () => {
-        await supabase.auth.signOut();
-        setUserProfile(null);
-        setIsCurrentUserAdmin(false);
+        await logout();
         setIsDropdownOpen(false);
         setIsMobileMenuOpen(false);
         navigate('/');
@@ -227,12 +177,12 @@ const SharedHeader = ({
                                 {item.label}
                             </Link>
                         ))}
-                        {!userProfile && <Link to="/login">Giriş Yap</Link>}
+                        {authChecked && !userProfile && <Link to="/login">Giriş Yap</Link>}
                     </div>
 
                     {/* User Actions */}
                     <div className="shared-user-actions">
-                        {userProfile ? (
+                        {!authChecked ? null : userProfile ? (
                             <div
                                 className="shared-user-dropdown"
                                 ref={dropdownRef}
@@ -283,6 +233,7 @@ const SharedHeader = ({
                                                 <span className="shared-user-menu-label">
                                                     Teklif Yönetimi
                                                 </span>
+                                                {pendingQuoteCount > 0 && <span className="shared-menu-badge">{pendingQuoteCount}</span>}
                                             </button>
                                             <button
                                                 type="button"
@@ -297,6 +248,23 @@ const SharedHeader = ({
                                                 </span>
                                                 <span className="shared-user-menu-label">
                                                     Bildirimler
+                                                </span>
+                                                {unreadNotifCount > 0 && <span className="shared-menu-badge">{unreadNotifCount}</span>}
+                                            </button>
+                                            {/* Enes Doğanay | 8 Nisan 2026: Kurumsal dropdown'a Favorilerim eklendi */}
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/firma-profil?tab=favoriler');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    collections_bookmark
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Favorilerim
                                                 </span>
                                             </button>
                                             </>
@@ -353,6 +321,7 @@ const SharedHeader = ({
                                                     <span className="shared-user-menu-label">
                                                         Tekliflerim
                                                     </span>
+                                                    {pendingQuoteCount > 0 && <span className="shared-menu-badge">{pendingQuoteCount}</span>}
                                                 </button>
 
                                                 <button
@@ -385,6 +354,7 @@ const SharedHeader = ({
                                                     <span className="shared-user-menu-label">
                                                         Bildirimler
                                                     </span>
+                                                    {unreadNotifCount > 0 && <span className="shared-menu-badge">{unreadNotifCount}</span>}
                                                 </button>
                                             </>
                                         )}
@@ -428,8 +398,8 @@ const SharedHeader = ({
                             {item.label}
                         </Link>
                     ))}
-                    {!userProfile && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Giriş Yap</Link>}
-                    {!userProfile && <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="shared-mobile-register">Kayıt Ol</Link>}
+                    {authChecked && !userProfile && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Giriş Yap</Link>}
+                    {authChecked && !userProfile && <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="shared-mobile-register">Kayıt Ol</Link>}
                     {userProfile && (
                         <>
                             {managedCompanyId ? (

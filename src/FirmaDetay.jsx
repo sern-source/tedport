@@ -33,6 +33,7 @@ import { supabase } from './supabaseClient';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import { formatTenderDate, getTenderStatusMeta } from './tenderUtils';
 import { getManagedCompanyId } from './companyManagementApi';
+import PageLoader from './PageLoader';
 
 // ===== FİRMA DETAY SAYFASI =====
 // Güncelleme: Enes Doğanay | Tarih: 5 Nisan 2026
@@ -756,7 +757,7 @@ const SupplierProfile = () => {
     };
 
     // Enes Doğanay | 6 Nisan 2026: Inline style yerine CSS class kullanıldı
-    if (loading) return <div className="page-status"><span className="material-symbols-outlined page-status-icon spinning">progress_activity</span>Yükleniyor...</div>;
+    if (loading) return <PageLoader />;
     if (!firma) return <div className="page-status page-status-error"><span className="material-symbols-outlined page-status-icon">error</span>Firma bulunamadı</div>;
 
     const adresText = firma.adres || firma.il_ilce;
@@ -833,6 +834,16 @@ const SupplierProfile = () => {
                                             )}
                                         </h1>
                                         <p className="hero-meta">• {firma.category_name} • 📍 {firma.il_ilce}</p>
+                                        {/* Enes Doğanay | 7 Nisan 2026: Firma yöneticisi için düzenleme butonu hero alanına taşındı */}
+                                        {isCurrentUserCompanyManager && (
+                                            <button
+                                                className="firma-edit-hero-btn"
+                                                onClick={() => navigate('/firma-profil?tab=panel')}
+                                            >
+                                                <span className="material-symbols-outlined">edit</span>
+                                                Firma Bilgilerini Düzenle
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -842,20 +853,6 @@ const SupplierProfile = () => {
 
                 {/* MAIN CONTENT */}
                 <main className="container">
-                    {/* Enes Doğanay | 7 Nisan 2026: Yönetici de public görünümü görür, düzenleme /firma-profil sayfasında */}
-                    {isCurrentUserCompanyManager && (
-                        <div style={{ marginBottom: '16px' }}>
-                            <button
-                                className="teklif-iste-btn"
-                                onClick={() => navigate('/firma-profil?tab=panel')}
-                                style={{ background: 'linear-gradient(135deg, #0f172a, #1e40af)', border: 'none' }}
-                            >
-                                <span className="material-symbols-outlined" style={{ marginRight: '6px' }}>edit</span>
-                                Firma Bilgilerini Düzenle
-                            </button>
-                        </div>
-                    )}
-
                     <div className="content-grid">
                             {/* LEFT COLUMN */}
                             <div className="main-info">

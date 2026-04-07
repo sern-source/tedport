@@ -575,6 +575,33 @@ body {
   margin: 0.5rem 0;
 }
 
+/* Enes Doğanay | 7 Nisan 2026: Firma yöneticisi için hero alanındaki düzenleme butonu */
+.firma-edit-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.625rem;
+  padding: 7px 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary, #1d4ed8);
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.firma-edit-hero-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.firma-edit-hero-btn:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+
 /* Section Headings */
 .section-title {
   font-size: 1.5rem;

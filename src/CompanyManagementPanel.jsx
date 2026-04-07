@@ -173,9 +173,8 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
     // Enes Doğanay | 6 Nisan 2026: banner kaldırıldı
     const districtOptions = TURKEY_DISTRICTS[fields.city] || [];
 
-    // kaydet
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // Enes Doğanay | 7 Nisan 2026: form yerine div kullanıldığı için event parametresi kaldırıldı
+    const handleSubmit = async () => {
         setSaving(true);
         setFeedback({ type: '', msg: '' });
         try {
@@ -205,8 +204,8 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
     return (
         <section className="cmp-workspace">
 
-            {/* ── FORM ── */}
-            <form className="cmp-form" onSubmit={handleSubmit}>
+            {/* Enes Doğanay | 7 Nisan 2026: form yerine div kullanıldı, Chrome adres kaydetme popup'ını tamamen engellemek için */}
+            <div className="cmp-form">
 
                 {/* Genel Bilgiler */}
                 <div className="cmp-card">
@@ -272,11 +271,11 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                     <div className="cmp-grid cmp-grid--3">
                         <label className="cmp-field">
                             <span>Telefon</span>
-                            <input type="text" value={fields.telefon} onChange={e => set('telefon', e.target.value)} placeholder="0 (5XX) XXX XX XX" />
+                            <input type="text" name="cmp_t_x" value={fields.telefon} onChange={e => set('telefon', e.target.value)} placeholder="0 (5XX) XXX XX XX" autoComplete="one-time-code" />
                         </label>
                         <label className="cmp-field">
                             <span>E-posta</span>
-                            <input type="email" value={fields.eposta} onChange={e => set('eposta', e.target.value)} placeholder="iletisim@firma.com" />
+                            <input type="text" name="cmp_e_x" value={fields.eposta} onChange={e => set('eposta', e.target.value)} placeholder="iletisim@firma.com" autoComplete="one-time-code" />
                         </label>
                         <label className="cmp-field">
                             <span>İl</span>
@@ -294,7 +293,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                         </label>
                         <label className="cmp-field cmp-field--span2">
                             <span>Açık Adres</span>
-                            <input type="text" value={fields.adres} onChange={e => set('adres', e.target.value)} placeholder="Cadde, sokak, bina no, kat / daire" />
+                            <input type="text" name="cmp_a_x" value={fields.adres} onChange={e => set('adres', e.target.value)} placeholder="Cadde, sokak, bina no, kat / daire" autoComplete="one-time-code" />
                         </label>
                     </div>
                 </div>
@@ -436,13 +435,13 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
 
                 <div className="cmp-actions">
                     <p className="cmp-actions__hint">Değişiklikler kaydedildikten hemen sonra firma detay sayfanızda canlıya geçer.</p>
-                    <button type="submit" className="cmp-btn cmp-btn--save" disabled={saving}>
+                    <button type="button" className="cmp-btn cmp-btn--save" disabled={saving} onClick={handleSubmit}>
                         <span className="material-symbols-outlined">{saving ? 'progress_activity' : 'save'}</span>
                         {saving ? 'Kaydediliyor…' : 'Değişiklikleri Kaydet'}
                     </button>
                 </div>
 
-            </form>
+            </div>
         </section>
     );
 };
