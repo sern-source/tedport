@@ -4,7 +4,8 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 import PageLoader from './PageLoader';
 
-const Home2 = lazy(() => import('./Home2'));
+/* Enes Doğanay | 11 Nisan 2026: Home2 → Home olarak yeniden adlandırıldı */
+const Home = lazy(() => import('./Home'));
 const Firmalar = lazy(() => import('./Firmalar'));
 const FirmaDetay = lazy(() => import('./FirmaDetay'));
 const Login = lazy(() => import('./Login'));
@@ -23,8 +24,9 @@ export default function Router() {
     <Suspense fallback={<PageLoader />}>
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Home2 />} />
-        <Route path="/home2" element={<Home2 />} />
+        <Route path="/" element={<Home />} />
+        {/* Enes Doğanay | 11 Nisan 2026: Eski /home2 yolu geriye uyumluluk için korundu */}
+        <Route path="/home2" element={<Home />} />
         <Route path="/firmalar" element={<Firmalar />} />
         <Route path="/ihaleler" element={<Ihaleler />} />
         <Route path="/login" element={<Login />} />

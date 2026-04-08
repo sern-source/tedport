@@ -389,12 +389,93 @@ summary {
     padding: 0.65rem 0.85rem;
     gap: 0.65rem;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .supplier-card:hover {
     border-color: #d1d5db;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Kart sağ üst köşesindeki favori toggle butonu */
+/* Enes Doğanay | 11 Nisan 2026: FirmaDetay sayfasındaki altın→mavi renk şemasıyla uyumlu hale getirildi */
+.card-fav-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid #fbbf24;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.18);
+}
+
+.card-fav-btn .material-symbols-outlined {
+    font-size: 20px;
+    color: #d97706;
+    transition: color 0.2s, transform 0.25s;
+}
+
+.card-fav-btn:hover {
+    background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+    border-color: #f59e0b;
+    transform: scale(1.1);
+    box-shadow: 0 4px 14px rgba(251, 191, 36, 0.28);
+}
+
+.card-fav-btn:hover .material-symbols-outlined {
+    color: #b45309;
+}
+
+.card-fav-btn--active {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #60a5fa;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.18);
+}
+
+.card-fav-btn--active .material-symbols-outlined {
+    color: #2563eb;
+}
+
+.card-fav-btn--active:hover {
+    background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+    border-color: #3b82f6;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.28);
+}
+
+.card-fav-btn--active:hover .material-symbols-outlined {
+    color: #1e40af;
+}
+
+.card-fav-btn:active .material-symbols-outlined {
+    transform: scale(0.85);
+}
+
+/* Enes Doğanay | 11 Nisan 2026: Giriş yapılmamışsa favori butonu deaktif */
+.card-fav-btn:disabled {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+.card-fav-btn:disabled .material-symbols-outlined {
+    color: #94a3b8;
+}
+
+.card-fav-btn:disabled:hover {
+    transform: none;
+    background: #f1f5f9;
+    box-shadow: none;
 }
 
 @media (min-width: 768px) {
@@ -530,6 +611,20 @@ summary {
 .verified-icon {
     color: var(--primary);
     font-size: 16px;
+}
+
+/* Enes Doğanay | 11 Nisan 2026: Onaylı Firma badge inline - ikon + yazı yan yana */
+.verified-badge-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    vertical-align: middle;
+}
+
+.verified-text {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--primary);
 }
 
 @media (min-width: 640px) {
@@ -915,6 +1010,45 @@ summary {
     text-align: center;
 }
 
+/* Enes Doğanay | 11 Nisan 2026: Giriş yapmamış kullanıcı için inline login prompt (FirmaDetay ile tutarlı) */
+.contact-gated-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    text-align: center;
+}
+
+.contact-gated-lock {
+    font-size: 28px;
+    color: #94a3b8;
+}
+
+.contact-gated-text {
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.contact-gated-btn {
+    width: 100%;
+    padding: 8px 16px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.contact-gated-btn:hover {
+    background: var(--primary-hover, #106ac5);
+}
+
 .filter-show-more-btn:hover {
     background: #e2e8f0;
 }
@@ -1239,8 +1373,67 @@ summary {
 /* Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişime geç butonu (kart ile aynı btn-outline, küçük) */
 .firmalar-list-col--action {
   display: flex;
+  align-items: center;
+  gap: 8px;
   justify-content: flex-end;
   overflow: visible;
+}
+
+/* Enes Doğanay | 11 Nisan 2026: Liste görünümü favori butonu — FirmaDetay ile uyumlu altın→mavi */
+.list-fav-btn {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1.5px solid #fbbf24;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d97706;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(251, 191, 36, 0.15);
+}
+
+.list-fav-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.list-fav-btn:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+  border-color: #f59e0b;
+  color: #b45309;
+  transform: scale(1.08);
+}
+
+.list-fav-btn--active {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #60a5fa;
+  color: #2563eb;
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.15);
+}
+
+.list-fav-btn--active:hover {
+  background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+/* Enes Doğanay | 11 Nisan 2026: Giriş yapılmamışsa liste favori butonu deaktif */
+.list-fav-btn:disabled {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+  color: #94a3b8;
+}
+
+.list-fav-btn:disabled:hover {
+  transform: none;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e2e8f0;
 }
 
 .firmalar-list-contact-btn {

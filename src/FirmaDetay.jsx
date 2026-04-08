@@ -369,7 +369,7 @@ const SupplierProfile = () => {
         const [firmaResult, tenderResult] = await Promise.all([
             supabase
                 .from('firmalar')
-                .select('firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best')
+                .select('firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best, onayli_hesap')
                 .eq('firmaID', id)
                 .single(),
             supabase
@@ -382,14 +382,9 @@ const SupplierProfile = () => {
 
         if (!firmaResult.error) {
             setFirma(firmaResult.data);
+            // Enes Doğanay | 8 Nisan 2026: onayli_hesap doğrudan firmalar tablosundan okunuyor
+            setIsVerified(firmaResult.data?.onayli_hesap === true);
         }
-
-        // Enes Doğanay | 7 Nisan 2026: Firma verified = kurumsal yöneticisi var mı kontrol
-        const { count: managerCount } = await supabase
-            .from('kurumsal_firma_yoneticileri')
-            .select('id', { count: 'exact', head: true })
-            .eq('firma_id', id);
-        setIsVerified(managerCount > 0);
 
         if (tenderResult.error) {
             if (isMissingRelationError(tenderResult.error)) {
@@ -805,8 +800,8 @@ const SupplierProfile = () => {
                 <section className="profile-hero">
                     <div className="container">
                         <div className="hero-flex">
-                            {/* Enes Doğanay | 6 Nisan 2026: logo_url varsa gerçek logo gösterilir, yoksa baş harf avatar */}
-                            {firma.logo_url ? (
+                            {/* Enes Doğanay | 8 Nisan 2026: Sadece firma-logolari bucket'inden yüklenen logolar kullanılır, eski sahte avatarlar elenir */}
+                            {firma.logo_url?.includes('firma-logolari') ? (
                                 <img
                                     src={firma.logo_url}
                                     alt={firma.firma_adi}
@@ -826,10 +821,11 @@ const SupplierProfile = () => {
                                         <h1 className="company-name">
                                             {firma.firma_adi}
                                             {/* Enes Doğanay | 7 Nisan 2026: Sadece kurumsal yöneticisi olan verified firmalar badge gösterir */}
+                                            {/* Enes Doğanay | 11 Nisan 2026: 'Onaylı Firma' yazısı eklendi, tüm sayfalarla tutarlı */}
                                             {isVerified && (
                                                 <span className="verified-badge">
                                                     <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span>
-                                                    Doğrulanmış
+                                                    Onaylı Firma
                                                 </span>
                                             )}
                                         </h1>
@@ -1055,13 +1051,13 @@ const SupplierProfile = () => {
                                                 </div>
                                             )}
 
-                                            {/* Enes Doğanay | 6 Nisan 2026: Favori butonu sadeleştirildi, kalp kaldırıldı ve tek satırlı kurumsal CTA yapısı korundu */}
+                                            {/* Enes Doğanay | 8 Nisan 2026: Favori butonu canlandırıldı — yıldız ikonlu, dikkat çekici */}
                                             <button
                                                 onClick={toggleFavorite}
                                                 className={`btn-favorite ${isFavorited ? 'btn-favorite--active' : ''}`}
                                             >
                                                 <span className="material-symbols-outlined btn-favorite-icon">
-                                                    {isFavorited ? 'bookmark_remove' : 'playlist_add'}
+                                                    {isFavorited ? 'bookmark_added' : 'bookmark_add'}
                                                 </span>
                                                 <span>
                                                     {isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}

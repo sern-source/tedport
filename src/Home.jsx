@@ -1,319 +1,342 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
+import SharedHeader from './SharedHeader';
+import './SharedHeader.css';
 import { supabase } from './supabaseClient';
-import { NavLink } from 'react-router-dom';
+/* Enes Doğanay | 6 Nisan 2026: Kullanılmayan NavLink import kaldırıldı */
+import { useNavigate } from 'react-router-dom';
 
-const Home = () => {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+/**
+ * SupplierConnect Component - Home Page / Landing Page
+ * 
+ * Mobile Responsive Design & Hamburger Menu Implementation
+ * Date: April 4, 2026
+ * Author: Enes Doğanay
+ * 
+ * This component implements a responsive header with hamburger menu for mobile devices,
+ * user authentication dropdown, and search functionality. The layout automatically
+ * adapts between mobile (hamburger menu) and desktop (full navigation) views.
+ */
 
+const SupplierConnect = () => {
+    const [searchTerm, setSearchTerm] = useState('');
     const [topSuppliers, setTopSuppliers] = useState([]);
+    const navigate = useNavigate();
 
+    const handleSearch = () => {
+        if (searchTerm.trim()) {
+            navigate(`/firmalar?search=${encodeURIComponent(searchTerm.trim())}`);
+        } else {
+            navigate(`/firmalar`);
+        }
+    };
 
-
+    // Enes Doğanay | 8 Nisan 2026: Verified firmalar öncelikli, kalan slotlar best=true (iso1000) ile doldurulur
     useEffect(() => {
         const fetchRandomSuppliers = async () => {
-            // 1️⃣ toplam firma sayısı
-            const { count, error: countError } = await supabase
+            // Enes Doğanay | 8 Nisan 2026: onayli_hesap=true olan firmaları doğrudan çek
+            const { data: verifiedData } = await supabase
                 .from('firmalar')
-                .select('*', { count: 'exact', head: true });
+                .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri')
+                .eq('onayli_hesap', true);
+            const verifiedFirmalar = (verifiedData || []).map(f => ({ ...f, _isVerified: true }));
 
-            if (countError || !count || count < 4) {
-                console.error('Firma sayısı alınamadı');
-                return;
+            // Enes Doğanay | 8 Nisan 2026: Kalan slotları best=true firmalardan rastgele doldur
+            const remainingSlots = 4 - Math.min(verifiedFirmalar.length, 4);
+            let bestPool = [];
+            if (remainingSlots > 0) {
+                const excludeIds = verifiedFirmalar.map(f => f.firmaID);
+                let q = supabase
+                    .from('firmalar')
+                    .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri')
+                    .eq('best', true)
+                    .eq('onayli_hesap', false);
+                if (excludeIds.length > 0) {
+                    q = q.not('firmaID', 'in', `(${excludeIds.join(',')})`);
+                }
+                const { data } = await q;
+                bestPool = (data || []).map(f => ({ ...f, _isVerified: false }));
             }
 
-            // 2️⃣ rastgele offset
-            const randomOffset = Math.floor(Math.random() * (count - 4));
-
-            // 3️⃣ rastgele 4 firma çek
-            const { data, error } = await supabase
-                .from('firmalar')
-                .select('*')
-                .range(randomOffset, randomOffset + 3);
-
-            if (error) {
-                console.error(error);
-            } else {
-                setTopSuppliers(data);
+            // Fisher-Yates shuffle
+            for (let i = bestPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [bestPool[i], bestPool[j]] = [bestPool[j], bestPool[i]];
             }
+
+            // Verified önce, kalan slotları random best ile doldur
+            const result = [...verifiedFirmalar.slice(0, 4), ...bestPool.slice(0, remainingSlots)];
+            setTopSuppliers(result.slice(0, 4));
         };
 
         fetchRandomSuppliers();
     }, []);
 
-
     return (
-        <>
-            {/* HEADER */}
-            <header className="header">
-                <div className="header-container2">
-                    <div className="logo-area">
-                        <span className="material-symbols-outlined logo-icon icon-filled">inventory_2</span>
-                        <h2 className="logo-text">Tedport</h2>
-                    </div>
-
-                    <div className={`nav-desktop ${isMobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-                        <NavLink to="/kategoriler" className="nav-link">Kategorilere Göz At</NavLink>
-                        <NavLink to="/firmalar" className="nav-link">Firmalar</NavLink>
-                        <NavLink to="/tedarikciler" className="nav-link">Tedarikçiler İçin</NavLink>
-                        <NavLink to="/login" className="nav-link">Giriş Yap</NavLink>
-                        <button className="btn-primary">Kayıt Ol</button>
-                    </div>
-
-                    <button
-                        className="mobile-menu-btn"
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    >
-                        <span className="material-symbols-outlined">menu</span>
-                    </button>
-                </div>
-            </header>
+        <div className="supplier-connect-wrapper">
+            <SharedHeader />
 
             <main>
-                {/* HERO SECTION */}
-                <section className="hero-section">
-                    <div className="hero-wrapper">
-                        <div className="hero-banner">
-                            <div className="hero-content">
-                                <h1 className="hero-title">Doğru Tedarikçiyi Hemen Bulun</h1>
-                                <p className="hero-subtitle">
-                                    Dünya çapındaki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.
-                                </p>
+                {/* Hero Section */}
+                <section className="sc-hero-section">
+                    <div className="container">
+                        <div className="sc-hero-box">
+                            <div style={{ zIndex: 10 }}>
+                                <h1 className="sc-hero-title">Doğru Tedarikçiyi Hemen Bulun</h1>
+                                {/* Enes Doğanay | 6 Nisan 2026: Türkiye odaklı alt başlık */}
+                                <p className="sc-hero-subtitle">Türkiye genelindeki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.</p>
                             </div>
 
-                            <div className="search-box">
-                                <div className="search-input-group">
-                                    <span className="material-symbols-outlined search-icon">search</span>
-                                    <input className="search-input" type="text" placeholder="Ürün veya firma ara..." />
+                            <div className="sc-search-container">
+                                <div className="sc-search-box">
+                                    <div className="sc-search-input-group">
+                                        <span className="material-symbols-outlined" style={{ color: '#94a3b8', marginRight: '12px' }}>search</span>
+                                        <input
+                                            type="text"
+                                            placeholder="Ürün veya firma ara..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                        />
+                                    </div>
+
+                                    <button className="sc-search-btn" onClick={handleSearch}>Ara</button>
                                 </div>
 
-                                <button className="search-btn">
-                                    Ara
-                                </button>
-                            </div>
-
-                            <div className="popular-tags">
-                                <span>Popüler:</span>
-                                <a href="#">Çelik Borular</a>
-                                <a href="#">Pamuklu Kumaş</a>
-                                <a href="#">Ambalaj</a>
-                                <a href="#">Elektronik</a>
+                                <div className="sc-popular-tags">
+                                    <span>Popüler:</span>
+                                    <a href="/firmalar?search=çelik">Çelik Borular</a>
+                                    <a href="/firmalar?search=pamuk">Pamuklu Kumaş</a>
+                                    <a href="/firmalar?search=ambalaj">Ambalaj</a>
+                                    <a href="/firmalar?search=elektronik">Elektronik</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* STATS SECTION */}
-                <section className="stats-section">
-                    <div className="stats-container">
-                        <div className="stat-item">
-                            <span className="stat-number">150k+</span>
-                            <span className="stat-label">Onaylı Tedarikçi</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-number">2M+</span>
-                            <span className="stat-label">Listelenen Ürün</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-number">180+</span>
-                            <span className="stat-label">Hizmet Verilen Ülke</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-number">4.8/5</span>
-                            <span className="stat-label">Kullanıcı Memnuniyeti</span>
+                {/* Stats Section */}
+                {/* Enes Doğanay | 5 Nisan 2026: "Hizmet Verilen Ülke" ve "Kullanıcı Memnuniyeti" kaldırıldı.
+                 * Türkiye odaklı platform olduğu için "81 İl" ve puan sistemi olmadığı için "50+ Sektör Kategorisi" eklendi. */}
+                <section className="sc-stats">
+                    <div className="container">
+                        <div className="sc-stats-grid">
+                            <div className="sc-stat-item">
+                                <span className="sc-stat-num">150k+</span>
+                                <span className="sc-stat-label">Onaylı Tedarikçi</span>
+                            </div>
+                            <div className="sc-stat-item">
+                                <span className="sc-stat-num">2M+</span>
+                                <span className="sc-stat-label">Listelenen Ürün</span>
+                            </div>
+                            <div className="sc-stat-item">
+                                <span className="sc-stat-num">81 İl</span>
+                                <span className="sc-stat-label">Türkiye Genelinde Hizmet</span>
+                            </div>
+                            <div className="sc-stat-item">
+                                <span className="sc-stat-num">50+</span>
+                                <span className="sc-stat-label">Sektör Kategorisi</span>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                {/* CATEGORIES SECTION */}
-                <section className="categories-bg">
-                    <div className="section-wrapper">
-                        <div className="section-header">
+                {/* Categories Section */}
+                <section className="sc-categories">
+                    <div className="container">
+                        <div className="sc-section-header">
                             <div>
-                                <h2 className="section-title">Öne Çıkan Kategoriler</h2>
-                                <p className="section-desc">Kapsamlı endüstriyel kategorilerimizi keşfedin.</p>
+                                <h2 className="sc-section-title">Öne Çıkan Kategoriler</h2>
+                                <p className="sc-section-desc">Kapsamlı endüstriyel kategorilerimizi keşfedin.</p>
                             </div>
-                            <a href="#" className="view-all-link">
-                                Tüm kategorileri gör <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_forward</span>
+                            <a href="/firmalar" className="sc-view-all">
+                                Tüm kategorileri gör <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
                             </a>
                         </div>
 
-                        <div className="categories-grid">
-                            {/* Category Items */}
-                            {[
-                                { icon: 'checkroom', title: 'Tekstil', desc: 'Kumaş & Hazır Giyim' },
-                                { icon: 'restaurant', title: 'Gıda', desc: 'İçerik & İşlenmiş' },
-                                { icon: 'build', title: 'Makine', desc: 'Ekipman & Aletler' },
-                                { icon: 'devices', title: 'Teknoloji', desc: 'Tüketici & Parçalar' },
-                                { icon: 'local_shipping', title: 'Lojistik', desc: 'Nakliye & Kargo' },
-                                { icon: 'science', title: 'Kimya', desc: 'Lab & Endüstriyel' },
-                            ].map((cat, index) => (
-                                <a key={index} href="#" className="category-card">
-                                    <div className="icon-circle">
-                                        <span className="material-symbols-outlined">{cat.icon}</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="cat-title">{cat.title}</h3>
-                                        <p className="cat-desc">{cat.desc}</p>
-                                    </div>
-                                </a>
-                            ))}
+                        <div className="sc-cat-grid">
+                            {/* Kategori 1 */}
+                            <a href="/firmalar?search=tekstil" className="sc-cat-card">
+                                <div className="sc-cat-icon"><span className="material-symbols-outlined">checkroom</span></div>
+                                <div>
+                                    <h3 className="sc-cat-name">Tekstil</h3>
+                                    <p className="sc-cat-sub">Kumaş & Hazır Giyim</p>
+                                </div>
+                            </a>
+                            {/* Kategori 2 */}
+                            <a href="/firmalar?search=gıda" className="sc-cat-card">
+                                <div className="sc-cat-icon"><span className="material-symbols-outlined">restaurant</span></div>
+                                <div>
+                                    <h3 className="sc-cat-name">Gıda</h3>
+                                    <p className="sc-cat-sub">İçerik & İşlenmiş</p>
+                                </div>
+                            </a>
+                            {/* Kategori 3 */}
+                            <a href="/firmalar?search=makine" className="sc-cat-card">
+                                <div className="sc-cat-icon"><span className="material-symbols-outlined">build</span></div>
+                                <div>
+                                    <h3 className="sc-cat-name">Makine</h3>
+                                    <p className="sc-cat-sub">Ekipman & Aletler</p>
+                                </div>
+                            </a>
+                            {/* Kategori 4 */}
+                            <a href="/firmalar?search=teknoloji" className="sc-cat-card">
+                                <div className="sc-cat-icon"><span className="material-symbols-outlined">devices</span></div>
+                                <div>
+                                    <h3 className="sc-cat-name">Teknoloji</h3>
+                                    <p className="sc-cat-sub">Tüketici & Parçalar</p>
+                                </div>
+                            </a>
+                            {/* Kategori 5 */}
+                            <a href="/firmalar?search=lojistik" className="sc-cat-card">
+                                <div className="sc-cat-icon"><span className="material-symbols-outlined">local_shipping</span></div>
+                                <div>
+                                    <h3 className="sc-cat-name">Lojistik</h3>
+                                    <p className="sc-cat-sub">Nakliye & Kargo</p>
+                                </div>
+                            </a>
+                            {/* Kategori 6 */}
+                            <a href="/firmalar?search=kimya" className="sc-cat-card">
+                                <div className="sc-cat-icon"><span className="material-symbols-outlined">science</span></div>
+                                <div>
+                                    <h3 className="sc-cat-name">Kimya</h3>
+                                    <p className="sc-cat-sub">Lab & Endüstriyel</p>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </section>
 
-                {/* TOP SUPPLIERS SECTION */}
-                <section className="suppliers-section">
-                    <div className="section-wrapper">
-                        <h2 className="section-title" style={{ marginBottom: '32px' }}>En İyi Tedarikçiler</h2>
-                        <div className="suppliers-grid">
+                {/* Top Suppliers Section */}
+                <section className="sc-suppliers">
+                    <div className="container">
+                        <h2 className="sc-section-title" style={{ marginBottom: '32px' }}>Örnek Tedarikçiler</h2>
+                        <div className="sc-sup-grid">
 
-                            {topSuppliers.map((firma) => (
-                                <div key={firma.firmaID} className="supplier-card">
-
-                                    <div className="card-header">
-                                        <div
-                                            className="company-logo-box"
-                                            style={{
-                                                background: '#eef2ff',
-                                                color: '#4f46e5',
-                                                border: '1px solid #e0e7ff'
-                                            }}
-                                        >
-                                            {firma.firma_adi?.charAt(0)}
-                                        </div>
-
-                                        {true && (
-                                            <div className="verified-badge">
-                                                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>
-                                                    verified
-                                                </span>
-                                                Onaylı
-                                            </div>
+                            {/* Tedarikçiler */}
+                            {/* Enes Doğanay | 5 Nisan 2026: key olarak index kullanıldı, rastgele çekimde tekrar eden firmaID çakışmasını önler */}
+                            {/* Enes Doğanay | 11 Nisan 2026: Logo, mavi onaylı badge ve ürün kategorileri eklendi */}
+                            {topSuppliers.map((firma, index) => {
+                                const validLogo = firma.logo_url?.includes('firma-logolari') ? firma.logo_url : null;
+                                const tags = (() => {
+                                    let raw = firma.urun_kategorileri;
+                                    if (!raw) return [];
+                                    if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch { return []; } }
+                                    if (!Array.isArray(raw)) return [];
+                                    return raw.map(k => k.ana_kategori).filter(Boolean).slice(0, 3);
+                                })();
+                                return (
+                                <div className="sc-sup-card" key={`supplier-${index}`}>
+                                    <div className="sc-sup-header">
+                                        {validLogo ? (
+                                            <img className="sc-sup-avatar" src={validLogo} alt={firma.firma_adi} style={{ objectFit: 'contain', background: '#fff', border: '1px solid #e0e7ff' }} />
+                                        ) : (
+                                            <div className="sc-sup-avatar" style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>{firma.firma_adi?.charAt(0)}</div>
+                                        )}
+                                        {firma._isVerified && (
+                                            <div className="sc-sup-verified"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span> Onaylı Firma</div>
                                         )}
                                     </div>
-
                                     <div>
-                                        <h3 className="supplier-name">{firma.firma_adi}</h3>
-
-                                        <div className="supplier-loc">
-                                            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-                                                location_on
-                                            </span>
-                                            {firma.il_ilce}
-                                        </div>
+                                        {/* Enes Doğanay | 11 Nisan 2026: Firma ismine tıklayarak detaya gitme, Görüntüle butonu kaldırıldı */}
+                                        <h3 className="sc-sup-name" onClick={() => navigate(`/firmadetay/${firma.firmaID}`)} style={{ cursor: 'pointer' }}>{firma.firma_adi}</h3>
+                                        <div className="sc-sup-location"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>location_on</span> {firma.il_ilce}</div>
                                     </div>
-
-                                    <div className="rating-row">
-                                        <div className="stars">
-                                            {[...Array(5)].map((_, i) => (
-                                                <span
-                                                    key={i}
-                                                    className="material-symbols-outlined icon-filled"
-                                                    style={{ color: i < Math.round(firma.puan || 4) ? '#facc15' : '#cbd5e1' }}
-                                                >
-                                                    star
-                                                </span>
-                                            ))}
-                                        </div>
-                                        <span className="rating-number">{firma.puan || '4.5'}</span>
-                                        <span className="review-count">({firma.yorum_sayisi || 0})</span>
+                                    <div className="sc-sup-tags">
+                                        {tags.length > 0 ? tags.map((tag, i) => (
+                                            <span className="sc-tag" key={i}>{tag}</span>
+                                        )) : (
+                                            <span className="sc-tag">{firma.ana_sektor}</span>
+                                        )}
                                     </div>
-
-                                    <div className="tags-row">
-
-                                        <span className="tag-badge">{firma.ana_sektor}</span>
-                                    </div>
-
-                                    <button className="btn-outline">
-                                        Tedarikçiyle İletişime Geç
-                                    </button>
                                 </div>
-                            ))}
-
+                                );
+                            })}
 
                         </div>
                     </div>
                 </section>
 
-                {/* CTA SECTION */}
-                <section className="cta-section">
-                    <div className="cta-container">
-                        <h2 className="cta-title">İşinizi Büyütmeye Hazır mısınız?</h2>
-                        <p className="cta-desc">
-                            Her gün uluslararası alıcılarla bağlantı kuran binlerce tedarikçiye katılın. Ücretsiz profilinizi şimdi oluşturun.
-                        </p>
-                        <div className="cta-buttons">
-                            <button className="btn-white">Tedarikçi Olarak Katıl</button>
-                            <button className="btn-transparent">Ben Bir Alıcıyım</button>
+                {/* CTA Section */}
+                <section className="sc-cta">
+                    <div className="container">
+                        <h2>İşinizi Büyütmeye Hazır mısınız?</h2>
+                        <p>Her gün uluslararası alıcılarla bağlantı kuran binlerce tedarikçiye katılın. Ücretsiz profilinizi şimdi oluşturun.</p>
+                        <div className="sc-cta-buttons">
+                            <button className="sc-btn-white" onClick={() => navigate('/register')}>
+                                Tedarikçi Olarak Katıl
+                            </button>
+                            <button className="sc-btn-transparent" onClick={() => navigate('/firmalar')}>
+                                Ürünleri Keşfet
+                            </button>
                         </div>
                     </div>
                 </section>
             </main>
 
-            {/* FOOTER */}
-            <footer className="footer">
-                <div className="footer-container">
-                    <div className="footer-grid">
-                        <div className="footer-about">
-                            <div className="logo-area" style={{ marginBottom: '16px' }}>
-                                <span className="material-symbols-outlined logo-icon icon-filled">inventory_2</span>
-                                <span className="logo-text">Tedport</span>
+            {/* Footer */}
+            <footer className="sc-footer">
+                <div className="container">
+                    <div className="sc-footer-grid">
+                        <div className="sc-footer-brand">
+                            <div className="sc-logo-area" style={{ display: 'flex', alignItems: 'center' }}>
+                                {/* LOGO BURAYA EKLENDİ */}
+                                <img
+                                    src="/tedport-logo.jpg"
+                                    alt="Tedport Logo"
+                                    style={{ height: '60px', objectFit: 'contain' }}
+                                />
                             </div>
-                            <p>Küresel ticaret için lider B2B pazaryeri. Doğrulanmış tedarikçileri dünya genelindeki alıcılarla buluşturuyoruz.</p>
-                            <div className="social-links">
-                                <a href="#"><span className="material-symbols-outlined">public</span></a>
-                                <a href="#"><span className="material-symbols-outlined">mail</span></a>
-                                <a href="#"><span className="material-symbols-outlined">call</span></a>
+                            {/* Enes Doğanay | 6 Nisan 2026: Türkiye odaklı footer açıklaması */}
+                            <p>Türkiye'nin lider B2B tedarikçi portalı. Doğrulanmış tedarikçileri Türkiye genelindeki alıcılarla buluşturuyoruz.</p>
+                            <div className="sc-socials">
+                                <a href="#web"><span className="material-symbols-outlined">public</span></a>
+                                <a href="#mail"><span className="material-symbols-outlined">mail</span></a>
+                                <a href="#phone"><span className="material-symbols-outlined">call</span></a>
                             </div>
-
-
-
                         </div>
 
-                        <div className="footer-col">
+                        <div>
                             <h4>Alıcılar İçin</h4>
-                            <ul className="footer-links">
-                                <li><a href="#">Kategorilere Göz At</a></li>
-                                <li><a href="#">Teklif İste</a></li>
-                                <li><a href="#">Doğrulanmış Tedarikçiler</a></li>
-                                <li><a href="#">Alıcı Başarı Hikayeleri</a></li>
+                            <ul>
+                                <li><a href="#link">Teklif İste</a></li>
+                                <li><a href="#link">Doğrulanmış Tedarikçiler</a></li>
+                                <li><a href="#link">Alıcı Başarı Hikayeleri</a></li>
                             </ul>
                         </div>
 
-                        <div className="footer-col">
+                        <div>
                             <h4>Tedarikçiler İçin</h4>
-                            <ul className="footer-links">
-                                <li><a href="#">Tedport'te Satış Yap</a></li>
-                                <li><a href="#">Üyelik Planları</a></li>
-                                <li><a href="#">Reklam Çözümleri</a></li>
-                                <li><a href="#">Tedarikçi Eğitim Merkezi</a></li>
+                            <ul>
+                                <li><a href="#link">Üyelik Planları</a></li>
+                                <li><a href="#link">Reklam Çözümleri</a></li>
+                                <li><a href="#link">Tedarikçi Eğitim Merkezi</a></li>
                             </ul>
                         </div>
 
-                        <div className="footer-col">
+                        <div>
                             <h4>Şirket</h4>
-                            <ul className="footer-links">
-                                <li><a href="#">Hakkımızda</a></li>
-                                <li><a href="#">Kariyer</a></li>
-                                <li><a href="#">Basın</a></li>
-                                <li><a href="#">Destek ile İletişime Geç</a></li>
+                            <ul>
+                                {/* Enes Doğanay | 6 Nisan 2026: Footer linkleri gerçek sayfalara yönlendiriliyor */}
+                                <li><a href="/hakkimizda">Hakkımızda</a></li>
+                                <li><a href="#link">Kariyer</a></li>
+                                <li><a href="/iletisim">Destek ile İletişime Geç</a></li>
                             </ul>
                         </div>
                     </div>
 
-                    <div className="footer-bottom">
-                        <p>© 2025 Tedport. Tüm hakları saklıdır.</p>
-                        <div className="footer-legal">
-                            <a href="#">Gizlilik Politikası</a>
-                            <a href="#">Hizmet Şartları</a>
-                            <a href="#">Çerez Ayarları</a>
+                    <div className="sc-footer-bottom">
+                        <p>© 2026 Tedport. Tüm hakları saklıdır.</p>
+                        <div className="sc-legal-links">
+                            <a href="#privacy">Gizlilik Politikası</a>
+                            <a href="#terms">Hizmet Şartları</a>
+                            <a href="#cookies">Çerez Ayarları</a>
                         </div>
                     </div>
                 </div>
             </footer>
-        </>
+        </div>
     );
 };
 
-export default Home;
+export default SupplierConnect;

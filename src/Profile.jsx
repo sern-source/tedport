@@ -5,6 +5,7 @@ import "./SharedHeader.css";
 import { supabase } from "./supabaseClient";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getManagedCompanyId } from './companyManagementApi';
+import { useAuth } from './AuthContext';
 import PageLoader from './PageLoader';
 
 // Enes Doğanay | 6 Nisan 2026: Deterministik renk üretimi (firma_id hash)
@@ -320,6 +321,9 @@ const ProfilePage = () => {
     }
   };
 
+  // Enes Doğanay | 8 Nisan 2026: Sağ üst menü badge'lerini güncellemek için AuthContext refreshCounts
+  const { refreshCounts } = useAuth();
+
   // Enes Doğanay | 6 Nisan 2026: Profilde tekil bildirimler okunduya alinabilir
   const handleMarkNotificationRead = async (notificationId) => {
     const { error } = await supabase.from('bildirimler').update({ is_read: true }).eq('id', notificationId).eq('user_id', user.id);
@@ -329,6 +333,7 @@ const ProfilePage = () => {
     }
 
     setNotifications((prev) => prev.map((notification) => notification.id === notificationId ? { ...notification, is_read: true } : notification));
+    refreshCounts();
   };
 
   // Enes Doğanay | 6 Nisan 2026: Bildirim merkezi icin tum bildirimler tek tikla okundu yapilabilir
@@ -344,6 +349,7 @@ const ProfilePage = () => {
     }
 
     setNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })));
+    refreshCounts();
   };
 
   // Enes Doğanay | 7 Nisan 2026: Teklif chatini aç — mesajları çek
@@ -641,7 +647,14 @@ const ProfilePage = () => {
           {/* SIDEBAR */}
           <aside className="sidebar">
             <div className="sidebar-user-card">
-              <div className="sidebar-avatar" style={{ backgroundImage: `url(${profile?.avatar || "https://i.pravatar.cc/150"})` }} />
+              {/* Enes Doğanay | 8 Nisan 2026: Fotoğraf yoksa baş harf placeholder göster */}
+              {profile?.avatar ? (
+                <div className="sidebar-avatar" style={{ backgroundImage: `url(${profile.avatar})` }} />
+              ) : (
+                <div className="sidebar-avatar sidebar-avatar--no-photo">
+                  <span className="material-symbols-outlined">person</span>
+                </div>
+              )}
               <div>
                 <div className="sidebar-user-name">{`${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || "Kullanıcı"}</div>
                 <div className="sidebar-user-company">{profile?.company_name || "Şirket Yok"}</div>
@@ -749,7 +762,14 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="profile-section">
-                  <div className="avatar-large" style={{ backgroundImage: `url(${profile?.avatar || "https://i.pravatar.cc/300"})` }} />
+                  {/* Enes Doğanay | 8 Nisan 2026: Fotoğraf yoksa büyük placeholder göster */}
+                  {profile?.avatar ? (
+                    <div className="avatar-large" style={{ backgroundImage: `url(${profile.avatar})` }} />
+                  ) : (
+                    <div className="avatar-large avatar-large--no-photo">
+                      <span className="material-symbols-outlined">person</span>
+                    </div>
+                  )}
                   <div style={{ width: '100%' }}>
                     <h3 className="profile-name">{`${profile?.first_name || ""}${profile?.last_name ? " " + profile.last_name : ""}`.trim() || "İsimsiz Kullanıcı"}</h3>
                     <p className="profile-company">{profile?.company_name || "Şirket yok"}</p>

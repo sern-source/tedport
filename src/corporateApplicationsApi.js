@@ -1,19 +1,34 @@
 import { supabase, supabaseAnonKey, supabaseUrl } from './supabaseClient';
 
 // Enes Doğanay | 6 Nisan 2026: Frontend ve server payload'lari ayni alan adlariyla eslenir
+// Enes Doğanay | 8 Nisan 2026: selectedFirmaId varsa metadata.requested_firma_id olarak eklenir
+// Enes Doğanay | 8 Nisan 2026: companyName kaldırıldı (listedCompanyName ile aynı), companyPhone eklendi
 const mapFormToDatabasePayload = (formData) => ({
   applicant_first_name: String(formData.applicantFirstName || '').trim(),
   applicant_last_name: String(formData.applicantLastName || '').trim(),
   applicant_title: String(formData.applicantTitle || '').trim() || null,
-  company_name: String(formData.companyName || '').trim(),
+  company_name: String(formData.listedCompanyName || '').trim(),
   listed_company_name: String(formData.listedCompanyName || '').trim() || null,
   website_url: String(formData.websiteUrl || '').trim() || null,
   corporate_email: String(formData.corporateEmail || '').trim().toLowerCase(),
   phone: String(formData.phone || '').trim(),
   tax_office: String(formData.taxOffice || '').trim() || null,
   tax_number: String(formData.taxNumber || '').trim() || null,
-  company_address: String(formData.companyAddress || '').trim() || null,
-  verification_note: String(formData.verificationNote || '').trim() || null
+// Enes Doğanay | 8 Nisan 2026: companyAddress yerine companyIl/companyIlce/companyOpenAddress birleştirilir
+  company_address: [
+    formData.companyIl,
+    formData.companyIlce,
+    formData.companyOpenAddress
+  ].map(v => String(v || '').trim()).filter(Boolean).join(', ') || null,
+  verification_note: String(formData.verificationNote || '').trim() || null,
+  ...(formData.selectedFirmaId || formData.companyPhone || formData.taxDocumentUrl || formData.companyIl ? {
+    metadata: {
+      ...(formData.selectedFirmaId ? { requested_firma_id: formData.selectedFirmaId } : {}),
+      ...(formData.companyPhone ? { company_phone: String(formData.companyPhone).trim() } : {}),
+      ...(formData.taxDocumentUrl ? { tax_document_url: formData.taxDocumentUrl } : {}),
+      ...(formData.companyIl ? { company_il: formData.companyIl, company_ilce: formData.companyIlce || '', company_open_address: formData.companyOpenAddress || '' } : {})
+    }
+  } : {})
 });
 
 const getFunctionsErrorMessage = (error, fallbackMessage) => {

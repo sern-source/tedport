@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { getManagedCompanyId } from './companyManagementApi';
+import { useAuth } from './AuthContext';
 import CompanyManagementPanel from './CompanyManagementPanel';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
@@ -166,6 +167,8 @@ const FirmaProfil = () => {
         if (!error) {
             setIncomingQuotes(prev => prev.map(q => q.id === quoteId ? { ...q, durum: newStatus } : q));
             if (activeQuoteChat?.id === quoteId) setActiveQuoteChat(prev => prev ? { ...prev, durum: newStatus } : null);
+            // Enes Doğanay | 8 Nisan 2026: Sağ üst menüdeki teklif badge'ini güncelle
+            refreshCounts();
         }
     };
 
@@ -201,10 +204,14 @@ const FirmaProfil = () => {
         setChatSending(false);
     };
 
+    // Enes Doğanay | 8 Nisan 2026: Sağ üst menü badge'lerini güncellemek için AuthContext refreshCounts
+    const { refreshCounts } = useAuth();
+
     // ── Bildirim okundu yap ──
     const handleMarkNotificationRead = async (notificationId) => {
         await supabase.from('bildirimler').update({ is_read: true }).eq('id', notificationId);
         setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n));
+        refreshCounts();
     };
 
     const handleMarkAllNotificationsRead = async () => {
@@ -213,6 +220,7 @@ const FirmaProfil = () => {
         const ids = unread.map(n => n.id);
         await supabase.from('bildirimler').update({ is_read: true }).in('id', ids);
         setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+        refreshCounts();
     };
 
     // Enes Doğanay | 7 Nisan 2026: Bildirimden teklif chatine yönlendir
@@ -338,8 +346,8 @@ const FirmaProfil = () => {
                     {/* ── SIDEBAR ── */}
                     <aside className="sidebar">
                         <div className="sidebar-user-card">
-                            {/* Enes Doğanay | 7 Nisan 2026: Firma logosu yuvarlak, bireysel profil avatar gibi */}
-                            {firma?.logo_url ? (
+                            {/* Enes Doğanay | 8 Nisan 2026: Sadece firma-logolari bucket'inden yüklenen logolar kullanılır */}
+                            {firma?.logo_url?.includes('firma-logolari') ? (
                                 <div className="sidebar-avatar" style={{ backgroundImage: `url(${firma.logo_url})` }} />
                             ) : (
                                 <div className="sidebar-avatar sidebar-avatar--placeholder">

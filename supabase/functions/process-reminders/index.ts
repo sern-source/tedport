@@ -1,9 +1,9 @@
-import { createAdminClient } from '../_shared/supabaseAdmin.ts';
-import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { createAdminClient } from "../_shared/supabaseAdmin.ts";
+import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
 const isAuthorizedRequest = (request: Request) => {
-    const requestSecret = request.headers.get('X-Edge-Function-Secret');
-    const expectedSecret = Deno.env.get('EDGE_FUNCTION_SECRET');
+    const requestSecret = request.headers.get("X-Edge-Function-Secret");
+    const expectedSecret = Deno.env.get("EDGE_FUNCTION_SECRET");
 
     if (!expectedSecret) {
         return true;
@@ -12,26 +12,28 @@ const isAuthorizedRequest = (request: Request) => {
     return requestSecret === expectedSecret;
 };
 
-const sendReminderEmail = async ({ to, subject, html }: { to: string; subject: string; html: string; }) => {
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    const fromEmail = Deno.env.get('REMINDER_FROM_EMAIL');
+const sendReminderEmail = async (
+    { to, subject, html }: { to: string; subject: string; html: string },
+) => {
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL");
 
     if (!resendApiKey || !fromEmail) {
-        throw new Error('RESEND_API_KEY veya REMINDER_FROM_EMAIL eksik.');
+        throw new Error("RESEND_API_KEY veya REMINDER_FROM_EMAIL eksik.");
     }
 
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
+    const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
         headers: {
             Authorization: `Bearer ${resendApiKey}`,
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
             from: fromEmail,
             to: [to],
             subject,
-            html
-        })
+            html,
+        }),
     });
 
     if (!response.ok) {
@@ -39,11 +41,23 @@ const sendReminderEmail = async ({ to, subject, html }: { to: string; subject: s
     }
 };
 
-const renderReminderEmail = ({ reminder, detailUrl }: { reminder: Record<string, unknown>; detailUrl: string; }) => {
-    const reminderDate = new Date(String(reminder.reminder_at || ''));
-    const formattedDate = `${reminderDate.toLocaleDateString('tr-TR')} ${reminderDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
-    const safeTitle = String(reminder.note_title || 'Hatırlatma Notu');
-    const safeBody = String(reminder.note_body || 'Hatırlatma içeriği bulunmuyor.');
+const renderReminderEmail = (
+    { reminder, detailUrl }: {
+        reminder: Record<string, unknown>;
+        detailUrl: string;
+    },
+) => {
+    const reminderDate = new Date(String(reminder.reminder_at || ""));
+    const formattedDate = `${reminderDate.toLocaleDateString("tr-TR")} ${
+        reminderDate.toLocaleTimeString("tr-TR", {
+            hour: "2-digit",
+            minute: "2-digit",
+        })
+    }`;
+    const safeTitle = String(reminder.note_title || "Hatırlatma Notu");
+    const safeBody = String(
+        reminder.note_body || "Hatırlatma içeriği bulunmuyor.",
+    );
 
     return `
     <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
@@ -64,28 +78,28 @@ const renderReminderEmail = ({ reminder, detailUrl }: { reminder: Record<string,
 };
 
 Deno.serve(async (request) => {
-    if (request.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders });
+    if (request.method === "OPTIONS") {
+        return new Response("ok", { headers: corsHeaders });
     }
 
-    if (request.method !== 'POST') {
-        return jsonResponse({ error: 'Method not allowed' }, 405);
+    if (request.method !== "POST") {
+        return jsonResponse({ error: "Method not allowed" }, 405);
     }
 
     if (!isAuthorizedRequest(request)) {
-        return jsonResponse({ error: 'Unauthorized' }, 401);
+        return jsonResponse({ error: "Unauthorized" }, 401);
     }
 
     const supabaseAdmin = createAdminClient();
     const now = new Date().toISOString();
-    const appBaseUrl = Deno.env.get('APP_BASE_URL') || 'http://localhost:5173';
+    const appBaseUrl = Deno.env.get("APP_BASE_URL") || "http://localhost:5173";
 
     const { data: dueReminders, error: remindersError } = await supabaseAdmin
-        .from('kullanici_hatirlaticilari')
-        .select('*')
-        .eq('status', 'pending')
-        .lte('reminder_at', now)
-        .order('reminder_at', { ascending: true })
+        .from("kullanici_hatirlaticilari")
+        .select("*")
+        .eq("status", "pending")
+        .lte("reminder_at", now)
+        .order("reminder_at", { ascending: true })
         .limit(50);
 
     if (remindersError) {
@@ -96,42 +110,68 @@ Deno.serve(async (request) => {
 
     for (const reminder of dueReminders || []) {
         try {
-            const detailUrl = `${appBaseUrl}/firmadetay/${encodeURIComponent(String(reminder.firma_id || ''))}`;
+            const detailUrl = `${appBaseUrl}/firmadetay/${
+                encodeURIComponent(String(reminder.firma_id || ""))
+            }`;
             await sendReminderEmail({
-                to: String(reminder.reminder_email || ''),
-                subject: `Tedport Hatırlatma: ${String(reminder.note_title || 'Notunuz')}`,
-                html: renderReminderEmail({ reminder, detailUrl })
+                to: String(reminder.reminder_email || ""),
+                subject: `Tedport Hatırlatma: ${
+                    String(reminder.note_title || "Notunuz")
+                }`,
+                html: renderReminderEmail({ reminder, detailUrl }),
             });
 
-            await supabaseAdmin.from('bildirimler').insert([{
+            await supabaseAdmin.from("bildirimler").insert([{
                 user_id: reminder.user_id,
-                type: 'reminder',
-                title: reminder.note_title || 'Hatırlatma Maili Gönderildi',
-                message: `Planlanan hatırlatma mailiniz ${new Date(String(reminder.reminder_at || '')).toLocaleString('tr-TR')} tarihinde gönderildi.`,
+                type: "reminder",
+                // Enes Doğanay | 8 Nisan 2026: Site bildirimi not içeriğine odaklı olarak güncellendi
+                title: `Not Hatırlatması: ${
+                    String(reminder.note_title || "İsimsiz Not")
+                }`,
+                message: String(reminder.note_body || "").slice(0, 200) ||
+                    "Hatırlatma zamanı geldi.",
                 firma_id: reminder.firma_id,
                 note_id: reminder.note_id,
                 reminder_id: reminder.id,
                 is_read: false,
                 metadata: {
                     reminder_at: reminder.reminder_at,
-                    reminder_email: reminder.reminder_email
-                }
+                    reminder_email: reminder.reminder_email,
+                    note_title: reminder.note_title,
+                    note_body: String(reminder.note_body || "").slice(0, 300),
+                },
             }]);
 
             await supabaseAdmin
-                .from('kullanici_hatirlaticilari')
-                .update({ status: 'sent', sent_at: now, email_error: null, updated_at: now })
-                .eq('id', reminder.id);
+                .from("kullanici_hatirlaticilari")
+                .update({
+                    status: "sent",
+                    sent_at: now,
+                    email_error: null,
+                    updated_at: now,
+                })
+                .eq("id", reminder.id);
 
-            results.push({ id: reminder.id, status: 'sent' });
+            results.push({ id: reminder.id, status: "sent" });
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+            const errorMessage = error instanceof Error
+                ? error.message
+                : "Bilinmeyen hata";
             await supabaseAdmin
-                .from('kullanici_hatirlaticilari')
-                .update({ status: 'failed', failed_at: now, email_error: errorMessage, updated_at: now })
-                .eq('id', reminder.id);
+                .from("kullanici_hatirlaticilari")
+                .update({
+                    status: "failed",
+                    failed_at: now,
+                    email_error: errorMessage,
+                    updated_at: now,
+                })
+                .eq("id", reminder.id);
 
-            results.push({ id: reminder.id, status: 'failed', error: errorMessage });
+            results.push({
+                id: reminder.id,
+                status: "failed",
+                error: errorMessage,
+            });
         }
     }
 

@@ -168,6 +168,105 @@
     line-height: 1.65;
 }
 
+/* Enes Doğanay | 8 Nisan 2026: Mevcut firma eşleşme badge'i admin panelinde */
+.corporate-admin-linked-firma {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+}
+
+.corporate-admin-linked-firma a {
+    color: #137fec;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.corporate-admin-linked-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-left: 8px;
+    text-transform: uppercase;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Vergi levhası badge'i admin panelinde */
+.corporate-admin-tax-doc {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Vergi levhası signed URL butonu */
+.corporate-admin-tax-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #16a34a;
+    text-decoration: underline;
+    font-weight: 600;
+    font-size: inherit;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.corporate-admin-tax-link:hover {
+    color: #15803d;
+}
+
+.corporate-admin-tax-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-left: 8px;
+    text-transform: uppercase;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Admin panelinde yapılandırılmış adres gösterimi */
+.corporate-admin-address-block {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.corporate-admin-address-detail {
+    display: inline-flex;
+    gap: 6px;
+}
+
+.corporate-admin-address-tag {
+    display: inline-flex;
+    padding: 2px 10px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+}
+
+.corporate-admin-address-open {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 0.88rem;
+}
+
 .corporate-admin-status {
     display: inline-flex;
     align-items: center;

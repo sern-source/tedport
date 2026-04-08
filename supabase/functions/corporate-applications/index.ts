@@ -239,7 +239,15 @@ const isUuid = (value: string) => {
         .test(String(value || "").trim());
 };
 
+// Enes Doğanay | 8 Nisan 2026: metadata.requested_firma_id varsa mevcut firmayı kullan
 const buildManagedFirmaId = (application: Record<string, unknown>) => {
+    // Önce metadata.requested_firma_id kontrol et (kullanıcı mevcut firma seçtiyse)
+    const meta = (application.metadata || {}) as Record<string, unknown>;
+    const requestedFirmaId = String(meta.requested_firma_id || "").trim();
+    if (isUuid(requestedFirmaId)) {
+        return requestedFirmaId;
+    }
+
     const existingManagedFirmaId = String(application.managed_firma_id || "")
         .trim();
     if (isUuid(existingManagedFirmaId)) {
@@ -261,11 +269,20 @@ const buildDefaultProductCatalog = () => [
     },
 ];
 
+// Enes Doğanay | 8 Nisan 2026: metadata'dan İl/İlçe/telefon doğru şekilde firma kaydına yazılır
 const buildManagedFirmaPayload = (
     application: Record<string, unknown>,
     firmaId: string,
 ) => {
+    const meta = (application.metadata || {}) as Record<string, unknown>;
+    const companyIl = String(meta.company_il || "").trim();
+    const companyIlce = String(meta.company_ilce || "").trim();
+    const companyOpenAddress = String(meta.company_open_address || "").trim();
+    const companyPhone = String(meta.company_phone || "").trim();
     const addressText = String(application.company_address || "").trim();
+    // İl/İlçe formatı: "İstanbul, Bahçelievler"
+    const ilIlce = [companyIl, companyIlce].filter(Boolean).join(", ") ||
+        addressText || "Belirtilmedi";
 
     return {
         firmaID: firmaId,
@@ -282,11 +299,11 @@ const buildManagedFirmaPayload = (
                 } için oluşturulan kurumsal firma profili.`,
         ).trim(),
         firma_turu: "Kurumsal Hesap",
-        telefon: String(application.phone || "").trim() || null,
+        telefon: companyPhone || String(application.phone || "").trim() || null,
         eposta:
             String(application.corporate_email || "").trim().toLowerCase() ||
             null,
-        adres: addressText || null,
+        adres: companyOpenAddress || addressText || null,
         latitude: null,
         longitude: null,
         ana_sektor:
@@ -294,7 +311,7 @@ const buildManagedFirmaPayload = (
                 .trim() || "Belirtilmedi",
         urun_kategorileri: JSON.stringify(buildDefaultProductCatalog()),
         logo_url: null,
-        il_ilce: addressText || "Belirtilmedi",
+        il_ilce: ilIlce,
         best: false,
     };
 };
@@ -357,6 +374,12 @@ const ensureManagedFirmaLink = async ({
     if (error) {
         throw toError(error, "Firma sahipliği kaydedilemedi.");
     }
+
+    // Enes Doğanay | 8 Nisan 2026: Firma onaylı olarak işaretle
+    await supabaseAdmin
+        .from("firmalar")
+        .update({ onayli_hesap: true })
+        .eq("firmaID", firmaId);
 };
 
 const findExistingUserByEmail = async (
@@ -631,9 +654,8 @@ Deno.serve(async (request) => {
                         );
                     }
                     return jsonResponse({
-                        error:
-                            toError(error, "Firma kaydı oluşturulamadı.")
-                                .message,
+                        error: toError(error, "Firma kaydı oluşturulamadı.")
+                            .message,
                     }, 500);
                 }
 
@@ -710,9 +732,8 @@ Deno.serve(async (request) => {
                         );
                     }
                     return jsonResponse({
-                        error:
-                            toError(error, "Karar e-postası gönderilemedi.")
-                                .message,
+                        error: toError(error, "Karar e-postası gönderilemedi.")
+                            .message,
                     }, 500);
                 }
             }
@@ -726,9 +747,8 @@ Deno.serve(async (request) => {
                 });
             } catch (error) {
                 return jsonResponse({
-                    error:
-                        toError(error, "Karar e-postası gönderilemedi.")
-                            .message,
+                    error: toError(error, "Karar e-postası gönderilemedi.")
+                        .message,
                 }, 500);
             }
         }

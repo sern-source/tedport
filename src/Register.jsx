@@ -5,21 +5,30 @@ import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { submitCorporateApplication } from './corporateApplicationsApi';
+// Enes Doğanay | 8 Nisan 2026: İl/İlçe dropdown'ları için Türkiye veri seti
+import { TURKEY_DISTRICTS } from './turkeyDistricts';
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal form ilk degerleri tek nesnede toplanir
+// Enes Doğanay | 8 Nisan 2026: selectedFirmaId eklendi — mevcut firma seçimi için
+// Enes Doğanay | 8 Nisan 2026: companyName kaldırıldı (listedCompanyName ile birleştirildi), companyPhone ve taxDocument eklendi
+// Enes Doğanay | 8 Nisan 2026: companyAddress → companyIl/companyIlce/companyOpenAddress olarak ayrıldı
 const initialCorporateForm = {
   applicantFirstName: '',
   applicantLastName: '',
   applicantTitle: '',
-  companyName: '',
   listedCompanyName: '',
+  selectedFirmaId: null,
+  companyPhone: '',
+  companyIl: '',
+  companyIlce: '',
+  companyOpenAddress: '',
   websiteUrl: '',
   corporateEmail: '',
   phone: '',
   taxOffice: '',
   taxNumber: '',
-  companyAddress: '',
-  verificationNote: ''
+  verificationNote: '',
+  taxDocument: null
 };
 
 const RegistrationPage = () => {
@@ -34,6 +43,8 @@ const RegistrationPage = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  /* Enes Doğanay | 11 Nisan 2026: Şifre tekrarı doğrulaması */
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [corporateForm, setCorporateForm] = useState(initialCorporateForm);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -41,6 +52,15 @@ const RegistrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [corporateSubmittedApplication, setCorporateSubmittedApplication] = useState(null);
   const [notification, setNotification] = useState({ show: false, type: '', message: '' });
+
+  /* Enes Doğanay | 8 Nisan 2026: Kurumsal form doğrulama hataları */
+  const [corporateErrors, setCorporateErrors] = useState({});
+
+  /* Enes Doğanay | 8 Nisan 2026: Firma autocomplete state'leri */
+  const [firmaSuggestions, setFirmaSuggestions] = useState([]);
+  const [showFirmaSuggestions, setShowFirmaSuggestions] = useState(false);
+  const firmaSearchRef = React.useRef(null);
+  const firmaDebounceRef = React.useRef(null);
 
   useEffect(() => {
     setRegistrationType(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
@@ -83,7 +103,98 @@ const RegistrationPage = () => {
       ...prevForm,
       [field]: value
     }));
+    // Enes Doğanay | 8 Nisan 2026: Hata mesajını alan doldurulunca temizle
+    if (corporateErrors[field]) {
+      setCorporateErrors((prev) => { const next = { ...prev }; delete next[field]; return next; });
+    }
   };
+
+  /* Enes Doğanay | 8 Nisan 2026: Firma adı yazıldıkça DB'den arama yapan debounced fonksiyon */
+  const handleFirmaSearch = (searchValue) => {
+    handleCorporateInputChange('listedCompanyName', searchValue);
+    // Kullanıcı elle yazdığında seçimi temizle
+    setCorporateForm((prev) => ({ ...prev, selectedFirmaId: null }));
+
+    if (firmaDebounceRef.current) clearTimeout(firmaDebounceRef.current);
+
+    if (searchValue.trim().length < 2) {
+      setFirmaSuggestions([]);
+      setShowFirmaSuggestions(false);
+      return;
+    }
+
+    firmaDebounceRef.current = setTimeout(async () => {
+      // Enes Doğanay | 8 Nisan 2026: Firma arama — onayli_hesap doğrudan firmalar tablosundan okunuyor
+      const { data, error } = await supabase
+        .from('firmalar')
+        .select('firmaID, firma_adi, il_ilce, logo_url, adres, telefon, onayli_hesap')
+        .ilike('firma_adi', `%${searchValue.trim()}%`)
+        .limit(8);
+
+      if (!error && data && data.length > 0) {
+        const enriched = data.map((f) => ({
+          ...f,
+          isManaged: f.onayli_hesap === true
+        }));
+        setFirmaSuggestions(enriched);
+        setShowFirmaSuggestions(true);
+      } else if (!error) {
+        setFirmaSuggestions([]);
+        setShowFirmaSuggestions(false);
+      }
+    }, 300);
+  };
+
+  /* Enes Doğanay | 8 Nisan 2026: Listeden firma seçildiğinde formu otomatik doldur */
+  /* Enes Doğanay | 8 Nisan 2026: İl/ilçe/adres/telefon bilgisi de firmadan çekilir */
+  /* Enes Doğanay | 8 Nisan 2026: il_ilce hem virgül hem slash formatını destekler, TURKEY_DISTRICTS'e göre doğrular */
+  const handleFirmaSelect = (firma) => {
+    let parsedIl = '';
+    let parsedIlce = '';
+    if (firma.il_ilce) {
+      // Hem virgül hem slash ile ayırmayı dene: "İstanbul, Bahçelievler" veya "Tuzla/İstanbul"
+      const separator = firma.il_ilce.includes(',') ? ',' : '/';
+      const parts = firma.il_ilce.split(separator).map((s) => s.trim()).filter(Boolean);
+      if (parts.length >= 2) {
+        // Hangisi İl (TURKEY_DISTRICTS key'i) kontrol et
+        if (TURKEY_DISTRICTS[parts[0]]) {
+          parsedIl = parts[0];
+          parsedIlce = parts[1];
+        } else if (TURKEY_DISTRICTS[parts[1]]) {
+          parsedIl = parts[1];
+          parsedIlce = parts[0];
+        } else {
+          parsedIl = parts[0];
+          parsedIlce = parts[1];
+        }
+      } else if (parts.length === 1 && TURKEY_DISTRICTS[parts[0]]) {
+        parsedIl = parts[0];
+      }
+    }
+
+    setCorporateForm((prev) => ({
+      ...prev,
+      listedCompanyName: firma.firma_adi,
+      selectedFirmaId: firma.firmaID,
+      ...(parsedIl ? { companyIl: parsedIl } : {}),
+      ...(parsedIlce ? { companyIlce: parsedIlce } : {}),
+      ...(firma.adres ? { companyOpenAddress: firma.adres } : {}),
+      ...(firma.telefon ? { companyPhone: firma.telefon } : {})
+    }));
+    setShowFirmaSuggestions(false);
+    setFirmaSuggestions([]);
+  };
+
+  /* Enes Doğanay | 8 Nisan 2026: Suggestions dışına tıklayınca kapat */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (firmaSearchRef.current && !firmaSearchRef.current.contains(e.target)) {
+        setShowFirmaSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Enes Doğanay | 6 Nisan 2026: Bireysel kayit mevcut auth akisini korur
   const handleIndividualSubmit = async (event) => {
@@ -91,6 +202,12 @@ const RegistrationPage = () => {
 
     if (!termsAccepted) {
       showMessage('error', 'Lütfen hizmet şartlarını ve gizlilik politikasını kabul edin.');
+      return;
+    }
+
+    /* Enes Doğanay | 11 Nisan 2026: Şifre tekrarı kontrolü */
+    if (password !== passwordConfirm) {
+      showMessage('error', 'Şifreler uyuşmuyor. Lütfen aynı şifreyi girdiğinizden emin olun.');
       return;
     }
 
@@ -170,9 +287,44 @@ const RegistrationPage = () => {
     }
   };
 
+  // Enes Doğanay | 8 Nisan 2026: Kurumsal form zorunlu alan doğrulaması — sadece verificationNote ve taxDocument opsiyonel
+  const validateCorporateForm = () => {
+    const errors = {};
+    const requiredFields = [
+      { key: 'applicantFirstName', label: 'Başvuran Adı' },
+      { key: 'applicantLastName', label: 'Başvuran Soyadı' },
+      { key: 'applicantTitle', label: 'Pozisyon' },
+      { key: 'phone', label: 'Başvuranın Telefon Numarası' },
+      { key: 'listedCompanyName', label: 'Şirket Adı' },
+      { key: 'websiteUrl', label: 'Web Sitesi' },
+      { key: 'corporateEmail', label: 'Kurumsal E-posta' },
+      { key: 'companyPhone', label: 'Şirket Telefon Numarası' },
+      { key: 'companyIl', label: 'İl' },
+      { key: 'companyIlce', label: 'İlçe' },
+      { key: 'companyOpenAddress', label: 'Açık Adres' },
+      { key: 'taxOffice', label: 'Vergi Dairesi' },
+      { key: 'taxNumber', label: 'Vergi Numarası' }
+    ];
+    requiredFields.forEach(({ key, label }) => {
+      if (!String(corporateForm[key] || '').trim()) {
+        errors[key] = `${label} alanını doldurunuz.`;
+      }
+    });
+    return errors;
+  };
+
   // Enes Doğanay | 6 Nisan 2026: Kurumsal sekme kullanici olusturmak yerine admin incelemesine giden basvuru olusturur
-  const handleCorporateSubmit = async (event) => {
-    event.preventDefault();
+  // Enes Doğanay | 8 Nisan 2026: Vergi levhası dosyası varsa Storage'a yükle, URL'yi metadata'ya ekle
+  // Enes Doğanay | 8 Nisan 2026: form yerine div kullanıldığı için event parametresi kaldırıldı — Chrome adres popup engeli
+  const handleCorporateSubmit = async () => {
+
+    // Enes Doğanay | 8 Nisan 2026: Zorunlu alan doğrulaması
+    const errors = validateCorporateForm();
+    setCorporateErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      showMessage('error', 'Lütfen kırmızı ile işaretlenen eksik alanları doldurun.');
+      return;
+    }
 
     if (!termsAccepted) {
       showMessage('error', 'Lütfen hizmet şartlarını ve gizlilik politikasını kabul edin.');
@@ -191,13 +343,29 @@ const RegistrationPage = () => {
         return;
       }
 
-      const result = await submitCorporateApplication(corporateForm);
+      // Enes Doğanay | 8 Nisan 2026: Vergi levhası private 'tax-documents' bucket'ına yüklenir
+      let taxDocumentUrl = null;
+      if (corporateForm.taxDocument) {
+        const file = corporateForm.taxDocument;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `vergi-levhasi-${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('tax-documents')
+          .upload(fileName, file);
+        if (uploadError) {
+          console.error('Vergi levhası yükleme hatası:', uploadError);
+        } else {
+          // Private bucket — sadece dosya yolunu sakla, admin signed URL ile açar
+          taxDocumentUrl = fileName;
+        }
+      }
+
+      const submissionData = { ...corporateForm, taxDocumentUrl };
+      const result = await submitCorporateApplication(submissionData);
       setCorporateSubmittedApplication(result.application || null);
       setCorporateForm(initialCorporateForm);
       setTermsAccepted(false);
-      showMessage('success', result.mode === 'database'
-        ? 'Kurumsal başvurunuz alındı. Şu an Edge Function fallback modunda yalnızca başvuru kaydı oluşturuldu; onay ve mail adımı Supabase secrets tamamlanınca aktif olacak.'
-        : 'Kurumsal başvurunuz alındı. İnceleme sonrası size e-posta ile dönüş yapılacaktır.');
+      showMessage('success', 'Kurumsal başvurunuz başarıyla alındı! Ekibimiz başvurunuzu en kısa sürede inceleyecek ve sonucu e-posta ile size bildirecektir.');
     } catch (error) {
       showMessage('error', error.message || 'Kurumsal başvuru oluşturulamadı.');
     } finally {
@@ -292,82 +460,226 @@ const RegistrationPage = () => {
                   </div>
                 </section>
               ) : (
-                <form className="form-body corporate-form-body" onSubmit={handleCorporateSubmit}>
+                /* Enes Doğanay | 8 Nisan 2026: form yerine div kullanıldı, Chrome adres kaydetme popup'ını tamamen engellemek için */
+                <div className="form-body corporate-form-body">
                   <div className="form-row">
                     <div className="input-group">
                       <label>Başvuran Adı</label>
-                      <input className="form-input" type="text" placeholder="Adınızı girin" value={corporateForm.applicantFirstName} onChange={(event) => handleCorporateInputChange('applicantFirstName', event.target.value)} required />
+                      <input className={`form-input${corporateErrors.applicantFirstName ? ' form-input--error' : ''}`} type="text" placeholder="Adınızı girin" value={corporateForm.applicantFirstName} onChange={(event) => handleCorporateInputChange('applicantFirstName', event.target.value)} name="crp_fn_x" autoComplete="one-time-code" />
+                      {corporateErrors.applicantFirstName && <span className="field-error-text">{corporateErrors.applicantFirstName}</span>}
                     </div>
                     <div className="input-group">
                       <label>Başvuran Soyadı</label>
-                      <input className="form-input" type="text" placeholder="Soyadınızı girin" value={corporateForm.applicantLastName} onChange={(event) => handleCorporateInputChange('applicantLastName', event.target.value)} required />
+                      <input className={`form-input${corporateErrors.applicantLastName ? ' form-input--error' : ''}`} type="text" placeholder="Soyadınızı girin" value={corporateForm.applicantLastName} onChange={(event) => handleCorporateInputChange('applicantLastName', event.target.value)} name="crp_ln_x" autoComplete="one-time-code" />
+                      {corporateErrors.applicantLastName && <span className="field-error-text">{corporateErrors.applicantLastName}</span>}
                     </div>
                   </div>
 
                   <div className="form-row">
                     <div className="input-group">
                       <label>Pozisyonunuz</label>
-                      <input className="form-input" type="text" placeholder="Örn. Kurucu, Satın Alma Müdürü" value={corporateForm.applicantTitle} onChange={(event) => handleCorporateInputChange('applicantTitle', event.target.value)} />
+                      <input className={`form-input${corporateErrors.applicantTitle ? ' form-input--error' : ''}`} type="text" placeholder="Örn. Kurucu, Satın Alma Müdürü" value={corporateForm.applicantTitle} onChange={(event) => handleCorporateInputChange('applicantTitle', event.target.value)} />
+                      {corporateErrors.applicantTitle && <span className="field-error-text">{corporateErrors.applicantTitle}</span>}
                     </div>
                     <div className="input-group">
-                      <label>Telefon Numarası</label>
+                      {/* Enes Doğanay | 8 Nisan 2026: "Telefon Numarası" → "Başvuranın Telefon Numarası" */}
+                      <label>Başvuranın Telefon Numarası</label>
                       <div className="input-wrapper">
-                        <input className="form-input" type="tel" placeholder="0 (5XX) XXX XX XX" value={corporateForm.phone} onChange={(event) => handleCorporateInputChange('phone', event.target.value)} required />
+                        <input className={`form-input${corporateErrors.phone ? ' form-input--error' : ''}`} type="tel" placeholder="0 (5XX) XXX XX XX" value={corporateForm.phone} onChange={(event) => handleCorporateInputChange('phone', event.target.value)} name="crp_ph_x" autoComplete="one-time-code" />
                         <span className="material-symbols-outlined input-icon">phone</span>
                       </div>
+                      {corporateErrors.phone && <span className="field-error-text">{corporateErrors.phone}</span>}
                     </div>
                   </div>
 
-                  <div className="input-group">
-                    <label>Şirket Adı</label>
+                  {/* Enes Doğanay | 8 Nisan 2026: Şirket Adı ve Tedport firma alanı birleştirildi — tek alan + autocomplete */}
+                  <div className="input-group" ref={firmaSearchRef} style={{ position: 'relative' }}>
+                    <label>Tedport'ta Görünmesini İstediğiniz İçin Başvurduğunuz Şirket</label>
                     <div className="input-wrapper">
-                      <input className="form-input" type="text" placeholder="Yasal şirket unvanını girin" value={corporateForm.companyName} onChange={(event) => handleCorporateInputChange('companyName', event.target.value)} required />
-                      <span className="material-symbols-outlined input-icon">business</span>
+                      <input
+                        className={`form-input${corporateForm.selectedFirmaId ? ' form-input--matched' : ''}${corporateErrors.listedCompanyName ? ' form-input--error' : ''}`}
+                        type="text"
+                        placeholder="Şirket adını yazın — Tedport'ta kayıtlıysa listeden seçin"
+                        value={corporateForm.listedCompanyName}
+                        onChange={(event) => handleFirmaSearch(event.target.value)}
+                        onFocus={() => { if (firmaSuggestions.length > 0) setShowFirmaSuggestions(true); }}
+                        autoComplete="off"
+                      />
+                      <span className="material-symbols-outlined input-icon">
+                        {corporateForm.selectedFirmaId ? 'check_circle' : 'search'}
+                      </span>
                     </div>
-                  </div>
-
-                  <div className="input-group">
-                    <label>Tedport'ta Görünmesini İstediğiniz Firma</label>
-                    <input className="form-input" type="text" placeholder="Listede varsa birebir firma adını yazın" value={corporateForm.listedCompanyName} onChange={(event) => handleCorporateInputChange('listedCompanyName', event.target.value)} />
+                    {corporateForm.selectedFirmaId && (
+                      <span className="field-hint field-hint--success">
+                        <span className="material-symbols-outlined" style={{ fontSize: 14, verticalAlign: 'middle', marginRight: 4 }}>link</span>
+                        Mevcut firma kaydı eşleştirildi — onay sonrası bu firma sayfasının yönetimi size bağlanacak.
+                      </span>
+                    )}
+                    {!corporateForm.selectedFirmaId && corporateForm.listedCompanyName && (
+                      <span className="field-hint">Listede yoksa yeni firma kaydı oluşturulur.</span>
+                    )}
+                    {showFirmaSuggestions && firmaSuggestions.length > 0 && (
+                      <div className="firma-autocomplete-dropdown">
+                        {firmaSuggestions.map((firma) => (
+                          <button
+                            key={firma.firmaID}
+                            type="button"
+                            className={`firma-autocomplete-item${firma.isManaged ? ' firma-autocomplete-item--managed' : ''}`}
+                            onClick={() => !firma.isManaged && handleFirmaSelect(firma)}
+                            disabled={firma.isManaged}
+                          >
+                            <div className="firma-autocomplete-avatar">
+                              {firma.logo_url ? (
+                                <img src={firma.logo_url} alt="" />
+                              ) : (
+                                <span>{firma.firma_adi?.charAt(0)}</span>
+                              )}
+                            </div>
+                            <div className="firma-autocomplete-info">
+                              <span className="firma-autocomplete-name">{firma.firma_adi}</span>
+                              {firma.il_ilce && <span className="firma-autocomplete-location">{firma.il_ilce}</span>}
+                            </div>
+                            {firma.isManaged && (
+                              <span className="firma-autocomplete-managed-badge">
+                                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>verified</span>
+                                Yönetiliyor
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {corporateErrors.listedCompanyName && <span className="field-error-text">{corporateErrors.listedCompanyName}</span>}
                   </div>
 
                   <div className="form-row">
                     <div className="input-group">
                       <label>Web Sitesi</label>
                       <div className="input-wrapper">
-                        <input className="form-input" type="text" placeholder="ornekfirma.com" value={corporateForm.websiteUrl} onChange={(event) => handleCorporateInputChange('websiteUrl', event.target.value)} />
+                        <input className={`form-input${corporateErrors.websiteUrl ? ' form-input--error' : ''}`} type="text" placeholder="ornekfirma.com" value={corporateForm.websiteUrl} onChange={(event) => handleCorporateInputChange('websiteUrl', event.target.value)} name="crp_ws_x" autoComplete="one-time-code" />
                         <span className="material-symbols-outlined input-icon">language</span>
                       </div>
+                      {corporateErrors.websiteUrl && <span className="field-error-text">{corporateErrors.websiteUrl}</span>}
                     </div>
                     <div className="input-group">
                       <label>Kurumsal E-posta</label>
                       <div className="input-wrapper">
-                        <input className="form-input" type="email" placeholder="adiniz@sirketiniz.com" value={corporateForm.corporateEmail} onChange={(event) => handleCorporateInputChange('corporateEmail', event.target.value)} required />
+                        <input className={`form-input${corporateErrors.corporateEmail ? ' form-input--error' : ''}`} type="email" placeholder="adiniz@sirketiniz.com" value={corporateForm.corporateEmail} onChange={(event) => handleCorporateInputChange('corporateEmail', event.target.value)} name="crp_ce_x" autoComplete="one-time-code" />
                         <span className="material-symbols-outlined input-icon">mail</span>
                       </div>
                       <span className="field-hint">Test için kişisel e-posta kullanabilirsiniz; canlıda şirket adresi tercih edilir.</span>
+                      {corporateErrors.corporateEmail && <span className="field-error-text">{corporateErrors.corporateEmail}</span>}
                     </div>
                   </div>
+                  {/* Enes Doğanay | 8 Nisan 2026: Şirket Telefon Numarası — firma autocomplete'den sonra */}
+                  <div className="input-group">
+                    <label>Şirket Telefon Numarası</label>
+                    <div className="input-wrapper">
+                      <input className={`form-input${corporateErrors.companyPhone ? ' form-input--error' : ''}`} type="tel" placeholder="0 (2XX) XXX XX XX" value={corporateForm.companyPhone} onChange={(event) => handleCorporateInputChange('companyPhone', event.target.value)} name="crp_cph_x" autoComplete="one-time-code" />
+                      <span className="material-symbols-outlined input-icon">phone</span>
+                    </div>
+                    {corporateErrors.companyPhone && <span className="field-error-text">{corporateErrors.companyPhone}</span>}
+                  </div>
+
+                  {/* Enes Doğanay | 8 Nisan 2026: İl/İlçe dropdown + Açık Adres bloğu — eski textarea yerine */}
+                  <fieldset className="corporate-address-block">
+                    <legend>
+                      <span className="material-symbols-outlined" style={{ fontSize: 18, verticalAlign: 'middle', marginRight: 6 }}>location_on</span>
+                      İletişim ve Konum
+                    </legend>
+                    <div className="form-row">
+                      <div className="input-group">
+                        <label>İl</label>
+                        <select
+                          className={`form-input form-select${corporateErrors.companyIl ? ' form-input--error' : ''}`}
+                          value={corporateForm.companyIl}
+                          onChange={(event) => {
+                            handleCorporateInputChange('companyIl', event.target.value);
+                            handleCorporateInputChange('companyIlce', '');
+                          }}
+                        >
+                          <option value="">İl seçin</option>
+                          {Object.keys(TURKEY_DISTRICTS).sort((a, b) => a.localeCompare(b, 'tr')).map((il) => (
+                            <option key={il} value={il}>{il}</option>
+                          ))}
+                        </select>
+                        {corporateErrors.companyIl && <span className="field-error-text">{corporateErrors.companyIl}</span>}
+                      </div>
+                      <div className="input-group">
+                        <label>İlçe</label>
+                        <select
+                          className={`form-input form-select${corporateErrors.companyIlce ? ' form-input--error' : ''}`}
+                          value={corporateForm.companyIlce}
+                          onChange={(event) => handleCorporateInputChange('companyIlce', event.target.value)}
+                          disabled={!corporateForm.companyIl}
+                        >
+                          <option value="">İlçe seçin</option>
+                          {(TURKEY_DISTRICTS[corporateForm.companyIl] || []).map((ilce) => (
+                            <option key={ilce} value={ilce}>{ilce}</option>
+                          ))}
+                        </select>
+                        {corporateErrors.companyIlce && <span className="field-error-text">{corporateErrors.companyIlce}</span>}
+                      </div>
+                    </div>
+                    <div className="input-group">
+                      <label>Açık Adres</label>
+                      <input className={`form-input${corporateErrors.companyOpenAddress ? ' form-input--error' : ''}`} type="text" placeholder="Cadde, sokak, bina no, kat / daire" value={corporateForm.companyOpenAddress} onChange={(event) => handleCorporateInputChange('companyOpenAddress', event.target.value)} name="crp_adr_x" autoComplete="one-time-code" />
+                      {corporateErrors.companyOpenAddress && <span className="field-error-text">{corporateErrors.companyOpenAddress}</span>}
+                    </div>
+                  </fieldset>
 
                   <div className="form-row">
                     <div className="input-group">
                       <label>Vergi Dairesi</label>
-                      <input className="form-input" type="text" placeholder="Vergi dairesini girin" value={corporateForm.taxOffice} onChange={(event) => handleCorporateInputChange('taxOffice', event.target.value)} />
+                      <input className={`form-input${corporateErrors.taxOffice ? ' form-input--error' : ''}`} type="text" placeholder="Vergi dairesini girin" value={corporateForm.taxOffice} onChange={(event) => handleCorporateInputChange('taxOffice', event.target.value)} name="crp_to_x" autoComplete="one-time-code" />
+                      {corporateErrors.taxOffice && <span className="field-error-text">{corporateErrors.taxOffice}</span>}
                     </div>
                     <div className="input-group">
                       <label>Vergi Numarası</label>
-                      <input className="form-input" type="text" placeholder="Vergi numarasını girin" value={corporateForm.taxNumber} onChange={(event) => handleCorporateInputChange('taxNumber', event.target.value)} />
+                      <input className={`form-input${corporateErrors.taxNumber ? ' form-input--error' : ''}`} type="text" placeholder="Vergi numarasını girin" value={corporateForm.taxNumber} onChange={(event) => handleCorporateInputChange('taxNumber', event.target.value)} name="crp_tn_x" autoComplete="one-time-code" />
+                      {corporateErrors.taxNumber && <span className="field-error-text">{corporateErrors.taxNumber}</span>}
                     </div>
                   </div>
 
+                  {/* Enes Doğanay | 8 Nisan 2026: Doğrulama Notu opsiyonel yapıldı */}
                   <div className="input-group">
-                    <label>Şirket Adresi</label>
-                    <textarea className="form-textarea" placeholder="Merkez ofis veya doğrulamada kullanılacak adresi girin" value={corporateForm.companyAddress} onChange={(event) => handleCorporateInputChange('companyAddress', event.target.value)} />
+                    <label>Doğrulama Notu <span className="field-optional">(Opsiyonel)</span></label>
+                    <textarea className="form-textarea" placeholder="Şirket sahipliği, ticaret sicili, mevcut firma kaydıyla bağınız veya incelemeyi hızlandıracak notları yazın" value={corporateForm.verificationNote} onChange={(event) => handleCorporateInputChange('verificationNote', event.target.value)} />
                   </div>
 
+                  {/* Enes Doğanay | 8 Nisan 2026: Vergi levhası yükleme (opsiyonel) + teşvik notu */}
                   <div className="input-group">
-                    <label>Doğrulama Notu</label>
-                    <textarea className="form-textarea" placeholder="Şirket sahipliği, ticaret sicili, mevcut firma kaydıyla bağınız veya incelemeyi hızlandıracak notları yazın" value={corporateForm.verificationNote} onChange={(event) => handleCorporateInputChange('verificationNote', event.target.value)} />
+                    <label>Vergi Levhası <span className="field-optional">(Opsiyonel)</span></label>
+                    <div className="tax-doc-upload">
+                      <label className="tax-doc-upload-area" htmlFor="taxDocInput">
+                        <span className="material-symbols-outlined tax-doc-upload-icon">
+                          {corporateForm.taxDocument ? 'task' : 'upload_file'}
+                        </span>
+                        <span className="tax-doc-upload-text">
+                          {corporateForm.taxDocument ? corporateForm.taxDocument.name : 'Vergi levhasını yüklemek için tıklayın'}
+                        </span>
+                        <input
+                          id="taxDocInput"
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="sr-only"
+                          onChange={(event) => {
+                            if (event.target.files && event.target.files[0]) {
+                              handleCorporateInputChange('taxDocument', event.target.files[0]);
+                            }
+                          }}
+                        />
+                      </label>
+                      {corporateForm.taxDocument && (
+                        <button type="button" className="tax-doc-remove" onClick={() => handleCorporateInputChange('taxDocument', null)}>
+                          <span className="material-symbols-outlined">close</span>
+                        </button>
+                      )}
+                    </div>
+                    <div className="tax-doc-boost-note">
+                      <span className="material-symbols-outlined tax-doc-boost-icon">trending_up</span>
+                      <span>Vergi levhası eklemek başvurunuzun <strong>onaylanma ihtimalini önemli ölçüde artırır</strong> ve inceleme sürecini hızlandırır.</span>
+                    </div>
                   </div>
 
                   <div className="corporate-process-box">
@@ -383,10 +695,10 @@ const RegistrationPage = () => {
                     </label>
                   </div>
 
-                  <button type="submit" className="register-btn-primary register-btn-submit" disabled={loading}>
+                  <button type="button" className="register-btn-primary register-btn-submit" disabled={loading} onClick={handleCorporateSubmit}>
                     {loading ? 'Başvurunuz Gönderiliyor...' : 'Kurumsal Başvuru Gönder'}
                   </button>
-                </form>
+                </div>
               )}
             </>
           ) : (
@@ -444,6 +756,18 @@ const RegistrationPage = () => {
                     {showPassword ? 'visibility_off' : 'visibility'}
                   </span>
                 </div>
+              </div>
+
+              {/* Enes Doğanay | 11 Nisan 2026: Şifre tekrarı alanı */}
+              <div className="input-group">
+                <label>Şifre Tekrarı</label>
+                <div className="input-wrapper">
+                  <input className={`form-input${passwordConfirm && password !== passwordConfirm ? ' form-input--error' : ''}`} type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={passwordConfirm} onChange={(event) => setPasswordConfirm(event.target.value)} required />
+                  <span className="material-symbols-outlined input-icon">lock</span>
+                </div>
+                {passwordConfirm && password !== passwordConfirm && (
+                  <span className="field-error-text">Şifreler uyuşmuyor</span>
+                )}
               </div>
 
               <div className="checkbox-group">

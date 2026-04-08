@@ -93,6 +93,19 @@
   box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px rgba(19, 127, 236, 0.15);
 }
 
+/* Enes Doğanay | 8 Nisan 2026: Profil fotoğrafı yoksa standart boş avatar */
+.sidebar-avatar--no-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #94a3b8;
+}
+
+.sidebar-avatar--no-photo .material-symbols-outlined {
+  font-size: 22px;
+}
+
 /* Enes Doğanay | 7 Nisan 2026: Logo placeholder — firma logosu yoksa baş harf gösterir */
 .sidebar-avatar--placeholder {
   display: flex;
@@ -584,6 +597,19 @@
 .avatar-large:hover {
   transform: scale(1.05);
   box-shadow: 0 0 0 3px var(--primary), 0 0 0 6px rgba(19, 127, 236, 0.2), 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Büyük profil fotoğrafı yoksa standart boş avatar */
+.avatar-large--no-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #94a3b8;
+}
+
+.avatar-large--no-photo .material-symbols-outlined {
+  font-size: 48px;
 }
 
 .profile-name {
@@ -2689,4 +2715,220 @@
   .my-quote-link {
     margin-left: 0;
   }
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Teklif chat stilleri — Profile sayfasında bağımsız çalışması için eklendi */
+.quote-chat-view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quote-chat-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #137fec;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.quote-chat-back:hover { color: #0c5fc0; }
+
+.quote-chat-back .material-symbols-outlined { font-size: 18px; }
+
+.quote-chat-header-card {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.quote-chat-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.quote-chat-header-top h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.quote-chat-firma {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.quote-chat-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.quote-chat-initial-msg {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.quote-chat-initial-msg small {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.quote-chat-initial-msg p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #374151;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.quote-chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.quote-chat-loading,
+.quote-chat-empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem 0;
+  font-size: 0.88rem;
+}
+
+.quote-chat-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.quote-chat-empty .material-symbols-outlined {
+  font-size: 32px;
+  color: #d1d5db;
+}
+
+.quote-chat-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.quote-chat-bubble.mine {
+  align-self: flex-end;
+  background: #137fec;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.quote-chat-bubble.theirs {
+  align-self: flex-start;
+  background: #f1f5f9;
+  color: #1e293b;
+  border-bottom-left-radius: 4px;
+}
+
+.quote-chat-bubble-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.quote-chat-bubble-header strong {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.quote-chat-bubble-header span {
+  font-size: 0.7rem;
+  opacity: 0.65;
+}
+
+.quote-chat-bubble.mine .quote-chat-bubble-header strong,
+.quote-chat-bubble.mine .quote-chat-bubble-header span { color: #fff; }
+
+.quote-chat-bubble p { margin: 0; white-space: pre-wrap; }
+
+.quote-chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0 0;
+}
+
+.quote-chat-input-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: #111827;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.quote-chat-input-row input:focus {
+  outline: none;
+  border-color: #137fec;
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
+}
+
+.quote-chat-input-row button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background: #137fec;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.quote-chat-input-row button:hover:not(:disabled) { background: #0c5fc0; }
+
+.quote-chat-input-row button:disabled { opacity: 0.5; cursor: default; }
+
+.quote-chat-input-row button .material-symbols-outlined { font-size: 20px; }
+
+.quote-chat-closed-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 500;
 }

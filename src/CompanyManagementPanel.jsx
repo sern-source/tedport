@@ -221,8 +221,9 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated }) => {
                             <span>Firma Adı *</span>
                             <input type="text" value={fields.firma_adi} onChange={e => set('firma_adi', e.target.value)} required placeholder="Örn. ABC Makine San. A.Ş." />
                         </label>
+                        {/* Enes Doğanay | 11 Nisan 2026: "Sektör / Kategori" → "Ana Sektör" olarak değiştirildi */}
                         <label className="cmp-field">
-                            <span>Sektör / Kategori</span>
+                            <span>Ana Sektör</span>
                             <input type="text" value={fields.category_name} onChange={e => set('category_name', e.target.value)} placeholder="Örn. Boru ve Profil Üreticisi" />
                         </label>
                         <label className="cmp-field">

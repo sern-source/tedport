@@ -346,7 +346,8 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
 
 /* ================= CARD ================= */
 
-const SupplierCard = ({ data, onSearchTag }) => {
+/* Enes Doğanay | 11 Nisan 2026: isLoggedIn prop eklendi — inline auth gating için */
+const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLoggedIn }) => {
   const navigate = useNavigate();
   // Enes Doğanay | 7 Nisan 2026: İletişime Geç popup state'i
   const [showContact, setShowContact] = useState(false);
@@ -375,7 +376,7 @@ const SupplierCard = ({ data, onSearchTag }) => {
     setQuoteSending(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { alert('Lütfen önce giriş yapın.'); return; }
+      if (!session?.user) { navigate('/login'); return; }
 
       let senderFirmaId = null;
       let senderFirmaAdi = '';
@@ -418,6 +419,19 @@ const SupplierCard = ({ data, onSearchTag }) => {
   return (
     <>
     <div className="supplier-card">
+      {/* Enes Doğanay | 8 Nisan 2026: Kart sağ üst köşesinde favori toggle butonu */}
+      {/* Enes Doğanay | 11 Nisan 2026: Giriş yapılmamışsa buton deaktif */}
+      <button
+        className={`card-fav-btn ${isFavorited ? 'card-fav-btn--active' : ''}`}
+        onClick={(e) => { e.stopPropagation(); onToggleFavorite(data.id); }}
+        title={!isLoggedIn ? 'Favorilere eklemek için giriş yapın' : isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+        type="button"
+        disabled={!isLoggedIn}
+      >
+        <span className="material-symbols-outlined">
+          {isFavorited ? 'bookmark_added' : 'bookmark_add'}
+        </span>
+      </button>
       {/* Enes Doğanay | 6 Nisan 2026: logo_url varsa gerçek logo gösterilir, yoksa baş harf avatar */}
       <div className="card-images">
         <div className="main-image">
@@ -442,10 +456,11 @@ const SupplierCard = ({ data, onSearchTag }) => {
         {/* Enes Doğanay | 14 Temmuz 2025: firma adına tıklayınca profil sayfasına yönlendirir */}
         <h3 className="supplier-name" onClick={() => navigate(`/firmadetay/${data.id}`)} style={{ cursor: 'pointer' }}>
           {data.name}
-          {/* Enes Doğanay | 7 Nisan 2026: Verified = kurumsal yöneticisi olan firmalar */}
+          {/* Enes Doğanay | 11 Nisan 2026: Verified = 'Onaylı Firma' yazısı eklendi */}
           {data.isVerified && (
-            <span className="material-symbols-outlined verified-icon">
-              verified
+            <span className="verified-badge-inline">
+              <span className="material-symbols-outlined verified-icon">verified</span>
+              <span className="verified-text">Onaylı Firma</span>
             </span>
           )}
         </h3>
@@ -476,33 +491,44 @@ const SupplierCard = ({ data, onSearchTag }) => {
                 <>
                   <div className="contact-dropdown-backdrop" onClick={() => setShowContact(false)} />
                   <div className="contact-dropdown">
-                    {data.isVerified && (
-                      <button className="contact-dropdown-item contact-dropdown-teklif" onClick={() => { setShowContact(false); setShowQuoteModal(true); }}>
-                        <span className="material-symbols-outlined">request_quote</span>Teklif İste
-                      </button>
-                    )}
-                    {data.telefon && (
-                      <a href={`tel:${data.telefon}`} className="contact-dropdown-item">
-                        <span className="material-symbols-outlined">call</span>{data.telefon}
-                      </a>
-                    )}
-                    {data.eposta && (
-                      <a href={`mailto:${data.eposta}`} className="contact-dropdown-item">
-                        <span className="material-symbols-outlined">mail</span>{data.eposta}
-                      </a>
-                    )}
-                    {data.web_sitesi && (
-                      <a href={data.web_sitesi.startsWith('http') ? data.web_sitesi : `https://${data.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
-                        <span className="material-symbols-outlined">language</span>{data.web_sitesi.replace(/^https?:\/\//, '')}
-                      </a>
-                    )}
-                    {(data.adres || data.location) && (
-                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.adres || data.location)}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
-                        <span className="material-symbols-outlined">location_on</span>{data.location || data.adres}
-                      </a>
-                    )}
-                    {!data.telefon && !data.eposta && !data.web_sitesi && !data.adres && !data.isVerified && (
-                      <span className="contact-dropdown-empty">İletişim bilgisi yok</span>
+                    {/* Enes Doğanay | 11 Nisan 2026: Giriş yapmayan kullanıcıya inline login prompt */}
+                    {!isLoggedIn ? (
+                      <div className="contact-gated-panel">
+                        <span className="material-symbols-outlined contact-gated-lock">lock</span>
+                        <p className="contact-gated-text">Teklif istemek ve iletişim bilgilerini görmek için giriş yapın.</p>
+                        <button onClick={() => navigate('/login')} className="contact-gated-btn">Giriş Yap</button>
+                      </div>
+                    ) : (
+                      <>
+                        {data.isVerified && (
+                          <button className="contact-dropdown-item contact-dropdown-teklif" onClick={() => { setShowContact(false); setShowQuoteModal(true); }}>
+                            <span className="material-symbols-outlined">request_quote</span>Teklif İste
+                          </button>
+                        )}
+                        {data.telefon && (
+                          <a href={`tel:${data.telefon}`} className="contact-dropdown-item">
+                            <span className="material-symbols-outlined">call</span>{data.telefon}
+                          </a>
+                        )}
+                        {data.eposta && (
+                          <a href={`mailto:${data.eposta}`} className="contact-dropdown-item">
+                            <span className="material-symbols-outlined">mail</span>{data.eposta}
+                          </a>
+                        )}
+                        {data.web_sitesi && (
+                          <a href={data.web_sitesi.startsWith('http') ? data.web_sitesi : `https://${data.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                            <span className="material-symbols-outlined">language</span>{data.web_sitesi.replace(/^https?:\/\//, '')}
+                          </a>
+                        )}
+                        {(data.adres || data.location) && (
+                          <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.adres || data.location)}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                            <span className="material-symbols-outlined">location_on</span>{data.location || data.adres}
+                          </a>
+                        )}
+                        {!data.telefon && !data.eposta && !data.web_sitesi && !data.adres && !data.isVerified && (
+                          <span className="contact-dropdown-empty">İletişim bilgisi yok</span>
+                        )}
+                      </>
                     )}
                   </div>
                 </>
@@ -673,6 +699,35 @@ function App() {
   const [listQuoteSent, setListQuoteSent] = useState(false);
   const [listUserProfile, setListUserProfile] = useState(null);
 
+  // Enes Doğanay | 8 Nisan 2026: Kullanıcının favori firma ID'leri — kart üzerinde kalp toggle için
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
+  // Enes Doğanay | 11 Nisan 2026: Giriş durumu — alert yerine inline UX için
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      setIsLoggedIn(true);
+      const { data } = await supabase.from('kullanici_favorileri').select('firma_id').eq('user_id', session.user.id);
+      if (data) setFavoriteIds(new Set(data.map(f => f.firma_id)));
+    })();
+  }, []);
+
+  /* Enes Doğanay | 11 Nisan 2026: Giriş yapmamış kullanıcıyı login sayfasına yönlendir, alert kaldırıldı */
+  const handleCardFavoriteToggle = async (firmaId) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) { navigate('/login'); return; }
+    const isFav = favoriteIds.has(firmaId);
+    if (isFav) {
+      await supabase.from('kullanici_favorileri').delete().eq('user_id', session.user.id).eq('firma_id', firmaId);
+      setFavoriteIds(prev => { const n = new Set(prev); n.delete(firmaId); return n; });
+    } else {
+      await supabase.from('kullanici_favorileri').insert([{ user_id: session.user.id, firma_id: firmaId }]);
+      setFavoriteIds(prev => new Set(prev).add(firmaId));
+    }
+  };
+
   useEffect(() => {
     if (!listQuoteSupplier) return;
     (async () => {
@@ -688,7 +743,7 @@ function App() {
     setListQuoteSending(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { alert('Lütfen önce giriş yapın.'); return; }
+      if (!session?.user) { navigate('/login'); return; }
       let senderFirmaId = null;
       let senderFirmaAdi = '';
       const managedId = await getManagedCompanyId();
@@ -780,7 +835,7 @@ function App() {
     /* Enes Doğanay | 6 Nisan 2026: Sadece kullanılan sütunlar çekiliyor (performans) */
     let query = supabase
       .from('firmalar')
-      .select('firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres', { count: 'exact' });
+      .select('firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres, onayli_hesap', { count: 'exact' });
 
     // Enes Doğanay | 5 Nisan 2026: Minimum 2 karakter kontrolü - çok geniş sorguları engeller
     const trimmedSearch = debouncedSearch?.trim() || '';
@@ -840,24 +895,17 @@ function App() {
     }
 
     if (!error && data) {
-      /* Enes Doğanay | 7 Nisan 2026: Verified = kurumsal yöneticisi olan firmalar */
-      const firmaIds = data.map(item => String(item.firmaID));
-      const { data: managersData } = await supabase
-        .from('kurumsal_firma_yoneticileri')
-        .select('firma_id')
-        .in('firma_id', firmaIds);
-      const verifiedSet = new Set((managersData || []).map(m => String(m.firma_id)));
-
       let mappedSuppliers = data.map(item => ({
         id: item.firmaID,
         name: item.firma_adi,
-        /* Enes Doğanay | 7 Nisan 2026: Verified artık kurumsal yöneticiye göre belirleniyor */
         isBest: item.best,
-        isVerified: verifiedSet.has(String(item.firmaID)),
+        /* Enes Doğanay | 8 Nisan 2026: onayli_hesap doğrudan firmalar tablosundan okunuyor */
+        isVerified: item.onayli_hesap === true,
         location: item.il_ilce,
         tags: (degerleriDiziyeCevir(item.urun_kategorileri) || []),
         description: item.description,
-        images: item.logo_url,
+        /* Enes Doğanay | 8 Nisan 2026: Sadece firma-logolari bucket'ından yüklenen logoyu kabul et, eski sahte avatarları ele */
+        images: item.logo_url?.includes('firma-logolari') ? item.logo_url : null,
         telefon: item.telefon || '',
         eposta: item.eposta || '',
         web_sitesi: item.web_sitesi || '',
@@ -1063,45 +1111,70 @@ function App() {
                     </span>
                     <span className="firmalar-list-col firmalar-list-col--name" onClick={() => navigate(`/firmadetay/${supplier.id}`)}>
                       {supplier.name}
-                      {supplier.isVerified && <span className="material-symbols-outlined verified-icon" style={{ fontSize: '16px', marginLeft: '4px', verticalAlign: 'middle' }}>verified</span>}
+                      {/* Enes Doğanay | 11 Nisan 2026: Liste görünümünde de 'Onaylı Firma' yazısı eklendi */}
+                      {supplier.isVerified && <span className="verified-badge-inline" style={{ marginLeft: '4px', verticalAlign: 'middle' }}><span className="material-symbols-outlined verified-icon" style={{ fontSize: '16px' }}>verified</span> <span className="verified-text">Onaylı Firma</span></span>}
                     </span>
                     <span className="firmalar-list-col firmalar-list-col--sector" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{(supplier.tags || []).slice(0, 2).join(', ') || '—'}</span>
                     <span className="firmalar-list-col firmalar-list-col--location" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{supplier.location || '—'}</span>
                     {/* Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişime geç (kart ile birebir aynı, küçük boyut) */}
                     <span className="firmalar-list-col firmalar-list-col--action" onClick={e => e.stopPropagation()}>
+                      {/* Enes Doğanay | 11 Nisan 2026: Liste görünümüne favori butonu eklendi */}
+                      {/* Enes Doğanay | 11 Nisan 2026: Giriş yapılmamışsa buton deaktif */}
+                      <button
+                        className={`list-fav-btn ${favoriteIds.has(supplier.id) ? 'list-fav-btn--active' : ''}`}
+                        onClick={() => handleCardFavoriteToggle(supplier.id)}
+                        title={!isLoggedIn ? 'Favorilere eklemek için giriş yapın' : favoriteIds.has(supplier.id) ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+                        type="button"
+                        disabled={!isLoggedIn}
+                      >
+                        <span className="material-symbols-outlined">
+                          {favoriteIds.has(supplier.id) ? 'bookmark_added' : 'bookmark_add'}
+                        </span>
+                      </button>
                       <div className="contact-dropdown-wrap">
                         <button className="btn-outline firmalar-list-contact-btn" onClick={() => setOpenContactId(openContactId === supplier.id ? null : supplier.id)}>İletişime Geç</button>
                         {openContactId === supplier.id && (
                           <>
                             <div className="contact-dropdown-backdrop" onClick={() => setOpenContactId(null)} />
                             <div className="contact-dropdown firmalar-list-contact-dropdown">
-                              {supplier.isVerified && (
-                                <button className="contact-dropdown-item contact-dropdown-teklif" onClick={() => { setOpenContactId(null); setListQuoteSupplier(supplier); }}>
-                                  <span className="material-symbols-outlined">request_quote</span>Teklif İste
-                                </button>
-                              )}
-                              {supplier.telefon && (
-                                <a href={`tel:${supplier.telefon}`} className="contact-dropdown-item">
-                                  <span className="material-symbols-outlined">call</span>{supplier.telefon}
-                                </a>
-                              )}
-                              {supplier.eposta && (
-                                <a href={`mailto:${supplier.eposta}`} className="contact-dropdown-item">
-                                  <span className="material-symbols-outlined">mail</span>{supplier.eposta}
-                                </a>
-                              )}
-                              {supplier.web_sitesi && (
-                                <a href={supplier.web_sitesi.startsWith('http') ? supplier.web_sitesi : `https://${supplier.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
-                                  <span className="material-symbols-outlined">language</span>{supplier.web_sitesi.replace(/^https?:\/\//, '')}
-                                </a>
-                              )}
-                              {(supplier.adres || supplier.location) && (
-                                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(supplier.adres || supplier.location)}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
-                                  <span className="material-symbols-outlined">location_on</span>{supplier.location || supplier.adres}
-                                </a>
-                              )}
-                              {!supplier.telefon && !supplier.eposta && !supplier.web_sitesi && !supplier.adres && !supplier.isVerified && (
-                                <span className="contact-dropdown-empty">İletişim bilgisi yok</span>
+                              {/* Enes Doğanay | 11 Nisan 2026: Liste görünümünde de inline login prompt */}
+                              {!isLoggedIn ? (
+                                <div className="contact-gated-panel">
+                                  <span className="material-symbols-outlined contact-gated-lock">lock</span>
+                                  <p className="contact-gated-text">Teklif istemek ve iletişim bilgilerini görmek için giriş yapın.</p>
+                                  <button onClick={() => navigate('/login')} className="contact-gated-btn">Giriş Yap</button>
+                                </div>
+                              ) : (
+                                <>
+                                  {supplier.isVerified && (
+                                    <button className="contact-dropdown-item contact-dropdown-teklif" onClick={() => { setOpenContactId(null); setListQuoteSupplier(supplier); }}>
+                                      <span className="material-symbols-outlined">request_quote</span>Teklif İste
+                                    </button>
+                                  )}
+                                  {supplier.telefon && (
+                                    <a href={`tel:${supplier.telefon}`} className="contact-dropdown-item">
+                                      <span className="material-symbols-outlined">call</span>{supplier.telefon}
+                                    </a>
+                                  )}
+                                  {supplier.eposta && (
+                                    <a href={`mailto:${supplier.eposta}`} className="contact-dropdown-item">
+                                      <span className="material-symbols-outlined">mail</span>{supplier.eposta}
+                                    </a>
+                                  )}
+                                  {supplier.web_sitesi && (
+                                    <a href={supplier.web_sitesi.startsWith('http') ? supplier.web_sitesi : `https://${supplier.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                                      <span className="material-symbols-outlined">language</span>{supplier.web_sitesi.replace(/^https?:\/\//, '')}
+                                    </a>
+                                  )}
+                                  {(supplier.adres || supplier.location) && (
+                                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(supplier.adres || supplier.location)}`} target="_blank" rel="noopener noreferrer" className="contact-dropdown-item">
+                                      <span className="material-symbols-outlined">location_on</span>{supplier.location || supplier.adres}
+                                    </a>
+                                  )}
+                                  {!supplier.telefon && !supplier.eposta && !supplier.web_sitesi && !supplier.adres && !supplier.isVerified && (
+                                    <span className="contact-dropdown-empty">İletişim bilgisi yok</span>
+                                  )}
+                                </>
                               )}
                             </div>
                           </>
@@ -1119,6 +1192,9 @@ function App() {
                       key={supplier.id}
                       data={supplier}
                       onSearchTag={setSearch}
+                      isFavorited={favoriteIds.has(supplier.id)}
+                      onToggleFavorite={handleCardFavoriteToggle}
+                      isLoggedIn={isLoggedIn}
                     />
                   ))}
               </>

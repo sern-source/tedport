@@ -5,7 +5,7 @@
  * Date: April 5, 2026
  * 
  * Purpose: Unified styling for SharedHeader component used across all pages
- * Used across all pages: Home2, Firmalar, Hakkımızda, İletişim, Profile, Login, Register, FirmaDetay
+ * Used across all pages: Home, Firmalar, Hakkımızda, İletişim, Profile, Login, Register, FirmaDetay
  * 
  * Features:
  * - Responsive header with hamburger menu for mobile (< 768px)
@@ -495,7 +495,9 @@
 
 .shared-mobile-menu a,
 .shared-mobile-menu button {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: #111418;
     padding: 14px 12px;
     font-size: 15px;
@@ -508,6 +510,27 @@
     text-align: left;
     width: 100%;
     border-radius: 6px;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Mobil menü ikon ve badge stilleri */
+.shared-mobile-menu-icon {
+    font-size: 20px;
+    color: #637588;
+}
+
+.shared-mobile-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: auto;
 }
 
 .shared-mobile-menu a:hover,

@@ -9,10 +9,10 @@ import { useAuth } from './AuthContext';
  * Date: April 5, 2026
  * 
  * Purpose: Unified header component eliminating code duplication across all pages
- * Integrates with: Home2, Firmalar, Hakkımızda, İletişim, Profile, Login, Register, FirmaDetay
+ * Integrates with: Home, Firmalar, Hakkımızda, İletişim, Profile, Login, Register, FirmaDetay
  * 
  * Features:
- * - Reusable header for all pages (Home2, Firmalar, Hakkımızda, İletişim, etc.)
+ * - Reusable header for all pages (Home, Firmalar, Hakkımızda, İletişim, etc.)
  * - User session management via Supabase
  * - Mobile hamburger menu with responsive navigation
  * - User dropdown menu (Profil, Favoriler, Bildirimler, Çıkış Yap)
@@ -403,24 +403,55 @@ const SharedHeader = ({
                     {userProfile && (
                         <>
                             {managedCompanyId ? (
-                                location.pathname !== `/firmadetay/${managedCompanyId}` && (
-                                    <Link to={`/firmadetay/${managedCompanyId}`} onClick={() => setIsMobileMenuOpen(false)}>Firma Paneli</Link>
-                                )
+                                <>
+                                    {/* Enes Doğanay | 8 Nisan 2026: Kurumsal mobil menü — tüm sekmeler eklendi */}
+                                    <Link to="/firma-profil?tab=panel" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">storefront</span>
+                                        Firma Paneli
+                                    </Link>
+                                    <Link to="/firma-profil?tab=teklifler" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">request_quote</span>
+                                        Teklif Yönetimi
+                                        {pendingQuoteCount > 0 && <span className="shared-mobile-badge">{pendingQuoteCount}</span>}
+                                    </Link>
+                                    <Link to="/firma-profil?tab=bildirimler" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>
+                                        Bildirimler
+                                        {unreadNotifCount > 0 && <span className="shared-mobile-badge">{unreadNotifCount}</span>}
+                                    </Link>
+                                    <Link to="/firma-profil?tab=favoriler" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">collections_bookmark</span>
+                                        Favorilerim
+                                    </Link>
+                                </>
                             ) : (
                                 <>
-                                    {!(location.pathname === '/profile' && !location.search) && (
-                                        <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>Profil</Link>
-                                    )}
-                                    {!(location.pathname === '/profile' && location.search === '?tab=favorites') && (
-                                        <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>Favoriler</Link>
-                                    )}
-                                    {!(location.pathname === '/profile' && location.search === '?tab=notifications') && (
-                                        <Link to="/profile?tab=notifications" onClick={() => setIsMobileMenuOpen(false)}>Bildirimler</Link>
-                                    )}
+                                    {/* Enes Doğanay | 8 Nisan 2026: Bireysel mobil menü — Tekliflerim eklendi */}
+                                    <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">person</span>
+                                        Profil
+                                    </Link>
+                                    <Link to="/profile?tab=quotes" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">request_quote</span>
+                                        Tekliflerim
+                                        {pendingQuoteCount > 0 && <span className="shared-mobile-badge">{pendingQuoteCount}</span>}
+                                    </Link>
+                                    <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">favorite</span>
+                                        Favoriler
+                                    </Link>
+                                    <Link to="/profile?tab=notifications" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>
+                                        Bildirimler
+                                        {unreadNotifCount > 0 && <span className="shared-mobile-badge">{unreadNotifCount}</span>}
+                                    </Link>
                                 </>
                             )}
-                            {isCurrentUserAdmin && location.pathname !== '/admin/kurumsal-basvurular' && (
-                                <Link to="/admin/kurumsal-basvurular" onClick={() => setIsMobileMenuOpen(false)}>Kurumsal Başvurular</Link>
+                            {isCurrentUserAdmin && (
+                                <Link to="/admin/kurumsal-basvurular" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span className="material-symbols-outlined shared-mobile-menu-icon">admin_panel_settings</span>
+                                    Kurumsal Başvurular
+                                </Link>
                             )}
                             <button
                                 className="shared-mobile-logout"

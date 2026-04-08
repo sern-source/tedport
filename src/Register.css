@@ -177,10 +177,12 @@ body {
   }
 }
 
+/* Enes Doğanay | 8 Nisan 2026: min-width:0 flex taşma sorununu önler */
 .input-group {
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
 }
 
 .input-group label {
@@ -193,6 +195,7 @@ body {
   position: relative;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .form-input {
@@ -205,6 +208,9 @@ body {
   font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  min-width: 0;
+  text-overflow: ellipsis;
 }
 
 .form-input:focus {
@@ -215,6 +221,127 @@ body {
 
 .form-input::placeholder {
   color: #a0aec0;
+}
+
+/* Enes Doğanay | 11 Nisan 2026: Şifre uyuşmazlık hata stili */
+.form-input--error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.field-error-text {
+  color: #ef4444;
+  font-size: 0.78rem;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Firma eşleşme başarı stili */
+.form-input--matched {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.field-hint--success {
+  color: #16a34a;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Firma autocomplete dropdown */
+.firma-autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  margin-top: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.firma-autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.firma-autocomplete-item:hover {
+  background: #f1f5f9;
+}
+
+.firma-autocomplete-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #137fec, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.firma-autocomplete-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.firma-autocomplete-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.firma-autocomplete-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111418;
+}
+
+.firma-autocomplete-location {
+  font-size: 0.78rem;
+  color: #637588;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Zaten yönetilen (verified) firma autocomplete'de soluk ve seçilemez */
+.firma-autocomplete-item--managed {
+  opacity: 0.48;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.firma-autocomplete-item--managed:hover {
+  background: none;
+}
+
+.firma-autocomplete-managed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Kurumsal kayit sekmesi icin cok satirli alan destegi eklendi */
@@ -455,6 +582,122 @@ body {
   margin: 0;
   line-height: 1.6;
   font-size: 0.88rem;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Opsiyonel alan etiketi */
+.field-optional {
+  font-weight: 400;
+  color: #94a3b8;
+  font-size: 0.82rem;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Vergi levhası yükleme alanı */
+.tax-doc-upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tax-doc-upload-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.tax-doc-upload-area:hover {
+  border-color: #137fec;
+  background: #f0f7ff;
+}
+
+.tax-doc-upload-icon {
+  font-size: 24px;
+  color: #137fec;
+}
+
+.tax-doc-upload-text {
+  font-size: 0.88rem;
+  color: #475569;
+}
+
+.tax-doc-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  color: #ef4444;
+  transition: background 0.15s;
+}
+
+.tax-doc-remove:hover {
+  background: #fef2f2;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: Vergi levhası teşvik notu */
+.tax-doc-boost-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #bbf7d0;
+  font-size: 0.82rem;
+  color: #15803d;
+  line-height: 1.55;
+}
+
+.tax-doc-boost-icon {
+  font-size: 18px;
+  color: #16a34a;
+  margin-top: 1px;
+}
+
+/* Enes Doğanay | 8 Nisan 2026: İletişim ve Konum fieldset bloğu — İl/İlçe + Açık Adres */
+.corporate-address-block {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px 18px 14px;
+  margin-top: 4px;
+  background: #f8fafc;
+}
+
+.corporate-address-block legend {
+  display: flex;
+  align-items: center;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  padding: 0 6px;
+}
+
+.corporate-address-block .form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.corporate-address-block .form-select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background-color: #f1f5f9;
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Basvuru sonrasi guven veren onay ekrani eklendi */

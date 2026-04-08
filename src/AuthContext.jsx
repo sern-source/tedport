@@ -2,7 +2,7 @@
  * AuthContext - Uygulama genelinde auth durumunu tek seferde yönetir
  * Enes Doğanay | 8 Nisan 2026: Sayfa geçişlerinde tekrar sorgu atılmasını önler
  */
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from './supabaseClient';
 import { isAdminEmail } from './adminAccess';
 import { resolveIsAdminUser } from './corporateApplicationsApi';
@@ -18,11 +18,17 @@ export function AuthProvider({ children }) {
   const [managedCompanyName, setManagedCompanyName] = useState(null);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [pendingQuoteCount, setPendingQuoteCount] = useState(0);
+  // Enes Doğanay | 8 Nisan 2026: Anlık toast bildirimleri state'i
+  const [toasts, setToasts] = useState([]);
+  const realtimeChannelRef = useRef(null);
+  const userIdRef = useRef(null);
 
   const loadUserData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session?.user) {
+      // Enes Doğanay | 8 Nisan 2026: Realtime subscription için user id'yi ref'te tut
+      userIdRef.current = session.user.id;
       const [adminResult, companyId, profileResult, notifResult] = await Promise.all([
         resolveIsAdminUser(session.user.email, isAdminEmail),
         getManagedCompanyId(),
@@ -52,6 +58,7 @@ export function AuthProvider({ children }) {
         setPendingQuoteCount(quoteCount || 0);
       }
     } else {
+      userIdRef.current = null;
       setUserProfile(null);
       setIsCurrentUserAdmin(false);
       setManagedCompanyId(null);
@@ -84,7 +91,7 @@ export function AuthProvider({ children }) {
     setPendingQuoteCount(0);
   };
 
-  // Enes Doğanay | 8 Nisan 2026: Badge sayılarını yenileme (bildirim okunduysa vb.)
+  // Enes Doğanay | 8 Nisan 2026: Badge sayılarını yenileme (bildirim okunduysa, teklif durum değiştiyse vb.)
   const refreshCounts = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) return;
@@ -94,7 +101,69 @@ export function AuthProvider({ children }) {
       .eq('user_id', session.user.id)
       .eq('is_read', false);
     setUnreadNotifCount(notifCount || 0);
+
+    // Enes Doğanay | 8 Nisan 2026: Bekleyen teklif sayısını da yenile
+    const cid = await getManagedCompanyId();
+    if (cid) {
+      const { count: qCount } = await supabase
+        .from('teklif_talepleri')
+        .select('id', { count: 'exact', head: true })
+        .eq('firma_id', cid)
+        .eq('durum', 'pending');
+      setPendingQuoteCount(qCount || 0);
+    } else {
+      const { count: qCount } = await supabase
+        .from('teklif_talepleri')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+        .eq('durum', 'pending');
+      setPendingQuoteCount(qCount || 0);
+    }
   };
+
+  // Enes Doğanay | 8 Nisan 2026: Toast bildirimi kaldır (animasyonlu)
+  const dismissToast = useCallback((toastId) => {
+    setToasts(prev => prev.map(t => t.id === toastId ? { ...t, exiting: true } : t));
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== toastId)), 350);
+  }, []);
+
+  // Enes Doğanay | 8 Nisan 2026: Supabase realtime — bildirimler tablosundaki INSERT'leri dinle
+  useEffect(() => {
+    if (!authChecked || !userIdRef.current) {
+      if (realtimeChannelRef.current) {
+        supabase.removeChannel(realtimeChannelRef.current);
+        realtimeChannelRef.current = null;
+      }
+      return;
+    }
+
+    const userId = userIdRef.current;
+    const channel = supabase
+      .channel('toast-notifications')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'bildirimler', filter: `user_id=eq.${userId}` },
+        (payload) => {
+          const n = payload.new;
+          setToasts(prev => [...prev, {
+            id: n.id,
+            type: n.type || 'default',
+            title: n.title || 'Yeni Bildirim',
+            message: n.message || '',
+            exiting: false
+          }]);
+          setUnreadNotifCount(prev => prev + 1);
+        }
+      )
+      .subscribe();
+
+    realtimeChannelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+      realtimeChannelRef.current = null;
+    };
+  }, [authChecked, userIdRef.current]);
 
   return (
     <AuthContext.Provider value={{
@@ -105,6 +174,8 @@ export function AuthProvider({ children }) {
       managedCompanyName,
       unreadNotifCount,
       pendingQuoteCount,
+      toasts,
+      dismissToast,
       logout,
       refreshCounts
     }}>
