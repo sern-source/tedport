@@ -3599,9 +3599,6 @@
   background: #fff;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
-  border-color: #137fec;
-  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
-}
 
 .quote-chat-input-row button {
   display: flex;
