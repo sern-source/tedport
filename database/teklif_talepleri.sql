@@ -18,7 +18,8 @@ create table if not exists public.teklif_talepleri (
   mesaj text not null,
   miktar text,
   teslim_tarihi text,
-  durum text not null default 'pending' check (durum in ('pending', 'read', 'replied', 'rejected', 'closed')),
+  teslim_yeri text,                        -- Enes Doğanay | 9 Nisan 2026: teslim yeri (şehir)
+  durum text not null default 'pending' check (durum in ('pending', 'read', 'replied', 'awaiting_reply', 'rejected', 'closed')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -76,6 +77,33 @@ create policy "Firma yoneticisi teklif durumunu guncelleyebilir"
       select 1 from public.kurumsal_firma_yoneticileri kfy
       where kfy.user_id = auth.uid()
         and kfy.firma_id::text = teklif_talepleri.firma_id::text
+    )
+  );
+
+-- Enes Doğanay | 9 Nisan 2026: Gönderen kendi teklifini silebilir
+create policy "Kullanici kendi teklifini silebilir"
+  on public.teklif_talepleri for delete
+  using (auth.uid() = user_id);
+
+-- Enes Doğanay | 9 Nisan 2026: Firma yöneticisi firmasına gelen teklifleri silebilir
+create policy "Firma yoneticisi gelen teklifi silebilir"
+  on public.teklif_talepleri for delete
+  using (
+    exists (
+      select 1 from public.kurumsal_firma_yoneticileri kfy
+      where kfy.user_id = auth.uid()
+        and kfy.firma_id::text = teklif_talepleri.firma_id::text
+    )
+  );
+
+-- Enes Doğanay | 9 Nisan 2026: Firma yöneticisi firmasından giden teklifleri silebilir
+create policy "Firma yoneticisi giden teklifi silebilir"
+  on public.teklif_talepleri for delete
+  using (
+    exists (
+      select 1 from public.kurumsal_firma_yoneticileri kfy
+      where kfy.user_id = auth.uid()
+        and kfy.firma_id::text = teklif_talepleri.gonderen_firma_id::text
     )
   );
 
@@ -241,3 +269,37 @@ create trigger trg_teklif_mesaj_bildirim
   after insert on public.teklif_mesajlari
   for each row
   execute function public.fn_teklif_mesaj_bildirim();
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- Enes Doğanay | 9 Nisan 2026: Teklif reddedildiğinde gönderene bildirim at
+-- ═══════════════════════════════════════════════════════════════════════════
+create or replace function public.fn_teklif_rejected_bildirim()
+returns trigger
+language plpgsql
+security definer
+as $$
+declare
+  firma_adi_val text;
+begin
+  if new.durum = 'rejected' and old.durum is distinct from 'rejected' then
+    select firma_adi into firma_adi_val from public.firmalar where "firmaID"::text = new.firma_id::text limit 1;
+
+    insert into public.bildirimler (user_id, type, title, message, firma_id, metadata)
+    values (
+      new.user_id,
+      'quote_rejected',
+      'Teklif Talebiniz Reddedildi',
+      '"' || new.konu || '" konulu teklif talebiniz ' || coalesce(firma_adi_val, 'firma') || ' tarafından reddedildi.',
+      new.firma_id::text,
+      jsonb_build_object('teklif_id', new.id)
+    );
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_teklif_rejected_bildirim on public.teklif_talepleri;
+create trigger trg_teklif_rejected_bildirim
+  after update on public.teklif_talepleri
+  for each row
+  execute function public.fn_teklif_rejected_bildirim();

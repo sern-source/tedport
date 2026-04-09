@@ -94,6 +94,12 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true
+    },
+    // Enes Doğanay | 9 Nisan 2026: Realtime bağlantısı için gerekli config — RLS filtreleme ve broadcast
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
     }
   }
 );

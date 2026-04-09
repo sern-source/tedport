@@ -192,8 +192,10 @@ const SharedHeader = ({
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                     type="button"
                                 >
-                                    {/* Enes Doğanay | 6 Nisan 2026: Kurumsal hesapta firma adı, bireysel hesapta kullanıcı adı */}
-                                    {managedCompanyName || `${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                                    {/* Enes Doğanay | 9 Nisan 2026: Uzun isim taşmasını önlemek için span wrapper */}
+                                    <span className="shared-user-btn-label">
+                                        {managedCompanyName || `${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                                    </span>
                                     <span className="material-symbols-outlined shared-user-btn-icon">
                                         {isDropdownOpen ? 'expand_less' : 'expand_more'}
                                     </span>
@@ -217,6 +219,22 @@ const SharedHeader = ({
                                                 </span>
                                                 <span className="shared-user-menu-label">
                                                     Firma Paneli
+                                                </span>
+                                            </button>
+                                            {/* Enes Doğanay | 9 Nisan 2026: Sıralama değiştirildi — Favorilerim öne alındı */}
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/firma-profil?tab=favoriler');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    collections_bookmark
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Favorilerim
                                                 </span>
                                             </button>
                                             <button
@@ -251,22 +269,6 @@ const SharedHeader = ({
                                                 </span>
                                                 {unreadNotifCount > 0 && <span className="shared-menu-badge">{unreadNotifCount}</span>}
                                             </button>
-                                            {/* Enes Doğanay | 8 Nisan 2026: Kurumsal dropdown'a Favorilerim eklendi */}
-                                            <button
-                                                type="button"
-                                                className="shared-user-menu-item"
-                                                onClick={() => {
-                                                    setIsDropdownOpen(false);
-                                                    navigate('/firma-profil?tab=favoriler');
-                                                }}
-                                            >
-                                                <span className="material-symbols-outlined shared-user-menu-icon">
-                                                    collections_bookmark
-                                                </span>
-                                                <span className="shared-user-menu-label">
-                                                    Favorilerim
-                                                </span>
-                                            </button>
                                             </>
                                         ) : (
                                             <button
@@ -281,7 +283,7 @@ const SharedHeader = ({
                                                     person
                                                 </span>
                                                 <span className="shared-user-menu-label">
-                                                    Profil
+                                                    Profil Bilgileri
                                                 </span>
                                             </button>
                                         )}
@@ -306,7 +308,23 @@ const SharedHeader = ({
 
                                         {!managedCompanyId && (
                                             <>
-                                                {/* Enes Doğanay | 7 Nisan 2026: Bireysel menüye Tekliflerim linki */}
+                                                {/* Enes Doğanay | 9 Nisan 2026: Sıralama güncellendi — Favorilerim öne, isimler düzeltildi */}
+                                                <button
+                                                    type="button"
+                                                    className="shared-user-menu-item"
+                                                    onClick={() => {
+                                                        setIsDropdownOpen(false);
+                                                        navigate('/profile?tab=favorites');
+                                                    }}
+                                                >
+                                                    <span className="material-symbols-outlined shared-user-menu-icon">
+                                                        collections_bookmark
+                                                    </span>
+                                                    <span className="shared-user-menu-label">
+                                                        Favorilerim
+                                                    </span>
+                                                </button>
+
                                                 <button
                                                     type="button"
                                                     className="shared-user-menu-item"
@@ -319,25 +337,9 @@ const SharedHeader = ({
                                                         request_quote
                                                     </span>
                                                     <span className="shared-user-menu-label">
-                                                        Tekliflerim
+                                                        Teklif Taleplerim
                                                     </span>
                                                     {pendingQuoteCount > 0 && <span className="shared-menu-badge">{pendingQuoteCount}</span>}
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    className="shared-user-menu-item"
-                                                    onClick={() => {
-                                                        setIsDropdownOpen(false);
-                                                        navigate('/profile?tab=favorites');
-                                                    }}
-                                                >
-                                                    <span className="material-symbols-outlined shared-user-menu-icon">
-                                                        favorite
-                                                    </span>
-                                                    <span className="shared-user-menu-label">
-                                                        Favoriler
-                                                    </span>
                                                 </button>
 
                                                 <button
@@ -404,10 +406,14 @@ const SharedHeader = ({
                         <>
                             {managedCompanyId ? (
                                 <>
-                                    {/* Enes Doğanay | 8 Nisan 2026: Kurumsal mobil menü — tüm sekmeler eklendi */}
+                                    {/* Enes Doğanay | 9 Nisan 2026: Kurumsal mobil menü — sıralama güncellendi */}
                                     <Link to="/firma-profil?tab=panel" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">storefront</span>
                                         Firma Paneli
+                                    </Link>
+                                    <Link to="/firma-profil?tab=favoriler" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">collections_bookmark</span>
+                                        Favorilerim
                                     </Link>
                                     <Link to="/firma-profil?tab=teklifler" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">request_quote</span>
@@ -418,10 +424,6 @@ const SharedHeader = ({
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>
                                         Bildirimler
                                         {unreadNotifCount > 0 && <span className="shared-mobile-badge">{unreadNotifCount}</span>}
-                                    </Link>
-                                    <Link to="/firma-profil?tab=favoriler" onClick={() => setIsMobileMenuOpen(false)}>
-                                        <span className="material-symbols-outlined shared-mobile-menu-icon">collections_bookmark</span>
-                                        Favorilerim
                                     </Link>
                                 </>
                             ) : (
@@ -434,6 +436,7 @@ const SharedHeader = ({
                                     <Link to="/profile?tab=quotes" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">request_quote</span>
                                         Tekliflerim
+                                        {/* Enes Doğanay | 9 Nisan 2026: Bireysel mobil Tekliflerim badge */}
                                         {pendingQuoteCount > 0 && <span className="shared-mobile-badge">{pendingQuoteCount}</span>}
                                     </Link>
                                     <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>

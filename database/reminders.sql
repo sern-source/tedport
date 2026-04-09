@@ -112,3 +112,10 @@ on public.bildirimler
 for update
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
+
+-- Enes Doğanay | 9 Nisan 2026: Kullanıcı kendi bildirimlerini silebilir
+drop policy if exists "Users can delete own notifications" on public.bildirimler;
+create policy "Users can delete own notifications"
+on public.bildirimler
+for delete
+using (auth.uid() = user_id);

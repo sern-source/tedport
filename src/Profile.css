@@ -2,6 +2,7 @@
 /* Enes Doğanay | 6 Nisan 2026: Inline style'lar CSS class'larına taşındı */
 /* Enes Doğanay | 6 Nisan 2026: Cool dokunuşlar — gradient, glassmorphism, micro-interactions */
 
+/* Enes Doğanay | 9 Nisan 2026: overflow-x kaldırıldı, kök sorunu header'da düzeltildi */
 .page {
   min-height: 100vh;
   display: flex;
@@ -405,24 +406,28 @@
 }
 
 /* SIDEBAR STATS */
+/* Enes Doğanay | 9 Nisan 2026: Kayıtlı tedarikçi kartı — kompakt ve modern */
 .sidebar-stats {
-  margin-top: 20px;
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
+  margin-top: 16px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
   color: #fff;
-  padding: 24px 20px;
-  border-radius: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.3);
+  box-shadow: 0 4px 14px rgba(29, 78, 216, 0.25);
 }
 
 .sidebar-stats::before {
   content: '';
   position: absolute;
-  top: -30px;
-  right: -30px;
-  width: 100px;
-  height: 100px;
+  top: -20px;
+  right: -20px;
+  width: 60px;
+  height: 60px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 50%;
 }
@@ -430,35 +435,54 @@
 .sidebar-stats::after {
   content: '';
   position: absolute;
-  bottom: -20px;
-  left: -20px;
-  width: 70px;
-  height: 70px;
+  bottom: -14px;
+  left: -14px;
+  width: 40px;
+  height: 40px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
 }
 
+.sidebar-stats-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-stats-icon .material-symbols-outlined {
+  font-size: 20px;
+  color: #fff;
+}
+
+.sidebar-stats-text {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
 .sidebar-stats-label {
-  font-size: 12px;
-  opacity: 0.9;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  opacity: 0.85;
+  letter-spacing: 0.3px;
 }
 
 .sidebar-stats-value {
-  font-size: 36px;
+  font-size: 1.4rem;
   font-weight: 800;
-  margin: 4px 0 0 0;
-  background: linear-gradient(to right, #fff, #e0f2fe);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
 }
 
 /* CONTENT */
+/* Enes Doğanay | 9 Nisan 2026: min-width:0 ile flex taşmayı önle */
 .content {
   flex: 1;
   width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
@@ -574,7 +598,402 @@
   }
 }
 
-/* PROFILE */
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 9 Nisan 2026: Profil sayfası modern tasarım v2
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Enes Doğanay | 10 Nisan 2026: overflow:hidden kaldırıldı — CitySelect fixed dropdown kırpılmasın */
+.profile-card-v2 {
+  padding: 0 !important;
+  animation: profileCardReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes profileCardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Hero banner - gradient + floating shapes */
+/* Enes Doğanay | 10 Nisan 2026: Banner'a üst köşe border-radius eklendi (kart overflow:hidden olmadan) */
+.profile-hero-banner {
+  position: relative;
+  height: 140px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #8b5cf6 100%);
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+
+@media (min-width: 640px) {
+  .profile-hero-banner {
+    height: 170px;
+  }
+}
+
+.profile-hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(255, 255, 255, 0.08) 0%, transparent 35%);
+}
+
+/* Floating decorative shapes */
+.profile-hero-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.12;
+  background: white;
+}
+
+.profile-hero-shape--1 {
+  width: 200px;
+  height: 200px;
+  top: -60px;
+  right: -40px;
+  animation: heroFloat 8s ease-in-out infinite;
+}
+
+.profile-hero-shape--2 {
+  width: 120px;
+  height: 120px;
+  bottom: -30px;
+  left: 10%;
+  animation: heroFloat 6s ease-in-out infinite 1s;
+}
+
+.profile-hero-shape--3 {
+  width: 80px;
+  height: 80px;
+  top: 20px;
+  left: 40%;
+  animation: heroFloat 7s ease-in-out infinite 2s;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.05); }
+}
+
+/* Avatar - banner kenarından taşan */
+.profile-avatar-center {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: -56px;
+  margin-bottom: 0.75rem;
+  z-index: 2;
+}
+
+.avatar-v2 {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  border: 4px solid white;
+  box-shadow:
+    0 0 0 4px rgba(99, 102, 241, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.12);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+}
+
+.avatar-v2:hover {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 0 4px rgba(99, 102, 241, 0.25),
+    0 12px 40px rgba(0, 0, 0, 0.16);
+}
+
+.avatar-v2--no-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #818cf8;
+}
+
+.avatar-v2--no-photo .material-symbols-outlined {
+  font-size: 48px;
+}
+
+/* Camera button - avatar üzerinde */
+.avatar-camera-btn {
+  position: absolute;
+  bottom: 2px;
+  left: calc(50% + 26px);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: 3px solid white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+}
+
+.avatar-camera-btn .material-symbols-outlined {
+  font-size: 17px;
+}
+
+.avatar-camera-btn:hover:not(:disabled) {
+  transform: scale(1.12);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+}
+
+.avatar-camera-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Centered identity block */
+.profile-identity {
+  text-align: center;
+  padding: 0 2rem 1.25rem;
+}
+
+.profile-display-name {
+  font-size: clamp(1.25rem, 4vw, 1.625rem);
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.375rem;
+  letter-spacing: -0.01em;
+}
+
+/* Enes Doğanay | 10 Nisan 2026: Şirket — badge arası boşluk artırıldı */
+.profile-display-company {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-gray);
+  font-size: 0.875rem;
+  margin: 0 0 1.125rem;
+}
+
+/* Enes Doğanay | 10 Nisan 2026: Şirket adı ile badge arası boşluk (margin-left) */
+.profile-badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+  color: #15803d;
+  padding: 0.4rem 0.875rem;
+  border-radius: 24px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-left: 10px;
+  animation: verifiedPulse 3s ease-in-out infinite;
+}
+
+.profile-badge-verified .material-symbols-outlined {
+  font-size: 17px;
+  color: #16a34a;
+}
+
+@keyframes verifiedPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+  50% { box-shadow: 0 0 20px rgba(22, 163, 74, 0.12); }
+}
+
+/* Divider */
+.profile-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #e2e8f0 20%, #e2e8f0 80%, transparent 100%);
+  margin: 0 2rem 1.5rem;
+}
+
+/* Fields grid - 2 kolon desktop */
+.profile-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 0 1.25rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .profile-fields-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 0 2rem 2rem;
+  }
+}
+
+/* Field card v2 - mini kart stili */
+.field-card-v2 {
+  background: linear-gradient(135deg, #fafbff 0%, #f8fafc 100%);
+  border: 1px solid #e8ecf4;
+  border-radius: 14px;
+  padding: 1rem 1.125rem !important;
+  border-bottom: none !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.875rem !important;
+  animation: fieldSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.field-card-v2:nth-child(1) { animation-delay: 0.08s; }
+.field-card-v2:nth-child(2) { animation-delay: 0.12s; }
+.field-card-v2:nth-child(3) { animation-delay: 0.16s; }
+.field-card-v2:nth-child(4) { animation-delay: 0.2s; }
+.field-card-v2:nth-child(5) { animation-delay: 0.24s; }
+.field-card-v2:nth-child(6) { animation-delay: 0.28s; }
+
+@keyframes fieldSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.field-card-v2:hover {
+  background: white;
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Field icon wrapper */
+.field-icon-wrap {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.field-card-v2:hover .field-icon-wrap {
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.field-icon-wrap .material-symbols-outlined {
+  font-size: 20px;
+  color: #6366f1;
+  transition: color 0.3s;
+}
+
+.field-card-v2:hover .field-icon-wrap .material-symbols-outlined {
+  color: white;
+}
+
+/* Field content v2 override */
+.field-card-v2 .field-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-card-v2 label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.field-card-v2 .field-value-display p {
+  font-size: 0.9rem;
+  color: #1e293b;
+  font-weight: 500;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Edit button v2 */
+.field-card-v2 .field-edit-btn {
+  font-size: 0.75rem;
+  color: #6366f1;
+  font-weight: 600;
+  padding: 0.375rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.field-card-v2 .field-edit-btn:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #4f46e5;
+  transform: none;
+}
+
+/* Edit row v2 */
+.field-card-v2 .field-edit-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.field-card-v2 .field-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+  min-width: 0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field-card-v2 .field-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.field-card-v2 .field-extra-badge {
+  font-size: 0.7rem;
+  background: linear-gradient(135deg, #dcfce7, #d1fae5);
+  color: #15803d;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Enes Doğanay | 10 Nisan 2026: Konum alanı CitySelect düzeni */
+.field-location-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.field-location-edit .city-select {
+  width: 100%;
+}
+
+.field-location-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* PROFILE (eski stiller - diğer yerler için korunmuş) */
 .profile-section {
   display: flex;
   flex-direction: column;
@@ -1211,36 +1630,55 @@
   font-size: 18px;
 }
 
-.fav-sort-wrapper {
+/* Enes Doğanay | 9 Nisan 2026: Modern sıralama buton grubu */
+.fav-sort-group {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  gap: 0;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(226, 232, 240, 0.6);
   border-radius: 12px;
-  padding: 10px 14px;
-  transition: border-color 0.2s;
+  overflow: hidden;
 }
 
-.fav-sort-wrapper:focus-within {
-  border-color: var(--primary);
-}
-
-.fav-sort-wrapper>.material-symbols-outlined {
-  color: var(--text-light);
-  font-size: 20px;
-}
-
-.fav-sort-select {
+.fav-sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
   border: none;
-  outline: none;
   background: transparent;
-  font-size: 14px;
-  color: var(--text-dark);
-  font-family: inherit;
-  cursor: pointer;
+  font-size: 13px;
   font-weight: 500;
+  color: var(--text-gray);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+  border-right: 1px solid rgba(226, 232, 240, 0.4);
+}
+
+.fav-sort-btn:last-child {
+  border-right: none;
+}
+
+.fav-sort-btn .material-symbols-outlined {
+  font-size: 17px;
+}
+
+.fav-sort-btn:hover {
+  background: #f1f5f9;
+  color: var(--text-dark);
+}
+
+.fav-sort-btn.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+}
+
+.fav-sort-btn.active .material-symbols-outlined {
+  color: #fff;
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Card menu (three-dot) */
@@ -1957,35 +2395,44 @@
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Profilde bildirim merkezi tasarlandi */
+/* Enes Doğanay | 12 Nisan 2026: Bildirim kartları küçültüldü, silme butonları eklendi, daha kompakt tasarım */
 .notifications-section {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .notifications-hero {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 22px 24px;
-  border-radius: 20px;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 14px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 248, 255, 0.96) 100%);
   border: 1px solid rgba(219, 234, 254, 0.9);
-  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
 .notifications-hero h1 {
-  margin: 0 0 6px;
-  font-size: clamp(1.3rem, 4vw, 1.6rem);
+  margin: 0 0 2px;
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
   color: #0f172a;
 }
 
 .notifications-hero p {
   margin: 0;
   color: #64748b;
-  font-size: 0.94rem;
-  line-height: 1.6;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Enes Doğanay | 12 Nisan 2026: Hero butonları yan yana */
+.notifications-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .notifications-mark-all {
@@ -1993,8 +2440,9 @@
   background: #eff6ff;
   color: #1d4ed8;
   border-radius: 999px;
-  padding: 10px 14px;
-  font-weight: 800;
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   white-space: nowrap;
@@ -2002,43 +2450,71 @@
 
 .notifications-mark-all:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.1);
 }
 
 .notifications-mark-all:disabled {
-  opacity: 0.55;
+  opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
+  transform: none;
+}
+
+/* Enes Doğanay | 12 Nisan 2026: Tümünü Sil butonu — kırmızı */
+.notifications-delete-all {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.notifications-delete-all:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(220, 38, 38, 0.12);
+  background: #fee2e2;
+}
+
+.notifications-delete-all:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .notifications-stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 10px;
 }
 
 .notification-stat-card {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 18px 20px;
-  border-radius: 18px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
   color: #fff;
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
 }
 
 .notification-stat-card .material-symbols-outlined {
-  font-size: 22px;
+  font-size: 20px;
   opacity: 0.9;
 }
 
 .notification-stat-card strong {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   line-height: 1;
 }
 
 .notification-stat-card span:last-child {
-  font-size: 0.86rem;
+  font-size: 0.78rem;
   opacity: 0.9;
 }
 
@@ -2050,80 +2526,85 @@
   background: linear-gradient(135deg, #d29a42 0%, #be7c20 100%);
 }
 
+/* Enes Doğanay | 9 Nisan 2026: Bildirimler (sol) geniş, Hatırlatmalar (sağ) dar — stat kartlarıyla hizalı */
+/* Enes Doğanay | 12 Nisan 2026: Kompakt grid + panel tasarımı */
 .notifications-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1.35fr;
-  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
 }
 
 .notifications-panel {
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.04);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.03);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .notifications-panel-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .notifications-panel-header h3 {
-  margin: 0 0 4px;
-  font-size: 1rem;
+  margin: 0 0 2px;
+  font-size: 0.9rem;
   color: #0f172a;
 }
 
 .notifications-panel-header p {
   margin: 0;
   color: #64748b;
-  font-size: 0.86rem;
-  line-height: 1.5;
+  font-size: 0.78rem;
+  line-height: 1.4;
 }
 
 .notifications-panel-subheader {
-  margin-top: 14px;
-  margin-bottom: 12px;
-  padding: 14px 16px;
-  border-radius: 16px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
   background: linear-gradient(180deg, #fff8ec 0%, #fffdf8 100%);
   border: 1px solid rgba(237, 201, 125, 0.52);
 }
 
 .notifications-panel-subheader h4 {
-  margin: 0 0 4px;
-  font-size: 0.92rem;
+  margin: 0 0 2px;
+  font-size: 0.82rem;
   color: #8a5d16;
 }
 
 .notifications-panel-subheader p {
   margin: 0;
   color: #8b7355;
-  font-size: 0.82rem;
-  line-height: 1.5;
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 .notifications-empty-state {
-  min-height: 180px;
+  min-height: 120px;
   border: 1px dashed rgba(203, 213, 225, 0.9);
-  border-radius: 18px;
+  border-radius: 12px;
   background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 10px;
+  gap: 6px;
   color: #64748b;
-  padding: 20px;
+  padding: 14px;
 }
 
 .notifications-empty-state .material-symbols-outlined {
-  font-size: 30px;
+  font-size: 24px;
   color: #94a3b8;
 }
 
@@ -2131,15 +2612,23 @@
 .notifications-feed-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .upcoming-reminder-card,
 .notification-feed-card {
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 10px 12px;
   border: 1px solid rgba(226, 232, 240, 0.9);
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Tıklanabilir bildirim kartı hover efekti */
+.notification-feed-card.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  border-color: rgba(96, 165, 250, 0.5);
 }
 
 .upcoming-reminder-card.overdue {
@@ -2152,8 +2641,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .upcoming-reminder-time,
@@ -2163,9 +2652,9 @@
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 5px 9px;
-  font-size: 11px;
-  font-weight: 800;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .upcoming-reminder-time {
@@ -2190,31 +2679,32 @@
 
 .upcoming-reminder-card h4,
 .notification-feed-card h4 {
-  margin: 0 0 8px;
+  margin: 0 0 3px;
   color: #0f172a;
-  font-size: 0.98rem;
+  font-size: 0.85rem;
 }
 
 .upcoming-reminder-card p,
 .notification-feed-card p {
   margin: 0;
   color: #64748b;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 .upcoming-reminder-link,
 .notification-read-btn,
 .notification-open-btn {
-  margin-top: 12px;
+  margin-top: 6px;
   border: none;
   border-radius: 999px;
-  padding: 9px 12px;
-  font-weight: 800;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -2233,22 +2723,22 @@
 .notification-read-btn:hover,
 .notification-open-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.07);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
 }
 
 .overdue-reminders-block {
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .notification-feed-card.unread {
   border-color: rgba(96, 165, 250, 0.38);
-  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.06);
 }
 
 .notification-feed-type {
   background: rgba(219, 234, 254, 0.9);
   color: #1d4ed8;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .notification-feed-time {
@@ -2259,7 +2749,34 @@
 .notification-feed-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Enes Doğanay | 12 Nisan 2026: Tekil bildirim silme butonu — kırmızı ikon */
+.notification-delete-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  margin-top: 6px;
+}
+
+.notification-delete-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.notification-delete-btn:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
 }
 
 @media (max-width: 1023px) {
@@ -2519,20 +3036,25 @@
   animation: fadeIn 0.3s ease;
 }
 
+/* Enes Doğanay | 9 Nisan 2026: Teklif Taleplerim hero — renkli gradient */
 .quotes-hero {
   margin-bottom: 1.5rem;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #eff6ff, #eef2ff);
+  border-radius: 14px;
+  border: 1px solid #dbeafe;
 }
 
 .quotes-hero h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: #1e3a5f;
   margin: 0 0 4px;
 }
 
 .quotes-hero p {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: #4b7399;
   margin: 0;
 }
 
@@ -2644,6 +3166,42 @@
 .my-quote-status--replied { background: #d1fae5; color: #065f46; }
 .my-quote-status--rejected { background: #fee2e2; color: #991b1b; }
 .my-quote-status--closed { background: #f3f4f6; color: #6b7280; }
+/* Enes Doğanay | 10 Nisan 2026: Yanıt Bekliyor durumu — yumuşak kırmızı */
+.my-quote-status--awaiting_reply { background: #fde8e8; color: #c53030; }
+
+/* Enes Doğanay | 10 Nisan 2026: Teklif durumu filtre butonları */
+.my-quotes-status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.my-quotes-status-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.my-quotes-status-filter-btn:hover {
+  border-color: #137fec;
+  color: #137fec;
+}
+
+.my-quotes-status-filter-btn.active {
+  background: #137fec;
+  border-color: #137fec;
+  color: #fff;
+}
 
 .my-quote-message {
   font-size: 0.88rem;
@@ -2663,19 +3221,81 @@
   flex-wrap: wrap;
 }
 
+/* Enes Doğanay | 9 Nisan 2026: Metin etiketli tag stili */
 .my-quote-tag {
-  font-size: 0.76rem;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 4px 10px;
-  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #374151;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 5px 12px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  line-height: 1.4;
 }
 
-.my-quote-tag .material-symbols-outlined {
-  font-size: 14px;
+.my-quote-tag strong {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Teklif silme butonları */
+.my-quote-delete-trigger {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.my-quote-delete-trigger:hover {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.my-quote-delete-trigger .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.my-quote-delete-confirm {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.my-quote-delete-btn {
+  border: none;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.my-quote-delete-btn--yes {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.my-quote-delete-btn--yes:hover {
+  background: #fecaca;
+}
+
+.my-quote-delete-btn--no {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.my-quote-delete-btn--no:hover {
+  background: #e5e7eb;
 }
 
 .my-quote-link {
@@ -2724,30 +3344,34 @@
   gap: 12px;
 }
 
+/* Enes Doğanay | 9 Nisan 2026: Chat görünümü modernleştirildi */
 .quote-chat-back {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: none;
-  border: none;
+  background: #eff6ff;
+  border: 1.5px solid #dbeafe;
   font: inherit;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #137fec;
+  color: #1d4ed8;
   cursor: pointer;
-  padding: 4px 0;
-  transition: color 0.15s;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: all 0.2s;
 }
 
-.quote-chat-back:hover { color: #0c5fc0; }
+.quote-chat-back:hover { background: #dbeafe; border-color: #93c5fd; }
 
 .quote-chat-back .material-symbols-outlined { font-size: 18px; }
 
 .quote-chat-header-card {
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 14px 16px;
+  background: linear-gradient(135deg, #f8fafc, #eff6ff);
+  border: 1.5px solid #dbeafe;
+  border-left: 4px solid #3b82f6;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.06);
 }
 
 .quote-chat-header-top {
@@ -2760,14 +3384,16 @@
 
 .quote-chat-header-top h2 {
   margin: 0;
-  font-size: 1rem;
-  color: #111827;
+  font-size: 1.05rem;
+  color: #1e3a5f;
+  font-weight: 700;
 }
 
 .quote-chat-firma {
   margin: 2px 0 0;
   font-size: 0.82rem;
-  color: #6b7280;
+  color: #1d4ed8;
+  font-weight: 500;
 }
 
 .quote-chat-meta {
@@ -2777,19 +3403,81 @@
   margin-bottom: 10px;
 }
 
-.quote-chat-initial-msg {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+/* Enes Doğanay | 11 Nisan 2026: Ek dosya tasarımı yenilendi */
+.quote-chat-attachment {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.quote-chat-attachment:hover {
+  box-shadow: 0 2px 8px rgba(14,165,233,0.13);
+  border-color: #7dd3fc;
+}
+.quote-chat-attachment-icon {
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
-  padding: 10px 12px;
+  background: #0ea5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.quote-chat-attachment-icon .material-symbols-outlined {
+  color: #fff;
+  font-size: 20px;
+}
+.quote-chat-attachment-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.quote-chat-attachment-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #0c4a6e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+.quote-chat-attachment-hint {
+  font-size: 0.75rem;
+  color: #0284c7;
+  margin-top: 2px;
+}
+.quote-chat-attachment-open {
+  margin-left: auto;
+  color: #0ea5e9;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.quote-chat-attachment-open .material-symbols-outlined {
+  font-size: 20px;
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Sarı arka plan yumuşatıldı, nötr gri tona çekildi */
+.quote-chat-initial-msg {
+  background: #f8f9fa;
+  border: 1px solid #e2e5e9;
+  border-radius: 10px;
+  padding: 12px 14px;
 }
 
 .quote-chat-initial-msg small {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  font-weight: 600;
+  font-weight: 700;
   display: block;
   margin-bottom: 4px;
 }
@@ -2805,11 +3493,19 @@
 .quote-chat-messages {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 360px;
+  gap: 10px;
+  max-height: 380px;
   overflow-y: auto;
-  padding: 4px 0;
+  padding: 12px 8px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
 }
+
+.quote-chat-messages::-webkit-scrollbar { width: 5px; }
+.quote-chat-messages::-webkit-scrollbar-track { background: transparent; }
+.quote-chat-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+.quote-chat-messages::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 .quote-chat-loading,
 .quote-chat-empty {
@@ -2832,24 +3528,27 @@
 }
 
 .quote-chat-bubble {
-  max-width: 80%;
+  max-width: 78%;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: 16px;
   font-size: 0.88rem;
   line-height: 1.55;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s;
 }
 
 .quote-chat-bubble.mine {
   align-self: flex-end;
-  background: #137fec;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 
 .quote-chat-bubble.theirs {
   align-self: flex-start;
-  background: #f1f5f9;
+  background: #fff;
   color: #1e293b;
+  border: 1px solid #e2e8f0;
   border-bottom-left-radius: 4px;
 }
 
@@ -2879,23 +3578,27 @@
 .quote-chat-input-row {
   display: flex;
   gap: 8px;
-  padding: 8px 0 0;
+  padding: 10px 0 0;
 }
 
 .quote-chat-input-row input {
   flex: 1;
-  padding: 10px 14px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 10px;
+  padding: 10px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 999px;
   font: inherit;
   font-size: 0.88rem;
   color: #111827;
-  background: #fff;
-  transition: border-color 0.15s;
+  background: #f8fafc;
+  transition: all 0.2s;
 }
 
 .quote-chat-input-row input:focus {
   outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
   border-color: #137fec;
   box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
 }
@@ -2907,17 +3610,18 @@
   width: 42px;
   height: 42px;
   border: none;
-  border-radius: 10px;
-  background: #137fec;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.2s;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
-.quote-chat-input-row button:hover:not(:disabled) { background: #0c5fc0; }
+.quote-chat-input-row button:hover:not(:disabled) { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: scale(1.05); }
 
-.quote-chat-input-row button:disabled { opacity: 0.5; cursor: default; }
+.quote-chat-input-row button:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
 
 .quote-chat-input-row button .material-symbols-outlined { font-size: 20px; }
 
@@ -2926,9 +3630,10 @@
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: #f3f4f6;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  border-radius: 10px;
   color: #6b7280;
   font-size: 0.85rem;
   font-weight: 500;
+  border: 1px solid #d1d5db;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './Home.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
@@ -22,6 +22,62 @@ const SupplierConnect = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [topSuppliers, setTopSuppliers] = useState([]);
     const navigate = useNavigate();
+
+    // Enes Doğanay | 9 Nisan 2026: Hero arama çubuğunda canlı firma önerileri
+    const [heroSuggestions, setHeroSuggestions] = useState([]);
+    const [heroNoResults, setHeroNoResults] = useState(false);
+    const heroSearchRef = useRef(null);
+
+    const sanitizeSearch = (input) => input.replace(/[\\"%#_]/g, '').trim();
+
+    const fetchHeroSuggestions = useCallback(async (term) => {
+        const trimmed = term?.trim() || '';
+        if (trimmed.length < 2) {
+            setHeroSuggestions([]);
+            setHeroNoResults(false);
+            return;
+        }
+        const safe = sanitizeSearch(trimmed);
+        if (safe.length < 2) { setHeroSuggestions([]); setHeroNoResults(false); return; }
+
+        const { data } = await supabase
+            .from('firmalar')
+            .select('firmaID, firma_adi, il_ilce, logo_url')
+            .or(`firma_adi.ilike."%${safe}%",ana_sektor.ilike."%${safe}%",urun_kategorileri.ilike."%${safe}%"`)
+            .order('best', { ascending: false })
+            .limit(6);
+
+        if (data && data.length > 0) {
+            setHeroSuggestions(data.map(f => ({
+                id: f.firmaID,
+                name: f.firma_adi,
+                location: f.il_ilce || '',
+                logo: f.logo_url?.includes('firma-logolari') ? f.logo_url : null
+            })));
+            setHeroNoResults(false);
+        } else {
+            setHeroSuggestions([]);
+            setHeroNoResults(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchHeroSuggestions(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm, fetchHeroSuggestions]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (heroSearchRef.current && !heroSearchRef.current.contains(e.target)) {
+                setHeroSuggestions([]);
+                setHeroNoResults(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleSearch = () => {
         if (searchTerm.trim()) {
@@ -87,7 +143,7 @@ const SupplierConnect = () => {
                                 <p className="sc-hero-subtitle">Türkiye genelindeki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.</p>
                             </div>
 
-                            <div className="sc-search-container">
+                            <div className="sc-search-container" ref={heroSearchRef}>
                                 <div className="sc-search-box">
                                     <div className="sc-search-input-group">
                                         <span className="material-symbols-outlined" style={{ color: '#94a3b8', marginRight: '12px' }}>search</span>
@@ -96,12 +152,58 @@ const SupplierConnect = () => {
                                             placeholder="Ürün veya firma ara..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') { setHeroSuggestions([]); setHeroNoResults(false); handleSearch(); } }}
                                         />
+                                        {/* Enes Doğanay | 9 Nisan 2026: Arama kutusunu tek tıkla temizleyen X butonu */}
+                                        {searchTerm && searchTerm.length > 0 && (
+                                            <span
+                                                className="material-symbols-outlined sc-search-clear"
+                                                onClick={() => { setSearchTerm(''); setHeroSuggestions([]); setHeroNoResults(false); }}
+                                                style={{ cursor: 'pointer', color: '#94a3b8', fontSize: '20px', marginLeft: '4px' }}
+                                            >close</span>
+                                        )}
                                     </div>
 
-                                    <button className="sc-search-btn" onClick={handleSearch}>Ara</button>
+                                    <button className="sc-search-btn" onClick={() => { setHeroSuggestions([]); setHeroNoResults(false); handleSearch(); }}>Ara</button>
                                 </div>
+
+                                {/* Enes Doğanay | 9 Nisan 2026: Canlı firma önerileri dropdown */}
+                                {heroSuggestions.length > 0 && (
+                                    <div className="sc-hero-suggestions">
+                                        {heroSuggestions.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className="sc-hero-suggestion-item"
+                                                onClick={() => { setHeroSuggestions([]); setHeroNoResults(false); navigate(`/firmadetay/${item.id}`); }}
+                                            >
+                                                <div className="sc-hero-suggestion-avatar">
+                                                    {item.logo
+                                                        ? <img src={item.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                                                        : item.name?.charAt(0)
+                                                    }
+                                                </div>
+                                                <div className="sc-hero-suggestion-info">
+                                                    <span className="sc-hero-suggestion-name">{item.name}</span>
+                                                    {item.location && <span className="sc-hero-suggestion-location">{item.location}</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {/* Enes Doğanay | 9 Nisan 2026: Tüm sonuçları gör bağlantısı */}
+                                        <div className="sc-hero-suggestion-all" onClick={() => { setHeroSuggestions([]); setHeroNoResults(false); handleSearch(); }}>
+                                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
+                                            Tüm sonuçları gör
+                                        </div>
+                                    </div>
+                                )}
+
+                                {heroNoResults && heroSuggestions.length === 0 && searchTerm.trim().length >= 2 && (
+                                    <div className="sc-hero-suggestions">
+                                        <div className="sc-hero-suggestion-no-result">
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#94a3b8' }}>search_off</span>
+                                            <span>Sonuç bulunamadı</span>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="sc-popular-tags">
                                     <span>Popüler:</span>

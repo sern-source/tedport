@@ -1532,8 +1532,10 @@ summary {
   letter-spacing: 0.03em;
 }
 
+/* Enes Doğanay | 9 Nisan 2026: select stili input/textarea ile aynı */
 .quote-form-group input,
-.quote-form-group textarea {
+.quote-form-group textarea,
+.quote-form-group select {
   padding: 10px 12px;
   border: 1.5px solid #e5e7eb;
   border-radius: 10px;
@@ -1543,10 +1545,17 @@ summary {
   background: #fafbfc;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
+  width: 100%;
+}
+
+.quote-form-group select {
+  cursor: pointer;
+  appearance: auto;
 }
 
 .quote-form-group input:focus,
-.quote-form-group textarea:focus {
+.quote-form-group textarea:focus,
+.quote-form-group select:focus {
   border-color: #137fec;
   box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
   background: #ffffff;
@@ -1580,30 +1589,66 @@ summary {
   flex-shrink: 0;
 }
 
+/* Enes Doğanay | 9 Nisan 2026: Modal footer butonları modernize edildi */
+/* Enes Doğanay | 10 Nisan 2026: Buton hizalama ve görsellik düzeltmesi */
 .quote-modal-footer {
   display: flex;
   gap: 0.75rem;
-  padding: 0 1.5rem 1.5rem;
+  padding: 1rem 1.5rem 1.5rem;
   justify-content: flex-end;
+  border-top: 1px solid #f3f4f6;
 }
 
 .quote-btn-cancel {
-  padding: 10px 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 11px 28px !important;
   border-radius: 10px !important;
   font-weight: 600 !important;
-  font-size: 0.85rem !important;
+  font-size: 0.9rem !important;
+  line-height: 1.25 !important;
+  border: 1.5px solid #e5e7eb !important;
+  background: #ffffff !important;
+  color: #374151 !important;
+  cursor: pointer;
+  transition: all 0.2s !important;
+}
+
+.quote-btn-cancel:hover {
+  background: #f9fafb !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
 }
 
 .quote-btn-send {
-  padding: 10px 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 11px 32px !important;
   border-radius: 10px !important;
   font-weight: 600 !important;
-  font-size: 0.85rem !important;
+  font-size: 0.9rem !important;
+  line-height: 1.25 !important;
+  background: linear-gradient(135deg, #137fec, #0b6dd4) !important;
+  color: #ffffff !important;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.2s !important;
+  box-shadow: 0 2px 8px rgba(19, 127, 236, 0.25);
+}
+
+.quote-btn-send:hover {
+  background: linear-gradient(135deg, #1a8af8, #137fec) !important;
+  box-shadow: 0 4px 12px rgba(19, 127, 236, 0.35);
+  transform: translateY(-1px);
 }
 
 .quote-btn-send:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .quote-modal-success {
@@ -1649,4 +1694,64 @@ summary {
     width: 100% !important;
     text-align: center;
   }
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Teklif modal ek dosya yükleme stilleri */
+.quote-file-upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quote-file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 10px;
+  background: #fafbfc;
+  font-size: 0.85rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quote-file-btn:hover {
+  border-color: #137fec;
+  background: #eff6ff;
+  color: #137fec;
+}
+
+.quote-file-btn .material-symbols-outlined {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.quote-file-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.quote-file-remove:hover {
+  background: #fecaca;
+}
+
+.quote-file-remove .material-symbols-outlined {
+  font-size: 16px;
 }

@@ -31,6 +31,7 @@ import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useParams } from 'react-router-dom';
+import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
 import { formatTenderDate, getTenderStatusMeta } from './tenderUtils';
 import { getManagedCompanyId } from './companyManagementApi';
 import PageLoader from './PageLoader';
@@ -181,9 +182,11 @@ const SupplierProfile = () => {
 
     // Enes Doğanay | 7 Nisan 2026: Teklif iste popup formu state'leri
     const [showQuoteModal, setShowQuoteModal] = useState(false);
-    const [quoteForm, setQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+    const [quoteForm, setQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
     const [quoteSending, setQuoteSending] = useState(false);
     const [quoteSent, setQuoteSent] = useState(false);
+    // Enes Doğanay | 9 Nisan 2026: Ek dosya yükleme state'i
+    const [quoteFile, setQuoteFile] = useState(null);
 
     // 📂 Accordion State'leri - Açık/Kapalı kategoriler
     // Enes Doğanay | 4 Nisan 2026: Ürün kategorilerini accordion olarak göstermek için state eklendi
@@ -547,6 +550,24 @@ const SupplierProfile = () => {
                 senderFirmaAdi = senderFirma?.firma_adi || '';
             }
 
+            // Enes Doğanay | 9 Nisan 2026: Ek dosya varsa Supabase Storage'a yükle
+            let ekDosyaUrl = null;
+            let ekDosyaAdi = null;
+            if (quoteFile) {
+                const ext = quoteFile.name.split('.').pop();
+                const filePath = `${session.user.id}/${Date.now()}.${ext}`;
+                const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(filePath, quoteFile);
+                if (!uploadErr) {
+                    ekDosyaUrl = filePath;
+                    ekDosyaAdi = quoteFile.name;
+                } else {
+                    // Enes Doğanay | 9 Nisan 2026: Upload hatası kullanıcıya gösterilir
+                    console.error('Dosya yükleme hatası:', uploadErr);
+                    alert('Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
+                    return;
+                }
+            }
+
             const { error } = await supabase.from('teklif_talepleri').insert([{
                 firma_id: String(id),
                 user_id: session.user.id,
@@ -558,7 +579,10 @@ const SupplierProfile = () => {
                 konu: quoteForm.konu.trim(),
                 mesaj: quoteForm.mesaj.trim(),
                 miktar: quoteForm.miktar.trim() || null,
-                teslim_tarihi: quoteForm.teslim_tarihi || null
+                teslim_tarihi: quoteForm.teslim_tarihi || null,
+                teslim_yeri: quoteForm.teslim_yeri || null, // Enes Doğanay | 9 Nisan 2026: Teslim Yeri eklendi
+                ek_dosya_url: ekDosyaUrl,
+                ek_dosya_adi: ekDosyaAdi
             }]);
 
             if (error) throw error;
@@ -567,7 +591,8 @@ const SupplierProfile = () => {
             setTimeout(() => {
                 setShowQuoteModal(false);
                 setQuoteSent(false);
-                setQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+                setQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
+                setQuoteFile(null);
             }, 2000);
         } catch (error) {
             console.error('Teklif talebi gönderilemedi:', error);
@@ -1328,9 +1353,9 @@ const SupplierProfile = () => {
                 </main>
             </div>
 
-            {/* Enes Doğanay | 7 Nisan 2026: Teklif İste popup modal */}
+            {/* Enes Doğanay | 9 Nisan 2026: Teklif İste popup modal — dışarı tıklama kapatmaz, dosya eki + iyileştirilmiş etiketler */}
             {showQuoteModal && (
-                <div className="quote-modal-overlay" onClick={() => { if (!quoteSending) { setShowQuoteModal(false); setQuoteSent(false); } }}>
+                <div className="quote-modal-overlay">
                     <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
                         {quoteSent ? (
                             <div className="quote-modal-success">
@@ -1342,17 +1367,19 @@ const SupplierProfile = () => {
                             <>
                                 <div className="quote-modal-header">
                                     <div>
-                                        <h3>Teklif İste</h3>
+                                        {/* Enes Doğanay | 9 Nisan 2026: Teklif İste → Teklif Talebi */}
+                                        <h3>Teklif Talebi</h3>
                                         <p className="quote-modal-subtitle">{firma?.firma_adi}</p>
                                     </div>
-                                    <button className="quote-modal-close" onClick={() => setShowQuoteModal(false)} type="button">
+                                    <button className="quote-modal-close" onClick={() => { setShowQuoteModal(false); setQuoteFile(null); }} type="button">
                                         <span className="material-symbols-outlined">close</span>
                                     </button>
                                 </div>
 
                                 <div className="quote-modal-body">
+                                    {/* Enes Doğanay | 9 Nisan 2026: Label güncellemeleri + Teslim Yeri eklendi */}
                                     <div className="quote-form-group">
-                                        <label>Konu *</label>
+                                        <label>Talep Başlığı *</label>
                                         <input
                                             type="text"
                                             placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi"
@@ -1364,7 +1391,7 @@ const SupplierProfile = () => {
 
                                     <div className="quote-form-row">
                                         <div className="quote-form-group">
-                                            <label>Miktar / Adet</label>
+                                            <label>Miktar</label>
                                             <input
                                                 type="text"
                                                 placeholder="Ör: 500 metre, 100 adet"
@@ -1374,7 +1401,7 @@ const SupplierProfile = () => {
                                             />
                                         </div>
                                         <div className="quote-form-group">
-                                            <label>Termin Tarihi</label>
+                                            <label>Talep Edilen Teslim Tarihi</label>
                                             <input
                                                 type="date"
                                                 value={quoteForm.teslim_tarihi}
@@ -1385,14 +1412,39 @@ const SupplierProfile = () => {
                                     </div>
 
                                     <div className="quote-form-group">
-                                        <label>Mesajınız *</label>
+                                        <label>Teslim Yeri</label>
+                                        <CitySelect
+                                            value={quoteForm.teslim_yeri}
+                                            onChange={(city) => setQuoteForm(prev => ({ ...prev, teslim_yeri: city }))}
+                                        />
+                                    </div>
+
+                                    <div className="quote-form-group">
+                                        <label>Talep Detayları *</label>
                                         <textarea
-                                            placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi, teslimat adresi vb.)"
+                                            placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi vb.)"
                                             value={quoteForm.mesaj}
                                             onChange={(e) => setQuoteForm(prev => ({ ...prev, mesaj: e.target.value }))}
                                             rows={4}
                                             maxLength={2000}
                                         />
+                                    </div>
+
+                                    {/* Enes Doğanay | 9 Nisan 2026: Opsiyonel ek dosya yükleme alanı */}
+                                    <div className="quote-form-group">
+                                        <label>Ek Dosya <span style={{ fontWeight: 400, textTransform: 'none', fontSize: '0.75rem', color: '#9ca3af' }}>(Opsiyonel — teknik şartname, çizim vb.)</span></label>
+                                        <div className="quote-file-upload">
+                                            <label className="quote-file-btn" htmlFor="detay-quote-file">
+                                                <span className="material-symbols-outlined">attach_file</span>
+                                                {quoteFile ? quoteFile.name : 'Dosya Seç'}
+                                            </label>
+                                            <input id="detay-quote-file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f && f.size <= 10 * 1024 * 1024) setQuoteFile(f); else if (f) alert('Dosya boyutu en fazla 10 MB olabilir.'); }} />
+                                            {quoteFile && (
+                                                <button type="button" className="quote-file-remove" onClick={() => setQuoteFile(null)}>
+                                                    <span className="material-symbols-outlined">close</span>
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="quote-form-info">
@@ -1402,7 +1454,7 @@ const SupplierProfile = () => {
                                 </div>
 
                                 <div className="quote-modal-footer">
-                                    <button className="btn btn-outline quote-btn-cancel" onClick={() => setShowQuoteModal(false)} type="button">
+                                    <button className="btn btn-outline quote-btn-cancel" onClick={() => { setShowQuoteModal(false); setQuoteFile(null); }} type="button">
                                         İptal
                                     </button>
                                     <button
@@ -1411,7 +1463,8 @@ const SupplierProfile = () => {
                                         disabled={quoteSending || !quoteForm.konu.trim() || !quoteForm.mesaj.trim()}
                                         type="button"
                                     >
-                                        {quoteSending ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
+                                        {/* Enes Doğanay | 9 Nisan 2026: Teklif Talebi Gönder → Teklif İste */}
+                                        {quoteSending ? 'Gönderiliyor...' : 'Teklif İste'}
                                     </button>
                                 </div>
                             </>

@@ -20,6 +20,7 @@ import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
 import { getManagedCompanyId } from './companyManagementApi';
 
 
@@ -354,10 +355,12 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
 
   // Enes Doğanay | 8 Nisan 2026: Teklif iste popup state'leri (Firmalar sayfasından doğrudan)
   const [showQuoteModal, setShowQuoteModal] = useState(false);
-  const [quoteForm, setQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+  const [quoteForm, setQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
   const [quoteSending, setQuoteSending] = useState(false);
   const [quoteSent, setQuoteSent] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  // Enes Doğanay | 9 Nisan 2026: Ek dosya yükleme state'leri
+  const [quoteFile, setQuoteFile] = useState(null);
 
   // Enes Doğanay | 8 Nisan 2026: Modal açıldığında kullanıcı profili çek
   useEffect(() => {
@@ -387,6 +390,24 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
         senderFirmaAdi = senderFirma?.firma_adi || '';
       }
 
+      // Enes Doğanay | 9 Nisan 2026: Ek dosya varsa Supabase Storage'a yükle
+      let ekDosyaUrl = null;
+      let ekDosyaAdi = null;
+      if (quoteFile) {
+        const ext = quoteFile.name.split('.').pop();
+        const filePath = `${session.user.id}/${Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(filePath, quoteFile);
+        if (!uploadErr) {
+          ekDosyaUrl = filePath;
+          ekDosyaAdi = quoteFile.name;
+        } else {
+          // Enes Doğanay | 9 Nisan 2026: Upload hatası kullanıcıya gösterilir
+          console.error('Dosya yükleme hatası:', uploadErr);
+          alert('Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
+          return;
+        }
+      }
+
       const { error } = await supabase.from('teklif_talepleri').insert([{
         firma_id: String(data.id),
         user_id: session.user.id,
@@ -398,7 +419,10 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
         konu: quoteForm.konu.trim(),
         mesaj: quoteForm.mesaj.trim(),
         miktar: quoteForm.miktar.trim() || null,
-        teslim_tarihi: quoteForm.teslim_tarihi || null
+        teslim_tarihi: quoteForm.teslim_tarihi || null,
+        teslim_yeri: quoteForm.teslim_yeri || null, // Enes Doğanay | 9 Nisan 2026: Teslim Yeri eklendi
+        ek_dosya_url: ekDosyaUrl,
+        ek_dosya_adi: ekDosyaAdi
       }]);
       if (error) throw error;
 
@@ -406,7 +430,8 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
       setTimeout(() => {
         setShowQuoteModal(false);
         setQuoteSent(false);
-        setQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+        setQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
+        setQuoteFile(null);
       }, 2000);
     } catch (error) {
       console.error('Teklif talebi gönderilemedi:', error);
@@ -540,9 +565,9 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
       </div>
     </div>
 
-      {/* Enes Doğanay | 8 Nisan 2026: Teklif İste popup modal — Firmalar sayfasından doğrudan */}
+      {/* Enes Doğanay | 9 Nisan 2026: Teklif İste popup modal — dışarı tıklama kapatmaz, dosya eki + iyileştirilmiş etiketler */}
       {showQuoteModal && (
-        <div className="quote-modal-overlay" onClick={() => { if (!quoteSending) { setShowQuoteModal(false); setQuoteSent(false); } }}>
+        <div className="quote-modal-overlay">
           <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
             {quoteSent ? (
               <div className="quote-modal-success">
@@ -554,17 +579,19 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
               <>
                 <div className="quote-modal-header">
                   <div>
-                    <h3>Teklif İste</h3>
+                    {/* Enes Doğanay | 9 Nisan 2026: Teklif İste → Teklif Talebi */}
+                    <h3>Teklif Talebi</h3>
                     <p className="quote-modal-subtitle">{data.name}</p>
                   </div>
-                  <button className="quote-modal-close" onClick={() => setShowQuoteModal(false)} type="button">
+                  <button className="quote-modal-close" onClick={() => { setShowQuoteModal(false); setQuoteFile(null); }} type="button">
                     <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
 
                 <div className="quote-modal-body">
+                  {/* Enes Doğanay | 9 Nisan 2026: Label güncellemeleri + Teslim Yeri eklendi */}
                   <div className="quote-form-group">
-                    <label>Konu *</label>
+                    <label>Talep Başlığı *</label>
                     <input
                       type="text"
                       placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi"
@@ -576,7 +603,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
 
                   <div className="quote-form-row">
                     <div className="quote-form-group">
-                      <label>Miktar / Adet</label>
+                      <label>Miktar</label>
                       <input
                         type="text"
                         placeholder="Ör: 500 metre, 100 adet"
@@ -586,7 +613,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                       />
                     </div>
                     <div className="quote-form-group">
-                      <label>Termin Tarihi</label>
+                      <label>Talep Edilen Teslim Tarihi</label>
                       <input
                         type="date"
                         value={quoteForm.teslim_tarihi}
@@ -597,14 +624,49 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                   </div>
 
                   <div className="quote-form-group">
-                    <label>Mesajınız *</label>
+                    <label>Teslim Yeri</label>
+                    <CitySelect
+                      value={quoteForm.teslim_yeri}
+                      onChange={(city) => setQuoteForm(prev => ({ ...prev, teslim_yeri: city }))}
+                    />
+                  </div>
+
+                  <div className="quote-form-group">
+                    <label>Talep Detayları *</label>
                     <textarea
-                      placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi, teslimat adresi vb.)"
+                      placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi vb.)"
                       value={quoteForm.mesaj}
                       onChange={(e) => setQuoteForm(prev => ({ ...prev, mesaj: e.target.value }))}
                       rows={4}
                       maxLength={2000}
                     />
+                  </div>
+
+                  {/* Enes Doğanay | 9 Nisan 2026: Opsiyonel ek dosya yükleme alanı */}
+                  <div className="quote-form-group">
+                    <label>Ek Dosya <span style={{ fontWeight: 400, textTransform: 'none', fontSize: '0.75rem', color: '#9ca3af' }}>(Opsiyonel — teknik şartname, çizim vb.)</span></label>
+                    <div className="quote-file-upload">
+                      <label className="quote-file-btn" htmlFor={`quote-file-${data.id}`}>
+                        <span className="material-symbols-outlined">attach_file</span>
+                        {quoteFile ? quoteFile.name : 'Dosya Seç'}
+                      </label>
+                      <input
+                        id={`quote-file-${data.id}`}
+                        type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f && f.size <= 10 * 1024 * 1024) setQuoteFile(f);
+                          else if (f) alert('Dosya boyutu en fazla 10 MB olabilir.');
+                        }}
+                      />
+                      {quoteFile && (
+                        <button type="button" className="quote-file-remove" onClick={() => setQuoteFile(null)}>
+                          <span className="material-symbols-outlined">close</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="quote-form-info">
@@ -614,7 +676,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                 </div>
 
                 <div className="quote-modal-footer">
-                  <button className="btn btn-outline quote-btn-cancel" onClick={() => setShowQuoteModal(false)} type="button">
+                  <button className="btn btn-outline quote-btn-cancel" onClick={() => { setShowQuoteModal(false); setQuoteFile(null); }} type="button">
                     İptal
                   </button>
                   <button
@@ -623,7 +685,8 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                     disabled={quoteSending || !quoteForm.konu.trim() || !quoteForm.mesaj.trim()}
                     type="button"
                   >
-                    {quoteSending ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
+                    {/* Enes Doğanay | 9 Nisan 2026: Teklif Talebi Gönder → Teklif İste */}
+                    {quoteSending ? 'Gönderiliyor...' : 'Teklif İste'}
                   </button>
                 </div>
               </>
@@ -686,18 +749,19 @@ function App() {
   const [debouncedSearch, setDebouncedSearch] = useState(urlSearchTerm || savedState?.search || '');
   const [filters, setFilters] = useState(savedState?.filters || { cities: [], categories: [], sectors: [] });
 
-  // Enes Doğanay | 8 Nisan 2026: Grid/Liste görünüm toggle (sessionStorage > localStorage)
-  const [viewMode, setViewMode] = useState(() => {
-    try { return savedState?.viewMode || localStorage.getItem('tedport_firmalar_view') || 'grid'; } catch { return 'grid'; }
-  });
+  // Enes Doğanay | 9 Nisan 2026: Görünüm modu kullanıcıya özel — giriş yapılmamışsa daima grid, giriş yapılmışsa user-key ile localStorage'dan okunur
+  const [viewMode, setViewMode] = useState('grid');
+  const [currentUserId, setCurrentUserId] = useState(null);
   // Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişim dropdown hangi satırda açık
   const [openContactId, setOpenContactId] = useState(null);
   // Enes Doğanay | 8 Nisan 2026: Liste görünümü - teklif iste modal state
   const [listQuoteSupplier, setListQuoteSupplier] = useState(null);
-  const [listQuoteForm, setListQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+  const [listQuoteForm, setListQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
   const [listQuoteSending, setListQuoteSending] = useState(false);
   const [listQuoteSent, setListQuoteSent] = useState(false);
   const [listUserProfile, setListUserProfile] = useState(null);
+  // Enes Doğanay | 9 Nisan 2026: Liste görünümü ek dosya state'i
+  const [listQuoteFile, setListQuoteFile] = useState(null);
 
   // Enes Doğanay | 8 Nisan 2026: Kullanıcının favori firma ID'leri — kart üzerinde kalp toggle için
   const [favoriteIds, setFavoriteIds] = useState(new Set());
@@ -707,8 +771,19 @@ function App() {
   useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
+      if (!session?.user) {
+        // Enes Doğanay | 9 Nisan 2026: Giriş yapılmamışsa daima grid görünümü
+        setCurrentUserId(null);
+        setViewMode('grid');
+        return;
+      }
       setIsLoggedIn(true);
+      setCurrentUserId(session.user.id);
+      // Enes Doğanay | 9 Nisan 2026: Kullanıcıya özel görünüm tercihini oku
+      try {
+        const userView = localStorage.getItem(`tedport_firmalar_view_${session.user.id}`);
+        if (userView === 'list' || userView === 'grid') setViewMode(userView);
+      } catch {}
       const { data } = await supabase.from('kullanici_favorileri').select('firma_id').eq('user_id', session.user.id);
       if (data) setFavoriteIds(new Set(data.map(f => f.firma_id)));
     })();
@@ -752,6 +827,23 @@ function App() {
         const { data: senderFirma } = await supabase.from('firmalar').select('firma_adi').eq('firmaID', managedId).single();
         senderFirmaAdi = senderFirma?.firma_adi || '';
       }
+      // Enes Doğanay | 9 Nisan 2026: Ek dosya varsa Supabase Storage'a yükle
+      let ekDosyaUrl = null;
+      let ekDosyaAdi = null;
+      if (listQuoteFile) {
+        const ext = listQuoteFile.name.split('.').pop();
+        const filePath = `${session.user.id}/${Date.now()}.${ext}`;
+        const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(filePath, listQuoteFile);
+        if (!uploadErr) {
+          ekDosyaUrl = filePath;
+          ekDosyaAdi = listQuoteFile.name;
+        } else {
+          // Enes Doğanay | 9 Nisan 2026: Upload hatası kullanıcıya gösterilir
+          console.error('Dosya yükleme hatası:', uploadErr);
+          alert('Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
+          return;
+        }
+      }
       const { error } = await supabase.from('teklif_talepleri').insert([{
         firma_id: String(listQuoteSupplier.id),
         user_id: session.user.id,
@@ -763,14 +855,18 @@ function App() {
         konu: listQuoteForm.konu.trim(),
         mesaj: listQuoteForm.mesaj.trim(),
         miktar: listQuoteForm.miktar.trim() || null,
-        teslim_tarihi: listQuoteForm.teslim_tarihi || null
+        teslim_tarihi: listQuoteForm.teslim_tarihi || null,
+        teslim_yeri: listQuoteForm.teslim_yeri || null, // Enes Doğanay | 9 Nisan 2026: Teslim Yeri eklendi
+        ek_dosya_url: ekDosyaUrl,
+        ek_dosya_adi: ekDosyaAdi
       }]);
       if (error) throw error;
       setListQuoteSent(true);
       setTimeout(() => {
         setListQuoteSupplier(null);
         setListQuoteSent(false);
-        setListQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '' });
+        setListQuoteForm({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
+        setListQuoteFile(null);
       }, 2000);
     } catch (error) {
       console.error('Teklif talebi gönderilemedi:', error);
@@ -780,10 +876,13 @@ function App() {
     }
   };
 
+  // Enes Doğanay | 9 Nisan 2026: Görünüm toggle — sadece giriş yapmış kullanıcılar için kalıcı, anonim için geçici
   const toggleViewMode = () => {
     const next = viewMode === 'grid' ? 'list' : 'grid';
     setViewMode(next);
-    try { localStorage.setItem('tedport_firmalar_view', next); } catch {}
+    if (currentUserId) {
+      try { localStorage.setItem(`tedport_firmalar_view_${currentUserId}`, next); } catch {}
+    }
   };
 
   // Enes Doğanay | 7 Nisan 2026: Arama, filtre ve sayfa değiştiğinde sessionStorage'a kaydet
@@ -1238,9 +1337,9 @@ function App() {
         </div>
       </main>
 
-      {/* Enes Doğanay | 8 Nisan 2026: Liste görünümü - Teklif İste modal (kart ile birebir aynı) */}
+      {/* Enes Doğanay | 9 Nisan 2026: Liste görünümü - Teklif İste modal — dışarı tıklama kapatmaz, dosya eki + iyileştirilmiş etiketler */}
       {listQuoteSupplier && (
-        <div className="quote-modal-overlay" onClick={() => { if (!listQuoteSending) { setListQuoteSupplier(null); setListQuoteSent(false); } }}>
+        <div className="quote-modal-overlay">
           <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
             {listQuoteSent ? (
               <div className="quote-modal-success">
@@ -1252,31 +1351,56 @@ function App() {
               <>
                 <div className="quote-modal-header">
                   <div>
-                    <h3>Teklif İste</h3>
+                    {/* Enes Doğanay | 9 Nisan 2026: Teklif İste → Teklif Talebi */}
+                    <h3>Teklif Talebi</h3>
                     <p className="quote-modal-subtitle">{listQuoteSupplier.name}</p>
                   </div>
-                  <button className="quote-modal-close" onClick={() => setListQuoteSupplier(null)} type="button">
+                  <button className="quote-modal-close" onClick={() => { setListQuoteSupplier(null); setListQuoteFile(null); }} type="button">
                     <span className="material-symbols-outlined">close</span>
                   </button>
                 </div>
                 <div className="quote-modal-body">
+                  {/* Enes Doğanay | 9 Nisan 2026: Label güncellemeleri + Teslim Yeri eklendi */}
                   <div className="quote-form-group">
-                    <label>Konu *</label>
+                    <label>Talep Başlığı *</label>
                     <input type="text" placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi" value={listQuoteForm.konu} onChange={(e) => setListQuoteForm(prev => ({ ...prev, konu: e.target.value }))} maxLength={200} />
                   </div>
                   <div className="quote-form-row">
                     <div className="quote-form-group">
-                      <label>Miktar / Adet</label>
+                      <label>Miktar</label>
                       <input type="text" placeholder="Ör: 500 metre, 100 adet" value={listQuoteForm.miktar} onChange={(e) => setListQuoteForm(prev => ({ ...prev, miktar: e.target.value }))} maxLength={100} />
                     </div>
                     <div className="quote-form-group">
-                      <label>Termin Tarihi</label>
+                      <label>Talep Edilen Teslim Tarihi</label>
                       <input type="date" value={listQuoteForm.teslim_tarihi} onChange={(e) => setListQuoteForm(prev => ({ ...prev, teslim_tarihi: e.target.value }))} min={new Date().toISOString().split('T')[0]} />
                     </div>
                   </div>
                   <div className="quote-form-group">
-                    <label>Mesajınız *</label>
-                    <textarea placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi, teslimat adresi vb.)" value={listQuoteForm.mesaj} onChange={(e) => setListQuoteForm(prev => ({ ...prev, mesaj: e.target.value }))} rows={4} maxLength={2000} />
+                    <label>Teslim Yeri</label>
+                    <CitySelect
+                      value={listQuoteForm.teslim_yeri}
+                      onChange={(city) => setListQuoteForm(prev => ({ ...prev, teslim_yeri: city }))}
+                    />
+                  </div>
+                  <div className="quote-form-group">
+                    <label>Talep Detayları *</label>
+                    <textarea placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi vb.)" value={listQuoteForm.mesaj} onChange={(e) => setListQuoteForm(prev => ({ ...prev, mesaj: e.target.value }))} rows={4} maxLength={2000} />
+                  </div>
+                  {/* Enes Doğanay | 9 Nisan 2026: Opsiyonel ek dosya yükleme alanı */}
+                  <div className="quote-form-group">
+                    <label>Ek Dosya <span style={{ fontWeight: 400, textTransform: 'none', fontSize: '0.75rem', color: '#9ca3af' }}>(Opsiyonel — teknik şartname, çizim vb.)</span></label>
+                    <div className="quote-file-upload">
+                      <label className="quote-file-btn" htmlFor="list-quote-file">
+                        <span className="material-symbols-outlined">attach_file</span>
+                        {listQuoteFile ? listQuoteFile.name : 'Dosya Seç'}
+                      </label>
+                      <input id="list-quote-file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f && f.size <= 10 * 1024 * 1024) setListQuoteFile(f); else if (f) alert('Dosya boyutu en fazla 10 MB olabilir.'); }} />
+                      {listQuoteFile && (
+                        <button type="button" className="quote-file-remove" onClick={() => setListQuoteFile(null)}>
+                          <span className="material-symbols-outlined">close</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="quote-form-info">
                     <span className="material-symbols-outlined">info</span>
@@ -1284,9 +1408,10 @@ function App() {
                   </div>
                 </div>
                 <div className="quote-modal-footer">
-                  <button className="btn btn-outline quote-btn-cancel" onClick={() => setListQuoteSupplier(null)} type="button">İptal</button>
+                  <button className="btn btn-outline quote-btn-cancel" onClick={() => { setListQuoteSupplier(null); setListQuoteFile(null); }} type="button">İptal</button>
                   <button className="btn btn-primary quote-btn-send" onClick={handleListQuoteRequest} disabled={listQuoteSending || !listQuoteForm.konu.trim() || !listQuoteForm.mesaj.trim()} type="button">
-                    {listQuoteSending ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
+                    {/* Enes Doğanay | 9 Nisan 2026: Teklif Talebi Gönder → Teklif İste */}
+                    {listQuoteSending ? 'Gönderiliyor...' : 'Teklif İste'}
                   </button>
                 </div>
               </>

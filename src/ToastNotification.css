@@ -23,6 +23,17 @@
   overflow: hidden;
   position: relative;
   will-change: transform, opacity;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Tıklanabilir toast hover efekti */
+.toast-item.toast-clickable {
+  cursor: pointer;
+}
+
+.toast-item.toast-clickable:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Enes Doğanay | 8 Nisan 2026: Giriş animasyonu — yukarıdan aşağı kayma */

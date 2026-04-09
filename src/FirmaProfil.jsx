@@ -1,5 +1,5 @@
 // Enes Doğanay | 7 Nisan 2026: Kurumsal firma profil sayfası — sidebar layout (bireysel Profil tasarımı gibi)
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { getManagedCompanyId } from './companyManagementApi';
@@ -51,15 +51,34 @@ const FirmaProfil = () => {
     const [outgoingQuotes, setOutgoingQuotes] = useState([]);
     const [quotesLoading, setQuotesLoading] = useState(true);
     const [quotesTab, setQuotesTab] = useState('incoming');
+    // Enes Doğanay | 10 Nisan 2026: Durum filtreleme state'i
+    const [statusFilter, setStatusFilter] = useState('all');
+    // Enes Doğanay | 9 Nisan 2026: Giden teklifler için ayrı filtre
+    const [outStatusFilter, setOutStatusFilter] = useState('all');
+    // Enes Doğanay | 9 Nisan 2026: Reddetme onay state'i
+    const [confirmRejectQuoteId, setConfirmRejectQuoteId] = useState(null);
+    // Enes Doğanay | 9 Nisan 2026: Sonlandırma onay state'i
+    const [confirmCloseQuoteId, setConfirmCloseQuoteId] = useState(null);
     const [activeQuoteChat, setActiveQuoteChat] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
     const [chatLoading, setChatLoading] = useState(false);
     const [chatInput, setChatInput] = useState('');
     const [chatSending, setChatSending] = useState(false);
     const chatEndRef = useRef(null);
+    /* Enes Doğanay | 9 Nisan 2026: Sadece mesaj container'ını aşağı kaydır, sayfayı değil */
+    const scrollChatToBottom = useCallback((smooth = true) => {
+        setTimeout(() => {
+            const container = chatEndRef.current?.parentElement;
+            if (container) container.scrollTo({ top: container.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
+        }, 80);
+    }, []);
+    // Enes Doğanay | 9 Nisan 2026: Teklif silme onay state'i
+    const [confirmDeleteQuoteId, setConfirmDeleteQuoteId] = useState(null);
 
     // Enes Doğanay | 7 Nisan 2026: Bildirim state'leri
     const [notifications, setNotifications] = useState([]);
+    // Enes Doğanay | 9 Nisan 2026: Hatırlatma state'i
+    const [upcomingReminders, setUpcomingReminders] = useState([]);
 
     // Enes Doğanay | 8 Nisan 2026: Favoriler state'leri (bireysel profildeki yapının kurumsal kopyası)
     const [myLists, setMyLists] = useState([]);
@@ -104,6 +123,7 @@ const FirmaProfil = () => {
 
             setFirma(firmaRes.data);
             setNotifications(notifRes.data || []);
+            setUpcomingReminders((remindersRes.data || []).filter(r => r.status === 'pending'));
             if (listsRes.data) setMyLists(listsRes.data);
 
             // Enes Doğanay | 8 Nisan 2026: Favori firma detaylarını birleştir
@@ -158,8 +178,122 @@ const FirmaProfil = () => {
                 setOutgoingQuotes([]);
             }
             setQuotesLoading(false);
+
+            // Enes Doğanay | 9 Nisan 2026: URL'deki teklif_id parametresiyle direkt chat aç (toast tıklaması)
+            const urlTeklifId = searchParams.get('teklif_id');
+            if (urlTeklifId) {
+                const tid = parseInt(urlTeklifId, 10);
+                const allQuotes = [...(inRes.data || []), ...(outRes.data || [])];
+                const targetQuote = allQuotes.find(q => q.id === tid);
+                if (targetQuote) {
+                    const newParams = new URLSearchParams(searchParams);
+                    newParams.delete('teklif_id');
+                    setSearchParams(newParams, { replace: true });
+                    setTimeout(() => openQuoteChat(targetQuote), 200);
+                }
+            }
         });
     }, [companyId]);
+
+    // Enes Doğanay | 9 Nisan 2026: Polling — 5 sn'de bir teklif listesini DB'den taze çek
+    // Enes Doğanay | 9 Nisan 2026: Son mesajın sender_role'üne göre _displayStatus hesapla
+    useEffect(() => {
+        if (!companyId) return;
+        const fid = String(companyId);
+        const fetchQuotes = async () => {
+            const [inRes, outRes] = await Promise.all([
+                supabase.from('teklif_talepleri').select('*').eq('firma_id', fid).order('created_at', { ascending: false }),
+                supabase.from('teklif_talepleri').select('*').eq('gonderen_firma_id', fid).order('created_at', { ascending: false })
+            ]);
+            // Tüm teklif id'lerini topla ve son mesajları tek sorguda çek
+            const allQuotes = [...(inRes.data || []), ...(outRes.data || [])];
+            const allIds = allQuotes.map(q => q.id);
+            let lastMsgMap = new Map();
+            if (allIds.length > 0) {
+                const { data: msgs } = await supabase.from('teklif_mesajlari').select('teklif_id, sender_role').in('teklif_id', allIds).order('created_at', { ascending: false });
+                for (const msg of (msgs || [])) {
+                    if (!lastMsgMap.has(msg.teklif_id)) lastMsgMap.set(msg.teklif_id, msg.sender_role);
+                }
+            }
+            if (inRes.data) {
+                const enrichedIn = inRes.data.map(q => {
+                    const lastSender = lastMsgMap.get(q.id);
+                    let _displayStatus;
+                    if (!lastSender) {
+                        _displayStatus = q.durum; // pending/read
+                    } else if (lastSender === 'company') {
+                        _displayStatus = 'replied'; // Biz (firma) cevap attık → Yanıtlandı
+                    } else {
+                        _displayStatus = 'awaiting_reply'; // Müşteri yazmış → Yanıt Bekleniyor
+                    }
+                    if (q.durum === 'rejected' || q.durum === 'closed') _displayStatus = q.durum;
+                    return { ...q, _displayStatus };
+                });
+                setIncomingQuotes(prev => {
+                    if (prev.length === enrichedIn.length && prev.every((q, i) => q.id === enrichedIn[i]?.id && q._displayStatus === enrichedIn[i]?._displayStatus)) return prev;
+                    return enrichedIn;
+                });
+                setActiveQuoteChat(prev => {
+                    if (!prev) return null;
+                    const updated = enrichedIn.find(q => q.id === prev.id);
+                    if (updated && updated._displayStatus !== prev._displayStatus) return { ...prev, _displayStatus: updated._displayStatus };
+                    return prev;
+                });
+            }
+            if (outRes.data) {
+                const outRaw = outRes.data;
+                if (outRaw.length > 0) {
+                    const ids = [...new Set(outRaw.map(q => q.firma_id))];
+                    const { data: firms } = await supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', ids);
+                    const map = new Map((firms || []).map(f => [f.firmaID, f.firma_adi]));
+                    const enrichedOut = outRaw.map(q => {
+                        const lastSender = lastMsgMap.get(q.id);
+                        let _displayStatus;
+                        if (!lastSender) {
+                            _displayStatus = q.durum;
+                        } else if (lastSender === 'company') {
+                            _displayStatus = 'awaiting_reply'; // Biz giden teklifte yazdık → Yanıt Bekleniyor
+                        } else {
+                            _displayStatus = 'replied'; // Karşı taraf yazdı → Yanıt Geldi
+                        }
+                        if (q.durum === 'rejected' || q.durum === 'closed') _displayStatus = q.durum;
+                        return { ...q, _alici_firma_adi: map.get(q.firma_id) || 'Firma', _displayStatus };
+                    });
+                    setOutgoingQuotes(prev => {
+                        if (prev.length === enrichedOut.length && prev.every((q, i) => q.id === enrichedOut[i]?.id && q._displayStatus === enrichedOut[i]?._displayStatus)) return prev;
+                        return enrichedOut;
+                    });
+                    setActiveQuoteChat(prev => {
+                        if (!prev) return null;
+                        const updated = enrichedOut.find(q => q.id === prev.id);
+                        if (updated && updated._displayStatus !== prev._displayStatus) return { ...prev, _displayStatus: updated._displayStatus };
+                        return prev;
+                    });
+                } else {
+                    setOutgoingQuotes(prev => prev.length === 0 ? prev : []);
+                }
+            }
+        };
+        fetchQuotes();
+        const pollInterval = setInterval(fetchQuotes, 5000);
+        return () => clearInterval(pollInterval);
+    }, [companyId]);
+
+    // Enes Doğanay | 9 Nisan 2026: Hatırlatma polling — 15s'de bir güncelle
+    useEffect(() => {
+        if (!userId) return;
+        const pollReminders = async () => {
+            const { data } = await supabase
+                .from('kullanici_hatirlaticilari')
+                .select('*')
+                .eq('user_id', userId)
+                .in('status', ['pending', 'sent'])
+                .order('reminder_at', { ascending: true });
+            if (data) setUpcomingReminders(data.filter(r => r.status === 'pending'));
+        };
+        const interval = setInterval(pollReminders, 15000);
+        return () => clearInterval(interval);
+    }, [userId]);
 
     // ── Teklif durum güncelle ──
     const handleQuoteStatusChange = async (quoteId, newStatus) => {
@@ -169,20 +303,82 @@ const FirmaProfil = () => {
             if (activeQuoteChat?.id === quoteId) setActiveQuoteChat(prev => prev ? { ...prev, durum: newStatus } : null);
             // Enes Doğanay | 8 Nisan 2026: Sağ üst menüdeki teklif badge'ini güncelle
             refreshCounts();
+            /* Enes Doğanay | 9 Nisan 2026: Reddetme onayını temizle */
+            if (newStatus === 'rejected') setConfirmRejectQuoteId(null);
         }
     };
 
-    // ── Teklif chatini aç ──
+    // Enes Doğanay | 9 Nisan 2026: Teklif chatini aç — sadece gelen teklifte pending→read
     const openQuoteChat = async (quote) => {
         setActiveQuoteChat(quote);
         setChatLoading(true);
         setChatInput('');
+
+        /* Enes Doğanay | 9 Nisan 2026: Teklif açıldığında ilgili okunmamış bildirimleri okundu yap */
+        const relatedUnread = notifications.filter(n => !n.is_read && (n.type === 'quote_reply' || n.type === 'quote_message' || n.type === 'quote_received') && n.metadata?.teklif_id === quote.id);
+        if (relatedUnread.length > 0) {
+            const ids = relatedUnread.map(n => n.id);
+            supabase.from('bildirimler').update({ is_read: true }).in('id', ids).then(() => refreshCounts());
+            setNotifications(prev => prev.map(n => ids.includes(n.id) ? { ...n, is_read: true } : n));
+        }
+
         const { data } = await supabase.from('teklif_mesajlari').select('*').eq('teklif_id', quote.id).order('created_at', { ascending: true });
         setChatMessages(data || []);
         setChatLoading(false);
-        if (quote.durum === 'pending') handleQuoteStatusChange(quote.id, 'read');
-        setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        const isIncoming = incomingQuotes.some(q => q.id === quote.id);
+        if (isIncoming && quote.durum === 'pending') handleQuoteStatusChange(quote.id, 'read');
+        scrollChatToBottom(false);
     };
+
+    // Enes Doğanay | 9 Nisan 2026: Broadcast + Polling fallback — kurumsal chat anlık mesajlaşma
+    const chatChannelRef = useRef(null);
+    useEffect(() => {
+        if (!activeQuoteChat) {
+            if (chatChannelRef.current) { supabase.removeChannel(chatChannelRef.current); chatChannelRef.current = null; }
+            return;
+        }
+        const teklifId = activeQuoteChat.id;
+        // Broadcast kanal — RLS'den bağımsız anlık iletim
+        const bcChannel = supabase
+            .channel(`teklif-chat-bc-${teklifId}`, { config: { broadcast: { ack: true } } })
+            .on('broadcast', { event: 'new-message' }, ({ payload }) => {
+                if (!payload) return;
+                setChatMessages(prev => {
+                    if (prev.some(m => m.id === payload.id)) return prev;
+                    scrollChatToBottom();
+                    return [...prev, payload];
+                });
+            })
+            .subscribe();
+        chatChannelRef.current = bcChannel;
+        // Polling — her 3 saniyede DB'den tüm mesajları çek (full-replace)
+        const pollInterval = setInterval(async () => {
+            const { data, error } = await supabase
+                .from('teklif_mesajlari')
+                .select('*')
+                .eq('teklif_id', teklifId)
+                .order('created_at', { ascending: true });
+            if (error) { console.error('[Polling] teklif_mesajlari hata:', error); return; }
+            if (data) {
+                setChatMessages(prev => {
+                    if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev;
+                    scrollChatToBottom();
+                    return data;
+                });
+            }
+        }, 3000);
+        return () => {
+            clearInterval(pollInterval);
+            supabase.removeChannel(bcChannel);
+            chatChannelRef.current = null;
+        };
+    }, [activeQuoteChat?.id]);
+
+    /* Enes Doğanay | 9 Nisan 2026: AuthContext'e aktif görüntülenen teklif id'sini bildir — toast bastırma için */
+    useEffect(() => {
+        setActiveViewingTeklifId(activeQuoteChat?.id || null);
+        return () => setActiveViewingTeklifId(null);
+    }, [activeQuoteChat?.id]);
 
     // ── Chat mesajı gönder ──
     const sendChatMessage = async () => {
@@ -196,16 +392,64 @@ const FirmaProfil = () => {
         if (!error && data) {
             setChatMessages(prev => [...prev, data]);
             setChatInput('');
-            if (isIncoming && (activeQuoteChat.durum === 'pending' || activeQuoteChat.durum === 'read')) {
-                handleQuoteStatusChange(activeQuoteChat.id, 'replied');
+            // Enes Doğanay | 9 Nisan 2026: Broadcast ile karşı tarafa mesajı anlık ilet
+            if (chatChannelRef.current) {
+                await chatChannelRef.current.send({ type: 'broadcast', event: 'new-message', payload: data });
             }
-            setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+            // Enes Doğanay | 9 Nisan 2026: Anlık UI güncellemesi — son mesajı biz attık
+            if (isIncoming) {
+                // Gelen teklifte biz (firma) cevap attık → Yanıtlandı
+                setIncomingQuotes(prev => prev.map(q => q.id === activeQuoteChat.id ? { ...q, _displayStatus: 'replied' } : q));
+                setActiveQuoteChat(prev => prev ? { ...prev, _displayStatus: 'replied' } : null);
+            } else {
+                // Giden teklifte biz yazdık → Yanıt Bekleniyor
+                setOutgoingQuotes(prev => prev.map(q => q.id === activeQuoteChat.id ? { ...q, _displayStatus: 'awaiting_reply' } : q));
+                setActiveQuoteChat(prev => prev ? { ...prev, _displayStatus: 'awaiting_reply' } : null);
+            }
+            scrollChatToBottom();
         }
         setChatSending(false);
     };
 
+    // Enes Doğanay | 9 Nisan 2026: Teklif talebini sil (ek dosya + DB kaydı)
+    const handleDeleteQuote = async (quoteId, isIncoming) => {
+        const list = isIncoming ? incomingQuotes : outgoingQuotes;
+        const quote = list.find(q => q.id === quoteId);
+        if (quote?.ek_dosya_url) {
+            await supabase.storage.from('teklif-ekleri').remove([quote.ek_dosya_url]);
+        }
+        const { error } = await supabase.from('teklif_talepleri').delete().eq('id', quoteId);
+        if (!error) {
+            if (isIncoming) setIncomingQuotes(prev => prev.filter(q => q.id !== quoteId));
+            else setOutgoingQuotes(prev => prev.filter(q => q.id !== quoteId));
+            if (activeQuoteChat?.id === quoteId) setActiveQuoteChat(null);
+        }
+        setConfirmDeleteQuoteId(null);
+    };
+
     // Enes Doğanay | 8 Nisan 2026: Sağ üst menü badge'lerini güncellemek için AuthContext refreshCounts
-    const { refreshCounts } = useAuth();
+    const { refreshCounts, latestNotification, setActiveViewingTeklifId } = useAuth();
+
+    // Enes Doğanay | 9 Nisan 2026: AuthContext'ten gelen yeni bildirimi listeye ekle
+    // Enes Doğanay | 9 Nisan 2026: Kullanıcı zaten ilgili teklifin chat'indeyse bildirimi anında okundu yap
+    useEffect(() => {
+        if (!latestNotification) return;
+        const isQuoteNotif = (latestNotification.type === 'quote_reply' || latestNotification.type === 'quote_message');
+        const notifTeklifId = latestNotification.metadata?.teklif_id;
+
+        if (isQuoteNotif && notifTeklifId && activeQuoteChat?.id === notifTeklifId) {
+            supabase.from('bildirimler').update({ is_read: true }).eq('id', latestNotification.id).then(() => refreshCounts());
+            setNotifications(prev => {
+                if (prev.some(n => n.id === latestNotification.id)) return prev;
+                return [{ ...latestNotification, is_read: true }, ...prev];
+            });
+        } else {
+            setNotifications(prev => {
+                if (prev.some(n => n.id === latestNotification.id)) return prev;
+                return [latestNotification, ...prev];
+            });
+        }
+    }, [latestNotification]);
 
     // ── Bildirim okundu yap ──
     const handleMarkNotificationRead = async (notificationId) => {
@@ -220,6 +464,31 @@ const FirmaProfil = () => {
         const ids = unread.map(n => n.id);
         await supabase.from('bildirimler').update({ is_read: true }).in('id', ids);
         setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+        refreshCounts();
+    };
+
+    // Enes Doğanay | 9 Nisan 2026: Tekil bildirim silme
+    const handleDeleteNotification = async (notificationId) => {
+        const { error } = await supabase.from('bildirimler').delete().eq('id', notificationId).eq('user_id', userId);
+        if (error) {
+            console.error('[Bildirim Sil] Hata:', error);
+            alert('Bildirim silinemedi.');
+            return;
+        }
+        setNotifications(prev => prev.filter(n => n.id !== notificationId));
+        refreshCounts();
+    };
+
+    // Enes Doğanay | 9 Nisan 2026: Tüm bildirimleri toplu sil
+    const handleDeleteAllNotifications = async () => {
+        if (notifications.length === 0) return;
+        const { error } = await supabase.from('bildirimler').delete().eq('user_id', userId);
+        if (error) {
+            console.error('[Bildirim Toplu Sil] Hata:', error);
+            alert('Bildirimler silinemedi.');
+            return;
+        }
+        setNotifications([]);
         refreshCounts();
     };
 
@@ -313,20 +582,23 @@ const FirmaProfil = () => {
     const pendingCount = incomingQuotes.filter(q => q.durum === 'pending').length;
     const unreadNotifCount = notifications.filter(n => !n.is_read).length;
 
+    /* Enes Doğanay | 9 Nisan 2026: Okunmamış teklif bildirimlerinin teklif_id'lerini topla — kart üzerinde yeni mesaj göstergesi için */
+    const unreadQuoteIds = new Set(
+        notifications
+            .filter(n => !n.is_read && (n.type === 'quote_reply' || n.type === 'quote_message' || n.type === 'quote_received') && n.metadata?.teklif_id)
+            .map(n => n.metadata.teklif_id)
+    );
+
     // Enes Doğanay | 8 Nisan 2026: Favori filtreleme + sıralama
-    const displayedFavorites = (() => {
-        let result = selectedListId ? favorites.filter(fav => fav.liste_id === selectedListId) : [...favorites];
-        if (favSearch.trim()) {
-            const q = favSearch.toLocaleLowerCase('tr-TR');
-            result = result.filter(fav => fav.name.toLocaleLowerCase('tr-TR').includes(q) || fav.category.toLocaleLowerCase('tr-TR').includes(q) || fav.location.toLocaleLowerCase('tr-TR').includes(q));
-        }
-        switch (favSort) {
-            case 'alpha': return [...result].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
-            case 'alpha-desc': return [...result].sort((a, b) => b.name.localeCompare(a.name, 'tr'));
-            case 'oldest': return [...result].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
-            case 'newest': default: return [...result].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
-        }
-    })();
+    let displayedFavorites = selectedListId ? favorites.filter(fav => fav.liste_id === selectedListId) : [...favorites];
+    if (favSearch.trim()) {
+        const q = favSearch.toLocaleLowerCase('tr-TR');
+        displayedFavorites = displayedFavorites.filter(fav => fav.name.toLocaleLowerCase('tr-TR').includes(q) || fav.category.toLocaleLowerCase('tr-TR').includes(q) || fav.location.toLocaleLowerCase('tr-TR').includes(q));
+    }
+    if (favSort === 'alpha') displayedFavorites.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    else if (favSort === 'alpha-desc') displayedFavorites.sort((a, b) => b.name.localeCompare(a.name, 'tr'));
+    else if (favSort === 'oldest') displayedFavorites.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+    else displayedFavorites.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
 
     return (
         <>
@@ -364,17 +636,17 @@ const FirmaProfil = () => {
                             <a className={`nav-item ${currentTab === 'panel' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'panel' })}>
                                 <span className="material-symbols-outlined">storefront</span> Firma Paneli
                             </a>
+                            {/* Enes Doğanay | 9 Nisan 2026: Sıralama değiştirildi — Favorilerim öne alındı */}
+                            <a className={`nav-item ${currentTab === 'favoriler' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'favoriler' })}>
+                                <span className="material-symbols-outlined">collections_bookmark</span> Favorilerim
+                            </a>
                             <a className={`nav-item ${currentTab === 'teklifler' ? 'active' : ''}`} onClick={() => { setSearchParams({ tab: 'teklifler' }); setActiveQuoteChat(null); }}>
-                                <span className="material-symbols-outlined">request_quote</span> Teklifler
+                                <span className="material-symbols-outlined">request_quote</span> Teklif Yönetimi
                                 {pendingCount > 0 && <span className="nav-item-badge">{pendingCount}</span>}
                             </a>
                             <a className={`nav-item ${currentTab === 'bildirimler' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'bildirimler' })}>
                                 <span className="material-symbols-outlined">notifications</span> Bildirimler
                                 {unreadNotifCount > 0 && <span className="nav-item-badge">{unreadNotifCount}</span>}
-                            </a>
-                            {/* Enes Doğanay | 8 Nisan 2026: Kurumsal kullanıcıya da favoriler sekmesi eklendi */}
-                            <a className={`nav-item ${currentTab === 'favoriler' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'favoriler' })}>
-                                <span className="material-symbols-outlined">collections_bookmark</span> Favorilerim
                             </a>
                             <hr className="sidebar-divider" />
                             <a className="nav-item logout" onClick={handleLogout}>
@@ -422,10 +694,13 @@ const FirmaProfil = () => {
                             </div>
                         )}
 
+                        {/* Enes Doğanay | 9 Nisan 2026: Kayıtlı Tedarikçi sadece favoriler sekmesinde göster */}
+                        {currentTab === 'favorites' && (
                         <div className="sidebar-stats">
                             <div className="sidebar-stats-label">Kayıtlı Tedarikçi</div>
                             <div className="sidebar-stats-value">{favorites.length}</div>
                         </div>
+                        )}
                     </aside>
 
                     {/* ── CONTENT ── */}
@@ -445,7 +720,12 @@ const FirmaProfil = () => {
                                 {activeQuoteChat ? (() => {
                                     const q = activeQuoteChat;
                                     const isIncoming = incomingQuotes.some(iq => iq.id === q.id);
-                                    const st = { pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı', rejected: 'Reddedildi', closed: 'Kapatıldı' }[q.durum] || 'Yeni';
+                                    // Enes Doğanay | 9 Nisan 2026: Chat başlığı — son mesaja göre _displayStatus
+                                    const displayDurum = q._displayStatus || q.durum;
+                                    const stMap = isIncoming
+                                        ? { pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' }
+                                        : { pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
+                                    const st = stMap[displayDurum] || 'Yeni';
                                     return (
                                         <div className="cmp-quote-chat-view">
                                             <button className="quote-chat-back" onClick={() => setActiveQuoteChat(null)}>
@@ -458,28 +738,61 @@ const FirmaProfil = () => {
                                                         <h2>{q.konu}</h2>
                                                         <p className="quote-chat-firma">{isIncoming ? q.ad_soyad : (q._alici_firma_adi || 'Firma')}{q.firma_adi ? ` • ${q.firma_adi}` : ''}</p>
                                                     </div>
-                                                    <span className={`cmp-quote-status cmp-quote-status--${q.durum}`}>{st}</span>
+                                                    <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>{st}</span>
                                                 </div>
                                                 <div className="quote-chat-meta">
-                                                    {isIncoming && <span className="my-quote-tag"><span className="material-symbols-outlined">mail</span>{q.email}</span>}
-                                                    {q.miktar && <span className="my-quote-tag"><span className="material-symbols-outlined">inventory_2</span>{q.miktar}</span>}
-                                                    {q.teslim_tarihi && <span className="my-quote-tag"><span className="material-symbols-outlined">calendar_month</span>{new Date(q.teslim_tarihi).toLocaleDateString('tr-TR')}</span>}
+                                                    {/* Enes Doğanay | 9 Nisan 2026: İkon yerine metin etiketleri + teslim_yeri */}
+                                                    {isIncoming && <span className="my-quote-tag"><strong>E-posta:</strong> {q.email}</span>}
+                                                    {q.miktar && <span className="my-quote-tag"><strong>Miktar:</strong> {q.miktar}</span>}
+                                                    {q.teslim_tarihi && <span className="my-quote-tag"><strong>Talep Edilen Teslim Tarihi:</strong> {new Date(q.teslim_tarihi).toLocaleDateString('tr-TR')}</span>}
+                                                    {q.teslim_yeri && <span className="my-quote-tag"><strong>Teslim Yeri:</strong> {q.teslim_yeri}</span>}
                                                 </div>
+                                                {/* Enes Doğanay | 9 Nisan 2026: Ek dosya görüntüleme — gelen teklifte de görünsün */}
+                                                {q.ek_dosya_url && q.ek_dosya_adi && (
+                                                    <div className="quote-chat-attachment" onClick={async () => {
+                                                        const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(q.ek_dosya_url, 300);
+                                                        if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                                                    }}>
+                                                        <div className="quote-chat-attachment-icon"><span className="material-symbols-outlined">description</span></div>
+                                                        <div className="quote-chat-attachment-info">
+                                                            <span className="quote-chat-attachment-name">{q.ek_dosya_adi}</span>
+                                                            <span className="quote-chat-attachment-hint">Eki görüntülemek için tıklayın</span>
+                                                        </div>
+                                                        <span className="quote-chat-attachment-open"><span className="material-symbols-outlined">open_in_new</span></span>
+                                                    </div>
+                                                )}
                                                 <div className="quote-chat-initial-msg">
-                                                    <small>{isIncoming ? 'Gelen talep mesajı' : 'Gönderdiğiniz mesaj'}</small>
+                                                    {/* Enes Doğanay | 9 Nisan 2026: Gelen talep mesajı → Talep detayları */}
+                                                    <small>Talep detayları</small>
                                                     <p>{q.mesaj}</p>
                                                 </div>
                                                 {isIncoming && (
                                                     <div className="cmp-quote-actions" style={{ marginTop: '12px' }}>
                                                         {q.durum !== 'rejected' && q.durum !== 'closed' && (
-                                                            <button className="cmp-btn cmp-btn--sm cmp-btn--rejected" onClick={() => handleQuoteStatusChange(q.id, 'rejected')}>
-                                                                <span className="material-symbols-outlined">close</span> Reddet
-                                                            </button>
+                                                            confirmRejectQuoteId === q.id ? (
+                                                                <div className="cmp-quote-delete-confirm" style={{ display: 'inline-flex' }}>
+                                                                    <span>Reddetmek istediğinize emin misiniz?</span>
+                                                                    <button className="cmp-quote-delete-btn cmp-quote-delete-btn--yes" onClick={() => handleQuoteStatusChange(q.id, 'rejected')}>Evet</button>
+                                                                    <button className="cmp-quote-delete-btn cmp-quote-delete-btn--no" onClick={() => setConfirmRejectQuoteId(null)}>Hayır</button>
+                                                                </div>
+                                                            ) : (
+                                                                <button className="cmp-btn cmp-btn--sm cmp-btn--rejected" onClick={() => setConfirmRejectQuoteId(q.id)}>
+                                                                    <span className="material-symbols-outlined">close</span> Reddet
+                                                                </button>
+                                                            )
                                                         )}
-                                                        {q.durum !== 'closed' && q.durum !== 'rejected' && (
-                                                            <button className="cmp-btn cmp-btn--sm cmp-btn--closed" onClick={() => handleQuoteStatusChange(q.id, 'closed')}>
-                                                                <span className="material-symbols-outlined">archive</span> Kapat
-                                                            </button>
+                                                        {q.durum !== 'closed' && q.durum !== 'rejected' && !confirmRejectQuoteId && (
+                                                            confirmCloseQuoteId === q.id ? (
+                                                                <div className="cmp-quote-delete-confirm" style={{ display: 'inline-flex' }}>
+                                                                    <span>Sonlandırmak istediğinize emin misiniz?</span>
+                                                                    <button className="cmp-quote-delete-btn cmp-quote-delete-btn--yes" onClick={() => { handleQuoteStatusChange(q.id, 'closed'); setConfirmCloseQuoteId(null); }}>Evet</button>
+                                                                    <button className="cmp-quote-delete-btn cmp-quote-delete-btn--no" onClick={() => setConfirmCloseQuoteId(null)}>Hayır</button>
+                                                                </div>
+                                                            ) : (
+                                                                <button className="cmp-btn cmp-btn--sm cmp-btn--closed" onClick={() => setConfirmCloseQuoteId(q.id)}>
+                                                                    <span className="material-symbols-outlined">archive</span> Görüşmeyi Sonlandır
+                                                                </button>
+                                                            )
                                                         )}
                                                     </div>
                                                 )}
@@ -536,8 +849,9 @@ const FirmaProfil = () => {
                                             <div>
                                                 <h1>Teklif Yönetimi</h1>
                                                 <p>Gelen ve gönderdiğiniz teklif taleplerini yönetin.</p>
+                                                {/* Enes Doğanay | 9 Nisan 2026: Badge başlık altına taşındı */}
+                                                {pendingCount > 0 && <span className="cmp-quotes-badge" style={{ fontSize: '0.85rem', padding: '4px 12px', marginTop: '8px', display: 'inline-block' }}>{pendingCount} yeni teklif</span>}
                                             </div>
-                                            {pendingCount > 0 && <span className="cmp-quotes-badge" style={{ fontSize: '0.85rem', padding: '4px 12px' }}>{pendingCount} yeni teklif</span>}
                                         </div>
 
                                         {/* Enes Doğanay | 7 Nisan 2026: Gelen / Giden tab switcher */}
@@ -561,25 +875,53 @@ const FirmaProfil = () => {
                                                     <p>Henüz teklif talebi gelmedi.</p>
                                                 </div>
                                             ) : (
+                                                <>
+                                                {/* Enes Doğanay | 10 Nisan 2026: Durum filtre butonları */}
+                                                <div className="cmp-quotes-status-filter">
+                                                    {[{ key: 'all', label: 'Tümü' }, { key: 'pending', label: 'Yeni' }, { key: 'read', label: 'Okundu' }, { key: 'replied', label: 'Yanıtlandı' }, { key: 'awaiting_reply', label: 'Yanıt Bekleniyor' }, { key: 'rejected', label: 'Reddedildi' }, { key: 'closed', label: 'Sonlandırıldı' }].map(f => (
+                                                        <button key={f.key} className={`cmp-quotes-status-filter-btn${statusFilter === f.key ? ' active' : ''}`} onClick={() => setStatusFilter(f.key)}>
+                                                            {f.label}
+                                                            {f.key !== 'all' && <span>({incomingQuotes.filter(q => (q._displayStatus || q.durum) === f.key).length})</span>}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                                 <div className="cmp-quotes-list">
-                                                    {incomingQuotes.map((q) => {
-                                                        const stMap = { pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı', rejected: 'Reddedildi', closed: 'Kapatıldı' };
+                                                    {(statusFilter === 'all' ? incomingQuotes : incomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).map((q) => {
+                                                        const stMap = { pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
                                                         return (
-                                                            <article key={q.id} className="cmp-quote-card" onClick={() => openQuoteChat(q)} style={{ cursor: 'pointer' }}>
+                                                            <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openQuoteChat(q)} style={{ cursor: 'pointer' }}>
                                                                 <div className="cmp-quote-top">
                                                                     <div className="cmp-quote-top-left">
-                                                                        <span className={`cmp-quote-status cmp-quote-status--${q.durum}`}>{stMap[q.durum] || 'Yeni'}</span>
+                                                                        <span className={`cmp-quote-status cmp-quote-status--${q._displayStatus || q.durum}`}>{stMap[q._displayStatus || q.durum] || 'Yeni'}</span>
+                                                                        {/* Enes Doğanay | 9 Nisan 2026: Okunmamış bildirimi olan tekliflerde "Yeni Mesaj" göstergesi */}
+                                                                        {unreadQuoteIds.has(q.id) && <span className="cmp-quote-new-badge">Yeni Mesaj</span>}
                                                                         <strong className="cmp-quote-subject">{q.konu}</strong>
                                                                     </div>
                                                                     <div className="cmp-quote-top-right">
-                                                                        <span className="cmp-quote-sender">{q.ad_soyad}{q.firma_adi ? ` • ${q.firma_adi}` : ''}</span>
-                                                                        <span className="cmp-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}</span>
+                                                                        <div className="cmp-quote-sender-info">
+                                                                            <span className="cmp-quote-sender">{q.ad_soyad}{q.firma_adi ? ` • ${q.firma_adi}` : ''}</span>
+                                                                            <span className="cmp-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}</span>
+                                                                        </div>
+                                                                        {/* Enes Doğanay | 11 Nisan 2026: Silme butonu satır içine taşındı */}
+                                                                        <button className="cmp-quote-delete-trigger" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(q.id); }} title="Teklifi Sil">
+                                                                            <span className="material-symbols-outlined">delete</span>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
+                                                                {/* Enes Doğanay | 9 Nisan 2026: İlk mesaj ön izlemesi */}
+                                                                <p className="cmp-quote-preview">{q.mesaj}</p>
+                                                                {confirmDeleteQuoteId === q.id && (
+                                                                    <div className="cmp-quote-delete-confirm" onClick={(e) => e.stopPropagation()}>
+                                                                        <span>Silmek istediğinize emin misiniz?</span>
+                                                                        <button className="cmp-quote-delete-btn cmp-quote-delete-btn--yes" onClick={(e) => { e.stopPropagation(); handleDeleteQuote(q.id, true); }}>Evet</button>
+                                                                        <button className="cmp-quote-delete-btn cmp-quote-delete-btn--no" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(null); }}>Hayır</button>
+                                                                    </div>
+                                                                )}
                                                             </article>
                                                         );
                                                     })}
                                                 </div>
+                                                </>
                                             )
                                         ) : (
                                             outgoingQuotes.length === 0 ? (
@@ -588,25 +930,53 @@ const FirmaProfil = () => {
                                                     <p>Henüz teklif talebi göndermediniz.</p>
                                                 </div>
                                             ) : (
+                                                <>
+                                                {/* Enes Doğanay | 9 Nisan 2026: Giden teklifler durum filtresi */}
+                                                <div className="cmp-quotes-status-filter">
+                                                    {[{ key: 'all', label: 'Tümü' }, { key: 'pending', label: 'Beklemede' }, { key: 'read', label: 'Firma Görüntüledi' }, { key: 'replied', label: 'Yanıt Geldi' }, { key: 'awaiting_reply', label: 'Yanıt Bekleniyor' }, { key: 'rejected', label: 'Reddedildi' }, { key: 'closed', label: 'Sonlandırıldı' }].map(f => (
+                                                        <button key={f.key} className={`cmp-quotes-status-filter-btn${outStatusFilter === f.key ? ' active' : ''}`} onClick={() => setOutStatusFilter(f.key)}>
+                                                            {f.label}
+                                                            {f.key !== 'all' && <span>({outgoingQuotes.filter(q => (q._displayStatus || q.durum) === f.key).length})</span>}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                                 <div className="cmp-quotes-list">
-                                                    {outgoingQuotes.map((q) => {
-                                                        const stMap = { pending: 'Beklemede', read: 'Okundu', replied: 'Yanıtlandı', rejected: 'Reddedildi', closed: 'Kapatıldı' };
+                                                    {(outStatusFilter === 'all' ? outgoingQuotes : outgoingQuotes.filter(q => (q._displayStatus || q.durum) === outStatusFilter)).map((q) => {
+                                                        const stMap = { pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
                                                         return (
-                                                            <article key={q.id} className="cmp-quote-card" onClick={() => openQuoteChat(q)} style={{ cursor: 'pointer' }}>
+                                                            <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openQuoteChat(q)} style={{ cursor: 'pointer' }}>
                                                                 <div className="cmp-quote-top">
                                                                     <div className="cmp-quote-top-left">
-                                                                        <span className={`cmp-quote-status cmp-quote-status--${q.durum}`}>{stMap[q.durum] || 'Beklemede'}</span>
+                                                                        <span className={`cmp-quote-status cmp-quote-status--${q._displayStatus || q.durum}`}>{stMap[q._displayStatus || q.durum] || 'Beklemede'}</span>
+                                                                        {/* Enes Doğanay | 9 Nisan 2026: Giden tekliflerde de "Yeni Mesaj" göstergesi */}
+                                                                        {unreadQuoteIds.has(q.id) && <span className="cmp-quote-new-badge">Yeni Mesaj</span>}
                                                                         <strong className="cmp-quote-subject">{q.konu}</strong>
                                                                     </div>
                                                                     <div className="cmp-quote-top-right">
-                                                                        <span className="cmp-quote-sender">{q._alici_firma_adi}</span>
-                                                                        <span className="cmp-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}</span>
+                                                                        <div className="cmp-quote-sender-info">
+                                                                            <span className="cmp-quote-sender">{q._alici_firma_adi}</span>
+                                                                            <span className="cmp-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}</span>
+                                                                        </div>
+                                                                        {/* Enes Doğanay | 11 Nisan 2026: Giden teklif silme butonu satır içine taşındı */}
+                                                                        <button className="cmp-quote-delete-trigger" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(q.id); }} title="Teklifi Sil">
+                                                                            <span className="material-symbols-outlined">delete</span>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
+                                                                {/* Enes Doğanay | 9 Nisan 2026: Giden teklif ön izlemesi */}
+                                                                <p className="cmp-quote-preview">{q.mesaj}</p>
+                                                                {confirmDeleteQuoteId === q.id && (
+                                                                    <div className="cmp-quote-delete-confirm" onClick={(e) => e.stopPropagation()}>
+                                                                        <span>Silmek istediğinize emin misiniz?</span>
+                                                                        <button className="cmp-quote-delete-btn cmp-quote-delete-btn--yes" onClick={(e) => { e.stopPropagation(); handleDeleteQuote(q.id, false); }}>Evet</button>
+                                                                        <button className="cmp-quote-delete-btn cmp-quote-delete-btn--no" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(null); }}>Hayır</button>
+                                                                    </div>
+                                                                )}
                                                             </article>
                                                         );
                                                     })}
                                                 </div>
+                                                </>
                                             )
                                         )}
                                     </>
@@ -615,72 +985,160 @@ const FirmaProfil = () => {
                         )}
 
                         {/* Enes Doğanay | 7 Nisan 2026: Tab → Bildirimler (kurumsal kullanıcı bildirimleri) */}
-                        {currentTab === 'bildirimler' && (
+                        {currentTab === 'bildirimler' && (() => {
+                            /* Enes Doğanay | 9 Nisan 2026: Bireysel ile birebir aynı format — hatırlatma paneli dahil */
+                            const futureUpcomingReminders = upcomingReminders.filter(r => new Date(r.reminder_at).getTime() > Date.now());
+                            const overduePendingReminders = upcomingReminders.filter(r => new Date(r.reminder_at).getTime() <= Date.now());
+                            return (
                             <div className="firma-profil-section">
                                 <div className="notifications-hero">
                                     <div>
-                                        <h1>Bildirimler</h1>
-                                        <p>Teklif bildirimleri ve sistem olaylarını buradan takip edebilirsiniz.</p>
+                                        <h1>Bildirim Merkezi</h1>
+                                        <p>Teklif yanıtları, mesajlar ve hatırlatmalarınız burada.</p>
                                     </div>
-                                    <button className="notifications-mark-all" onClick={handleMarkAllNotificationsRead} disabled={unreadNotifCount === 0}>
-                                        Tümünü Okundu Yap
-                                    </button>
+                                    <div className="notifications-hero-actions">
+                                        <button className="notifications-mark-all" onClick={handleMarkAllNotificationsRead} disabled={unreadNotifCount === 0}>
+                                            Tümünü Okundu Yap
+                                        </button>
+                                        <button className="notifications-delete-all" onClick={handleDeleteAllNotifications} disabled={notifications.length === 0}>
+                                            Tümünü Sil
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="notifications-stats-grid">
                                     <div className="notification-stat-card notification-stat-card-unread">
                                         <span className="material-symbols-outlined">mark_email_unread</span>
                                         <strong>{unreadNotifCount}</strong>
-                                        <span>Okunmamış Bildirim</span>
+                                        <span>Okunmamış</span>
                                     </div>
                                     <div className="notification-stat-card notification-stat-card-reminders">
-                                        <span className="material-symbols-outlined">request_quote</span>
-                                        <strong>{pendingCount}</strong>
-                                        <span>Bekleyen Teklif</span>
+                                        <span className="material-symbols-outlined">alarm</span>
+                                        <strong>{futureUpcomingReminders.length}</strong>
+                                        <span>Hatırlatma</span>
                                     </div>
                                 </div>
 
-                                {notifications.length === 0 ? (
-                                    <div className="notifications-empty-state" style={{ marginTop: '24px' }}>
-                                        <span className="material-symbols-outlined">notifications_none</span>
-                                        <p>Henüz bildirim oluşmadı.</p>
-                                    </div>
-                                ) : (
-                                    <div className="notifications-feed-list" style={{ marginTop: '20px' }}>
-                                        {notifications.map((notification) => (
-                                            <article key={notification.id} className={`notification-feed-card ${notification.is_read ? '' : 'unread'}`}>
-                                                <div className="notification-feed-top">
-                                                    <div>
-                                                        <span className="notification-feed-type">
-                                                            {notification.type === 'quote_received' ? 'Teklif Talebi'
-                                                                : notification.type === 'quote_reply' ? 'Teklif Yanıtı'
-                                                                : notification.type === 'quote_message' ? 'Teklif Mesajı'
-                                                                : notification.type === 'reminder' ? 'Hatırlatma'
-                                                                : 'Bildirim'}
-                                                        </span>
-                                                        <h4>{notification.title}</h4>
-                                                    </div>
-                                                    <span className="notification-feed-time">{formatRelativeTime(notification.created_at)}</span>
-                                                </div>
-                                                <p>{notification.message}</p>
-                                                <div className="notification-feed-actions">
-                                                    {!notification.is_read && (
-                                                        <button type="button" className="notification-read-btn" onClick={() => handleMarkNotificationRead(notification.id)}>
-                                                            Okundu Yap
+                                <div className="notifications-grid">
+                                    {/* SOL: SON BİLDİRİMLER */}
+                                    <section className="notifications-panel notifications-panel-feed">
+                                        <div className="notifications-panel-header">
+                                            <div>
+                                                <h3>Son Bildirimler</h3>
+                                                <p>Teklif güncellemeleri ve mesajlarınız</p>
+                                            </div>
+                                        </div>
+
+                                        {notifications.length === 0 ? (
+                                            <div className="notifications-empty-state">
+                                                <span className="material-symbols-outlined">notifications_none</span>
+                                                <p>Henüz bildiriminiz yok. Firmaya teklif geldiğinde veya mesaj aldığınızda burada görünecek.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="notifications-feed-list">
+                                                {notifications.map((notification) => (
+                                                    <article
+                                                        key={notification.id}
+                                                        className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${notification.metadata?.teklif_id ? 'clickable' : ''}`}
+                                                        onClick={() => {
+                                                            if (notification.metadata?.teklif_id) {
+                                                                navigateToQuoteFromNotification(notification);
+                                                            }
+                                                        }}
+                                                        style={{ cursor: notification.metadata?.teklif_id ? 'pointer' : 'default' }}
+                                                    >
+                                                        <div className="notification-feed-top">
+                                                            <div>
+                                                                <span className="notification-feed-type">
+                                                                    {notification.type === 'quote_received' ? '📩 Yeni Teklif'
+                                                                        : notification.type === 'quote_reply' ? '💬 Yanıt Geldi'
+                                                                        : notification.type === 'quote_message' ? '✉️ Yeni Mesaj'
+                                                                        : notification.type === 'reminder' ? '⏰ Hatırlatma'
+                                                                        : '🔔 Bildirim'}
+                                                                </span>
+                                                                <h4>{notification.title}</h4>
+                                                            </div>
+                                                            <span className="notification-feed-time">{formatRelativeTime(notification.created_at)}</span>
+                                                        </div>
+                                                        <p>{notification.message}</p>
+                                                        <div className="notification-feed-actions">
+                                                            {!notification.is_read && (
+                                                                <button type="button" className="notification-read-btn" onClick={(e) => { e.stopPropagation(); handleMarkNotificationRead(notification.id); }}>
+                                                                    Okundu Yap
+                                                                </button>
+                                                            )}
+                                                            <button type="button" className="notification-delete-btn" onClick={(e) => { e.stopPropagation(); handleDeleteNotification(notification.id); }}>
+                                                                <span className="material-symbols-outlined">delete</span>
+                                                            </button>
+                                                        </div>
+                                                    </article>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </section>
+
+                                    {/* SAĞ: YAKLAŞAN HATIRLATMALAR */}
+                                    <section className="notifications-panel notifications-panel-reminders">
+                                        <div className="notifications-panel-header">
+                                            <div>
+                                                <h3>Yaklaşan Hatırlatmalar</h3>
+                                                <p>Planladığınız hatırlatmalar e-postanıza gönderilecek.</p>
+                                            </div>
+                                        </div>
+
+                                        {futureUpcomingReminders.length === 0 ? (
+                                            <div className="notifications-empty-state">
+                                                <span className="material-symbols-outlined">alarm_off</span>
+                                                <p>Aktif hatırlatmanız yok. Firma notlarından hatırlatma oluşturabilirsiniz.</p>
+                                            </div>
+                                        ) : (
+                                            <div className="upcoming-reminders-list">
+                                                {futureUpcomingReminders.map((reminder) => (
+                                                    <article key={reminder.id} className="upcoming-reminder-card">
+                                                        <div className="upcoming-reminder-top">
+                                                            <span className="upcoming-reminder-time">{formatReminderLabel(reminder.reminder_at)}</span>
+                                                            <span className="upcoming-reminder-badge">Planlandı</span>
+                                                        </div>
+                                                        <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
+                                                        <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
+                                                        <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                                                            <span className="material-symbols-outlined">open_in_new</span>
+                                                            <span>Firmaya Git</span>
                                                         </button>
-                                                    )}
-                                                    {notification.metadata?.teklif_id && (
-                                                        <button type="button" className="notification-open-btn" onClick={() => navigateToQuoteFromNotification(notification)}>
-                                                            <span className="material-symbols-outlined" style={{ fontSize: '16px', marginRight: '4px' }}>chat</span> Teklifi Aç
-                                                        </button>
-                                                    )}
+                                                    </article>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {overduePendingReminders.length > 0 && (
+                                            <div className="overdue-reminders-block">
+                                                <div className="notifications-panel-subheader">
+                                                    <h4>Mail Gönderilecek Hatırlatmalar</h4>
+                                                    <p>Bu hatırlatmalarınızın zamanı geldi, e-postanıza iletilmek üzere.</p>
                                                 </div>
-                                            </article>
-                                        ))}
-                                    </div>
-                                )}
+                                                <div className="upcoming-reminders-list">
+                                                    {overduePendingReminders.map((reminder) => (
+                                                        <article key={reminder.id} className="upcoming-reminder-card overdue">
+                                                            <div className="upcoming-reminder-top">
+                                                                <span className="upcoming-reminder-time overdue">{formatReminderLabel(reminder.reminder_at)}</span>
+                                                                <span className="upcoming-reminder-badge overdue">Gönderiliyor</span>
+                                                            </div>
+                                                            <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
+                                                            <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
+                                                            <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                                                                <span className="material-symbols-outlined">open_in_new</span>
+                                                                <span>Firmaya Git</span>
+                                                            </button>
+                                                        </article>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </section>
+                                </div>
                             </div>
-                        )}
+                            );
+                        })()}
 
                         {/* Enes Doğanay | 8 Nisan 2026: Tab → Favoriler (bireysel profildeki yapının kurumsal kopyası) */}
                         {currentTab === 'favoriler' && (
@@ -688,7 +1146,6 @@ const FirmaProfil = () => {
                                 <div className="favorites-header">
                                     <div>
                                         <h1>{selectedListId === null ? 'Tüm Favoriler' : myLists.find(l => l.id === selectedListId)?.liste_adi}</h1>
-                                        <p>{displayedFavorites.length} tedarikçi{favSearch.trim() ? ` · "${favSearch}" araması` : ''}</p>
                                     </div>
                                 </div>
 
@@ -728,6 +1185,7 @@ const FirmaProfil = () => {
                                     )}
                                 </div>
 
+                                {/* Enes Doğanay | 9 Nisan 2026: Modern toolbar — arama + sıralama butonları */}
                                 <div className="favorites-toolbar">
                                     <div className="fav-search-wrapper">
                                         <span className="material-symbols-outlined">search</span>
@@ -738,14 +1196,13 @@ const FirmaProfil = () => {
                                             </button>
                                         )}
                                     </div>
-                                    <div className="fav-sort-wrapper">
-                                        <span className="material-symbols-outlined">swap_vert</span>
-                                        <select className="fav-sort-select" value={favSort} onChange={e => setFavSort(e.target.value)}>
-                                            <option value="newest">Son Eklenen</option>
-                                            <option value="oldest">İlk Eklenen</option>
-                                            <option value="alpha">A → Z</option>
-                                            <option value="alpha-desc">Z → A</option>
-                                        </select>
+                                    <div className="fav-sort-group">
+                                        {[{ key: 'newest', label: 'Yeni', icon: 'schedule' }, { key: 'oldest', label: 'Eski', icon: 'history' }, { key: 'alpha', label: 'A-Z', icon: 'sort_by_alpha' }, { key: 'alpha-desc', label: 'Z-A', icon: 'sort_by_alpha' }].map(s => (
+                                            <button key={s.key} className={`fav-sort-btn${favSort === s.key ? ' active' : ''}`} onClick={() => setFavSort(s.key)}>
+                                                <span className="material-symbols-outlined">{s.icon}</span>
+                                                {s.label}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 

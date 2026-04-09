@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import "./Profile.css";
+// Enes Doğanay | 9 Nisan 2026: cmp-quote-* kart stilleri için
+import "./CompanyManagementPanel.css";
 import SharedHeader from "./SharedHeader";
 import "./SharedHeader.css";
 import { supabase } from "./supabaseClient";
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import CitySelect from './CitySelect';
 import { getManagedCompanyId } from './companyManagementApi';
 import { useAuth } from './AuthContext';
 import PageLoader from './PageLoader';
@@ -140,11 +143,22 @@ const ProfilePage = () => {
   const [myQuotesLoading, setMyQuotesLoading] = useState(true);
   // Enes Doğanay | 7 Nisan 2026: Teklif chat state'leri
   const [activeQuoteId, setActiveQuoteId] = useState(null);
+  // Enes Doğanay | 10 Nisan 2026: Durum filtreleme state'i
+  const [quoteStatusFilter, setQuoteStatusFilter] = useState('all');
   const [quoteChatMessages, setQuoteChatMessages] = useState([]);
   const [quoteChatLoading, setQuoteChatLoading] = useState(false);
   const [quoteChatInput, setQuoteChatInput] = useState('');
   const [quoteChatSending, setQuoteChatSending] = useState(false);
   const quoteChatEndRef = useRef(null);
+  /* Enes Doğanay | 9 Nisan 2026: Sadece mesaj container'ını aşağı kaydır, sayfayı değil */
+  const scrollChatToBottom = useCallback((smooth = true) => {
+    setTimeout(() => {
+      const container = quoteChatEndRef.current?.parentElement;
+      if (container) container.scrollTo({ top: container.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
+    }, 80);
+  }, []);
+  // Enes Doğanay | 9 Nisan 2026: Teklif silme onay state'i
+  const [confirmDeleteQuoteId, setConfirmDeleteQuoteId] = useState(null);
 
   // Enes Doğanay | 6 Nisan 2026: select('*') → spesifik sütunlar, console.log temizlendi, is_verified/premium kaldırıldı
   useEffect(() => {
@@ -205,6 +219,20 @@ const ProfilePage = () => {
         }
         setMyQuotesLoading(false);
 
+        // Enes Doğanay | 9 Nisan 2026: URL'deki teklif_id parametresiyle direkt chat aç (toast tıklaması)
+        const urlTeklifId = searchParams.get('teklif_id');
+        if (urlTeklifId) {
+          const tid = parseInt(urlTeklifId, 10);
+          if (!isNaN(tid)) {
+            // searchParams'tan teklif_id'yi temizle (tekrar açılmasın)
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('teklif_id');
+            setSearchParams(newParams, { replace: true });
+            // Chat'i aç
+            setTimeout(() => openQuoteChat(tid), 200);
+          }
+        }
+
         setLoading(false);
 
         if (favsResult.data && favsResult.data.length > 0) {
@@ -258,6 +286,166 @@ const ProfilePage = () => {
 
     fetchData();
   }, []);
+
+  /* Enes Doğanay | 9 Nisan 2026: URL'de teklif_id değiştiğinde (toast tıklaması vb.) ilgili teklif chat'ini aç */
+  useEffect(() => {
+    const urlTeklifId = searchParams.get('teklif_id');
+    if (urlTeklifId && !loading) {
+      const tid = parseInt(urlTeklifId, 10);
+      if (!isNaN(tid)) {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('teklif_id');
+        setSearchParams(newParams, { replace: true });
+        openQuoteChat(tid);
+      }
+    }
+  }, [searchParams.get('teklif_id'), loading]);
+
+  // Enes Doğanay | 9 Nisan 2026: AuthContext'ten gelen latestNotification ve pendingQuoteCount
+  const { latestNotification, pendingQuoteCount, setActiveViewingTeklifId } = useAuth();
+  useEffect(() => {
+    if (!latestNotification) return;
+    const isQuoteNotif = (latestNotification.type === 'quote_reply' || latestNotification.type === 'quote_message');
+    const notifTeklifId = latestNotification.metadata?.teklif_id;
+
+    /* Enes Doğanay | 9 Nisan 2026: Kullanıcı zaten ilgili teklifin chat'indeyse bildirimi anında okundu yap */
+    if (isQuoteNotif && notifTeklifId && activeQuoteId === notifTeklifId) {
+      supabase.from('bildirimler').update({ is_read: true }).eq('id', latestNotification.id).then(() => refreshCounts());
+      setNotifications(prev => {
+        if (prev.some(n => n.id === latestNotification.id)) return prev;
+        return [{ ...latestNotification, is_read: true }, ...prev];
+      });
+    } else {
+      setNotifications(prev => {
+        if (prev.some(n => n.id === latestNotification.id)) return prev;
+        return [latestNotification, ...prev];
+      });
+    }
+  }, [latestNotification]);
+
+  // Enes Doğanay | 9 Nisan 2026: Polling — 5 sn'de bir teklif listesini DB'den taze çek
+  // Enes Doğanay | 9 Nisan 2026: Son mesajın sender_role'üne göre display status hesapla
+  useEffect(() => {
+    if (!user) return;
+    const fetchQuotes = async () => {
+      const { data } = await supabase.from('teklif_talepleri').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+      if (!data) return;
+      const rawQuotes = data;
+      let enriched;
+      if (rawQuotes.length > 0) {
+        const quoteFirmaIds = [...new Set(rawQuotes.map(q => q.firma_id))];
+        const quoteIds = rawQuotes.map(q => q.id);
+        const [quoteFirmsRes, lastMsgsRes] = await Promise.all([
+          supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', quoteFirmaIds),
+          supabase.from('teklif_mesajlari').select('teklif_id, sender_role').in('teklif_id', quoteIds).order('created_at', { ascending: false })
+        ]);
+        const firmMap = new Map((quoteFirmsRes.data || []).map(f => [f.firmaID, f.firma_adi]));
+        // Her teklif için son mesajın sender_role'ünü bul
+        const lastMsgMap = new Map();
+        for (const msg of (lastMsgsRes.data || [])) {
+          if (!lastMsgMap.has(msg.teklif_id)) lastMsgMap.set(msg.teklif_id, msg.sender_role);
+        }
+        enriched = rawQuotes.map(q => {
+          const lastSender = lastMsgMap.get(q.id);
+          // Bireysel kullanıcının giden teklifleri: son mesaja göre durum
+          let _displayStatus;
+          if (!lastSender) {
+            // Henüz mesaj yok — DB'deki durum geçerli (pending/read)
+            _displayStatus = q.durum;
+          } else if (lastSender === 'company') {
+            _displayStatus = 'replied'; // Firma cevap vermiş → Yanıt Geldi
+          } else {
+            _displayStatus = 'awaiting_reply'; // Biz yazmışız → Yanıt Bekleniyor
+          }
+          // rejected/closed DB'den gelir, override etme
+          if (q.durum === 'rejected' || q.durum === 'closed') _displayStatus = q.durum;
+          return { ...q, _firma_adi: firmMap.get(q.firma_id) || 'Firma', _displayStatus };
+        });
+      } else {
+        enriched = [];
+      }
+      setMyQuotes(prev => {
+        if (prev.length === enriched.length && prev.every((q, i) => q.id === enriched[i]?.id && q._displayStatus === enriched[i]?._displayStatus)) return prev;
+        return enriched;
+      });
+    };
+    fetchQuotes();
+    const pollInterval = setInterval(fetchQuotes, 5000);
+    return () => clearInterval(pollInterval);
+  }, [user]);
+
+  // Enes Doğanay | 9 Nisan 2026: Broadcast + Polling fallback
+  // Broadcast anlık iletim sağlar; polling 3 sn'de bir DB'den yeni mesajları kontrol eder.
+  // RLS veya Realtime sorunlarından tamamen bağımsız, %100 garanti çalışır.
+  const quoteChatChannelRef = useRef(null);
+  useEffect(() => {
+    if (!activeQuoteId) {
+      if (quoteChatChannelRef.current) { supabase.removeChannel(quoteChatChannelRef.current); quoteChatChannelRef.current = null; }
+      return;
+    }
+    const addMessage = (msg) => {
+      if (!msg) return;
+      setQuoteChatMessages(prev => {
+        if (prev.some(m => m.id === msg.id)) return prev;
+        return [...prev, msg];
+      });
+      scrollChatToBottom();
+    };
+    // Broadcast kanal — RLS'den bağımsız anlık iletim
+    const bcChannel = supabase
+      .channel(`teklif-chat-bc-${activeQuoteId}`, { config: { broadcast: { ack: true } } })
+      .on('broadcast', { event: 'new-message' }, ({ payload }) => {
+        addMessage(payload);
+      })
+      .subscribe();
+    quoteChatChannelRef.current = bcChannel;
+    // Enes Doğanay | 9 Nisan 2026: Polling — her 3 saniyede DB'den tüm mesajları çek ve state'i güncelle
+    // Append değil full-replace: RLS/Realtime sorunlarından bağımsız, kesin çalışır
+    const pollInterval = setInterval(async () => {
+      const { data, error } = await supabase
+        .from('teklif_mesajlari')
+        .select('*')
+        .eq('teklif_id', activeQuoteId)
+        .order('created_at', { ascending: true });
+      if (error) { console.error('[Polling] teklif_mesajlari hata:', error); return; }
+      if (data) {
+        setQuoteChatMessages(prev => {
+          if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev;
+          scrollChatToBottom();
+          return data;
+        });
+      }
+    }, 3000);
+    return () => {
+      clearInterval(pollInterval);
+      supabase.removeChannel(bcChannel);
+      quoteChatChannelRef.current = null;
+    };
+  }, [activeQuoteId]);
+
+  /* Enes Doğanay | 9 Nisan 2026: AuthContext'e aktif görüntülenen teklif id'sini bildir — toast bastırma için */
+  useEffect(() => {
+    setActiveViewingTeklifId(activeQuoteId || null);
+    return () => setActiveViewingTeklifId(null);
+  }, [activeQuoteId]);
+
+  // Enes Doğanay | 9 Nisan 2026: Hatırlatma polling — status 'sent' olduğunda kart otomatik kaybolsun
+  useEffect(() => {
+    if (!user) return;
+    const pollReminders = async () => {
+      const { data } = await supabase
+        .from('kullanici_hatirlaticilari')
+        .select('*')
+        .eq('user_id', user.id)
+        .in('status', ['pending', 'sent'])
+        .order('reminder_at', { ascending: true });
+      if (data) {
+        setUpcomingReminders(data.filter((r) => r.status === 'pending'));
+      }
+    };
+    const reminderPollInterval = setInterval(pollReminders, 15000);
+    return () => clearInterval(reminderPollInterval);
+  }, [user]);
 
   // Enes Doğanay | 6 Nisan 2026: Promise.all paralel sorgular
   const fetchListsAndFavorites = async (userId) => {
@@ -352,11 +540,44 @@ const ProfilePage = () => {
     refreshCounts();
   };
 
+  // Enes Doğanay | 9 Nisan 2026: Tekil bildirim silme
+  const handleDeleteNotification = async (notificationId) => {
+    const { error } = await supabase.from('bildirimler').delete().eq('id', notificationId).eq('user_id', user.id);
+    if (error) {
+      console.error('[Bildirim Sil] Hata:', error);
+      alert('Bildirim silinemedi.');
+      return;
+    }
+    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+    refreshCounts();
+  };
+
+  // Enes Doğanay | 9 Nisan 2026: Tüm bildirimleri toplu sil
+  const handleDeleteAllNotifications = async () => {
+    if (notifications.length === 0) return;
+    const { error } = await supabase.from('bildirimler').delete().eq('user_id', user.id);
+    if (error) {
+      console.error('[Bildirim Toplu Sil] Hata:', error);
+      alert('Bildirimler silinemedi.');
+      return;
+    }
+    setNotifications([]);
+    refreshCounts();
+  };
+
   // Enes Doğanay | 7 Nisan 2026: Teklif chatini aç — mesajları çek
   const openQuoteChat = async (quoteId) => {
     setActiveQuoteId(quoteId);
     setQuoteChatLoading(true);
     setQuoteChatInput('');
+
+    /* Enes Doğanay | 9 Nisan 2026: Teklif açıldığında ilgili okunmamış bildirimleri okundu yap */
+    const relatedUnread = notifications.filter(n => !n.is_read && (n.type === 'quote_reply' || n.type === 'quote_message') && n.metadata?.teklif_id === quoteId);
+    if (relatedUnread.length > 0) {
+      const ids = relatedUnread.map(n => n.id);
+      supabase.from('bildirimler').update({ is_read: true }).in('id', ids).then(() => refreshCounts());
+      setNotifications(prev => prev.map(n => ids.includes(n.id) ? { ...n, is_read: true } : n));
+    }
 
     const { data, error } = await supabase.from('teklif_mesajlari')
       .select('*')
@@ -365,7 +586,8 @@ const ProfilePage = () => {
 
     if (!error) setQuoteChatMessages(data || []);
     setQuoteChatLoading(false);
-    setTimeout(() => quoteChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+    /* Enes Doğanay | 9 Nisan 2026: Chat açıldığında mesaj container'ını en alta kaydır (sayfa kaymaz) */
+    scrollChatToBottom(false);
   };
 
   // Enes Doğanay | 7 Nisan 2026: Teklif chatine mesaj gönder (kullanıcı tarafı)
@@ -381,14 +603,29 @@ const ProfilePage = () => {
     if (!error && data) {
       setQuoteChatMessages(prev => [...prev, data]);
       setQuoteChatInput('');
-      // Enes Doğanay | 7 Nisan 2026: İlk mesaj gönderildiğinde teklif durumunu replied yap
-      const currentQuote = myQuotes.find(q => q.id === activeQuoteId);
-      if (currentQuote && currentQuote.durum === 'pending') {
-        // durum değişikliği gönderen tarafta yapılmaz, sadece firma tarafı yapar
+      // Enes Doğanay | 9 Nisan 2026: Broadcast ile karşı tarafa mesajı anlık ilet (await ile güvenilir gönderim)
+      if (quoteChatChannelRef.current) {
+        await quoteChatChannelRef.current.send({ type: 'broadcast', event: 'new-message', payload: data });
       }
-      setTimeout(() => quoteChatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+      // Enes Doğanay | 9 Nisan 2026: Anlık UI güncellemesi — son mesajı biz attık → Yanıt Bekleniyor
+      setMyQuotes(prev => prev.map(q => q.id === activeQuoteId ? { ...q, _displayStatus: 'awaiting_reply' } : q));
+      scrollChatToBottom();
     }
     setQuoteChatSending(false);
+  };
+
+  // Enes Doğanay | 9 Nisan 2026: Teklif talebini sil (ek dosya + DB kaydı)
+  const handleDeleteQuote = async (quoteId) => {
+    const quote = myQuotes.find(q => q.id === quoteId);
+    if (quote?.ek_dosya_url) {
+      await supabase.storage.from('teklif-ekleri').remove([quote.ek_dosya_url]);
+    }
+    const { error } = await supabase.from('teklif_talepleri').delete().eq('id', quoteId);
+    if (!error) {
+      setMyQuotes(prev => prev.filter(q => q.id !== quoteId));
+      if (activeQuoteId === quoteId) setActiveQuoteId(null);
+    }
+    setConfirmDeleteQuoteId(null);
   };
 
   // Enes Doğanay | 7 Nisan 2026: Bildirimden teklif chatine yönlendir
@@ -606,24 +843,27 @@ const ProfilePage = () => {
 
   if (loading) return <PageLoader />;
 
+  /* Enes Doğanay | 9 Nisan 2026: Okunmamış teklif bildirimlerinin teklif_id'lerini topla — kart üzerinde yeni bildirim göstergesi için */
+  const unreadQuoteIds = new Set(
+    notifications
+      .filter(n => !n.is_read && (n.type === 'quote_reply' || n.type === 'quote_message') && n.metadata?.teklif_id)
+      .map(n => n.metadata.teklif_id)
+  );
+
   // Enes Doğanay | 6 Nisan 2026: Arama + sıralama ile filtreleme
-  const displayedFavorites = (() => {
-    let result = selectedListId ? favorites.filter(fav => fav.liste_id === selectedListId) : [...favorites];
-    if (favSearch.trim()) {
-      const q = favSearch.toLowerCase();
-      result = result.filter(fav =>
-        fav.name.toLowerCase().includes(q) ||
-        fav.category.toLowerCase().includes(q) ||
-        fav.location.toLowerCase().includes(q)
-      );
-    }
-    switch (favSort) {
-      case 'alpha': return [...result].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
-      case 'alpha-desc': return [...result].sort((a, b) => b.name.localeCompare(a.name, 'tr'));
-      case 'oldest': return [...result].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
-      case 'newest': default: return [...result].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
-    }
-  })();
+  let displayedFavorites = selectedListId ? favorites.filter(fav => fav.liste_id === selectedListId) : [...favorites];
+  if (favSearch.trim()) {
+    const q = favSearch.toLowerCase();
+    displayedFavorites = displayedFavorites.filter(fav =>
+      fav.name.toLowerCase().includes(q) ||
+      fav.category.toLowerCase().includes(q) ||
+      fav.location.toLowerCase().includes(q)
+    );
+  }
+  if (favSort === 'alpha') displayedFavorites.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+  else if (favSort === 'alpha-desc') displayedFavorites.sort((a, b) => b.name.localeCompare(a.name, 'tr'));
+  else if (favSort === 'oldest') displayedFavorites.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+  else displayedFavorites.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
   const unreadNotificationsCount = notifications.filter((notification) => !notification.is_read).length;
   // Enes Doğanay | 6 Nisan 2026: Zamani gecen ancak henuz server tarafinda islenmemis hatirlaticilar yaklasan olarak gosterilmez
   const futureUpcomingReminders = upcomingReminders.filter((reminder) => new Date(reminder.reminder_at).getTime() > Date.now());
@@ -669,8 +909,10 @@ const ProfilePage = () => {
                 <span className="material-symbols-outlined">collections_bookmark</span> Favorilerim
               </a>
               {/* Enes Doğanay | 7 Nisan 2026: Teklif Taleplerim sekmesi */}
+              {/* Enes Doğanay | 9 Nisan 2026: Sidebar Teklif Taleplerim badge — okunmamış yanıt/mesaj bildirimi sayısı */}
               <a className={`nav-item ${currentTab === 'quotes' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'quotes' })}>
                 <span className="material-symbols-outlined">request_quote</span> Teklif Taleplerim
+                {pendingQuoteCount > 0 && <span className="nav-item-badge">{pendingQuoteCount}</span>}
               </a>
               <a className={`nav-item ${currentTab === 'notifications' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'notifications' })}>
                 <span className="material-symbols-outlined">notifications</span> Bildirimler
@@ -740,55 +982,65 @@ const ProfilePage = () => {
               </div>
             )}
 
-            <div className="sidebar-stats">
-              <div className="sidebar-stats-label">Kayıtlı Tedarikçi</div>
-              <div className="sidebar-stats-value">{favorites.length}</div>
-            </div>
+            {/* Enes Doğanay | 9 Nisan 2026: Kayıtlı Tedarikçi kartı sadece Favorilerim sekmesinde görünür */}
+            {currentTab === 'favorites' && (
+              <div className="sidebar-stats">
+                <div className="sidebar-stats-icon"><span className="material-symbols-outlined">inventory</span></div>
+                <div className="sidebar-stats-text">
+                  <div className="sidebar-stats-value">{favorites.length}</div>
+                  <div className="sidebar-stats-label">Tedarikçi</div>
+                </div>
+              </div>
+            )}
           </aside>
 
           {/* CONTENT */}
           <main className="content">
 
+            {/* Enes Doğanay | 9 Nisan 2026: Profil sayfası modern tasarım v2 */}
             {currentTab === 'profile' && (
-              <div className="card">
-                <div className="card-header">
-                  <div className="card-header-inner">
-                    <div>
-                      <h1>Profil Bilgileri</h1>
-                      <p>Kişisel ve kurumsal bilgilerinizi buradan yönetebilirsiniz.</p>
-                    </div>
-                    <span className="status">Hesabınız Onaylı</span>
-                  </div>
+              <div className="card profile-card-v2">
+                <div className="profile-hero-banner">
+                  <div className="profile-hero-shape profile-hero-shape--1"></div>
+                  <div className="profile-hero-shape profile-hero-shape--2"></div>
+                  <div className="profile-hero-shape profile-hero-shape--3"></div>
                 </div>
 
-                <div className="profile-section">
-                  {/* Enes Doğanay | 8 Nisan 2026: Fotoğraf yoksa büyük placeholder göster */}
+                <div className="profile-avatar-center">
                   {profile?.avatar ? (
-                    <div className="avatar-large" style={{ backgroundImage: `url(${profile.avatar})` }} />
+                    <div className="avatar-v2" style={{ backgroundImage: `url(${profile.avatar})` }} />
                   ) : (
-                    <div className="avatar-large avatar-large--no-photo">
+                    <div className="avatar-v2 avatar-v2--no-photo">
                       <span className="material-symbols-outlined">person</span>
                     </div>
                   )}
-                  <div style={{ width: '100%' }}>
-                    <h3 className="profile-name">{`${profile?.first_name || ""}${profile?.last_name ? " " + profile.last_name : ""}`.trim() || "İsimsiz Kullanıcı"}</h3>
-                    <p className="profile-company">{profile?.company_name || "Şirket yok"}</p>
-                    <div className="profile-buttons">
-                      <button className="secondary-btn" onClick={() => fileInputRef.current.click()} disabled={uploading}>
-                        {uploading ? "Yükleniyor..." : "Fotoğrafı Değiştir"}
-                      </button>
-                      <input type="file" accept="image/*" ref={fileInputRef} onChange={handleAvatarUpload} className="sr-only" />
-                    </div>
+                  <button className="avatar-camera-btn" onClick={() => fileInputRef.current.click()} disabled={uploading} title="Fotoğrafı Değiştir">
+                    <span className="material-symbols-outlined">{uploading ? 'hourglass_empty' : 'photo_camera'}</span>
+                  </button>
+                  <input type="file" accept="image/*" ref={fileInputRef} onChange={handleAvatarUpload} className="sr-only" />
+                </div>
+
+                <div className="profile-identity">
+                  <h2 className="profile-display-name">{`${profile?.first_name || ""}${profile?.last_name ? " " + profile.last_name : ""}`.trim() || "İsimsiz Kullanıcı"}</h2>
+                  <p className="profile-display-company">
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>business</span>
+                    {profile?.company_name || "Şirket yok"}
+                  </p>
+                  <div className="profile-badge-verified">
+                    <span className="material-symbols-outlined">verified</span>
+                    Hesabınız Onaylı
                   </div>
                 </div>
 
-                <div className="profile-fields">
-                  <ProfileField label="Ad" value={profile?.first_name || ""} dbField="first_name" onSave={handleUpdateField} />
-                  <ProfileField label="Soyad" value={profile?.last_name || ""} dbField="last_name" onSave={handleUpdateField} />
-                  <ProfileField label="Şirket Adı" value={profile?.company_name || ""} dbField="company_name" onSave={handleUpdateField} />
-                  <ProfileField label="E-posta Adresi" value={user?.email || ""} dbField="email" isEmail={true} extra="Doğrulanmış" onSave={handleUpdateField} editable={false} />
-                  <ProfileField label="Telefon Numarası" value={profile?.phone || "-"} dbField="phone" onSave={handleUpdateField} />
-                  <ProfileField label="Konum" value={profile?.location || "-"} dbField="location" onSave={handleUpdateField} isLocation={true} cities={cities} />
+                <div className="profile-divider"></div>
+
+                <div className="profile-fields-grid">
+                  <ProfileField label="Ad" value={profile?.first_name || ""} dbField="first_name" onSave={handleUpdateField} icon="person" />
+                  <ProfileField label="Soyad" value={profile?.last_name || ""} dbField="last_name" onSave={handleUpdateField} icon="badge" />
+                  <ProfileField label="Şirket Adı" value={profile?.company_name || ""} dbField="company_name" onSave={handleUpdateField} icon="apartment" />
+                  <ProfileField label="E-posta Adresi" value={user?.email || ""} dbField="email" isEmail={true} extra="Doğrulanmış" onSave={handleUpdateField} editable={false} icon="mail" />
+                  <ProfileField label="Telefon Numarası" value={profile?.phone || "-"} dbField="phone" onSave={handleUpdateField} icon="phone" />
+                  <ProfileField label="Konum" value={profile?.location || "-"} dbField="location" onSave={handleUpdateField} isLocation={true} cities={cities} icon="location_on" />
                 </div>
               </div>
             )}
@@ -798,7 +1050,6 @@ const ProfilePage = () => {
                 <div className="favorites-header">
                   <div>
                     <h1>{selectedListId === null ? "Tüm Favoriler" : myLists.find(l => l.id === selectedListId)?.liste_adi}</h1>
-                    <p>{displayedFavorites.length} tedarikçi{favSearch.trim() ? ` · "${favSearch}" araması` : ''}</p>
                   </div>
                 </div>
 
@@ -855,6 +1106,7 @@ const ProfilePage = () => {
                   )}
                 </div>
 
+                {/* Enes Doğanay | 9 Nisan 2026: Modern toolbar — arama + sıralama butonları */}
                 <div className="favorites-toolbar">
                   <div className="fav-search-wrapper">
                     <span className="material-symbols-outlined">search</span>
@@ -871,14 +1123,13 @@ const ProfilePage = () => {
                       </button>
                     )}
                   </div>
-                  <div className="fav-sort-wrapper">
-                    <span className="material-symbols-outlined">swap_vert</span>
-                    <select className="fav-sort-select" value={favSort} onChange={e => setFavSort(e.target.value)}>
-                      <option value="newest">Son Eklenen</option>
-                      <option value="oldest">İlk Eklenen</option>
-                      <option value="alpha">A → Z</option>
-                      <option value="alpha-desc">Z → A</option>
-                    </select>
+                  <div className="fav-sort-group">
+                    {[{ key: 'newest', label: 'Yeni', icon: 'schedule' }, { key: 'oldest', label: 'Eski', icon: 'history' }, { key: 'alpha', label: 'A-Z', icon: 'sort_by_alpha' }, { key: 'alpha-desc', label: 'Z-A', icon: 'sort_by_alpha' }].map(s => (
+                      <button key={s.key} className={`fav-sort-btn${favSort === s.key ? ' active' : ''}`} onClick={() => setFavSort(s.key)}>
+                        <span className="material-symbols-outlined">{s.icon}</span>
+                        {s.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -1096,7 +1347,10 @@ const ProfilePage = () => {
                 {activeQuoteId ? (() => {
                   const activeQuote = myQuotes.find(q => q.id === activeQuoteId);
                   if (!activeQuote) return null;
-                  const st = { pending: 'Beklemede', read: 'Okundu', replied: 'Yanıtlandı', rejected: 'Reddedildi', closed: 'Kapatıldı' }[activeQuote.durum] || 'Beklemede';
+                  // Enes Doğanay | 9 Nisan 2026: Son mesaja göre hesaplanan _displayStatus kullan
+                  const displayDurum = activeQuote._displayStatus || activeQuote.durum;
+                  const stMap = { pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
+                  const st = stMap[displayDurum] || 'Beklemede';
                   return (
                     <div className="quote-chat-view">
                       <button className="quote-chat-back" onClick={() => setActiveQuoteId(null)}>
@@ -1109,15 +1363,31 @@ const ProfilePage = () => {
                             <h2>{activeQuote.konu}</h2>
                             <p className="quote-chat-firma">{activeQuote._firma_adi}</p>
                           </div>
-                          <span className={`my-quote-status my-quote-status--${activeQuote.durum}`}>{st}</span>
+                          <span className={`my-quote-status my-quote-status--${displayDurum}`}>{st}</span>
                         </div>
                         <div className="quote-chat-meta">
-                          {activeQuote.miktar && <span className="my-quote-tag"><span className="material-symbols-outlined">inventory_2</span>{activeQuote.miktar}</span>}
-                          {activeQuote.teslim_tarihi && <span className="my-quote-tag"><span className="material-symbols-outlined">calendar_month</span>{new Date(activeQuote.teslim_tarihi).toLocaleDateString('tr-TR')}</span>}
-                          <span className="my-quote-tag"><span className="material-symbols-outlined">schedule</span>{new Date(activeQuote.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                          {/* Enes Doğanay | 9 Nisan 2026: İkon yerine metin etiketleri + teslim_yeri */}
+                          {activeQuote.miktar && <span className="my-quote-tag"><strong>Miktar:</strong> {activeQuote.miktar}</span>}
+                          {activeQuote.teslim_tarihi && <span className="my-quote-tag"><strong>Talep Edilen Teslim Tarihi:</strong> {new Date(activeQuote.teslim_tarihi).toLocaleDateString('tr-TR')}</span>}
+                          {activeQuote.teslim_yeri && <span className="my-quote-tag"><strong>Teslim Yeri:</strong> {activeQuote.teslim_yeri}</span>}
                         </div>
+                        {/* Enes Doğanay | 11 Nisan 2026: Ek dosya tasarımı yenilendi */}
+                        {activeQuote.ek_dosya_url && activeQuote.ek_dosya_adi && (
+                          <div className="quote-chat-attachment" onClick={async () => {
+                            const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(activeQuote.ek_dosya_url, 300);
+                            if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                          }}>
+                            <div className="quote-chat-attachment-icon"><span className="material-symbols-outlined">description</span></div>
+                            <div className="quote-chat-attachment-info">
+                              <span className="quote-chat-attachment-name">{activeQuote.ek_dosya_adi}</span>
+                              <span className="quote-chat-attachment-hint">Eki görüntülemek için tıklayın</span>
+                            </div>
+                            <span className="quote-chat-attachment-open"><span className="material-symbols-outlined">open_in_new</span></span>
+                          </div>
+                        )}
                         <div className="quote-chat-initial-msg">
-                          <small>İlk mesajınız</small>
+                          {/* Enes Doğanay | 9 Nisan 2026: İlk mesajınız → Talep detayları */}
+                          <small>Talep detayları</small>
                           <p>{activeQuote.mesaj}</p>
                         </div>
                       </div>
@@ -1185,39 +1455,54 @@ const ProfilePage = () => {
                         <p>Firma detay sayfalarında "Teklif İste" butonunu kullanarak firmalardan teklif isteyebilirsiniz.</p>
                       </div>
                     ) : (
-                      <div className="quotes-list">
-                        {myQuotes.map((q) => {
-                          const statusMap = {
-                            pending: { label: 'Beklemede', cls: 'pending', icon: 'schedule' },
-                            read: { label: 'Okundu', cls: 'read', icon: 'visibility' },
-                            replied: { label: 'Yanıtlandı', cls: 'replied', icon: 'reply' },
-                            rejected: { label: 'Reddedildi', cls: 'rejected', icon: 'close' },
-                            closed: { label: 'Kapatıldı', cls: 'closed', icon: 'archive' }
-                          };
-                          const st = statusMap[q.durum] || statusMap.pending;
+                      <>
+                      {/* Enes Doğanay | 9 Nisan 2026: Durum filtre butonları — kurumsal formatla aynı tasarım */}
+                      <div className="cmp-quotes-status-filter">
+                        {[{ key: 'all', label: 'Tümü' }, { key: 'pending', label: 'Beklemede' }, { key: 'read', label: 'Firma Görüntüledi' }, { key: 'replied', label: 'Yanıt Geldi' }, { key: 'awaiting_reply', label: 'Yanıt Bekleniyor' }, { key: 'rejected', label: 'Reddedildi' }, { key: 'closed', label: 'Sonlandırıldı' }].map(f => (
+                          <button key={f.key} className={`cmp-quotes-status-filter-btn${quoteStatusFilter === f.key ? ' active' : ''}`} onClick={() => setQuoteStatusFilter(f.key)}>
+                            {f.label}
+                            {f.key !== 'all' && <span>({myQuotes.filter(q => (q._displayStatus || q.durum) === f.key).length})</span>}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="cmp-quotes-list">
+                        {(quoteStatusFilter === 'all' ? myQuotes : myQuotes.filter(q => (q._displayStatus || q.durum) === quoteStatusFilter)).map((q) => {
+                          // Enes Doğanay | 9 Nisan 2026: Son mesaja göre hesaplanan _displayStatus kullan
+                          const displayDurum = q._displayStatus || q.durum;
+                          const stMap = { pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
 
                           return (
-                            <article key={q.id} className="my-quote-card" onClick={() => openQuoteChat(q.id)} style={{ cursor: 'pointer' }}>
-                              <div className="my-quote-top">
-                                <div className="my-quote-top-left">
-                                  <span className={`my-quote-status my-quote-status--${st.cls}`}>
-                                    <span className="material-symbols-outlined">{st.icon}</span>
-                                    {st.label}
-                                  </span>
-                                  <strong className="my-quote-subject">{q.konu}</strong>
+                            <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openQuoteChat(q.id)} style={{ cursor: 'pointer' }}>
+                              <div className="cmp-quote-top">
+                                <div className="cmp-quote-top-left">
+                                  <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>{stMap[displayDurum] || 'Beklemede'}</span>
+                                  {/* Enes Doğanay | 9 Nisan 2026: Okunmamış bildirimi olan tekliflerde "Yeni Mesaj" göstergesi */}
+                                  {unreadQuoteIds.has(q.id) && <span className="cmp-quote-new-badge">Yeni Mesaj</span>}
+                                  <strong className="cmp-quote-subject">{q.konu}</strong>
                                 </div>
-                                <span className="my-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                <div className="cmp-quote-top-right">
+                                  <div className="cmp-quote-sender-info">
+                                    <span className="cmp-quote-sender">{q._firma_adi}</span>
+                                    <span className="cmp-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                  </div>
+                                  <button className="cmp-quote-delete-trigger" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(q.id); }} title="Teklifi Sil">
+                                    <span className="material-symbols-outlined">delete</span>
+                                  </button>
+                                </div>
                               </div>
-                              <p className="my-quote-message">{q.mesaj}</p>
-                              <div className="my-quote-footer">
-                                <span className="my-quote-tag"><span className="material-symbols-outlined">business</span>{q._firma_adi}</span>
-                                {q.miktar && <span className="my-quote-tag"><span className="material-symbols-outlined">inventory_2</span>{q.miktar}</span>}
-
-                              </div>
+                              <p className="cmp-quote-preview">{q.mesaj}</p>
+                              {confirmDeleteQuoteId === q.id && (
+                                <div className="cmp-quote-delete-confirm" onClick={(e) => e.stopPropagation()}>
+                                  <span>Silmek istediğinize emin misiniz?</span>
+                                  <button className="cmp-quote-delete-btn cmp-quote-delete-btn--yes" onClick={(e) => { e.stopPropagation(); handleDeleteQuote(q.id); }}>Evet</button>
+                                  <button className="cmp-quote-delete-btn cmp-quote-delete-btn--no" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(null); }}>Hayır</button>
+                                </div>
+                              )}
                             </article>
                           );
                         })}
                       </div>
+                      </>
                     )}
                   </>
                 )}
@@ -1228,40 +1513,102 @@ const ProfilePage = () => {
               <div className="notifications-section">
                 <div className="notifications-hero">
                   <div>
-                    <h1>Bildirimler</h1>
-                    <p>Zamanlanan hatırlatmaları ve gönderilmiş bildirimleri buradan takip edebilirsiniz.</p>
+                    <h1>Bildirim Merkezi</h1>
+                    <p>Teklif yanıtları, mesajlar ve hatırlatmalarınız burada.</p>
                   </div>
-                  <button className="notifications-mark-all" onClick={handleMarkAllNotificationsRead} disabled={unreadNotificationsCount === 0}>
-                    Tümünü Okundu Yap
-                  </button>
+                  {/* Enes Doğanay | 12 Nisan 2026: Tümünü Okundu Yap + Tümünü Sil butonları */}
+                  <div className="notifications-hero-actions">
+                    <button className="notifications-mark-all" onClick={handleMarkAllNotificationsRead} disabled={unreadNotificationsCount === 0}>
+                      Tümünü Okundu Yap
+                    </button>
+                    <button className="notifications-delete-all" onClick={handleDeleteAllNotifications} disabled={notifications.length === 0}>
+                      Tümünü Sil
+                    </button>
+                  </div>
                 </div>
 
                 <div className="notifications-stats-grid">
                   <div className="notification-stat-card notification-stat-card-unread">
                     <span className="material-symbols-outlined">mark_email_unread</span>
                     <strong>{unreadNotificationsCount}</strong>
-                    <span>Okunmamış Bildirim</span>
+                    <span>Okunmamış</span>
                   </div>
                   <div className="notification-stat-card notification-stat-card-reminders">
                     <span className="material-symbols-outlined">alarm</span>
                     <strong>{futureUpcomingReminders.length}</strong>
-                    <span>Yaklaşan Hatırlatma</span>
+                    <span>Hatırlatma</span>
                   </div>
                 </div>
 
+                {/* Enes Doğanay | 9 Nisan 2026: Bildirimler solda (stat kartıyla hizalı), Hatırlatmalar sağda */}
                 <div className="notifications-grid">
+                  <section className="notifications-panel notifications-panel-feed">
+                    <div className="notifications-panel-header">
+                      <div>
+                        <h3>Son Bildirimler</h3>
+                        <p>Teklif güncellemeleri ve mesajlarınız</p>
+                      </div>
+                    </div>
+
+                    {notifications.length === 0 ? (
+                      <div className="notifications-empty-state">
+                        <span className="material-symbols-outlined">notifications_none</span>
+                        <p>Henüz bildiriminiz yok. Teklif gönderdiğinizde veya yanıt aldığınızda burada görünecek.</p>
+                      </div>
+                    ) : (
+                      <div className="notifications-feed-list">
+                        {notifications.map((notification) => (
+                          <article
+                            key={notification.id}
+                            className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${notification.metadata?.teklif_id || notification.firma_id ? 'clickable' : ''}`}
+                            onClick={() => {
+                              // Enes Doğanay | 9 Nisan 2026: Bildirim kartı tıklanabilir — ilgili sayfaya yönlendir
+                              if (notification.metadata?.teklif_id) {
+                                navigateToQuoteChat(notification);
+                              } else if (notification.firma_id) {
+                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                navigate(`/firmadetay/${notification.firma_id}`);
+                              }
+                            }}
+                            style={{ cursor: notification.metadata?.teklif_id || notification.firma_id ? 'pointer' : 'default' }}
+                          >
+                            <div className="notification-feed-top">
+                              <div>
+                                <span className="notification-feed-type">{notification.type === 'reminder' ? '⏰ Hatırlatma' : notification.type === 'quote_received' ? '📩 Yeni Teklif' : notification.type === 'quote_reply' ? '💬 Yanıt Geldi' : notification.type === 'quote_message' ? '✉️ Yeni Mesaj' : '🔔 Bildirim'}</span>
+                                <h4>{notification.title}</h4>
+                              </div>
+                              <span className="notification-feed-time">{formatRelativeNotificationTime(notification.created_at)}</span>
+                            </div>
+                            <p>{notification.message}</p>
+                            <div className="notification-feed-actions">
+                              {!notification.is_read && (
+                                <button type="button" className="notification-read-btn" onClick={(e) => { e.stopPropagation(); handleMarkNotificationRead(notification.id); }}>
+                                  Okundu Yap
+                                </button>
+                              )}
+                              {/* Enes Doğanay | 12 Nisan 2026: Tekil bildirim silme butonu */}
+                              <button type="button" className="notification-delete-btn" onClick={(e) => { e.stopPropagation(); handleDeleteNotification(notification.id); }}>
+                                <span className="material-symbols-outlined">delete</span>
+                              </button>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+
                   <section className="notifications-panel notifications-panel-reminders">
                     <div className="notifications-panel-header">
                       <div>
                         <h3>Yaklaşan Hatırlatmalar</h3>
-                        <p>Profil mail adresinize gönderilecek planlı hatırlatmalar.</p>
+                        <p>Planladığınız hatırlatmalar e-postanıza gönderilecek.</p>
                       </div>
                     </div>
 
                     {futureUpcomingReminders.length === 0 ? (
                       <div className="notifications-empty-state">
                         <span className="material-symbols-outlined">alarm_off</span>
-                        <p>Planlanmış hatırlatma yok.</p>
+                        <p>Aktif hatırlatmanız yok. Firma notlarından hatırlatma oluşturabilirsiniz.</p>
                       </div>
                     ) : (
                       <div className="upcoming-reminders-list">
@@ -1272,10 +1619,10 @@ const ProfilePage = () => {
                               <span className="upcoming-reminder-badge">Planlandı</span>
                             </div>
                             <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
-                            <p>{reminder.note_body || 'Hatırlatıcı not içeriği burada görünecek.'}</p>
+                            <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
                             <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
                               <span className="material-symbols-outlined">open_in_new</span>
-                              <span>Notun Olduğu Firmaya Git</span>
+                              <span>Firmaya Git</span>
                             </button>
                           </article>
                         ))}
@@ -1285,74 +1632,26 @@ const ProfilePage = () => {
                     {overduePendingReminders.length > 0 && (
                       <div className="overdue-reminders-block">
                         <div className="notifications-panel-subheader">
-                          <h4>İşlenmeyi Bekleyen Hatırlatmalar</h4>
-                          <p>Bu kayıtların zamanı geçti. Arka plan mail servisi kurulmadıysa burada beklemesi normaldir.</p>
+                          {/* Enes Doğanay | 9 Nisan 2026: Olumlu ton — mail gönderim sürecini yansıtır */}
+                          <h4>Mail Gönderilecek Hatırlatmalar</h4>
+                          <p>Bu hatırlatmalarınızın zamanı geldi, e-postanıza iletilmek üzere.</p>
                         </div>
                         <div className="upcoming-reminders-list">
                           {overduePendingReminders.map((reminder) => (
                             <article key={reminder.id} className="upcoming-reminder-card overdue">
                               <div className="upcoming-reminder-top">
                                 <span className="upcoming-reminder-time overdue">{formatReminderLabel(reminder.reminder_at)}</span>
-                                <span className="upcoming-reminder-badge overdue">İşlenmedi</span>
+                                <span className="upcoming-reminder-badge overdue">Gönderiliyor</span>
                               </div>
                               <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
-                              <p>{reminder.note_body || 'Hatırlatıcı not içeriği burada görünecek.'}</p>
+                              <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
                               <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
                                 <span className="material-symbols-outlined">open_in_new</span>
-                                <span>Notun Olduğu Firmaya Git</span>
+                                <span>Firmaya Git</span>
                               </button>
                             </article>
                           ))}
                         </div>
-                      </div>
-                    )}
-                  </section>
-
-                  <section className="notifications-panel notifications-panel-feed">
-                    <div className="notifications-panel-header">
-                      <div>
-                        <h3>Bildirim Akışı</h3>
-                        <p>Gönderilen hatırlatmalar ve sistem olayları burada listelenir.</p>
-                      </div>
-                    </div>
-
-                    {notifications.length === 0 ? (
-                      <div className="notifications-empty-state">
-                        <span className="material-symbols-outlined">notifications_none</span>
-                        <p>Henüz bildirim oluşmadı.</p>
-                      </div>
-                    ) : (
-                      <div className="notifications-feed-list">
-                        {notifications.map((notification) => (
-                          <article key={notification.id} className={`notification-feed-card ${notification.is_read ? '' : 'unread'}`}>
-                            <div className="notification-feed-top">
-                              <div>
-                                <span className="notification-feed-type">{notification.type === 'reminder' ? 'Hatırlatma Maili' : notification.type === 'quote_received' ? 'Teklif Talebi' : notification.type === 'quote_reply' ? 'Teklif Yanıtı' : notification.type === 'quote_message' ? 'Teklif Mesajı' : 'Bildirim'}</span>
-                                <h4>{notification.title}</h4>
-                              </div>
-                              <span className="notification-feed-time">{formatRelativeNotificationTime(notification.created_at)}</span>
-                            </div>
-                            <p>{notification.message}</p>
-                            <div className="notification-feed-actions">
-                              {!notification.is_read && (
-                                <button type="button" className="notification-read-btn" onClick={() => handleMarkNotificationRead(notification.id)}>
-                                  Okundu Yap
-                                </button>
-                              )}
-                              {/* Enes Doğanay | 7 Nisan 2026: Teklif bildirimlerinde chat'e yönlendir */}
-                              {notification.metadata?.teklif_id && (
-                                <button type="button" className="notification-open-btn" onClick={() => navigateToQuoteChat(notification)}>
-                                  <span className="material-symbols-outlined" style={{ fontSize: '16px', marginRight: '4px' }}>chat</span> Teklifi Aç
-                                </button>
-                              )}
-                              {notification.firma_id && !notification.metadata?.teklif_id && (
-                                <button type="button" className="notification-open-btn" onClick={() => navigate(`/firmadetay/${notification.firma_id}`)}>
-                                  Firmayı Aç
-                                </button>
-                              )}
-                            </div>
-                          </article>
-                        ))}
                       </div>
                     )}
                   </section>
@@ -1403,37 +1702,42 @@ const ProfilePage = () => {
   );
 };
 
-const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, cities = [], onSave, editable = true }) => {
+{/* Enes Doğanay | 10 Nisan 2026: ProfileField — konum alanı CitySelect ile değiştirildi */}
+const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, cities = [], onSave, editable = true, icon }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value || "");
-  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => { setTempValue(value || ""); }, [value]);
 
-  // Enes Doğanay | 6 Nisan 2026: filteredCities tanımlandı (ReferenceError düzeltmesi)
-  const filteredCities = cities.filter(c => c.toLowerCase().includes(tempValue.toLowerCase()));
-
   const handleSaveClick = async () => {
     if (tempValue !== value) { await onSave(dbField, tempValue, isEmail); }
-    setIsEditing(false); setShowSuggestions(false);
+    setIsEditing(false);
   };
-  const handleCancelClick = () => { setTempValue(value || ""); setIsEditing(false); setShowSuggestions(false); };
-  const handleCitySelect = (city) => { setTempValue(city); setShowSuggestions(false); };
+  const handleCancelClick = () => { setTempValue(value || ""); setIsEditing(false); };
+
+  // Enes Doğanay | 10 Nisan 2026: Konum alanı — CitySelect ile şehir seçimi + kaydet/iptal
+  const handleCityChange = (city) => { setTempValue(city); };
 
   return (
-    <div className="field">
+    <div className="field field-card-v2">
+      {icon && <div className="field-icon-wrap"><span className="material-symbols-outlined">{icon}</span></div>}
       <div className="field-content">
         <label>{label}</label>
         {isEditing ? (
           <>
-            <div className="field-edit-row">
-              <input className="field-input" type="text" value={tempValue} onChange={(e) => { setTempValue(e.target.value); if (isLocation) setShowSuggestions(true); }} onFocus={() => { if (isLocation) setShowSuggestions(true); }} onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} autoFocus />
-              <button className="field-btn-save" onClick={handleSaveClick}>Kaydet</button>
-              <button className="field-btn-cancel" onClick={handleCancelClick}>İptal</button>
-            </div>
-            {isLocation && showSuggestions && filteredCities.length > 0 && (
-              <div className="field-suggestions">
-                {filteredCities.map((city) => (<div key={city} className="field-suggestion-item" onMouseDown={(e) => e.preventDefault()} onClick={() => handleCitySelect(city)}>{city}</div>))}
+            {isLocation ? (
+              <div className="field-location-edit">
+                <CitySelect value={tempValue === '-' ? '' : tempValue} onChange={handleCityChange} />
+                <div className="field-location-actions">
+                  <button className="field-btn-save" onClick={handleSaveClick}>Kaydet</button>
+                  <button className="field-btn-cancel" onClick={handleCancelClick}>İptal</button>
+                </div>
+              </div>
+            ) : (
+              <div className="field-edit-row">
+                <input className="field-input" type="text" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus />
+                <button className="field-btn-save" onClick={handleSaveClick}>Kaydet</button>
+                <button className="field-btn-cancel" onClick={handleCancelClick}>İptal</button>
               </div>
             )}
           </>

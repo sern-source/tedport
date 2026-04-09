@@ -30,8 +30,9 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
+/* Enes Doğanay | 9 Nisan 2026: max-width ile yatay taşma engellendi */
 .shared-header-inner {
-    max-width: 80%;
+    max-width: 1400px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -39,6 +40,8 @@
     padding: 0 16px;
     gap: 12px;
     position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
@@ -87,10 +90,12 @@
     }
 }
 
+/* Enes Doğanay | 9 Nisan 2026: Arama çubuğu shrink edebilir, taşma önlenir */
 @media (min-width: 1024px) {
     .shared-search-bar {
-        flex: 0 0 320px;
-        max-width: 350px;
+        flex: 1 1 220px;
+        max-width: 320px;
+        min-width: 140px;
     }
 }
 
@@ -288,11 +293,13 @@
 
 /* ========== DESKTOP NAVIGATION ========== */
 
+/* Enes Doğanay | 9 Nisan 2026: Nav shrink edilebilir, gap daraltıldı */
 .shared-nav {
     display: none;
     align-items: center;
-    gap: 32px;
-    flex-shrink: 0;
+    gap: 16px;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 @media (min-width: 1024px) {
@@ -303,7 +310,7 @@
 
 .shared-nav-links {
     display: flex;
-    gap: 24px;
+    gap: 16px;
     align-items: center;
 }
 
@@ -322,17 +329,20 @@
 
 /* ========== USER ACTIONS ========== */
 
+/* Enes Doğanay | 9 Nisan 2026: Kullanıcı alanı shrink edilebilir */
 .shared-user-actions {
     display: flex;
     gap: 8px;
     align-items: center;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .shared-user-dropdown {
     position: relative;
 }
 
+/* Enes Doğanay | 9 Nisan 2026: Uzun isimler için taşmayı önle */
 .shared-user-btn {
     background: white;
     color: #1d4ed8;
@@ -346,10 +356,20 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    max-width: 240px;
+}
+
+/* Enes Doğanay | 9 Nisan 2026: İsim metnini kısalt */
+.shared-user-btn-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .shared-user-btn-icon {
     font-size: 18px;
+    flex-shrink: 0;
 }
 
 .shared-user-btn:hover {
