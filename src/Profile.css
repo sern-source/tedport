@@ -1081,6 +1081,30 @@
   color: #ef4444;
   background: rgba(239, 68, 68, 0.08);
 }
+/* Enes Doğanay | 10 Nisan 2026: Onay mailini tekrar gönder butonu */
+.field-pending-resend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+  width: 18px;
+  height: 18px;
+}
+.field-pending-resend .material-symbols-outlined {
+  font-size: 13px;
+  color: inherit;
+}
+.field-pending-resend:hover {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
 
 /* Enes Doğanay | 10 Nisan 2026: Konum alanı CitySelect düzeni */
 .field-location-edit {
@@ -1278,6 +1302,34 @@
 .field-btn-save:active {
   transform: translateY(0);
   box-shadow: 0 1px 4px rgba(16, 185, 129, 0.2);
+}
+
+/* Enes Doğanay | 10 Nisan 2026: Kaydet butonu disabled + spinner */
+.field-btn-save:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+.field-btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: fieldSpin 0.6s linear infinite;
+  vertical-align: middle;
+}
+@keyframes fieldSpin {
+  to { transform: rotate(360deg); }
+}
+.field-btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.field-input:disabled {
+  opacity: 0.6;
+  background: #f1f5f9;
 }
 
 .field-btn-cancel {

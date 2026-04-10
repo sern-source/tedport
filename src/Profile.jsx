@@ -297,24 +297,29 @@ const ProfilePage = () => {
 
   // Enes Doğanay | 10 Nisan 2026: E-posta onaylandığında profiles tablosunu ve yerel state'i güncelle
   useEffect(() => {
+    const handleEmailUpdate = async (session) => {
+      if (!session?.user) return;
+      const freshEmail = session.user.email;
+      // Güncel profildeki e-postayı karşılaştır (user state'ine bağımlı olmadan)
+      const { data: currentProfile } = await supabase.from('profiles').select('email').eq('id', session.user.id).single();
+      if (freshEmail && currentProfile && freshEmail !== currentProfile.email) {
+        await supabase.from('profiles').update({ email: freshEmail }).eq('id', session.user.id);
+        setUser(session.user);
+        setProfile(prev => ({ ...prev, email: freshEmail }));
+        setPendingEmail(null);
+        setFieldFeedback({ type: 'success', message: 'E-posta adresiniz başarıyla güncellendi!' });
+        setTimeout(() => setFieldFeedback(null), 5000);
+      }
+      if (!session.user.new_email) setPendingEmail(null);
+    };
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'USER_UPDATED' && session?.user) {
-        const freshEmail = session.user.email;
-        // E-posta gerçekten değiştiyse profiles tablosunu güncelle
-        if (freshEmail && user && freshEmail !== user.email) {
-          await supabase.from('profiles').update({ email: freshEmail }).eq('id', session.user.id);
-          setUser(session.user);
-          setProfile(prev => ({ ...prev, email: freshEmail }));
-          setPendingEmail(null);
-          setFieldFeedback({ type: 'success', message: 'E-posta adresiniz başarıyla güncellendi!' });
-          setTimeout(() => setFieldFeedback(null), 5000);
-        }
-        // new_email temizlendiyse pending'i kaldır
-        if (!session.user.new_email) setPendingEmail(null);
+      // Enes Doğanay | 10 Nisan 2026: Hem USER_UPDATED hem SIGNED_IN event'lerini yakala (email change redirect)
+      if ((event === 'USER_UPDATED' || event === 'SIGNED_IN') && session?.user) {
+        await handleEmailUpdate(session);
       }
     });
     return () => subscription.unsubscribe();
-  }, [user]);
+  }, []);
 
   /* Enes Doğanay | 9 Nisan 2026: URL'de teklif_id değiştiğinde (toast tıklaması vb.) ilgili teklif chat'ini aç */
   useEffect(() => {
@@ -877,35 +882,89 @@ const ProfilePage = () => {
     }
   };
 
-  // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik talebini iptal et
-  const handleCancelEmailChange = async () => {
+  // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik talebini iptal et (API çağırmadan sadece local temizle)
+  const handleCancelEmailChange = () => {
+    setPendingEmail(null);
+    setFieldFeedback({ type: 'info', message: 'E-posta değişiklik talebi iptal edildi.' });
+    setTimeout(() => setFieldFeedback(null), 4000);
+  };
+
+  // Enes Doğanay | 10 Nisan 2026: Onay mailini tekrar gönder (10sn timeout ile)
+  const handleResendEmailChange = async () => {
+    if (!pendingEmail) return;
+    setFieldFeedback({ type: 'info', message: 'Onay maili tekrar gönderiliyor...' });
+
+    let done = false;
+    const timeout = setTimeout(() => {
+      if (!done) {
+        done = true;
+        setFieldFeedback({ type: 'success', message: 'Onay maili gönderildi! Gelen kutunuzu (ve spam klasörünü) kontrol edin.' });
+        setTimeout(() => setFieldFeedback(null), 5000);
+      }
+    }, 10000);
+
     try {
-      // Mevcut e-postayı tekrar set ederek Supabase'deki new_email'i sıfırla
-      const { error } = await supabase.auth.updateUser({ email: user.email });
-      if (error) throw error;
-      setPendingEmail(null);
-      setFieldFeedback({ type: 'info', message: 'E-posta değişiklik talebi iptal edildi.' });
-      setTimeout(() => setFieldFeedback(null), 4000);
+      const { error } = await supabase.auth.updateUser(
+        { email: pendingEmail },
+        { emailRedirectTo: window.location.origin + '/profile' }
+      );
+      clearTimeout(timeout);
+      if (done) return;
+      done = true;
+      if (error) {
+        if (error.message?.includes('rate') || error.message?.includes('limit') || error.status === 429) {
+          setFieldFeedback({ type: 'error', message: 'Kısa sürede çok fazla istek. Lütfen biraz bekleyip tekrar deneyin.' });
+        } else {
+          setFieldFeedback({ type: 'error', message: 'Mail gönderilemedi: ' + error.message });
+        }
+      } else {
+        setFieldFeedback({ type: 'success', message: 'Onay maili tekrar gönderildi! Gelen kutunuzu kontrol edin.' });
+      }
+      setTimeout(() => setFieldFeedback(null), 5000);
     } catch {
-      setPendingEmail(null);
-      setFieldFeedback({ type: 'info', message: 'E-posta değişiklik talebi iptal edildi.' });
-      setTimeout(() => setFieldFeedback(null), 4000);
+      clearTimeout(timeout);
+      if (done) return;
+      done = true;
+      setFieldFeedback({ type: 'error', message: 'Mail gönderilirken bir hata oluştu.' });
+      setTimeout(() => setFieldFeedback(null), 5000);
     }
   };
 
   const handleUpdateField = async (field, newValue, isEmail = false) => {
     try {
       if (isEmail) {
-        // Enes Doğanay | 10 Nisan 2026: Onay maili mevcut ortama yönlensin (localhost veya production)
-        const { error: authError } = await supabase.auth.updateUser(
-          { email: newValue },
-          { emailRedirectTo: window.location.origin + '/profile' }
-        );
-        if (authError) throw authError;
-        // Enes Doğanay | 11 Nisan 2026: E-posta hemen güncellenmez, onay bekler
+        // Enes Doğanay | 10 Nisan 2026: E-posta değişikliği — hemen UI güncelle, arka planda API çağır
         setPendingEmail(newValue);
-        setFieldFeedback({ type: 'info', message: 'Yeni e-posta adresinize bir onay maili gönderdik. Onaylanana kadar mevcut e-posta geçerli kalacak.' });
-        setTimeout(() => setFieldFeedback(null), 6000);
+        setFieldFeedback({ type: 'info', message: 'E-posta değişiklik talebi gönderiliyor...' });
+        
+        // Enes Doğanay | 10 Nisan 2026: 20sn timeout — API asılırsa bile UI pending kalır
+        let timedOut = false;
+        const timeout = setTimeout(() => {
+          timedOut = true;
+          setFieldFeedback({ type: 'info', message: 'Onay maili gönderilmiş olabilir. Gelen kutunuzu kontrol edin.' });
+          setTimeout(() => setFieldFeedback(null), 6000);
+        }, 20000);
+
+        try {
+          const { error: authError } = await supabase.auth.updateUser(
+            { email: newValue },
+            { emailRedirectTo: window.location.origin + '/profile' }
+          );
+          clearTimeout(timeout);
+          if (timedOut) return;
+          if (authError) {
+            setPendingEmail(null);
+            if (authError.message?.includes('rate') || authError.message?.includes('limit') || authError.status === 429) {
+              throw new Error('Kısa sürede çok fazla e-posta değişikliği yapıldı. Lütfen 1 saat sonra tekrar deneyin.');
+            }
+            throw authError;
+          }
+          setFieldFeedback({ type: 'info', message: 'Yeni e-posta adresinize bir onay maili gönderdik. Onaylanana kadar mevcut e-posta geçerli kalacak.' });
+          setTimeout(() => setFieldFeedback(null), 6000);
+        } catch (err) {
+          clearTimeout(timeout);
+          if (!timedOut) throw err;
+        }
       } else {
         const { error } = await supabase.from("profiles").update({ [field]: newValue }).eq("id", user.id);
         if (error) throw error;
@@ -1126,7 +1185,7 @@ const ProfilePage = () => {
                   <ProfileField label="Soyad" value={profile?.last_name || ""} dbField="last_name" onSave={handleUpdateField} icon="badge" />
                   <ProfileField label="Şirket Adı" value={profile?.company_name || ""} dbField="company_name" onSave={handleUpdateField} icon="apartment" />
                   {/* Enes Doğanay | 10 Nisan 2026: E-posta düzenleme aktif edildi */}
-                  <ProfileField label="E-posta Adresi" value={user?.email || ""} dbField="email" isEmail={true} extra="Doğrulanmış" onSave={handleUpdateField} editable={true} icon="mail" pendingEmail={pendingEmail} onCancelPendingEmail={handleCancelEmailChange} />
+                  <ProfileField label="E-posta Adresi" value={user?.email || ""} dbField="email" isEmail={true} extra="Doğrulanmış" onSave={handleUpdateField} editable={true} icon="mail" pendingEmail={pendingEmail} onCancelPendingEmail={handleCancelEmailChange} onResendEmail={handleResendEmailChange} />
                   <ProfileField label="Telefon Numarası" value={profile?.phone || "-"} dbField="phone" onSave={handleUpdateField} icon="phone" />
                   <ProfileField label="Konum" value={profile?.location || "-"} dbField="location" onSave={handleUpdateField} isLocation={true} cities={cities} icon="location_on" />
                 </div>
@@ -1830,14 +1889,25 @@ const ProfilePage = () => {
 };
 
 {/* Enes Doğanay | 10 Nisan 2026: ProfileField — konum alanı CitySelect ile değiştirildi */}
-const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, cities = [], onSave, editable = true, icon, pendingEmail, onCancelPendingEmail }) => {
+const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, cities = [], onSave, editable = true, icon, pendingEmail, onCancelPendingEmail, onResendEmail }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value || "");
+  // Enes Doğanay | 10 Nisan 2026: Kaydetme sırasında loading göstergesi
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => { setTempValue(value || ""); }, [value]);
 
   const handleSaveClick = async () => {
-    if (tempValue !== value) { await onSave(dbField, tempValue, isEmail); }
+    if (tempValue !== value) {
+      // Enes Doğanay | 10 Nisan 2026: E-posta için hemen edit modunu kapat, API arka planda çalışsın
+      if (isEmail) {
+        setIsEditing(false);
+        onSave(dbField, tempValue, isEmail);
+        return;
+      }
+      setIsSaving(true);
+      try { await onSave(dbField, tempValue, isEmail); } finally { setIsSaving(false); }
+    }
     setIsEditing(false);
   };
   const handleCancelClick = () => { setTempValue(value || ""); setIsEditing(false); };
@@ -1862,9 +1932,11 @@ const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, citie
               </div>
             ) : (
               <div className="field-edit-row">
-                <input className="field-input" type="text" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus />
-                <button className="field-btn-save" onClick={handleSaveClick}>Kaydet</button>
-                <button className="field-btn-cancel" onClick={handleCancelClick}>İptal</button>
+                <input className="field-input" type="text" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus disabled={isSaving} />
+                <button className="field-btn-save" onClick={handleSaveClick} disabled={isSaving}>
+                  {isSaving ? <span className="field-btn-spinner" /> : 'Kaydet'}
+                </button>
+                <button className="field-btn-cancel" onClick={handleCancelClick} disabled={isSaving}>İptal</button>
               </div>
             )}
           </>
@@ -1877,6 +1949,11 @@ const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, citie
               <div className="field-pending-email">
                 <span className="material-symbols-outlined">schedule</span>
                 Onay bekleniyor: <strong>{pendingEmail}</strong>
+                {onResendEmail && (
+                  <button type="button" className="field-pending-resend" onClick={onResendEmail} title="Onay mailini tekrar gönder">
+                    <span className="material-symbols-outlined">send</span>
+                  </button>
+                )}
                 {onCancelPendingEmail && (
                   <button type="button" className="field-pending-cancel" onClick={onCancelPendingEmail} title="Talebi iptal et">
                     <span className="material-symbols-outlined">close</span>
@@ -1887,7 +1964,8 @@ const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, citie
           </div>
         )}
       </div>
-      {editable && !isEditing && (
+      {/* Enes Doğanay | 10 Nisan 2026: Bekleyen e-posta değişikliği varken düzenleme butonu gizlenir */}
+      {editable && !isEditing && !pendingEmail && (
         <button className="field-edit-btn" onClick={() => setIsEditing(true)}>Düzenle</button>
       )}
     </div>
