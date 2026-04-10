@@ -297,40 +297,60 @@ const ProfilePage = () => {
 
   // Enes Doğanay | 10 Nisan 2026: E-posta onaylandığında profiles tablosunu ve yerel state'i güncelle
   useEffect(() => {
-    const handleEmailUpdate = async (session) => {
-      if (!session?.user) return;
-      const freshEmail = session.user.email;
-      const { data: currentProfile } = await supabase.from('profiles').select('email').eq('id', session.user.id).single();
+    const handleEmailUpdate = async (freshUser) => {
+      if (!freshUser) return;
+      const freshEmail = freshUser.email;
+      const { data: currentProfile } = await supabase.from('profiles').select('email').eq('id', freshUser.id).single();
       if (freshEmail && currentProfile && freshEmail !== currentProfile.email) {
-        await supabase.from('profiles').update({ email: freshEmail }).eq('id', session.user.id);
-        setUser(session.user);
-        setProfile(prev => ({ ...prev, email: freshEmail }));
+        await supabase.from('profiles').update({ email: freshEmail }).eq('id', freshUser.id);
+        setUser(freshUser);
+        setProfile(prev => prev ? ({ ...prev, email: freshEmail }) : prev);
         setPendingEmail(null);
         setFieldFeedback({ type: 'success', message: 'E-posta adresiniz başarıyla güncellendi!' });
         setTimeout(() => setFieldFeedback(null), 5000);
+        return;
       }
-      if (!session.user.new_email) setPendingEmail(null);
+      if (!freshUser.new_email) setPendingEmail(null);
     };
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if ((event === 'USER_UPDATED' || event === 'SIGNED_IN') && session?.user) {
-        await handleEmailUpdate(session);
+      if ((event === 'USER_UPDATED' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+        await handleEmailUpdate(session.user);
       }
     });
 
-    // Enes Doğanay | 10 Nisan 2026: Pending email varken 10sn'de bir Supabase'den güncel durumu kontrol et
+    // Enes Doğanay | 10 Nisan 2026: Pending email varken 5sn'de bir Supabase'den güncel durumu kontrol et
     const pollInterval = setInterval(async () => {
       if (!pendingEmail) return;
       try {
         const { data: { user: freshUser } } = await supabase.auth.getUser();
         if (freshUser && !freshUser.new_email && freshUser.email === pendingEmail) {
-          await handleEmailUpdate({ user: freshUser });
+          await handleEmailUpdate(freshUser);
         } else if (freshUser && !freshUser.new_email && freshUser.email !== pendingEmail) {
           // Talep iptal edilmiş veya expire olmuş
           setPendingEmail(null);
         }
       } catch { /* sessiz */ }
-    }, 10000);
-    return () => { subscription.unsubscribe(); clearInterval(pollInterval); };
+    }, 5000);
+
+    // Enes Doğanay | 10 Nisan 2026: Kullanıcı başka sekmeden onaylayıp geri döndüğünde anında kontrol et
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible' || !pendingEmail) return;
+      try {
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        if (freshUser && !freshUser.new_email && freshUser.email === pendingEmail) {
+          await handleEmailUpdate(freshUser);
+        } else if (freshUser && !freshUser.new_email && freshUser.email !== pendingEmail) {
+          setPendingEmail(null);
+        }
+      } catch { /* sessiz */ }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [pendingEmail]);
 
   /* Enes Doğanay | 9 Nisan 2026: URL'de teklif_id değiştiğinde (toast tıklaması vb.) ilgili teklif chat'ini aç */

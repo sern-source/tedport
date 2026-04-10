@@ -18,6 +18,8 @@ const EmailConfirm = lazy(() => import('./EmailConfirmation'));
 const ResetPassword = lazy(() => import('./ResetPassword'));
 const AdminCorporateApplications = lazy(() => import('./AdminCorporateApplications'));
 const FirmaProfil = lazy(() => import('./FirmaProfil'));
+/* Enes Doğanay | 10 Nisan 2026: E-posta değişikliği onay başarı sayfası */
+const EmailChangeSuccess = lazy(() => import('./EmailChangeSuccess'));
 
 export default function Router() {
   return (
@@ -35,6 +37,8 @@ export default function Router() {
         <Route path="/hakkimizda" element={<Hakkimizda />} />
         <Route path="/iletisim" element={<Iletisim />} />
         <Route path="/emailconfirmation" element={<EmailConfirm />} />
+        {/* Enes Doğanay | 10 Nisan 2026: E-posta değişikliği onay başarı sayfası */}
+        <Route path="/email-degisikligi-onay" element={<EmailChangeSuccess />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin/kurumsal-basvurular" element={<AdminCorporateApplications />} />
         <Route path="/admin/kurumsal-başvurular" element={<AdminCorporateApplications />} />

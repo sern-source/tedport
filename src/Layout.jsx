@@ -13,10 +13,10 @@ export default function Layout() {
             navigate(`/reset-password${hash}`, { replace: true });
             return;
         }
-        // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik onayı — hash'teki token ile giriş yap, profile yönlendir
+        // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik onayı — hash ile birlikte onay sayfasına yönlendir
         const isEmailChangeFlow = hash.includes('type=email_change');
         if (isEmailChangeFlow) {
-            navigate(`/profile${hash}`, { replace: true });
+            navigate(`/email-degisikligi-onay${hash}`, { replace: true });
             return;
         }
         // Enes Doğanay | 10 Nisan 2026: Supabase onay mesajı hash'inde — hash temizle, profile yönlendir

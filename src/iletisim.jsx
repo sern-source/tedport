@@ -241,7 +241,8 @@ const Contact = () => {
                                             <div className="contact-info-text">
                                                 <h3>E-posta</h3>
                                                 <p>Tüm sorularınız için</p>
-                                                <a href="mailto:destek@tedport.com">destek@tedport.com</a>
+                                                {/* Enes Doğanay | 10 Nisan 2026: destek@ → info@ olarak güncellendi */}
+                                                <a href="mailto:info@tedport.com">info@tedport.com</a>
                                             </div>
                                         </div>
                                     </div>
