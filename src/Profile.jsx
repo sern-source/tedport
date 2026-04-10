@@ -973,7 +973,8 @@ const ProfilePage = () => {
         let timedOut = false;
         const timeout = setTimeout(() => {
           timedOut = true;
-          setFieldFeedback({ type: 'info', message: 'Onay maili gönderilmiş olabilir. Gelen kutunuzu kontrol edin.' });
+          {/* Enes Doğanay | 10 Nisan 2026: Mesaj netleştirildi */}
+          setFieldFeedback({ type: 'info', message: 'Onay maili gönderildi. Gelen kutunuzu kontrol edin.' });
           setTimeout(() => setFieldFeedback(null), 6000);
         }, 20000);
 

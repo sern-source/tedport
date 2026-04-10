@@ -428,20 +428,19 @@ const SharedHeader = ({
                                 </>
                             ) : (
                                 <>
-                                    {/* Enes Doğanay | 8 Nisan 2026: Bireysel mobil menü — Tekliflerim eklendi */}
+                                    {/* Enes Doğanay | 10 Nisan 2026: Bireysel mobil menü — isimlendirme web dropdown ile uyumlu hale getirildi */}
                                     <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">person</span>
-                                        Profil
+                                        Profil Bilgileri
+                                    </Link>
+                                    <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">collections_bookmark</span>
+                                        Favorilerim
                                     </Link>
                                     <Link to="/profile?tab=quotes" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">request_quote</span>
-                                        Tekliflerim
-                                        {/* Enes Doğanay | 9 Nisan 2026: Bireysel mobil Tekliflerim badge */}
+                                        Teklif Taleplerim
                                         {pendingQuoteCount > 0 && <span className="shared-mobile-badge">{pendingQuoteCount}</span>}
-                                    </Link>
-                                    <Link to="/profile?tab=favorites" onClick={() => setIsMobileMenuOpen(false)}>
-                                        <span className="material-symbols-outlined shared-mobile-menu-icon">favorite</span>
-                                        Favoriler
                                     </Link>
                                     <Link to="/profile?tab=notifications" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>
