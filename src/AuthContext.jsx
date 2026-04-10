@@ -30,6 +30,8 @@ export function AuthProvider({ children }) {
   const setActiveViewingTeklifId = useCallback((id) => { activeViewingTeklifIdRef.current = id; }, []);
 
   const loadUserData = async () => {
+    // Enes Doğanay | 10 Nisan 2026: try/finally ile authChecked her durumda true olur — AbortError header'ı kilitliyordu
+    try {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session?.user) {
@@ -78,7 +80,14 @@ export function AuthProvider({ children }) {
       setUnreadNotifCount(0);
       setPendingQuoteCount(0);
     }
-    setAuthChecked(true);
+    } catch (err) {
+      // Enes Doğanay | 10 Nisan 2026: AbortError veya ağ hatası auth akışını kilitlememeli
+      if (!err?.message?.includes('abort')) {
+        console.error('Auth yükleme hatası:', err);
+      }
+    } finally {
+      setAuthChecked(true);
+    }
   };
 
   useEffect(() => {
