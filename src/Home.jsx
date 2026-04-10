@@ -138,7 +138,7 @@ const SupplierConnect = () => {
                     <div className="container">
                         <div className="sc-hero-box">
                             <div style={{ zIndex: 10 }}>
-                                <h1 className="sc-hero-title">Doğru Tedarikçiyi Hemen Bulun</h1>
+                                <h1 className="sc-hero-title">Doğru Tedarikçiyi2 Hemen Bulun</h1>
                                 {/* Enes Doğanay | 6 Nisan 2026: Türkiye odaklı alt başlık */}
                                 <p className="sc-hero-subtitle">Türkiye genelindeki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.</p>
                             </div>

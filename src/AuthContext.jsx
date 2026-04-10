@@ -29,71 +29,104 @@ export function AuthProvider({ children }) {
   const activeViewingTeklifIdRef = useRef(null);
   const setActiveViewingTeklifId = useCallback((id) => { activeViewingTeklifIdRef.current = id; }, []);
 
-  const loadUserData = async () => {
-    // Enes Doğanay | 10 Nisan 2026: try/finally ile authChecked her durumda true olur — AbortError header'ı kilitliyordu
-    try {
-    const { data: { session } } = await supabase.auth.getSession();
+  // Enes Doğanay | 10 Nisan 2026: State'i temizleyen yardımcı — tekrar kullanım için
+  const clearAuthState = () => {
+    setRealtimeUserId(null);
+    setUserProfile(null);
+    setIsCurrentUserAdmin(false);
+    setManagedCompanyId(null);
+    setManagedCompanyName(null);
+    setUnreadNotifCount(0);
+    setPendingQuoteCount(0);
+  };
 
-    if (session?.user) {
-      // Enes Doğanay | 9 Nisan 2026: Realtime RLS için access_token'ı global olarak set et (tek sefer yeterli)
+  const loadUserData = async () => {
+    try {
+      // Enes Doğanay | 10 Nisan 2026: getSession localStorage'dan okur (network çağrısı yok)
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        clearAuthState();
+        return;
+      }
+
+      // Enes Doğanay | 10 Nisan 2026: Session var ama geçerli mi? getUser ile doğrula (network çağrısı)
+      // Şifre/email değişikliğinde token revoke olur — bunu tespit etmek şart
+      let sessionStale = false;
+      try {
+        const { data: { user: verifiedUser }, error: verifyError } = await supabase.auth.getUser();
+        if (verifyError || !verifiedUser) sessionStale = true;
+      } catch (verifyErr) {
+        // getUser fırlattı (abort/network) — geçici hata, session'ı geçerli kabul et
+        if (verifyErr?.message?.includes('abort')) {
+          sessionStale = false; // AbortError → devam et
+        } else {
+          sessionStale = true; // Gerçek hata → stale
+        }
+      }
+
+      if (sessionStale) {
+        // Token geçersiz — storage'dan temizle, header "Giriş Yap" göstersin
+        try { await supabase.auth.signOut(); } catch {}
+        clearAuthState();
+        return;
+      }
+
+      // Enes Doğanay | 9 Nisan 2026: Realtime RLS için access_token'ı global olarak set et
       if (session.access_token) {
         supabase.realtime.setAuth(session.access_token);
       }
-      // Enes Doğanay | 9 Nisan 2026: Realtime subscription için user id'yi state'te tut (ref dependency'de çalışmaz)
       setRealtimeUserId(session.user.id);
-      const [adminResult, companyId, profileResult, notifResult] = await Promise.all([
-        resolveIsAdminUser(session.user.email, isAdminEmail),
-        getManagedCompanyId(),
-        supabase.from('profiles').select('first_name, last_name').eq('id', session.user.id).single(),
-        supabase.from('bildirimler').select('id', { count: 'exact', head: true }).eq('user_id', session.user.id).eq('is_read', false)
-      ]);
 
-      setIsCurrentUserAdmin(adminResult);
-      setManagedCompanyId(companyId);
-      setUserProfile(profileResult.data || { first_name: 'Profilime', last_name: 'Git' });
-      setUnreadNotifCount(notifResult.count || 0);
-
-      if (companyId) {
-        const [firmResult, quoteResult] = await Promise.all([
-          supabase.from('firmalar').select('firma_adi').eq('firmaID', companyId).single(),
-          supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', companyId).eq('durum', 'pending')
+      // Enes Doğanay | 10 Nisan 2026: Veri yükleme ayrı try/catch — hata olursa session'ı öldürme
+      // getManagedCompanyId() yerine direkt sorgu — fazladan getUser() çağrısını önler (AbortError kaynağıydı)
+      try {
+        const [adminResult, companyResult, profileResult, notifResult] = await Promise.all([
+          resolveIsAdminUser(session.user.email, isAdminEmail),
+          supabase.from('kurumsal_firma_yoneticileri').select('firma_id').eq('user_id', session.user.id).maybeSingle(),
+          supabase.from('profiles').select('first_name, last_name').eq('id', session.user.id).single(),
+          supabase.from('bildirimler').select('id', { count: 'exact', head: true }).eq('user_id', session.user.id).eq('is_read', false)
         ]);
-        setManagedCompanyName(firmResult.data?.firma_adi || null);
-        setPendingQuoteCount(quoteResult.count || 0);
-      } else {
-        setManagedCompanyName(null);
-        /* Enes Doğanay | 9 Nisan 2026: Bireysel kullanıcı için beklemede olan teklif sayısı yerine okunmamış teklif yanıt/mesaj bildirimlerini say */
-        const { count: quoteNotifCount } = await supabase
-          .from('bildirimler')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('is_read', false)
-          .in('type', ['quote_reply', 'quote_message']);
-        setPendingQuoteCount(quoteNotifCount || 0);
+
+        const companyId = companyResult.data?.firma_id || null;
+        setIsCurrentUserAdmin(adminResult);
+        setManagedCompanyId(companyId);
+        setUserProfile(profileResult.data || { first_name: 'Profilime', last_name: 'Git' });
+        setUnreadNotifCount(notifResult.count || 0);
+
+        if (companyId) {
+          const [firmResult, quoteResult] = await Promise.all([
+            supabase.from('firmalar').select('firma_adi').eq('firmaID', companyId).single(),
+            supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', companyId).eq('durum', 'pending')
+          ]);
+          setManagedCompanyName(firmResult.data?.firma_adi || null);
+          setPendingQuoteCount(quoteResult.count || 0);
+        } else {
+          setManagedCompanyName(null);
+          /* Enes Doğanay | 9 Nisan 2026: Bireysel kullanıcı için okunmamış teklif yanıt/mesaj bildirimlerini say */
+          const { count: quoteNotifCount } = await supabase
+            .from('bildirimler')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', session.user.id)
+            .eq('is_read', false)
+            .in('type', ['quote_reply', 'quote_message']);
+          setPendingQuoteCount(quoteNotifCount || 0);
+        }
+      } catch (dataErr) {
+        // Enes Doğanay | 10 Nisan 2026: Veri sorgusu başarısız ama session geçerli
+        // Session'ı öldürme! Minimal profil göster, kullanıcı giriş yapmış olarak kalsın
+        if (!dataErr?.message?.includes('abort')) {
+          console.error('Kullanıcı verisi yüklenemedi:', dataErr);
+        }
+        setUserProfile(prev => prev || { first_name: session.user.email?.split('@')[0] || 'Kullanıcı', last_name: '' });
       }
-    } else {
-      setRealtimeUserId(null);
-      setUserProfile(null);
-      setIsCurrentUserAdmin(false);
-      setManagedCompanyId(null);
-      setManagedCompanyName(null);
-      setUnreadNotifCount(0);
-      setPendingQuoteCount(0);
-    }
     } catch (err) {
-      // Enes Doğanay | 10 Nisan 2026: Session geçersizse (şifre değişikliği vb.) tüm state'i temizle — kullanıcıdan tekrar giriş iste
+      // Enes Doğanay | 10 Nisan 2026: getSession bile çöktüyse — tamamen beklenmedik hata
+      // signOut çağırma — ölüm sarmalı yaratır (onAuthStateChange → loadUserData → signOut → ...)
       if (!err?.message?.includes('abort')) {
-        console.error('Auth yükleme hatası:', err);
+        console.error('Auth hatası:', err);
       }
-      // Stale token'ı localStorage'dan da sil
-      try { await supabase.auth.signOut(); } catch {}
-      setRealtimeUserId(null);
-      setUserProfile(null);
-      setIsCurrentUserAdmin(false);
-      setManagedCompanyId(null);
-      setManagedCompanyName(null);
-      setUnreadNotifCount(0);
-      setPendingQuoteCount(0);
+      clearAuthState();
     } finally {
       setAuthChecked(true);
     }

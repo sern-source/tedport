@@ -4,7 +4,6 @@ import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase, setAuthPersistenceMode } from './supabaseClient';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { getManagedCompanyId } from './companyManagementApi';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -33,8 +32,14 @@ const LoginPage = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session && !cancelled) {
-        const managedCompanyId = await getManagedCompanyId();
+        // Enes Doğanay | 10 Nisan 2026: getManagedCompanyId() yerine direkt sorgu — fazladan getUser() AbortError yaratıyordu
+        const { data: companyData } = await supabase
+          .from('kurumsal_firma_yoneticileri')
+          .select('firma_id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
         if (cancelled) return;
+        const managedCompanyId = companyData?.firma_id || null;
         if (managedCompanyId) {
           const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
           if (!localStorage.getItem(visitedKey)) {
@@ -87,7 +92,13 @@ const LoginPage = () => {
       }
     } else {
       console.log("Giriş başarılı:", data.user);
-      const managedCompanyId = await getManagedCompanyId();
+      // Enes Doğanay | 10 Nisan 2026: getManagedCompanyId() yerine direkt sorgu — AbortError önleme
+      const { data: companyData } = await supabase
+        .from('kurumsal_firma_yoneticileri')
+        .select('firma_id')
+        .eq('user_id', data.user.id)
+        .maybeSingle();
+      const managedCompanyId = companyData?.firma_id || null;
       // Enes Doğanay | 7 Nisan 2026: İlk girişte firma profil paneline, sonraki girişlerde ana sayfaya yönlendir
       if (managedCompanyId) {
         const visitedKey = `tedport_firma_visited_${managedCompanyId}`;

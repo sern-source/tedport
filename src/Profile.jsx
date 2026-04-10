@@ -7,7 +7,6 @@ import "./SharedHeader.css";
 import { supabase } from "./supabaseClient";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CitySelect from './CitySelect';
-import { getManagedCompanyId } from './companyManagementApi';
 import { useAuth } from './AuthContext';
 import PageLoader from './PageLoader';
 
@@ -182,8 +181,13 @@ const ProfilePage = () => {
           return;
         }
 
-        const managedCompanyId = await getManagedCompanyId();
-        if (managedCompanyId) {
+        // Enes Doğanay | 10 Nisan 2026: getManagedCompanyId() yerine direkt sorgu — fazladan getUser() çağrısı AbortError yaratıyordu
+        const { data: companyData } = await supabase
+          .from('kurumsal_firma_yoneticileri')
+          .select('firma_id')
+          .eq('user_id', userData.user.id)
+          .maybeSingle();
+        if (companyData?.firma_id) {
           setLoading(false);
           navigate('/firma-profil');
           return;
