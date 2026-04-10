@@ -40,7 +40,12 @@ export function AuthProvider({ children }) {
     setPendingQuoteCount(0);
   };
 
+  // Enes Doğanay | 10 Nisan 2026: Logout sırasında auto-refresh yarış koşulunu engelleyen flag
+  const isLoggingOutRef = useRef(false);
+
   const loadUserData = async () => {
+    // Enes Doğanay | 10 Nisan 2026: Logout sırasında session tekrar yüklenmesin
+    if (isLoggingOutRef.current) return;
     try {
       // Enes Doğanay | 10 Nisan 2026: getSession localStorage/memory'den okur — hızlı, network yok
       // Şifre değişikliğinde refresh token revoke olur → getSession otomatik null döner
@@ -109,13 +114,23 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     loadUserData();
 
-    // Enes Doğanay | 8 Nisan 2026: Auth değişikliklerini dinle (login/logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Enes Doğanay | 9 Nisan 2026: Token yenilendiğinde realtime auth'u da güncelle
+    // Enes Doğanay | 10 Nisan 2026: Event tipine göre akıllı handling — SIGNED_OUT'ta loadUserData çağırma
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // Enes Doğanay | 10 Nisan 2026: Logout flag'i aktifken hiçbir event'i işleme — auto-refresh yarışını engelle
+      if (isLoggingOutRef.current) return;
+
+      if (event === 'SIGNED_OUT') {
+        // Enes Doğanay | 10 Nisan 2026: Logout — direkt state temizle, loadUserData çağırma
+        clearAuthState();
+        setAuthChecked(true);
+        return;
+      }
+
+      // Token yenilendiğinde realtime auth'u güncelle
       if (session?.access_token) {
         supabase.realtime.setAuth(session.access_token);
       }
-      // Küçük gecikme ile çakışmaları önle
+      // Login, token refresh vb. — kullanıcı verisini yenile
       setTimeout(() => loadUserData(), 100);
     });
 
@@ -123,13 +138,23 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setUserProfile(null);
-    setIsCurrentUserAdmin(false);
-    setManagedCompanyId(null);
-    setManagedCompanyName(null);
-    setUnreadNotifCount(0);
-    setPendingQuoteCount(0);
+    // Enes Doğanay | 10 Nisan 2026: Flag ile auto-refresh'in session'ı geri getirmesini engelle
+    isLoggingOutRef.current = true;
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch {}
+    // Storage'ı manuel temizle — auto-refresh kalıntısı kalmasın
+    try {
+      const projectRef = new URL('https://gsdbutprqfnxjtppwwhn.supabase.co').host.split('.')[0];
+      window.localStorage.removeItem(`sb-${projectRef}-auth-token`);
+      window.sessionStorage.removeItem(`sb-${projectRef}-auth-token`);
+      window.localStorage.removeItem('tedport-auth-storage-mode');
+      window.sessionStorage.removeItem('tedport-auth-storage-mode');
+    } catch {}
+    clearAuthState();
+    setAuthChecked(true);
+    // Flag'i 2sn sonra kaldır — auto-refresh timer'ı ölmüş olur
+    setTimeout(() => { isLoggingOutRef.current = false; }, 2000);
   };
 
   // Enes Doğanay | 8 Nisan 2026: Badge sayılarını yenileme (bildirim okunduysa, teklif durum değiştiyse vb.)

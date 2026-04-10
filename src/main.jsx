@@ -32,10 +32,14 @@ if (hash.includes('type=email_change')) {
           await supabase.from('profiles').update({ email: freshEmail }).eq('id', session.user.id);
         }
         // Session'ı temizle — SPA'yı kirletmesin
-        await supabase.auth.signOut();
+        // Enes Doğanay | 10 Nisan 2026: scope: global ile TÜM cihazlardaki refresh token'ları revoke et
+        await supabase.auth.signOut({ scope: 'global' });
         // Storage'ı da temizle (kalıntı kalmasın)
-        window.localStorage.removeItem(`sb-${new URL('https://gsdbutprqfnxjtppwwhn.supabase.co').host.split('.')[0]}-auth-token`);
-        window.sessionStorage.removeItem(`sb-${new URL('https://gsdbutprqfnxjtppwwhn.supabase.co').host.split('.')[0]}-auth-token`);
+        const pRef = new URL('https://gsdbutprqfnxjtppwwhn.supabase.co').host.split('.')[0];
+        window.localStorage.removeItem(`sb-${pRef}-auth-token`);
+        window.sessionStorage.removeItem(`sb-${pRef}-auth-token`);
+        window.localStorage.removeItem('tedport-auth-storage-mode');
+        window.sessionStorage.removeItem('tedport-auth-storage-mode');
         // Yeni e-postayı URL'e ekleyerek başarı sayfasına yönlendir
         window.location.replace(`/email-degisikligi-onay?email=${encodeURIComponent(freshEmail)}`);
       } else {
