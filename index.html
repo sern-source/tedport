@@ -13,6 +13,28 @@
 </head>
 
 <body>
+  <!-- Enes Doğanay | 10 Nisan 2026: Email değişiklik onayında eski session'ı Vite bundle'dan ÖNCE temizle.
+       Supabase JS client (detectSessionInUrl: true) başlatılırken eski token ile yeni hash token'ı
+       yarışmasın diye eski auth verisi silinir. Sadece email_change hash'inde çalışır. -->
+  <script>
+    (function(){
+      try {
+        var h = window.location.hash || '';
+        if (h.indexOf('type=email_change') === -1) return;
+        var ls = window.localStorage;
+        var ss = window.sessionStorage;
+        var keys, i;
+        keys = Object.keys(ls);
+        for (i = 0; i < keys.length; i++) {
+          if (keys[i].indexOf('sb-') === 0 || keys[i].indexOf('tedport-auth') === 0) ls.removeItem(keys[i]);
+        }
+        keys = Object.keys(ss);
+        for (i = 0; i < keys.length; i++) {
+          if (keys[i].indexOf('sb-') === 0 || keys[i].indexOf('tedport-auth') === 0) ss.removeItem(keys[i]);
+        }
+      } catch(e) {}
+    })();
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
