@@ -103,7 +103,6 @@ const ProfilePage = () => {
   const [cities, setCities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const mountedRef = useRef(false);
   const fileInputRef = useRef(null);
 
   const [myLists, setMyLists] = useState([]);
@@ -166,45 +165,46 @@ const ProfilePage = () => {
   const [pendingEmail, setPendingEmail] = useState(null);
 
   // Enes Doğanay | 6 Nisan 2026: select('*') → spesifik sütunlar, console.log temizlendi, is_verified/premium kaldırıldı
+  // Enes Doğanay | 10 Nisan 2026: getUser() → getSession() — AuthContext ile aynı anda getUser çağrısı AbortError yaratıyordu
+  // getSession() localStorage'dan okur (network yok, abort yok). AuthContext stale session'ı ayrıca tespit eder.
+  // mountedRef kaldırıldı — ilk deneme başarısız olursa tekrar denemeye izin verir
   useEffect(() => {
-    if (mountedRef.current) return;
-    mountedRef.current = true;
+    let cancelled = false;
 
     const fetchData = async () => {
       try {
-        const { data: userData, error: userError } = await supabase.auth.getUser();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        if (userError || !userData.user) {
-          // Enes Doğanay | 10 Nisan 2026: Stale session'da loading'i kapat, sonra login'e yönlendir
-          setLoading(false);
-          navigate("/login");
+        if (sessionError || !session?.user) {
+          if (!cancelled) { setLoading(false); navigate("/login"); }
           return;
         }
+        const currentUser = session.user;
 
-        // Enes Doğanay | 10 Nisan 2026: getManagedCompanyId() yerine direkt sorgu — fazladan getUser() çağrısı AbortError yaratıyordu
+        // Enes Doğanay | 10 Nisan 2026: direkt sorgu — fazladan getUser() çağrısı AbortError yaratıyordu
         const { data: companyData } = await supabase
           .from('kurumsal_firma_yoneticileri')
           .select('firma_id')
-          .eq('user_id', userData.user.id)
+          .eq('user_id', currentUser.id)
           .maybeSingle();
         if (companyData?.firma_id) {
-          setLoading(false);
-          navigate('/firma-profil');
+          if (!cancelled) { setLoading(false); navigate('/firma-profil'); }
           return;
         }
 
-        setUser(userData.user);
+        if (cancelled) return;
+        setUser(currentUser);
         // Enes Doğanay | 11 Nisan 2026: Supabase'den bekleyen e-posta değişikliğini oku
-        if (userData.user.new_email) setPendingEmail(userData.user.new_email);
+        if (currentUser.new_email) setPendingEmail(currentUser.new_email);
 
         const [profileResult, cityResult, listsResult, favsResult, notificationsResult, remindersResult, quotesResult] = await Promise.all([
-          supabase.from("profiles").select("id, first_name, last_name, company_name, phone, location, avatar, email").eq("id", userData.user.id).single(),
+          supabase.from("profiles").select("id, first_name, last_name, company_name, phone, location, avatar, email").eq("id", currentUser.id).single(),
           supabase.from("sehirler").select("sehir").order("sehir", { ascending: true }),
-          supabase.from('kullanici_listeleri').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: true }),
-          supabase.from('kullanici_favorileri').select('*').eq('user_id', userData.user.id),
-          supabase.from('bildirimler').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: false }).limit(30),
-          supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userData.user.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true }),
-          supabase.from('teklif_talepleri').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: false })
+          supabase.from('kullanici_listeleri').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true }),
+          supabase.from('kullanici_favorileri').select('*').eq('user_id', currentUser.id),
+          supabase.from('bildirimler').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30),
+          supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', currentUser.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true }),
+          supabase.from('teklif_talepleri').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
         ]);
 
         const { data: profileData } = profileResult;
@@ -256,7 +256,7 @@ const ProfilePage = () => {
 
           const [firmsData, notesData] = await Promise.all([
             supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
-            supabase.from('kisisel_notlar').select('*').eq('user_id', userData.user.id).in('firma_id', firmaIds)
+            supabase.from('kisisel_notlar').select('*').eq('user_id', currentUser.id).in('firma_id', firmaIds)
           ]);
 
           const mergedFavorites = favsResult.data.map(fav => {
@@ -294,12 +294,15 @@ const ProfilePage = () => {
           setFavorites([]);
         }
       } catch (error) {
-        console.error("fetchData hata:", error);
-        setLoading(false);
+        if (!cancelled) {
+          console.error("fetchData hata:", error);
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+    return () => { cancelled = true; };
   }, []);
 
   // Enes Doğanay | 10 Nisan 2026: E-posta onaylandığında profiles tablosunu ve yerel state'i güncelle

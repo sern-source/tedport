@@ -6,17 +6,18 @@ const getFunctionsErrorMessage = (error, fallbackMessage) => {
 };
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal hesap sahibi kullanicinin yonettigi firma id'si tek noktadan okunur
+// Enes Doğanay | 10 Nisan 2026: getUser() → getSession() — network çağrısı yerine localStorage okuma, AbortError önlenir
 export const getManagedCompanyId = async () => {
-    const { data: userResult, error: userError } = await supabase.auth.getUser();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-    if (userError || !userResult?.user?.id) {
+    if (sessionError || !session?.user?.id) {
         return null;
     }
 
     const { data, error } = await supabase
         .from('kurumsal_firma_yoneticileri')
         .select('firma_id')
-        .eq('user_id', userResult.user.id)
+        .eq('user_id', session.user.id)
         .maybeSingle();
 
     if (error) {

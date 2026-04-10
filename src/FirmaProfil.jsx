@@ -110,17 +110,18 @@ const FirmaProfil = () => {
             if (!cid) { navigate('/'); return; }
             setCompanyId(cid);
 
-            const { data: userData } = await supabase.auth.getUser();
-            if (!userData?.user) { navigate('/login'); return; }
-            setUserId(userData.user.id);
+            // Enes Doğanay | 10 Nisan 2026: getUser() → getSession() — AuthContext ile yarış önlenir (AbortError)
+            const { data: { session: userSession } } = await supabase.auth.getSession();
+            if (!userSession?.user) { navigate('/login'); return; }
+            setUserId(userSession.user.id);
 
             const [firmaRes, notifRes, listsRes, favsRes, remindersRes] = await Promise.all([
                 supabase.from('firmalar').select('*').eq('firmaID', cid).single(),
-                supabase.from('bildirimler').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: false }).limit(50),
+                supabase.from('bildirimler').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(50),
                 // Enes Doğanay | 8 Nisan 2026: Favoriler için listeler ve kayıtlar çekilir
-                supabase.from('kullanici_listeleri').select('*').eq('user_id', userData.user.id).order('created_at', { ascending: true }),
-                supabase.from('kullanici_favorileri').select('*').eq('user_id', userData.user.id),
-                supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userData.user.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true })
+                supabase.from('kullanici_listeleri').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: true }),
+                supabase.from('kullanici_favorileri').select('*').eq('user_id', userSession.user.id),
+                supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userSession.user.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true })
             ]);
 
             setFirma(firmaRes.data);
@@ -134,7 +135,7 @@ const FirmaProfil = () => {
                 const reminderMap = new Map((remindersRes.data || []).map(r => [String(r.note_id), r]));
                 const [firmsData, notesData] = await Promise.all([
                     supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
-                    supabase.from('kisisel_notlar').select('*').eq('user_id', userData.user.id).in('firma_id', firmaIds)
+                    supabase.from('kisisel_notlar').select('*').eq('user_id', userSession.user.id).in('firma_id', firmaIds)
                 ]);
                 setFavorites(favsRes.data.map(fav => {
                     const firm = firmsData.data?.find(f => f.firmaID === fav.firma_id) || {};
