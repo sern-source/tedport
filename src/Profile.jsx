@@ -300,7 +300,6 @@ const ProfilePage = () => {
     const handleEmailUpdate = async (session) => {
       if (!session?.user) return;
       const freshEmail = session.user.email;
-      // Güncel profildeki e-postayı karşılaştır (user state'ine bağımlı olmadan)
       const { data: currentProfile } = await supabase.from('profiles').select('email').eq('id', session.user.id).single();
       if (freshEmail && currentProfile && freshEmail !== currentProfile.email) {
         await supabase.from('profiles').update({ email: freshEmail }).eq('id', session.user.id);
@@ -313,13 +312,26 @@ const ProfilePage = () => {
       if (!session.user.new_email) setPendingEmail(null);
     };
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Enes Doğanay | 10 Nisan 2026: Hem USER_UPDATED hem SIGNED_IN event'lerini yakala (email change redirect)
       if ((event === 'USER_UPDATED' || event === 'SIGNED_IN') && session?.user) {
         await handleEmailUpdate(session);
       }
     });
-    return () => subscription.unsubscribe();
-  }, []);
+
+    // Enes Doğanay | 10 Nisan 2026: Pending email varken 10sn'de bir Supabase'den güncel durumu kontrol et
+    const pollInterval = setInterval(async () => {
+      if (!pendingEmail) return;
+      try {
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        if (freshUser && !freshUser.new_email && freshUser.email === pendingEmail) {
+          await handleEmailUpdate({ user: freshUser });
+        } else if (freshUser && !freshUser.new_email && freshUser.email !== pendingEmail) {
+          // Talep iptal edilmiş veya expire olmuş
+          setPendingEmail(null);
+        }
+      } catch { /* sessiz */ }
+    }, 10000);
+    return () => { subscription.unsubscribe(); clearInterval(pollInterval); };
+  }, [pendingEmail]);
 
   /* Enes Doğanay | 9 Nisan 2026: URL'de teklif_id değiştiğinde (toast tıklaması vb.) ilgili teklif chat'ini aç */
   useEffect(() => {
@@ -1912,6 +1924,9 @@ const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, citie
   };
   const handleCancelClick = () => { setTempValue(value || ""); setIsEditing(false); };
 
+  // Enes Doğanay | 10 Nisan 2026: Enter tuşuyla kaydetme
+  const handleKeyDown = (e) => { if (e.key === 'Enter' && !isSaving) handleSaveClick(); };
+
   // Enes Doğanay | 10 Nisan 2026: Konum alanı — CitySelect ile şehir seçimi + kaydet/iptal
   const handleCityChange = (city) => { setTempValue(city); };
 
@@ -1932,7 +1947,7 @@ const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, citie
               </div>
             ) : (
               <div className="field-edit-row">
-                <input className="field-input" type="text" value={tempValue} onChange={(e) => setTempValue(e.target.value)} autoFocus disabled={isSaving} />
+                <input className="field-input" type="text" value={tempValue} onChange={(e) => setTempValue(e.target.value)} onKeyDown={handleKeyDown} autoFocus disabled={isSaving} />
                 <button className="field-btn-save" onClick={handleSaveClick} disabled={isSaving}>
                   {isSaving ? <span className="field-btn-spinner" /> : 'Kaydet'}
                 </button>
