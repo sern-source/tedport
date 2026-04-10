@@ -176,12 +176,15 @@ const ProfilePage = () => {
         const { data: userData, error: userError } = await supabase.auth.getUser();
 
         if (userError || !userData.user) {
+          // Enes Doğanay | 10 Nisan 2026: Stale session'da loading'i kapat, sonra login'e yönlendir
+          setLoading(false);
           navigate("/login");
           return;
         }
 
         const managedCompanyId = await getManagedCompanyId();
         if (managedCompanyId) {
+          setLoading(false);
           navigate('/firma-profil');
           return;
         }

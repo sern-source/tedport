@@ -81,10 +81,19 @@ export function AuthProvider({ children }) {
       setPendingQuoteCount(0);
     }
     } catch (err) {
-      // Enes Doğanay | 10 Nisan 2026: AbortError veya ağ hatası auth akışını kilitlememeli
+      // Enes Doğanay | 10 Nisan 2026: Session geçersizse (şifre değişikliği vb.) tüm state'i temizle — kullanıcıdan tekrar giriş iste
       if (!err?.message?.includes('abort')) {
         console.error('Auth yükleme hatası:', err);
       }
+      // Stale token'ı localStorage'dan da sil
+      try { await supabase.auth.signOut(); } catch {}
+      setRealtimeUserId(null);
+      setUserProfile(null);
+      setIsCurrentUserAdmin(false);
+      setManagedCompanyId(null);
+      setManagedCompanyName(null);
+      setUnreadNotifCount(0);
+      setPendingQuoteCount(0);
     } finally {
       setAuthChecked(true);
     }

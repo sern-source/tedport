@@ -48,8 +48,9 @@ const IhalelerPage = () => {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     // Kurumsal giriş kontrolü
+    // Enes Doğanay | 10 Nisan 2026: Stale session'da hata yutulur, sayfa kırılmaz
     useEffect(() => {
-        getManagedCompanyId().then(id => setManagedFirmaId(id || null));
+        getManagedCompanyId().then(id => setManagedFirmaId(id || null)).catch(() => {});
     }, []);
 
     // Kendi ihalelerini çek (sadece kurumsal kullanıcılar için)
