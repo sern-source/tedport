@@ -27,46 +27,29 @@ const LoginPage = () => {
     setActiveTab(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
   }, [searchParams]);
 
-  // Sayfa yüklendiğinde oturum kontrolü yap
+  // Enes Doğanay | 10 Nisan 2026: Sayfa yüklendiğinde oturum kontrolü — sadece tek seferlik, onAuthStateChange loop'u kaldırıldı
   useEffect(() => {
-    const redirectAuthenticatedUser = async () => {
-      const managedCompanyId = await getManagedCompanyId();
-      // Enes Doğanay | 7 Nisan 2026: İlk girişte firma profil paneline, sonraki girişlerde ana sayfaya yönlendir
-      if (managedCompanyId) {
-        const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
-        if (!localStorage.getItem(visitedKey)) {
-          localStorage.setItem(visitedKey, '1');
-          navigate('/firma-profil?tab=panel');
+    let cancelled = false;
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && !cancelled) {
+        const managedCompanyId = await getManagedCompanyId();
+        if (cancelled) return;
+        if (managedCompanyId) {
+          const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
+          if (!localStorage.getItem(visitedKey)) {
+            localStorage.setItem(visitedKey, '1');
+            navigate('/firma-profil?tab=panel');
+          } else {
+            navigate('/');
+          }
         } else {
           navigate('/');
         }
-      } else {
-        navigate('/');
       }
     };
-
-    const checkSession = async () => {
-      // Mevcut oturumu al
-      const { data: { session } } = await supabase.auth.getSession();
-
-      // Eğer kullanıcı zaten giriş yapmışsa, beklemeden profile yönlendir
-      if (session) {
-        redirectAuthenticatedUser();
-      }
-    };
-
     checkSession();
-
-    // Opsiyonel: Anlık oturum değişikliklerini dinle (Aynı tarayıcıda sekme arası vs.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        redirectAuthenticatedUser();
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => { cancelled = true; };
   }, [navigate]);
 
   const togglePassword = () => {

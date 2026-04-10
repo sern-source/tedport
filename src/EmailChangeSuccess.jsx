@@ -53,8 +53,8 @@ const EmailChangeSuccess = () => {
           </p>
 
           {/* Enes Doğanay | 10 Nisan 2026: <a> tag ile tam sayfa yenileme — hiçbir SPA state'i taşınmaz */}
-          <a href="/login" className="ec-btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span>Giriş Yap</span>
+          <a href="/login" className="ec-btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box', lineHeight: '48px', height: '48px', padding: '0 24px' }}>
+            Giriş Yap
           </a>
 
           <div className="ec-secondary-section">

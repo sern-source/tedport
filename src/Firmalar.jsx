@@ -974,6 +974,8 @@ function App() {
     const { data, error, count } = await query.range(from, to);
 
     if (error) {
+      // Enes Doğanay | 10 Nisan 2026: StrictMode'un çift render'da abort ettiği fetch'leri sessizce yoksay
+      if (error.message?.includes('abort')) return;
       console.error("SUPABASE SORGUSU HATASI:", error);
     }
 
