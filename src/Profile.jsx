@@ -126,6 +126,8 @@ const ProfilePage = () => {
   const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState(null);
   // Enes Doğanay | 6 Nisan 2026: Profilde kaydetme sonrasi kisa sureli basari geri bildirimi gosterilir
   const [saveFeedbackFavoriteId, setSaveFeedbackFavoriteId] = useState(null);
+  // Enes Doğanay | 10 Nisan 2026: Profil alanı güncelleme geri bildirimi
+  const [fieldFeedback, setFieldFeedback] = useState(null);
 
   // Enes Doğanay | 6 Nisan 2026: Favori arama, sıralama, menü ve liste atama
   const [favSearch, setFavSearch] = useState("");
@@ -159,6 +161,10 @@ const ProfilePage = () => {
   }, []);
   // Enes Doğanay | 9 Nisan 2026: Teklif silme onay state'i
   const [confirmDeleteQuoteId, setConfirmDeleteQuoteId] = useState(null);
+  // Enes Doğanay | 10 Nisan 2026: Hatırlatıcı silme onay state'i
+  const [confirmDeleteReminder, setConfirmDeleteReminder] = useState(null);
+  // Enes Doğanay | 11 Nisan 2026: Bekleyen e-posta değişikliği (onay maili bekleniyor)
+  const [pendingEmail, setPendingEmail] = useState(null);
 
   // Enes Doğanay | 6 Nisan 2026: select('*') → spesifik sütunlar, console.log temizlendi, is_verified/premium kaldırıldı
   useEffect(() => {
@@ -181,6 +187,8 @@ const ProfilePage = () => {
         }
 
         setUser(userData.user);
+        // Enes Doğanay | 11 Nisan 2026: Supabase'den bekleyen e-posta değişikliğini oku
+        if (userData.user.new_email) setPendingEmail(userData.user.new_email);
 
         const [profileResult, cityResult, listsResult, favsResult, notificationsResult, remindersResult, quotesResult] = await Promise.all([
           supabase.from("profiles").select("id, first_name, last_name, company_name, phone, location, avatar, email").eq("id", userData.user.id).single(),
@@ -286,6 +294,27 @@ const ProfilePage = () => {
 
     fetchData();
   }, []);
+
+  // Enes Doğanay | 10 Nisan 2026: E-posta onaylandığında profiles tablosunu ve yerel state'i güncelle
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'USER_UPDATED' && session?.user) {
+        const freshEmail = session.user.email;
+        // E-posta gerçekten değiştiyse profiles tablosunu güncelle
+        if (freshEmail && user && freshEmail !== user.email) {
+          await supabase.from('profiles').update({ email: freshEmail }).eq('id', session.user.id);
+          setUser(session.user);
+          setProfile(prev => ({ ...prev, email: freshEmail }));
+          setPendingEmail(null);
+          setFieldFeedback({ type: 'success', message: 'E-posta adresiniz başarıyla güncellendi!' });
+          setTimeout(() => setFieldFeedback(null), 5000);
+        }
+        // new_email temizlendiyse pending'i kaldır
+        if (!session.user.new_email) setPendingEmail(null);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [user]);
 
   /* Enes Doğanay | 9 Nisan 2026: URL'de teklif_id değiştiğinde (toast tıklaması vb.) ilgili teklif chat'ini aç */
   useEffect(() => {
@@ -550,6 +579,32 @@ const ProfilePage = () => {
     }
     setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
     refreshCounts();
+  };
+
+  {/* Enes Doğanay | 10 Nisan 2026: Hatırlatıcı + bağlı notu silme (onay sonrası) */}
+  const handleDeleteReminder = async (reminder) => {
+    const { error: reminderError } = await supabase
+      .from('kullanici_hatirlaticilari')
+      .delete()
+      .eq('id', reminder.id)
+      .eq('user_id', user.id);
+    if (reminderError) {
+      console.error('[Hatırlatıcı Sil] Hata:', reminderError);
+      alert('Hatırlatıcı silinemedi.');
+      return;
+    }
+    if (reminder.note_id) {
+      const { error: noteError } = await supabase
+        .from('kisisel_notlar')
+        .delete()
+        .eq('id', reminder.note_id)
+        .eq('user_id', user.id);
+      if (noteError && !isMissingRelationError(noteError)) {
+        console.error('[Not Sil] Hata:', noteError);
+      }
+    }
+    setUpcomingReminders((prev) => prev.filter((r) => r.id !== reminder.id));
+    setConfirmDeleteReminder(null);
   };
 
   // Enes Doğanay | 9 Nisan 2026: Tüm bildirimleri toplu sil
@@ -822,22 +877,43 @@ const ProfilePage = () => {
     }
   };
 
+  // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik talebini iptal et
+  const handleCancelEmailChange = async () => {
+    try {
+      // Mevcut e-postayı tekrar set ederek Supabase'deki new_email'i sıfırla
+      const { error } = await supabase.auth.updateUser({ email: user.email });
+      if (error) throw error;
+      setPendingEmail(null);
+      setFieldFeedback({ type: 'info', message: 'E-posta değişiklik talebi iptal edildi.' });
+      setTimeout(() => setFieldFeedback(null), 4000);
+    } catch {
+      setPendingEmail(null);
+      setFieldFeedback({ type: 'info', message: 'E-posta değişiklik talebi iptal edildi.' });
+      setTimeout(() => setFieldFeedback(null), 4000);
+    }
+  };
+
   const handleUpdateField = async (field, newValue, isEmail = false) => {
     try {
       if (isEmail) {
-        const { error: authError } = await supabase.auth.updateUser({ email: newValue });
+        // Enes Doğanay | 10 Nisan 2026: Onay maili mevcut ortama yönlensin (localhost veya production)
+        const { error: authError } = await supabase.auth.updateUser(
+          { email: newValue },
+          { emailRedirectTo: window.location.origin + '/profile' }
+        );
         if (authError) throw authError;
-        const { error: profileError } = await supabase.from("profiles").update({ email: newValue }).eq("id", user.id);
-        if (profileError) throw profileError;
-        setUser({ ...user, email: newValue });
-        alert("E-posta adresi güncellendi. Yeni adresinize onay maili gitmiş olabilir, lütfen kontrol edin.");
+        // Enes Doğanay | 11 Nisan 2026: E-posta hemen güncellenmez, onay bekler
+        setPendingEmail(newValue);
+        setFieldFeedback({ type: 'info', message: 'Yeni e-posta adresinize bir onay maili gönderdik. Onaylanana kadar mevcut e-posta geçerli kalacak.' });
+        setTimeout(() => setFieldFeedback(null), 6000);
       } else {
         const { error } = await supabase.from("profiles").update({ [field]: newValue }).eq("id", user.id);
         if (error) throw error;
       }
       setProfile((prev) => ({ ...prev, [field]: newValue }));
     } catch (error) {
-      alert("Güncellenirken bir hata oluştu: " + error.message);
+      setFieldFeedback({ type: 'error', message: 'Güncellenirken bir hata oluştu: ' + error.message });
+      setTimeout(() => setFieldFeedback(null), 5000);
     }
   };
 
@@ -1034,11 +1110,23 @@ const ProfilePage = () => {
 
                 <div className="profile-divider"></div>
 
+                {/* Enes Doğanay | 10 Nisan 2026: Profil alanı güncelleme geri bildirimi */}
+                {fieldFeedback && (
+                  <div className={`field-feedback field-feedback--${fieldFeedback.type}`}>
+                    <span className="material-symbols-outlined">{fieldFeedback.type === 'error' ? 'error' : fieldFeedback.type === 'success' ? 'check_circle' : 'mail'}</span>
+                    <span>{fieldFeedback.message}</span>
+                    <button type="button" className="field-feedback-close" onClick={() => setFieldFeedback(null)}>
+                      <span className="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+                )}
+
                 <div className="profile-fields-grid">
                   <ProfileField label="Ad" value={profile?.first_name || ""} dbField="first_name" onSave={handleUpdateField} icon="person" />
                   <ProfileField label="Soyad" value={profile?.last_name || ""} dbField="last_name" onSave={handleUpdateField} icon="badge" />
                   <ProfileField label="Şirket Adı" value={profile?.company_name || ""} dbField="company_name" onSave={handleUpdateField} icon="apartment" />
-                  <ProfileField label="E-posta Adresi" value={user?.email || ""} dbField="email" isEmail={true} extra="Doğrulanmış" onSave={handleUpdateField} editable={false} icon="mail" />
+                  {/* Enes Doğanay | 10 Nisan 2026: E-posta düzenleme aktif edildi */}
+                  <ProfileField label="E-posta Adresi" value={user?.email || ""} dbField="email" isEmail={true} extra="Doğrulanmış" onSave={handleUpdateField} editable={true} icon="mail" pendingEmail={pendingEmail} onCancelPendingEmail={handleCancelEmailChange} />
                   <ProfileField label="Telefon Numarası" value={profile?.phone || "-"} dbField="phone" onSave={handleUpdateField} icon="phone" />
                   <ProfileField label="Konum" value={profile?.location || "-"} dbField="location" onSave={handleUpdateField} isLocation={true} cities={cities} icon="location_on" />
                 </div>
@@ -1516,13 +1604,15 @@ const ProfilePage = () => {
                     <h1>Bildirim Merkezi</h1>
                     <p>Teklif yanıtları, mesajlar ve hatırlatmalarınız burada.</p>
                   </div>
-                  {/* Enes Doğanay | 12 Nisan 2026: Tümünü Okundu Yap + Tümünü Sil butonları */}
+                  {/* Enes Doğanay | 10 Nisan 2026: Bildirim toplu aksiyon butonları — sadece bildirimler için */}
                   <div className="notifications-hero-actions">
                     <button className="notifications-mark-all" onClick={handleMarkAllNotificationsRead} disabled={unreadNotificationsCount === 0}>
-                      Tümünü Okundu Yap
+                      <span className="material-symbols-outlined">done_all</span>
+                      Okundu
                     </button>
                     <button className="notifications-delete-all" onClick={handleDeleteAllNotifications} disabled={notifications.length === 0}>
-                      Tümünü Sil
+                      <span className="material-symbols-outlined">delete_sweep</span>
+                      Temizle
                     </button>
                   </div>
                 </div>
@@ -1586,7 +1676,7 @@ const ProfilePage = () => {
                                   Okundu Yap
                                 </button>
                               )}
-                              {/* Enes Doğanay | 12 Nisan 2026: Tekil bildirim silme butonu */}
+                              {/* Enes Doğanay | 10 Nisan 2026: Tekil bildirim silme butonu — sağa hizalı */}
                               <button type="button" className="notification-delete-btn" onClick={(e) => { e.stopPropagation(); handleDeleteNotification(notification.id); }}>
                                 <span className="material-symbols-outlined">delete</span>
                               </button>
@@ -1620,10 +1710,28 @@ const ProfilePage = () => {
                             </div>
                             <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
                             <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
-                            <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
-                              <span className="material-symbols-outlined">open_in_new</span>
-                              <span>Firmaya Git</span>
-                            </button>
+                            <div className="upcoming-reminder-actions">
+                              <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                                <span className="material-symbols-outlined">open_in_new</span>
+                                <span>Firmaya Git</span>
+                              </button>
+                              {/* Enes Doğanay | 10 Nisan 2026: Tekil hatırlatıcı silme — inline onay */}
+                              {confirmDeleteReminder?.id === reminder.id ? (
+                                <span className="reminder-inline-confirm">
+                                  <span className="reminder-inline-confirm-label">Silinsin mi?</span>
+                                  <button type="button" className="reminder-inline-confirm-cancel" onClick={() => setConfirmDeleteReminder(null)}>
+                                    <span className="material-symbols-outlined">close</span>
+                                  </button>
+                                  <button type="button" className="reminder-inline-confirm-yes" onClick={() => handleDeleteReminder(reminder)}>
+                                    <span className="material-symbols-outlined">delete</span>
+                                  </button>
+                                </span>
+                              ) : (
+                                <button type="button" className="reminder-delete-btn" onClick={() => setConfirmDeleteReminder(reminder)}>
+                                  <span className="material-symbols-outlined">delete</span>
+                                </button>
+                              )}
+                            </div>
                           </article>
                         ))}
                       </div>
@@ -1645,10 +1753,28 @@ const ProfilePage = () => {
                               </div>
                               <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
                               <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
-                              <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
-                                <span className="material-symbols-outlined">open_in_new</span>
-                                <span>Firmaya Git</span>
-                              </button>
+                              <div className="upcoming-reminder-actions">
+                                <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                                  <span className="material-symbols-outlined">open_in_new</span>
+                                  <span>Firmaya Git</span>
+                                </button>
+                                {/* Enes Doğanay | 10 Nisan 2026: Tekil hatırlatıcı silme — inline onay */}
+                                {confirmDeleteReminder?.id === reminder.id ? (
+                                  <span className="reminder-inline-confirm">
+                                    <span className="reminder-inline-confirm-label">Silinsin mi?</span>
+                                    <button type="button" className="reminder-inline-confirm-cancel" onClick={() => setConfirmDeleteReminder(null)}>
+                                      <span className="material-symbols-outlined">close</span>
+                                    </button>
+                                    <button type="button" className="reminder-inline-confirm-yes" onClick={() => handleDeleteReminder(reminder)}>
+                                      <span className="material-symbols-outlined">delete</span>
+                                    </button>
+                                  </span>
+                                ) : (
+                                  <button type="button" className="reminder-delete-btn" onClick={() => setConfirmDeleteReminder(reminder)}>
+                                    <span className="material-symbols-outlined">delete</span>
+                                  </button>
+                                )}
+                              </div>
                             </article>
                           ))}
                         </div>
@@ -1698,12 +1824,13 @@ const ProfilePage = () => {
           </div>
         </div>
       )}
+
     </>
   );
 };
 
 {/* Enes Doğanay | 10 Nisan 2026: ProfileField — konum alanı CitySelect ile değiştirildi */}
-const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, cities = [], onSave, editable = true, icon }) => {
+const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, cities = [], onSave, editable = true, icon, pendingEmail, onCancelPendingEmail }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value || "");
 
@@ -1744,7 +1871,19 @@ const ProfileField = ({ label, value, extra, dbField, isEmail, isLocation, citie
         ) : (
           <div className="field-value-display">
             <p>{value}</p>
-            {extra && <span className="field-extra-badge">{extra}</span>}
+            {extra && !pendingEmail && <span className="field-extra-badge">{extra}</span>}
+            {/* Enes Doğanay | 10 Nisan 2026: Bekleyen e-posta değişikliği bilgisi + iptal butonu */}
+            {pendingEmail && (
+              <div className="field-pending-email">
+                <span className="material-symbols-outlined">schedule</span>
+                Onay bekleniyor: <strong>{pendingEmail}</strong>
+                {onCancelPendingEmail && (
+                  <button type="button" className="field-pending-cancel" onClick={onCancelPendingEmail} title="Talebi iptal et">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -79,6 +79,8 @@ const FirmaProfil = () => {
     const [notifications, setNotifications] = useState([]);
     // Enes Doğanay | 9 Nisan 2026: Hatırlatma state'i
     const [upcomingReminders, setUpcomingReminders] = useState([]);
+    // Enes Doğanay | 10 Nisan 2026: Hatırlatıcı silme onay state'i
+    const [confirmDeleteReminder, setConfirmDeleteReminder] = useState(null);
 
     // Enes Doğanay | 8 Nisan 2026: Favoriler state'leri (bireysel profildeki yapının kurumsal kopyası)
     const [myLists, setMyLists] = useState([]);
@@ -477,6 +479,32 @@ const FirmaProfil = () => {
         }
         setNotifications(prev => prev.filter(n => n.id !== notificationId));
         refreshCounts();
+    };
+
+    {/* Enes Doğanay | 10 Nisan 2026: Hatırlatıcı + bağlı notu silme (onay sonrası) */}
+    const handleDeleteReminder = async (reminder) => {
+        const { error: reminderError } = await supabase
+            .from('kullanici_hatirlaticilari')
+            .delete()
+            .eq('id', reminder.id)
+            .eq('user_id', userId);
+        if (reminderError) {
+            console.error('[Hatırlatıcı Sil] Hata:', reminderError);
+            alert('Hatırlatıcı silinemedi.');
+            return;
+        }
+        if (reminder.note_id) {
+            const { error: noteError } = await supabase
+                .from('kisisel_notlar')
+                .delete()
+                .eq('id', reminder.note_id)
+                .eq('user_id', userId);
+            if (noteError) {
+                console.error('[Not Sil] Hata:', noteError);
+            }
+        }
+        setUpcomingReminders(prev => prev.filter(r => r.id !== reminder.id));
+        setConfirmDeleteReminder(null);
     };
 
     // Enes Doğanay | 9 Nisan 2026: Tüm bildirimleri toplu sil
@@ -990,18 +1018,21 @@ const FirmaProfil = () => {
                             const futureUpcomingReminders = upcomingReminders.filter(r => new Date(r.reminder_at).getTime() > Date.now());
                             const overduePendingReminders = upcomingReminders.filter(r => new Date(r.reminder_at).getTime() <= Date.now());
                             return (
-                            <div className="firma-profil-section">
+                            <div className="firma-profil-section notifications-section">
                                 <div className="notifications-hero">
                                     <div>
                                         <h1>Bildirim Merkezi</h1>
                                         <p>Teklif yanıtları, mesajlar ve hatırlatmalarınız burada.</p>
                                     </div>
+                                    {/* Enes Doğanay | 10 Nisan 2026: Bildirim toplu aksiyon butonları */}
                                     <div className="notifications-hero-actions">
                                         <button className="notifications-mark-all" onClick={handleMarkAllNotificationsRead} disabled={unreadNotifCount === 0}>
-                                            Tümünü Okundu Yap
+                                            <span className="material-symbols-outlined">done_all</span>
+                                            Okundu
                                         </button>
                                         <button className="notifications-delete-all" onClick={handleDeleteAllNotifications} disabled={notifications.length === 0}>
-                                            Tümünü Sil
+                                            <span className="material-symbols-outlined">delete_sweep</span>
+                                            Temizle
                                         </button>
                                     </div>
                                 </div>
@@ -1101,10 +1132,28 @@ const FirmaProfil = () => {
                                                         </div>
                                                         <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
                                                         <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
-                                                        <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
-                                                            <span className="material-symbols-outlined">open_in_new</span>
-                                                            <span>Firmaya Git</span>
-                                                        </button>
+                                                        <div className="upcoming-reminder-actions">
+                                                            <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                                                                <span className="material-symbols-outlined">open_in_new</span>
+                                                                <span>Firmaya Git</span>
+                                                            </button>
+                                                            {/* Enes Doğanay | 10 Nisan 2026: Tekil hatırlatıcı silme — inline onay */}
+                                                            {confirmDeleteReminder?.id === reminder.id ? (
+                                                                <span className="reminder-inline-confirm">
+                                                                    <span className="reminder-inline-confirm-label">Silinsin mi?</span>
+                                                                    <button type="button" className="reminder-inline-confirm-cancel" onClick={() => setConfirmDeleteReminder(null)}>
+                                                                        <span className="material-symbols-outlined">close</span>
+                                                                    </button>
+                                                                    <button type="button" className="reminder-inline-confirm-yes" onClick={() => handleDeleteReminder(reminder)}>
+                                                                        <span className="material-symbols-outlined">delete</span>
+                                                                    </button>
+                                                                </span>
+                                                            ) : (
+                                                                <button type="button" className="reminder-delete-btn" onClick={() => setConfirmDeleteReminder(reminder)}>
+                                                                    <span className="material-symbols-outlined">delete</span>
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </article>
                                                 ))}
                                             </div>
@@ -1125,10 +1174,28 @@ const FirmaProfil = () => {
                                                             </div>
                                                             <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
                                                             <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
-                                                            <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
-                                                                <span className="material-symbols-outlined">open_in_new</span>
-                                                                <span>Firmaya Git</span>
-                                                            </button>
+                                                            <div className="upcoming-reminder-actions">
+                                                                <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+                                                                    <span className="material-symbols-outlined">open_in_new</span>
+                                                                    <span>Firmaya Git</span>
+                                                                </button>
+                                                                {/* Enes Doğanay | 10 Nisan 2026: Tekil hatırlatıcı silme — inline onay */}
+                                                                {confirmDeleteReminder?.id === reminder.id ? (
+                                                                    <span className="reminder-inline-confirm">
+                                                                        <span className="reminder-inline-confirm-label">Silinsin mi?</span>
+                                                                        <button type="button" className="reminder-inline-confirm-cancel" onClick={() => setConfirmDeleteReminder(null)}>
+                                                                            <span className="material-symbols-outlined">close</span>
+                                                                        </button>
+                                                                        <button type="button" className="reminder-inline-confirm-yes" onClick={() => handleDeleteReminder(reminder)}>
+                                                                            <span className="material-symbols-outlined">delete</span>
+                                                                        </button>
+                                                                    </span>
+                                                                ) : (
+                                                                    <button type="button" className="reminder-delete-btn" onClick={() => setConfirmDeleteReminder(reminder)}>
+                                                                        <span className="material-symbols-outlined">delete</span>
+                                                                    </button>
+                                                                )}
+                                                            </div>
                                                         </article>
                                                     ))}
                                                 </div>
@@ -1398,6 +1465,7 @@ const FirmaProfil = () => {
                     </main>
                 </div>
             </div>
+
         </>
     );
 };
