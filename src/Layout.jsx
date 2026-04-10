@@ -17,6 +17,12 @@ export default function Layout() {
         const isEmailChangeFlow = hash.includes('type=email_change');
         if (isEmailChangeFlow) {
             navigate(`/profile${hash}`, { replace: true });
+            return;
+        }
+        // Enes Doğanay | 10 Nisan 2026: Supabase onay mesajı hash'inde — hash temizle, profile yönlendir
+        if (hash.includes('message=') && location.pathname === '/') {
+            window.history.replaceState(null, '', '/profile');
+            navigate('/profile', { replace: true });
         }
     }, [location.pathname, navigate]);
 
