@@ -1,5 +1,6 @@
 {/* Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici dropdown — aşağı açılır, fixed pozisyonlu */}
 {/* Enes Doğanay | 10 Nisan 2026: createPortal eklendi — ancestor transform içinde fixed pozisyon düzeltmesi */}
+{/* Enes Doğanay | 10 Nisan 2026: options/placeholder prop desteği — ilçe ve diğer listeler için genelleştirildi */}
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
@@ -7,7 +8,10 @@ import './CitySelect.css';
 
 const cities = Object.keys(TURKEY_DISTRICTS);
 
-export default function CitySelect({ value, onChange }) {
+export default function CitySelect({ value, onChange, options, placeholder, icon }) {
+  const items = options || cities;
+  const placeholderText = placeholder || 'Şehir seçiniz';
+  const optionIcon = icon || 'location_on';
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [style, setStyle] = useState({});
@@ -73,7 +77,7 @@ export default function CitySelect({ value, onChange }) {
   }, [open, calcPosition]);
 
   // Enes Doğanay | 10 Nisan 2026: Türkçe locale ile büyük/küçük harf duyarsız arama
-  const filtered = cities.filter(c => c.toLocaleLowerCase('tr-TR').includes(search.toLocaleLowerCase('tr-TR')));
+  const filtered = items.filter(c => c.toLocaleLowerCase('tr-TR').includes(search.toLocaleLowerCase('tr-TR')));
 
   return (
     <div className="city-select">
@@ -84,7 +88,7 @@ export default function CitySelect({ value, onChange }) {
         onClick={handleOpen}
       >
         <span className={value ? 'city-select-value' : 'city-select-placeholder'}>
-          {value || 'Şehir seçiniz'}
+          {value || placeholderText}
         </span>
         <span className="city-select-actions">
           {value && (
@@ -106,21 +110,21 @@ export default function CitySelect({ value, onChange }) {
             <input
               type="text"
               className="city-select-search"
-              placeholder="Şehir ara..."
+              placeholder="Ara..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               autoFocus
             />
           </div>
           <div className="city-select-list">
-            {filtered.length > 0 ? filtered.map(city => (
+            {filtered.length > 0 ? filtered.map(item => (
               <div
-                key={city}
-                className={`city-select-option ${city === value ? 'city-select-option--active' : ''}`}
-                onClick={() => handleSelect(city)}
+                key={item}
+                className={`city-select-option ${item === value ? 'city-select-option--active' : ''}`}
+                onClick={() => handleSelect(item)}
               >
-                <span className="material-symbols-outlined city-select-option-icon">location_on</span>
-                {city}
+                <span className="material-symbols-outlined city-select-option-icon">{optionIcon}</span>
+                {item}
               </div>
             )) : (
               <div className="city-select-empty">Sonuç bulunamadı</div>
