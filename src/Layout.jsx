@@ -13,10 +13,11 @@ export default function Layout() {
             navigate(`/reset-password${hash}`, { replace: true });
             return;
         }
-        // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik onayı — hash ile birlikte onay sayfasına yönlendir
+        // Enes Doğanay | 10 Nisan 2026: Email change hash'i artık main.jsx'te işleniyor (SPA yüklenmeden önce)
+        // Buraya düşmesi mümkün değil ama güvenlik için yine de yönlendir
         const isEmailChangeFlow = hash.includes('type=email_change');
         if (isEmailChangeFlow) {
-            navigate(`/email-degisikligi-onay${hash}`, { replace: true });
+            window.location.replace('/email-degisikligi-onay');
             return;
         }
         // Enes Doğanay | 10 Nisan 2026: Supabase onay mesajı hash'inde — hash temizle, profile yönlendir
