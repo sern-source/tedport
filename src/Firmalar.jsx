@@ -982,7 +982,8 @@ function App() {
       query = query.or(categoryQuery);
     }
 
-    query = query.order('best', { ascending: false });
+    /* Enes Doğanay | 13 Nisan 2026: İkincil sıralama (firmaID) — best aynı olduğunda sayfalama tutarlılığı sağlar */
+    query = query.order('best', { ascending: false }).order('firmaID', { ascending: true });
 
     const { data, error, count } = await query.range(from, to);
 

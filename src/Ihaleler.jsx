@@ -117,6 +117,10 @@ const IhalelerPage = () => {
     const [withdrawConfirm, setWithdrawConfirm] = useState(false);
     const [withdrawing, setWithdrawing] = useState(false);
     const teklifDosyaRef = useRef(null);
+    /* Enes Doğanay | 13 Nisan 2026: Giriş yapmamış kullanıcı için login prompt popup */
+    const [loginPromptTenderId, setLoginPromptTenderId] = useState(null);
+    const [loginPromptPos, setLoginPromptPos] = useState(null);
+    const loginPromptRef = useRef(null);
 
     // Kurumsal giriş kontrolü
     // Enes Doğanay | 10 Nisan 2026: Stale session'da hata yutulur, sayfa kırılmaz + verified firma kontrolü
@@ -129,6 +133,18 @@ const IhalelerPage = () => {
             }
         }).catch(() => {});
     }, []);
+
+    /* Enes Doğanay | 13 Nisan 2026: Login prompt dışına tıklayınca kapat */
+    useEffect(() => {
+        if (!loginPromptTenderId) return;
+        const handler = (e) => {
+            if (loginPromptRef.current && !loginPromptRef.current.contains(e.target)) {
+                setLoginPromptTenderId(null);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [loginPromptTenderId]);
 
     // Kendi ihalelerini çek (sadece kurumsal kullanıcılar için)
     const fetchMyTenders = useCallback(async () => {
@@ -588,7 +604,31 @@ const IhalelerPage = () => {
 
     // Enes Doğanay | 10 Nisan 2026: Teklif Ver popup açma — ihale gereksinimlerinden kalem tablosu oluştur
     // Enes Doğanay | 13 Nisan 2026: Mevcut teklif varsa formu doldur (güncelleme modu)
-    const openTeklifPopup = (tender) => {
+    const openTeklifPopup = (tender, e) => {
+        /* Enes Doğanay | 13 Nisan 2026: Giriş yapmamış kullanıcıya inline login prompt göster */
+        if (!userProfile) {
+            if (loginPromptTenderId === tender.id) {
+                setLoginPromptTenderId(null);
+                setLoginPromptPos(null);
+            } else {
+                const btn = e?.currentTarget;
+                if (btn) {
+                    const rect = btn.getBoundingClientRect();
+                    const popupW = 210;
+                    let left = rect.left + rect.width / 2 - popupW / 2;
+                    if (left < 8) left = 8;
+                    if (left + popupW > window.innerWidth - 8) left = window.innerWidth - 8 - popupW;
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    if (spaceBelow > 180) {
+                        setLoginPromptPos({ top: rect.bottom + 8, left });
+                    } else {
+                        setLoginPromptPos({ bottom: window.innerHeight - rect.top + 8, left });
+                    }
+                }
+                setLoginPromptTenderId(tender.id);
+            }
+            return;
+        }
         const existing = userOffers[String(tender.id)];
         if (existing) {
             /* Mevcut teklifi düzenleme — formu mevcut verilerle doldur */
@@ -1512,9 +1552,11 @@ const IhalelerPage = () => {
                                                         </span>
                                                     );
                                                     return (
-                                                        <button type="button" className={`tenders-list-action-btn ${hasOffer ? (isDraft ? 'tenders-list-action-btn--draft' : (isRejected ? 'tenders-list-action-btn--rejected' : 'tenders-list-action-btn--update')) : 'tenders-list-action-btn--join'}`} title={hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Teklifiniz Reddedildi — Güncelleyebilirsiniz' : 'Teklifi Güncelle')) : 'Teklif Ver'} onClick={() => openTeklifPopup(tender)}>
-                                                            <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
-                                                        </button>
+                                                        <>
+                                                            <button type="button" className={`tenders-list-action-btn ${hasOffer ? (isDraft ? 'tenders-list-action-btn--draft' : (isRejected ? 'tenders-list-action-btn--rejected' : 'tenders-list-action-btn--update')) : 'tenders-list-action-btn--join'}`} title={hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Teklifiniz Reddedildi — Güncelleyebilirsiniz' : 'Teklifi Güncelle')) : 'Teklif Ver'} onClick={(e) => openTeklifPopup(tender, e)}>
+                                                                <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
+                                                            </button>
+                                                        </>
                                                     );
                                                 })()}
                                                 <button type="button" className="tenders-list-action-btn tenders-list-action-btn--detail" title="Detay" onClick={() => setDetailTender(tender)}>
@@ -1645,7 +1687,7 @@ const IhalelerPage = () => {
                                                         </span>
                                                     );
                                                     return (
-                                                        <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'}`} onClick={() => openTeklifPopup(tender)} disabled={isClosed && hasOffer && !isDraft}>
+                                                        <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'}`} onClick={(e) => openTeklifPopup(tender, e)} disabled={isClosed && hasOffer && !isDraft}>
                                                             <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
                                                             {hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Yeniden Teklif Ver' : (isClosed ? 'Teklif Verildi' : 'Teklifi Güncelle'))) : 'Teklif Ver'}
                                                         </button>
@@ -1780,7 +1822,7 @@ const IhalelerPage = () => {
                                             </span>
                                         );
                                         return (
-                                            <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'} tender-action--full`} onClick={() => { setDetailTender(null); openTeklifPopup(dt); }} disabled={isClosed && hasOffer && !isDraft}>
+                                            <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'} tender-action--full`} onClick={(e) => { if (!userProfile) { openTeklifPopup(dt, e); return; } setDetailTender(null); openTeklifPopup(dt, e); }} disabled={isClosed && hasOffer && !isDraft}>
                                                 <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
                                                 {hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Yeniden Teklif Ver' : (isClosed ? 'Teklif Verildi' : 'Teklifi Güncelle'))) : 'Teklif Ver'}
                                             </button>
@@ -2131,6 +2173,15 @@ const IhalelerPage = () => {
                                 Tamam
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {/* Enes Doğanay | 13 Nisan 2026: Fixed login prompt — overflow: hidden kartları aşar */}
+                {loginPromptTenderId && loginPromptPos && (
+                    <div className="tender-login-prompt" ref={loginPromptRef} style={loginPromptPos.top != null ? { top: loginPromptPos.top, left: loginPromptPos.left } : { bottom: loginPromptPos.bottom, left: loginPromptPos.left }}>
+                        <span className="material-symbols-outlined tender-login-prompt__icon">lock</span>
+                        <p className="tender-login-prompt__text">İhaleye teklif vermek için giriş yapın.</p>
+                        <button className="tender-login-prompt__btn" onClick={() => navigate('/login')}>Giriş Yap</button>
                     </div>
                 )}
             </main>
