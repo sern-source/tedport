@@ -8,12 +8,21 @@ const typeConfig = {
   quote_reply: { icon: 'reply', label: 'Teklif Yanıtı', color: '#059669' },
   quote_message: { icon: 'chat', label: 'Yeni Mesaj', color: '#7c3aed' },
   reminder: { icon: 'alarm', label: 'Hatırlatma', color: '#d97706' },
+  /* Enes Doğanay | 13 Nisan 2026: İhale teklif bildirim tipleri */
+  tender_new_offer: { icon: 'gavel', label: 'Yeni İhale Teklifi', color: '#059669' },
+  tender_offer_updated: { icon: 'edit_note', label: 'Teklif Güncellendi', color: '#2563eb' },
+  tender_offer_withdrawn: { icon: 'undo', label: 'Teklif Geri Çekildi', color: '#ea580c' },
+  tender_updated: { icon: 'update', label: 'İhale Güncellendi', color: '#7c3aed' },
+  tender_closed: { icon: 'lock', label: 'İhale Kapandı', color: '#dc2626' },
+  tender_cancelled: { icon: 'cancel', label: 'İhale İptal', color: '#dc2626' },
+  tender_offer_status: { icon: 'how_to_reg', label: 'Teklif Durumu', color: '#059669' },
   default: { icon: 'notifications', label: 'Bildirim', color: '#137fec' }
 };
 
 const ToastItem = ({ toast, onDismiss, onClickToast }) => {
   const config = typeConfig[toast.type] || typeConfig.default;
-  const isClickable = !!(toast.metadata?.teklif_id || toast.firma_id);
+  /* Enes Doğanay | 13 Nisan 2026: ihale_id olan bildirimler de tıklanabilir */
+  const isClickable = !!(toast.metadata?.teklif_id || toast.metadata?.ihale_id || toast.firma_id);
 
   useEffect(() => {
     const timer = setTimeout(() => onDismiss(toast.id), 5000);

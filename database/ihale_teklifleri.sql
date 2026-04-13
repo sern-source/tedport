@@ -68,10 +68,10 @@ create policy "authenticated_insert"
     on public.ihale_teklifleri for insert
     with check (auth.uid() = user_id);
 
--- Teklif veren kendi taslağını güncelleyebilir
+-- Enes Doğanay | 13 Nisan 2026: Teklif veren kendi gönderilmiş/taslak teklifini güncelleyebilir
 create policy "teklif_sahibi_update"
     on public.ihale_teklifleri for update
-    using (auth.uid() = user_id and durum = 'taslak')
+    using (auth.uid() = user_id and durum in ('taslak', 'gonderildi'))
     with check (auth.uid() = user_id);
 
 -- İhale sahibi firma yöneticisi durum güncelleyebilir (kabul/red)
@@ -85,7 +85,7 @@ create policy "ihale_sahibi_status_update"
         )
     );
 
--- Teklif veren kendi taslağını silebilir
+-- Enes Doğanay | 13 Nisan 2026: Teklif veren kendi gönderilmiş/taslak teklifini silebilir (geri çek)
 create policy "teklif_sahibi_delete"
     on public.ihale_teklifleri for delete
-    using (auth.uid() = user_id and durum = 'taslak');
+    using (auth.uid() = user_id and durum in ('taslak', 'gonderildi'));

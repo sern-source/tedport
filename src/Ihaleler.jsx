@@ -43,8 +43,12 @@ const STEPPER_LABELS = [
 
 const IhalelerPage = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const firmaFilter = searchParams.get('firma') || '';
+    /* Enes Doğanay | 13 Nisan 2026: Bildirimden ihaleye navigate — URL'den ihale ID oku */
+    const ihaleParam = searchParams.get('ihale') || '';
+    /* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler'den teklif popup'ı doğrudan açmak için */
+    const teklifParam = searchParams.get('teklif') || '';
     // Enes Doğanay | 10 Nisan 2026: Auth context — teklif popup'ında kullanıcı bilgisi için
     const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
 
@@ -105,6 +109,13 @@ const IhalelerPage = () => {
     const [teklifDosya, setTeklifDosya] = useState(null);
     const [teklifSaving, setTeklifSaving] = useState(false);
     const [teklifError, setTeklifError] = useState('');
+    /* Enes Doğanay | 13 Nisan 2026: Teklif başarılı gönderildi mesajı */
+    const [teklifSuccess, setTeklifSuccess] = useState(false);
+    /* Enes Doğanay | 13 Nisan 2026: Kullanıcının mevcut teklifleri — 1 ihale 1 teklif kısıtı */
+    const [userOffers, setUserOffers] = useState({});
+    /* Enes Doğanay | 13 Nisan 2026: Teklifi geri çekme state */
+    const [withdrawConfirm, setWithdrawConfirm] = useState(false);
+    const [withdrawing, setWithdrawing] = useState(false);
     const teklifDosyaRef = useRef(null);
 
     // Kurumsal giriş kontrolü
@@ -441,6 +452,7 @@ const IhalelerPage = () => {
             const { data: tenderData, error: tenderError } = await tenderQuery;
 
             if (tenderError) {
+                if (tenderError.name === 'AbortError') return;
                 if (isMissingRelationError(tenderError)) {
                     setTableMissing(true);
                     setTenders([]);
@@ -471,6 +483,7 @@ const IhalelerPage = () => {
             setSelectedFirmaName(firmaFilter ? mappedTenders[0]?.firma_adi || '' : '');
             setTableMissing(false);
         } catch (error) {
+            if (error?.name === 'AbortError') return;
             console.error('İhaleler alınamadı:', error);
             setTenders([]);
         } finally {
@@ -478,7 +491,60 @@ const IhalelerPage = () => {
         }
     }, [firmaFilter]);
 
-    useEffect(() => { fetchPublicTenders(); }, [fetchPublicTenders]);
+    /* Enes Doğanay | 13 Nisan 2026: Supabase client init tamamlanmadan query atılmasını engelle */
+    useEffect(() => {
+        supabase.auth.getSession().then(() => { fetchPublicTenders(); });
+    }, [fetchPublicTenders]);
+
+    /* Enes Doğanay | 13 Nisan 2026: Bildirimden ?ihale= ile gelindiğinde ilgili ihaleyi bul ve detay modal aç */
+    const highlightTenderRef = useRef(null);
+    const [highlightTenderId, setHighlightTenderId] = useState(null);
+
+    useEffect(() => {
+        if (!ihaleParam || loading || tenders.length === 0) return;
+        const target = tenders.find(t => String(t.id) === ihaleParam);
+        if (target) {
+            /* Enes Doğanay | 13 Nisan 2026: teklif=1 varsa teklif popup'ını aç, yoksa detay modal */
+            if (teklifParam) {
+                openTeklifPopup(target);
+            } else {
+                setDetailTender(target);
+            }
+            setHighlightTenderId(target.id);
+            setTimeout(() => setHighlightTenderId(null), 3000);
+        }
+        // URL param temizle
+        const params = new URLSearchParams(searchParams);
+        params.delete('ihale');
+        params.delete('teklif');
+        setSearchParams(params, { replace: true });
+    }, [ihaleParam, loading, tenders]);
+
+    useEffect(() => {
+        if (highlightTenderId && highlightTenderRef.current) {
+            highlightTenderRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [highlightTenderId]);
+
+    /* Enes Doğanay | 13 Nisan 2026: Kullanıcının mevcut tekliflerini çek — ihale_id bazlı harita */
+    useEffect(() => {
+        let cancelled = false;
+        const fetchUserOffers = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user || cancelled) return;
+            const { data } = await supabase
+                .from('ihale_teklifleri')
+                .select('id, ihale_id, toplam_tutar, para_birimi, kdv_dahil, teslim_suresi_gun, teslim_aciklamasi, not_field, kalemler, ek_dosya_url, ek_dosya_adi, durum, created_at')
+                .eq('user_id', session.user.id);
+            if (data && !cancelled) {
+                const map = {};
+                data.forEach(o => { map[String(o.ihale_id)] = o; });
+                setUserOffers(map);
+            }
+        };
+        fetchUserOffers();
+        return () => { cancelled = true; };
+    }, [teklifSuccess]);
 
     const filteredTenders = tenders
         .filter((tender) => {
@@ -521,24 +587,40 @@ const IhalelerPage = () => {
     };
 
     // Enes Doğanay | 10 Nisan 2026: Teklif Ver popup açma — ihale gereksinimlerinden kalem tablosu oluştur
+    // Enes Doğanay | 13 Nisan 2026: Mevcut teklif varsa formu doldur (güncelleme modu)
     const openTeklifPopup = (tender) => {
-        const gereksinimler = Array.isArray(tender.gereksinimler) ? tender.gereksinimler : [];
-        const kalemler = gereksinimler.map(g => ({
-            gereksinim_id: g.id,
-            madde: g.madde,
-            birim_fiyat: '',
-            miktar: '1',
-            aciklama: '',
-        }));
-        setTeklifForm({
-            kalemler,
-            genel_toplam: '',
-            para_birimi: 'TRY',
-            kdv_dahil: tender.kdv_durumu === 'dahil',
-            teslim_suresi_gun: '',
-            teslim_aciklamasi: '',
-            not: '',
-        });
+        const existing = userOffers[String(tender.id)];
+        if (existing) {
+            /* Mevcut teklifi düzenleme — formu mevcut verilerle doldur */
+            setTeklifForm({
+                kalemler: Array.isArray(existing.kalemler) ? existing.kalemler : [],
+                genel_toplam: existing.toplam_tutar ? String(existing.toplam_tutar) : '',
+                para_birimi: existing.para_birimi || 'TRY',
+                kdv_dahil: existing.kdv_dahil || false,
+                teslim_suresi_gun: existing.teslim_suresi_gun ? String(existing.teslim_suresi_gun) : '',
+                teslim_aciklamasi: existing.teslim_aciklamasi || '',
+                not: existing.not_field || '',
+            });
+        } else {
+            /* Yeni teklif — gereksinimlerden boş kalem tablosu oluştur */
+            const gereksinimler = Array.isArray(tender.gereksinimler) ? tender.gereksinimler : [];
+            const kalemler = gereksinimler.map(g => ({
+                gereksinim_id: g.id,
+                madde: g.madde,
+                birim_fiyat: '',
+                miktar: '1',
+                aciklama: '',
+            }));
+            setTeklifForm({
+                kalemler,
+                genel_toplam: '',
+                para_birimi: 'TRY',
+                kdv_dahil: tender.kdv_durumu === 'dahil',
+                teslim_suresi_gun: '',
+                teslim_aciklamasi: '',
+                not: '',
+            });
+        }
         setTeklifDosya(null);
         setTeklifError('');
         setTeklifTender(tender);
@@ -575,6 +657,7 @@ const IhalelerPage = () => {
     };
 
     // Enes Doğanay | 10 Nisan 2026: Teklif gönder / taslak kaydet
+    // Enes Doğanay | 13 Nisan 2026: Mevcut teklif varsa güncelle (upsert), yoksa yeni oluştur
     const handleTeklifSubmit = async (isDraft = false) => {
         setTeklifSaving(true);
         setTeklifError('');
@@ -613,15 +696,10 @@ const IhalelerPage = () => {
             // DB'ye kaydet
             const toplam = getTeklifGenelToplam();
             const userName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || session.user.email;
+            const existingOffer = userOffers[String(teklifTender.id)];
+            const isUpdate = !!existingOffer;
 
-            const { error: insertErr } = await supabase.from('ihale_teklifleri').insert({
-                ihale_id: teklifTender.id,
-                firma_id: teklifTender.firma_id,
-                user_id: session.user.id,
-                gonderen_firma_id: authManagedCompanyId || null,
-                gonderen_firma_adi: managedCompanyName || null,
-                gonderen_ad_soyad: userName,
-                gonderen_email: session.user.email,
+            const payload = {
                 kalemler: teklifForm.kalemler.length > 0 ? teklifForm.kalemler : null,
                 toplam_tutar: toplam,
                 para_birimi: teklifForm.para_birimi,
@@ -629,17 +707,134 @@ const IhalelerPage = () => {
                 teslim_suresi_gun: parseInt(teklifForm.teslim_suresi_gun, 10) || null,
                 teslim_aciklamasi: teklifForm.teslim_aciklamasi || null,
                 not_field: teklifForm.not || null,
-                ek_dosya_url: dosyaUrl,
-                ek_dosya_adi: dosyaAdi,
                 durum: isDraft ? 'taslak' : 'gonderildi',
-            });
-            if (insertErr) throw insertErr;
+                ...(dosyaUrl ? { ek_dosya_url: dosyaUrl, ek_dosya_adi: dosyaAdi } : {}),
+            };
+
+            if (isUpdate) {
+                /* Enes Doğanay | 13 Nisan 2026: Mevcut teklifi güncelle — updated_at ile birlikte */
+                const { data: updatedRows, error: updateErr } = await supabase
+                    .from('ihale_teklifleri')
+                    .update({ ...payload, updated_at: new Date().toISOString() })
+                    .eq('id', existingOffer.id)
+                    .select();
+                if (updateErr) throw updateErr;
+                if (!updatedRows || updatedRows.length === 0) throw new Error('Teklif güncellenemedi. Yetki hatası olabilir.');
+                /* Enes Doğanay | 13 Nisan 2026: userOffers state'ini anında güncelle */
+                setUserOffers(prev => ({ ...prev, [String(teklifTender.id)]: updatedRows[0] }));
+            } else {
+                /* Yeni teklif oluştur */
+                const { data: insertedRows, error: insertErr } = await supabase.from('ihale_teklifleri').insert({
+                    ihale_id: teklifTender.id,
+                    firma_id: teklifTender.firma_id,
+                    user_id: session.user.id,
+                    gonderen_firma_id: authManagedCompanyId || null,
+                    gonderen_firma_adi: managedCompanyName || null,
+                    gonderen_ad_soyad: userName,
+                    gonderen_email: session.user.email,
+                    ...payload,
+                    ek_dosya_url: dosyaUrl,
+                    ek_dosya_adi: dosyaAdi,
+                }).select();
+                if (insertErr) throw insertErr;
+                if (insertedRows?.[0]) {
+                    setUserOffers(prev => ({ ...prev, [String(teklifTender.id)]: insertedRows[0] }));
+                }
+            }
+
+            /* Enes Doğanay | 13 Nisan 2026: Bildirim gönder — yeni teklif veya güncelleme */
+            if (!isDraft && teklifTender?.firma_id) {
+                const { data: managers } = await supabase
+                    .from('kurumsal_firma_yoneticileri')
+                    .select('user_id')
+                    .eq('firma_id', String(teklifTender.firma_id));
+                if (managers?.length) {
+                    const notifTitle = isUpdate ? 'Teklif güncellendi' : 'Yeni teklif geldi!';
+                    const notifMessage = isUpdate
+                        ? `"${teklifTender.baslik || 'İhale'}" ihalenize gelen bir teklifte güncelleme yapıldı.`
+                        : `"${teklifTender.baslik || 'İhale'}" ihalenize yeni bir teklif gönderildi.`;
+                    const notifRows = managers.map(m => ({
+                        user_id: m.user_id,
+                        type: isUpdate ? 'tender_offer_updated' : 'tender_new_offer',
+                        title: notifTitle,
+                        message: notifMessage,
+                        firma_id: String(teklifTender.firma_id),
+                        is_read: false,
+                        metadata: {
+                            ihale_id: teklifTender.id,
+                            ihale_baslik: teklifTender.baslik,
+                            teklif_id: existingOffer?.id || null,
+                            teklif_user_id: session.user.id,
+                        },
+                    }));
+                    supabase.from('bildirimler').insert(notifRows).then(() => {});
+                }
+            }
 
             setTeklifTender(null);
+            /* Enes Doğanay | 13 Nisan 2026: Taslak dahil tüm kaydetmelerde başarı popup'ı */
+            if (isDraft) {
+                setTeklifSuccess('draft');
+            } else {
+                setTeklifSuccess(isUpdate ? 'update' : true);
+            }
+            setTimeout(() => setTeklifSuccess(false), 4500);
         } catch (err) {
             setTeklifError(err.message || 'Teklif gönderilemedi.');
         } finally {
             setTeklifSaving(false);
+        }
+    };
+
+    /* Enes Doğanay | 13 Nisan 2026: Teklifi geri çek — ihale teklifini sil */
+    const handleWithdrawOffer = async () => {
+        if (!teklifTender) return;
+        const existing = userOffers[String(teklifTender.id)];
+        if (!existing) return;
+        setWithdrawing(true);
+        try {
+            const { error: delErr } = await supabase
+                .from('ihale_teklifleri')
+                .delete()
+                .eq('id', existing.id);
+            if (delErr) throw delErr;
+
+            /* Bildirim gönder — teklif geri çekildi */
+            if (teklifTender.firma_id) {
+                const { data: managers } = await supabase
+                    .from('kurumsal_firma_yoneticileri')
+                    .select('user_id')
+                    .eq('firma_id', String(teklifTender.firma_id));
+                if (managers?.length) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const userName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || session?.user?.email || '';
+                    const notifRows = managers.map(m => ({
+                        user_id: m.user_id,
+                        type: 'tender_offer_withdrawn',
+                        title: 'Teklif geri çekildi',
+                        message: `"${teklifTender.baslik || 'İhale'}" ihalenize verilen bir teklif geri çekildi. (${userName})`,
+                        firma_id: String(teklifTender.firma_id),
+                        is_read: false,
+                        metadata: { ihale_id: teklifTender.id, ihale_baslik: teklifTender.baslik },
+                    }));
+                    supabase.from('bildirimler').insert(notifRows).then(() => {});
+                }
+            }
+
+            /* State temizle */
+            setUserOffers(prev => {
+                const next = { ...prev };
+                delete next[String(teklifTender.id)];
+                return next;
+            });
+            setTeklifTender(null);
+            setWithdrawConfirm(false);
+            setTeklifSuccess('withdrawn');
+            setTimeout(() => setTeklifSuccess(false), 4500);
+        } catch (err) {
+            setTeklifError(err.message || 'Teklif geri çekilemedi.');
+        } finally {
+            setWithdrawing(false);
         }
     };
 
@@ -686,7 +881,8 @@ const IhalelerPage = () => {
                                                 <button type="button" className="my-tender-btn my-tender-btn--clone" onClick={() => handleClone(t)} title="İhaleyi Tekrarla">
                                                     <span className="material-symbols-outlined">content_copy</span>
                                                 </button>
-                                                <button type="button" className="my-tender-btn my-tender-btn--edit" onClick={() => openEdit(t)}>
+                                                {/* Enes Doğanay | 13 Nisan 2026: Kapanan ihalede düzenle deaktif */}
+                                                <button type="button" className="my-tender-btn my-tender-btn--edit" onClick={() => openEdit(t)} disabled={sm.key === 'kapali' || sm.key === 'iptal'} title={sm.key === 'kapali' || sm.key === 'iptal' ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
                                                     <span className="material-symbols-outlined">edit</span>
                                                 </button>
                                                 {deleteConfirmId === t.id ? (
@@ -1293,8 +1489,9 @@ const IhalelerPage = () => {
                                 </div>
                                 {filteredTenders.map((tender) => {
                                     const statusMeta = getTenderStatusMeta(tender);
+                                    const isHighlighted = highlightTenderId === tender.id;
                                     return (
-                                        <div key={tender.id} className="tenders-list-row" onClick={() => setDetailTender(tender)}>
+                                        <div key={tender.id} ref={isHighlighted ? highlightTenderRef : null} className={`tenders-list-row${isHighlighted ? ' tenders-list-row--highlight' : ''}`} onClick={() => setDetailTender(tender)}>
                                             <span className="tenders-list-col tenders-list-col--firma" onClick={(e) => { e.stopPropagation(); navigate(`/firmadetay/${tender.firma_id}`); }}>{tender.firma_adi}</span>
                                             <span className="tenders-list-col tenders-list-col--baslik">{tender.baslik}</span>
                                             <span className="tenders-list-col tenders-list-col--konum">{[tender.teslim_il, tender.teslim_ilce].filter(Boolean).join(' / ') || '—'}</span>
@@ -1302,9 +1499,24 @@ const IhalelerPage = () => {
                                             <span className="tenders-list-col tenders-list-col--tarih">{formatTenderDate(tender.son_basvuru_tarihi)}</span>
                                             <span className={`tenders-list-col tenders-list-col--durum tender-card-status tender-card-status-${statusMeta.className}`}>{statusMeta.label}</span>
                                             <span className="tenders-list-col tenders-list-col--actions" onClick={(e) => e.stopPropagation()}>
-                                                <button type="button" className="tenders-list-action-btn tenders-list-action-btn--join" title="Teklif Ver" onClick={() => openTeklifPopup(tender)}>
-                                                    <span className="material-symbols-outlined">handshake</span>
-                                                </button>
+                                                {/* Enes Doğanay | 13 Nisan 2026: Kabul/red durumuna göre buton ayrımı — list view */}
+                                                {(() => {
+                                                    const offer = userOffers[String(tender.id)];
+                                                    const hasOffer = !!offer;
+                                                    const isAccepted = hasOffer && offer.durum === 'kabul';
+                                                    const isRejected = hasOffer && offer.durum === 'red';
+                                                    const isDraft = hasOffer && offer.durum === 'taslak';
+                                                    if (isAccepted) return (
+                                                        <span className="tenders-list-action-btn tenders-list-action-btn--accepted" title="Teklifiniz Kabul Edildi">
+                                                            <span className="material-symbols-outlined">check_circle</span>
+                                                        </span>
+                                                    );
+                                                    return (
+                                                        <button type="button" className={`tenders-list-action-btn ${hasOffer ? (isDraft ? 'tenders-list-action-btn--draft' : (isRejected ? 'tenders-list-action-btn--rejected' : 'tenders-list-action-btn--update')) : 'tenders-list-action-btn--join'}`} title={hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Teklifiniz Reddedildi — Güncelleyebilirsiniz' : 'Teklifi Güncelle')) : 'Teklif Ver'} onClick={() => openTeklifPopup(tender)}>
+                                                            <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
+                                                        </button>
+                                                    );
+                                                })()}
                                                 <button type="button" className="tenders-list-action-btn tenders-list-action-btn--detail" title="Detay" onClick={() => setDetailTender(tender)}>
                                                     <span className="material-symbols-outlined">visibility</span>
                                                 </button>
@@ -1334,7 +1546,7 @@ const IhalelerPage = () => {
                                     const teslimYeri = [tender.teslim_il, tender.teslim_ilce].filter(Boolean).join(', ');
 
                                     return (
-                                        <article key={tender.id} className={`tender-card tender-card--${statusMeta.className}`}>
+                                        <article key={tender.id} ref={highlightTenderId === tender.id ? highlightTenderRef : null} className={`tender-card tender-card--${statusMeta.className}${highlightTenderId === tender.id ? ' tender-card--highlight' : ''}`}>
                                             {/* Üst şerit: Firma + Durum */}
                                             <div className="tender-card__header">
                                                 <button type="button" className="tender-card__company" onClick={() => navigate(`/firmadetay/${tender.firma_id}`)}>
@@ -1416,10 +1628,29 @@ const IhalelerPage = () => {
 
                                             {/* Aksiyon butonları */}
                                             <div className="tender-card__actions">
-                                                <button type="button" className="tender-action tender-action--join" onClick={() => openTeklifPopup(tender)}>
-                                                    <span className="material-symbols-outlined">handshake</span>
-                                                    Teklif Ver
-                                                </button>
+                                                {/* Enes Doğanay | 13 Nisan 2026: Kabul/red durumuna göre buton ayrımı — grid card */}
+                                                {(() => {
+                                                    const st = getTenderStatusMeta(tender);
+                                                    const offer = userOffers[String(tender.id)];
+                                                    const hasOffer = !!offer;
+                                                    const isDraft = hasOffer && offer.durum === 'taslak';
+                                                    const isAccepted = hasOffer && offer.durum === 'kabul';
+                                                    const isRejected = hasOffer && offer.durum === 'red';
+                                                    const isClosed = st.key === 'kapali' || st.key === 'iptal';
+                                                    if (isClosed && !hasOffer) return null;
+                                                    if (isAccepted) return (
+                                                        <span className="tender-action tender-action--accepted">
+                                                            <span className="material-symbols-outlined">verified</span>
+                                                            Teklifiniz Kabul Edildi
+                                                        </span>
+                                                    );
+                                                    return (
+                                                        <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'}`} onClick={() => openTeklifPopup(tender)} disabled={isClosed && hasOffer && !isDraft}>
+                                                            <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
+                                                            {hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Yeniden Teklif Ver' : (isClosed ? 'Teklif Verildi' : 'Teklifi Güncelle'))) : 'Teklif Ver'}
+                                                        </button>
+                                                    );
+                                                })()}
                                                 <button type="button" className="tender-action tender-action--detail" onClick={() => setDetailTender(tender)}>
                                                     <span className="material-symbols-outlined">open_in_full</span>
                                                     Detay
@@ -1441,8 +1672,8 @@ const IhalelerPage = () => {
                     const ekDosyalar = Array.isArray(dt.ek_dosyalar) ? dt.ek_dosyalar : [];
                     const teslimYeri = [dt.teslim_il, dt.teslim_ilce].filter(Boolean).join(' / ');
                     return (
-                        <div className="tender-detail-overlay" onClick={() => setDetailTender(null)}>
-                            <aside className="tender-detail-drawer" onClick={(e) => e.stopPropagation()}>
+                        <div className="tender-detail-overlay tender-detail-overlay--center" onClick={() => setDetailTender(null)}>
+                            <div className="tender-detail-modal" onClick={(e) => e.stopPropagation()}>
                                 <div className="tender-detail__head">
                                     <div>
                                         <span className={`tender-card-status tender-card-status-${statusMeta.className}`}>{statusMeta.label}</span>
@@ -1531,13 +1762,32 @@ const IhalelerPage = () => {
                                     )}
                                 </div>
 
+                                {/* Enes Doğanay | 13 Nisan 2026: 1 ihale 1 teklif — detail drawer güncelleme butonu */}
+                                {/* Enes Doğanay | 13 Nisan 2026: Kabul/red durumuna göre buton ayrımı — detail drawer */}
                                 <div className="tender-detail__footer">
-                                    <button type="button" className="tender-action tender-action--join tender-action--full" onClick={() => { setDetailTender(null); openTeklifPopup(dt); }}>
-                                        <span className="material-symbols-outlined">handshake</span>
-                                        Teklif Ver
-                                    </button>
+                                    {(() => {
+                                        const offer = userOffers[String(dt.id)];
+                                        const hasOffer = !!offer;
+                                        const isDraft = hasOffer && offer.durum === 'taslak';
+                                        const isAccepted = hasOffer && offer.durum === 'kabul';
+                                        const isRejected = hasOffer && offer.durum === 'red';
+                                        const stMeta = getTenderStatusMeta(dt);
+                                        const isClosed = stMeta.key === 'kapali' || stMeta.key === 'iptal';
+                                        if (isAccepted) return (
+                                            <span className="tender-action tender-action--accepted tender-action--full">
+                                                <span className="material-symbols-outlined">verified</span>
+                                                Teklifiniz Kabul Edildi
+                                            </span>
+                                        );
+                                        return (
+                                            <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'} tender-action--full`} onClick={() => { setDetailTender(null); openTeklifPopup(dt); }} disabled={isClosed && hasOffer && !isDraft}>
+                                                <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
+                                                {hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Yeniden Teklif Ver' : (isClosed ? 'Teklif Verildi' : 'Teklifi Güncelle'))) : 'Teklif Ver'}
+                                            </button>
+                                        );
+                                    })()}
                                 </div>
-                            </aside>
+                            </div>
                         </div>
                     );
                 })()}
@@ -1548,16 +1798,20 @@ const IhalelerPage = () => {
                     const gereksinimler = Array.isArray(tt.gereksinimler) ? tt.gereksinimler : [];
                     const hasKalemler = teklifForm.kalemler.length > 0;
                     const genelToplam = getTeklifGenelToplam();
+                    /* Enes Doğanay | 13 Nisan 2026: Güncelleme modu kontrol */
+                    const isUpdateMode = !!userOffers[String(tt.id)];
+                    /* Enes Doğanay | 13 Nisan 2026: Taslak modu — henüz gönderilmemiş */
+                    const isDraftMode = isUpdateMode && userOffers[String(tt.id)].durum === 'taslak';
 
                     return (
-                        <div className="teklif-popup-overlay" onClick={() => !teklifSaving && setTeklifTender(null)}>
+                        <div className="teklif-popup-overlay">
                             <div className="teklif-popup" onClick={(e) => e.stopPropagation()}>
                                 {/* Başlık */}
                                 <div className="teklif-popup__head">
                                     <div className="teklif-popup__head-left">
-                                        <span className="material-symbols-outlined teklif-popup__head-icon">handshake</span>
+                                        <span className="material-symbols-outlined teklif-popup__head-icon">{isUpdateMode ? (isDraftMode ? 'draft' : 'edit') : 'handshake'}</span>
                                         <div>
-                                            <h2>Teklif Ver</h2>
+                                            <h2>{isUpdateMode ? (isDraftMode ? 'Taslağı Görüntüle' : 'Teklifi Güncelle') : 'Teklif Ver'}</h2>
                                             <p className="teklif-popup__tender-name">{tt.baslik}</p>
                                             <p className="teklif-popup__tender-firma">
                                                 <span className="material-symbols-outlined">apartment</span>
@@ -1811,13 +2065,21 @@ const IhalelerPage = () => {
                                         {teklifForm.kdv_dahil && <small>KDV Dahil</small>}
                                     </div>
                                     <div className="teklif-popup__footer-actions">
-                                        <button type="button" className="teklif-btn teklif-btn--draft" disabled={teklifSaving} onClick={() => handleTeklifSubmit(true)}>
-                                            <span className="material-symbols-outlined">save</span>
-                                            {teklifSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}
-                                        </button>
+                                        {/* Enes Doğanay | 13 Nisan 2026: Gönderilmiş → Geri Çek, Taslak/Yeni → Taslak Kaydet */}
+                                        {isUpdateMode && !isDraftMode ? (
+                                            <button type="button" className="teklif-btn teklif-btn--withdraw" disabled={teklifSaving || withdrawing} onClick={() => setWithdrawConfirm(true)}>
+                                                <span className="material-symbols-outlined">undo</span>
+                                                Teklifi Geri Çek
+                                            </button>
+                                        ) : (
+                                            <button type="button" className="teklif-btn teklif-btn--draft" disabled={teklifSaving} onClick={() => handleTeklifSubmit(true)}>
+                                                <span className="material-symbols-outlined">save</span>
+                                                {teklifSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}
+                                            </button>
+                                        )}
                                         <button type="button" className="teklif-btn teklif-btn--submit" disabled={teklifSaving} onClick={() => handleTeklifSubmit(false)}>
-                                            <span className="material-symbols-outlined">send</span>
-                                            {teklifSaving ? 'Gönderiliyor…' : 'Teklifi Gönder'}
+                                            <span className="material-symbols-outlined">{isUpdateMode && !isDraftMode ? 'edit' : 'send'}</span>
+                                            {teklifSaving ? 'Gönderiliyor…' : (isUpdateMode && !isDraftMode ? 'Teklifi Güncelle' : 'Teklifi Gönder')}
                                         </button>
                                     </div>
                                 </div>
@@ -1825,6 +2087,52 @@ const IhalelerPage = () => {
                         </div>
                     );
                 })()}
+
+                {/* Enes Doğanay | 13 Nisan 2026: Teklifi Geri Çek onay modal */}
+                {withdrawConfirm && (
+                    <div className="teklif-success-overlay" onClick={() => !withdrawing && setWithdrawConfirm(false)}>
+                        <div className="teklif-success-card teklif-success-card--withdraw-confirm" onClick={e => e.stopPropagation()}>
+                            <div className="teklif-success-card__icon teklif-success-card__icon--warn">
+                                <span className="material-symbols-outlined">warning</span>
+                            </div>
+                            <h3>Teklifinizi Geri Çekmek İstediğinize Emin Misiniz?</h3>
+                            <p>Bu işlem geri alınamaz. Teklifiniz bu ihaleden tamamen silinecektir.</p>
+                            <div className="teklif-withdraw-modal-actions">
+                                <button className="teklif-withdraw-modal-btn teklif-withdraw-modal-btn--cancel" onClick={() => setWithdrawConfirm(false)} disabled={withdrawing}>
+                                    Vazgeç
+                                </button>
+                                <button className="teklif-withdraw-modal-btn teklif-withdraw-modal-btn--confirm" onClick={handleWithdrawOffer} disabled={withdrawing}>
+                                    <span className="material-symbols-outlined">undo</span>
+                                    {withdrawing ? 'Çekiliyor…' : 'Evet, Geri Çek'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Enes Doğanay | 13 Nisan 2026: Teklif başarıyla gönderildi/güncellendi/geri çekildi overlay */}
+                {/* Enes Doğanay | 13 Nisan 2026: Teklif başarıyla gönderildi/güncellendi/taslak kaydedildi/geri çekildi overlay */}
+                {teklifSuccess && (
+                    <div className="teklif-success-overlay" onClick={() => setTeklifSuccess(false)}>
+                        <div className={`teklif-success-card${teklifSuccess === 'withdrawn' ? ' teklif-success-card--withdrawn' : ''}${teklifSuccess === 'draft' ? ' teklif-success-card--draft' : ''}`} onClick={e => e.stopPropagation()}>
+                            <div className={`teklif-success-card__icon${teklifSuccess === 'withdrawn' ? ' teklif-success-card__icon--withdrawn' : ''}${teklifSuccess === 'draft' ? ' teklif-success-card__icon--draft' : ''}`}>
+                                <span className="material-symbols-outlined">{teklifSuccess === 'withdrawn' ? 'remove_circle' : teklifSuccess === 'draft' ? 'draft' : 'check_circle'}</span>
+                            </div>
+                            <h3>{teklifSuccess === 'draft' ? 'Taslak Kaydedildi!' : teklifSuccess === 'update' ? 'Teklifiniz Güncellendi!' : teklifSuccess === 'withdrawn' ? 'Teklifiniz Geri Çekildi' : 'Teklifiniz Gönderildi!'}</h3>
+                            <p>{teklifSuccess === 'draft'
+                                ? 'Teklifiniz taslak olarak kaydedildi. İstediğiniz zaman düzenleyip gönderebilirsiniz.'
+                                : teklifSuccess === 'update'
+                                ? 'Teklifiniz başarıyla güncellendi. İhale sahibi güncel teklifinizi görebilir.'
+                                : teklifSuccess === 'withdrawn'
+                                ? 'Teklifiniz bu ihaleden başarıyla geri çekildi.'
+                                : 'Teklifiniz ihale sahibine başarıyla iletildi. Durumunu profil sayfanızdan takip edebilirsiniz.'
+                            }</p>
+                            <button className="teklif-success-card__btn" onClick={() => setTeklifSuccess(false)}>
+                                Tamam
+                            </button>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );

@@ -1,9 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Layout() {
     const location = useLocation();
     const navigate = useNavigate();
+    /* Enes Doğanay | 13 Nisan 2026: Geri tuşuyla dönüşte scroll pozisyonunu koru, yeni navigasyonda smooth scroll top */
+    const isPopRef = useRef(false);
+
+    useEffect(() => {
+        const onPop = () => { isPopRef.current = true; };
+        window.addEventListener('popstate', onPop);
+        return () => window.removeEventListener('popstate', onPop);
+    }, []);
+
+    useEffect(() => {
+        if (isPopRef.current) {
+            isPopRef.current = false;
+            return; // geri/ileri — browser scroll restore'a bırak
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [location.pathname]);
 
     useEffect(() => {
         const hash = window.location.hash || '';

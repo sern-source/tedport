@@ -5,6 +5,9 @@ import { supabase } from './supabaseClient';
 import { getManagedCompanyId } from './companyManagementApi';
 import { useAuth } from './AuthContext';
 import CompanyManagementPanel from './CompanyManagementPanel';
+import TenderOffersManagement from './TenderOffersManagement';
+/* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler paneli */
+import MyOffersPanel from './MyOffersPanel';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import './Profile.css';
@@ -673,6 +676,10 @@ const FirmaProfil = () => {
                                 <span className="material-symbols-outlined">request_quote</span> Teklif Yönetimi
                                 {pendingCount > 0 && <span className="nav-item-badge">{pendingCount}</span>}
                             </a>
+                            {/* Enes Doğanay | 13 Nisan 2026: İhale Yönetimi — İhalelerim + Katıldığım İhaleler birleştirildi */}
+                            <a className={`nav-item ${currentTab === 'ihale-yonetimi' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'ihale-yonetimi' })}>
+                                <span className="material-symbols-outlined">gavel</span> İhale Yönetimi
+                            </a>
                             <a className={`nav-item ${currentTab === 'bildirimler' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'bildirimler' })}>
                                 <span className="material-symbols-outlined">notifications</span> Bildirimler
                                 {unreadNotifCount > 0 && <span className="nav-item-badge">{unreadNotifCount}</span>}
@@ -1013,6 +1020,25 @@ const FirmaProfil = () => {
                             </div>
                         )}
 
+                        {/* Enes Doğanay | 13 Nisan 2026: İhale Yönetimi — 2 alt sekme: İhalelerim + Katıldığım İhaleler */}
+                        {currentTab === 'ihale-yonetimi' && (
+                            <div className="firma-profil-section">
+                                <div className="cmp-quotes-tabs" style={{ marginBottom: '16px' }}>
+                                    <button className={`cmp-quotes-tab ${(searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'ihale-yonetimi', subtab: 'ihalelerim' })}>
+                                        <span className="material-symbols-outlined">gavel</span> İhalelerim
+                                    </button>
+                                    <button className={`cmp-quotes-tab ${searchParams.get('subtab') === 'katildigim' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'ihale-yonetimi', subtab: 'katildigim' })}>
+                                        <span className="material-symbols-outlined">assignment_turned_in</span> Katıldığım İhaleler
+                                    </button>
+                                </div>
+                                {(searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? (
+                                    <TenderOffersManagement companyId={companyId} />
+                                ) : (
+                                    <MyOffersPanel />
+                                )}
+                            </div>
+                        )}
+
                         {/* Enes Doğanay | 7 Nisan 2026: Tab → Bildirimler (kurumsal kullanıcı bildirimleri) */}
                         {currentTab === 'bildirimler' && (() => {
                             /* Enes Doğanay | 9 Nisan 2026: Bireysel ile birebir aynı format — hatırlatma paneli dahil */
@@ -1071,13 +1097,34 @@ const FirmaProfil = () => {
                                                 {notifications.map((notification) => (
                                                     <article
                                                         key={notification.id}
-                                                        className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${notification.metadata?.teklif_id ? 'clickable' : ''}`}
+                                                        className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${(notification.metadata?.teklif_id || notification.metadata?.ihale_id) ? 'clickable' : ''}`}
                                                         onClick={() => {
-                                                            if (notification.metadata?.teklif_id) {
+                                                            /* Enes Doğanay | 13 Nisan 2026: İhale teklif bildirimlerinde ilgili sekmeye yönlendir */
+                                                            if (notification.type === 'tender_new_offer' || notification.type === 'tender_offer_updated' || notification.type === 'tender_offer_withdrawn') {
+                                                                /* Enes Doğanay | 13 Nisan 2026: İhaleye ve teklif kartına odaklan */
+                                                                const params = { tab: 'ihale-yonetimi' };
+                                                                if (notification.metadata?.ihale_id) params.ihale = notification.metadata.ihale_id;
+                                                                if (notification.metadata?.teklif_user_id) params.teklif_user = notification.metadata.teklif_user_id;
+                                                                setSearchParams(params);
+                                                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                                            } else if (notification.type === 'tender_offer_status') {
+                                                                /* Enes Doğanay | 13 Nisan 2026: Teklif durumu bildirimi — İhale Yönetimi > Katıldığım İhaleler */
+                                                                if (notification.metadata?.ihale_id) {
+                                                                    sessionStorage.setItem('mop_highlight_ihale', String(notification.metadata.ihale_id));
+                                                                }
+                                                                setSearchParams({ tab: 'ihale-yonetimi', subtab: 'katildigim' });
+                                                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                                            } else if (notification.type === 'tender_updated' || notification.type === 'tender_closed' || notification.type === 'tender_cancelled') {
+                                                                /* Enes Doğanay | 13 Nisan 2026: İhale durumu değişiklik bildirimleri — ilgili ihaleye navigate */
+                                                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                                                if (notification.metadata?.ihale_id) {
+                                                                    navigate(`/ihaleler?ihale=${notification.metadata.ihale_id}`);
+                                                                }
+                                                            } else if (notification.metadata?.teklif_id) {
                                                                 navigateToQuoteFromNotification(notification);
                                                             }
                                                         }}
-                                                        style={{ cursor: notification.metadata?.teklif_id ? 'pointer' : 'default' }}
+                                                        style={{ cursor: (notification.metadata?.teklif_id || notification.metadata?.ihale_id) ? 'pointer' : 'default' }}
                                                     >
                                                         <div className="notification-feed-top">
                                                             <div>
@@ -1086,6 +1133,13 @@ const FirmaProfil = () => {
                                                                         : notification.type === 'quote_reply' ? '💬 Yanıt Geldi'
                                                                         : notification.type === 'quote_message' ? '✉️ Yeni Mesaj'
                                                                         : notification.type === 'reminder' ? '⏰ Hatırlatma'
+                                                                        : notification.type === 'tender_new_offer' ? '📋 Yeni İhale Teklifi'
+                                                                        : notification.type === 'tender_offer_updated' ? '✏️ Teklif Güncellendi'
+                                                                        : notification.type === 'tender_offer_status' ? '📊 Teklif Durumu'
+                                                                        : notification.type === 'tender_updated' ? '📝 İhale Güncellendi'
+                                                                        : notification.type === 'tender_closed' ? '🔒 İhale Kapandı'
+                                                                        : notification.type === 'tender_cancelled' ? '❌ İhale İptal'
+                                                                        : notification.type === 'tender_offer_withdrawn' ? '↩️ Teklif Geri Çekildi'
                                                                         : '🔔 Bildirim'}
                                                                 </span>
                                                                 <h4>{notification.title}</h4>

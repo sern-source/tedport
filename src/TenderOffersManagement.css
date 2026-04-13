@@ -1,0 +1,2216 @@
+/* Enes Doğanay | 13 Nisan 2026: İhalelerim & Gelen Teklifler — tamamen yeniden tasarım */
+
+/* ═══════════════════════════════════════════════════
+   EKRAN KAP
+   ═══════════════════════════════════════════════════ */
+.tom-screen {
+    font-family: Manrope, 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════
+   HERO BANNER — Koyu gradient (İhaleler sayfasıyla uyumlu)
+   ═══════════════════════════════════════════════════ */
+.tom-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 26px 28px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+    color: #fff;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(30, 58, 138, 0.22);
+}
+
+.tom-hero__text h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.25;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tom-hero__text h1 .material-symbols-outlined {
+    font-size: 28px;
+    opacity: 0.85;
+}
+
+.tom-hero__text p {
+    margin: 6px 0 0;
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 480px;
+}
+
+.tom-hero__stats {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Cam efektli KPI stat kartları */
+.tom-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: background 0.2s, transform 0.2s;
+    min-width: 100px;
+}
+
+.tom-stat:hover {
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateY(-2px);
+}
+
+.tom-stat .material-symbols-outlined {
+    font-size: 22px;
+    opacity: 0.8;
+}
+
+.tom-stat div {
+    display: flex;
+    flex-direction: column;
+}
+
+.tom-stat strong {
+    font-size: 1.3rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.tom-stat span:last-child {
+    font-size: 0.72rem;
+    opacity: 0.7;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.tom-stat--green .material-symbols-outlined,
+.tom-stat--green strong { color: #86efac; }
+
+.tom-stat--amber .material-symbols-outlined,
+.tom-stat--amber strong { color: #fde68a; }
+
+/* ═══════════════════════════════════════════════════
+   HATA TOAST
+   ═══════════════════════════════════════════════════ */
+.tom-toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+    animation: tomSlideIn 0.25s ease;
+}
+
+.tom-toast button {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #991b1b;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 6px;
+    display: flex;
+}
+
+.tom-toast button:hover { background: rgba(153, 27, 27, 0.1); }
+
+.tom-toast .material-symbols-outlined { font-size: 20px; }
+
+/* ═══════════════════════════════════════════════════
+   ANA DÜZEN — Sol panel + Sağ içerik
+   ═══════════════════════════════════════════════════ */
+.tom-body {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    min-height: 600px;
+}
+
+/* ═══════════════════════════════════════════════════
+   SOL PANEL — İhale Listesi
+   ═══════════════════════════════════════════════════ */
+.tom-sidebar {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tom-sidebar__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 0;
+}
+
+.tom-sidebar__head h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.tom-sidebar__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 7px;
+    border-radius: 99px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: İhale arama inputu */
+.tom-sidebar__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 16px 0;
+    padding: 0 12px;
+    height: 40px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.tom-sidebar__search:focus-within {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tom-sidebar__search .material-symbols-outlined {
+    font-size: 18px;
+    color: #94a3b8;
+}
+
+.tom-sidebar__search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: #0f172a;
+}
+
+.tom-sidebar__clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #64748b;
+    transition: background 0.15s;
+}
+
+.tom-sidebar__clear:hover { background: #cbd5e1; }
+.tom-sidebar__clear .material-symbols-outlined { font-size: 14px; }
+
+/* Enes Doğanay | 13 Nisan 2026: İhale durumu filtre pilleri */
+.tom-sidebar__filters {
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px 0;
+    flex-wrap: wrap;
+}
+
+.tom-pill {
+    padding: 5px 10px;
+    border-radius: 99px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tom-pill:hover {
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+.tom-pill--on {
+    background: #1d4ed8;
+    color: #fff;
+    border-color: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+}
+
+/* Enes Doğanay | 13 Nisan 2026: İhale listesi kaydırılabilir alan */
+.tom-sidebar__list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* İhale Kartı */
+.tom-tender-card {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    text-align: left;
+    width: 100%;
+    padding: 0;
+}
+
+.tom-tender-card:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+}
+
+.tom-tender-card--active {
+    border-color: #2563eb;
+    background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+    box-shadow: 0 3px 12px rgba(37, 99, 235, 0.15);
+}
+
+/* Sol renk çubuğu */
+.tom-tender-card__bar {
+    width: 4px;
+    flex-shrink: 0;
+    border-radius: 12px 0 0 12px;
+    background: #94a3b8;
+}
+
+.tom-tender-card__bar--active { background: linear-gradient(180deg, #22c55e, #16a34a); }
+.tom-tender-card__bar--closed { background: linear-gradient(180deg, #ef4444, #b91c1c); }
+.tom-tender-card__bar--draft { background: linear-gradient(180deg, #94a3b8, #64748b); }
+.tom-tender-card__bar--cancelled { background: linear-gradient(180deg, #f97316, #ea580c); }
+.tom-tender-card__bar--unknown { background: #cbd5e1; }
+
+.tom-tender-card__body {
+    flex: 1;
+    padding: 10px 12px;
+    min-width: 0;
+}
+
+.tom-tender-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.tom-tender-card__top h3 {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.tom-tender-card--active .tom-tender-card__top h3 { color: #1e40af; }
+
+/* Enes Doğanay | 13 Nisan 2026: Durum rozetleri */
+.tom-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tom-badge .material-symbols-outlined { font-size: 12px; }
+
+.tom-badge--active { background: #dcfce7; color: #166534; }
+.tom-badge--closed { background: #fee2e2; color: #991b1b; }
+.tom-badge--draft { background: #f1f5f9; color: #475569; }
+.tom-badge--cancelled { background: #ffedd5; color: #9a3412; }
+.tom-badge--unknown { background: #f1f5f9; color: #64748b; }
+
+.tom-tender-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.tom-tender-card__meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tom-tender-card__meta .material-symbols-outlined { font-size: 14px; }
+
+.tom-tender-card__offers {
+    font-weight: 600;
+    color: #475569;
+}
+
+.tom-deadline--urgent {
+    color: #dc2626 !important;
+    font-weight: 700;
+    animation: tomPulse 2s ease-in-out infinite;
+}
+
+.tom-deadline--past {
+    color: #991b1b !important;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════
+   SAĞ PANEL — İçerik
+   ═══════════════════════════════════════════════════ */
+.tom-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+/* ── İhale Bilgi Kartı ── */
+.tom-info-card {
+    background: #fff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+
+.tom-info-card__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 16px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    gap: 12px;
+    transition: background 0.15s;
+}
+
+.tom-info-card__toggle:hover { background: #f8fafc; }
+
+.tom-info-card__title-row {
+    flex: 1;
+    min-width: 0;
+}
+
+.tom-info-card__title-row h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+.tom-info-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.tom-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: #f0f4ff;
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+.tom-tag .material-symbols-outlined { font-size: 13px; }
+
+.tom-info-card__chevron {
+    font-size: 24px;
+    color: #94a3b8;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.tom-info-card__body {
+    padding: 0 20px 20px;
+    animation: tomSlideIn 0.2s ease;
+}
+
+.tom-info-card__desc {
+    margin: 0 0 16px;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.tom-info-card__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.tom-info-cell {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+}
+
+.tom-info-cell .material-symbols-outlined {
+    font-size: 20px;
+    color: #3b82f6;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.tom-info-cell small {
+    display: block;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.tom-info-cell strong {
+    display: block;
+    font-size: 0.88rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════
+   TEKLİFLER BÖLÜMÜ
+   ═══════════════════════════════════════════════════ */
+.tom-offers-section {
+    background: #fff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    padding: 20px;
+}
+
+.tom-offers-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.tom-offers-toolbar__left h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tom-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 99px;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.tom-offers-toolbar__right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: İkon buton (puanlama toggle) */
+.tom-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.15s ease;
+}
+
+.tom-btn-icon:hover { border-color: #93c5fd; color: #2563eb; background: #eff6ff; }
+
+.tom-btn-icon--active {
+    background: #1d4ed8;
+    color: #fff;
+    border-color: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3);
+}
+
+.tom-btn-icon .material-symbols-outlined { font-size: 20px; }
+
+/* Sıralama dropdown */
+.tom-sort-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+
+.tom-sort-wrap:focus-within { border-color: #93c5fd; }
+.tom-sort-wrap .material-symbols-outlined { font-size: 18px; color: #94a3b8; }
+
+.tom-sort-select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.82rem;
+    color: #0f172a;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Teklif filtre chipleri */
+.tom-offers-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.tom-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid rgba(219, 234, 254, 0.9);
+    background: #fff;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tom-chip .material-symbols-outlined { font-size: 15px; }
+
+.tom-chip:hover {
+    color: #1d4ed8;
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.tom-chip--on {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+}
+
+.tom-chip--on .material-symbols-outlined { color: #fff; }
+
+/* ═══════════════════════════════════════════════════
+   PUANLAMA PANELİ (Açılır/Kapanır)
+   ═══════════════════════════════════════════════════ */
+.tom-score-panel {
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f4ff 100%);
+    border: 1px solid rgba(219, 234, 254, 0.8);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    animation: tomSlideIn 0.2s ease;
+}
+
+.tom-score-panel__head h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tom-score-panel__head h4 .material-symbols-outlined { font-size: 20px; color: #3b82f6; }
+
+.tom-score-panel__head p {
+    margin: 4px 0 0;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.tom-score-panel__sliders {
+    display: grid;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.tom-slider-row__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.tom-slider-row__label .material-symbols-outlined { font-size: 18px; }
+
+.tom-slider-row__label span {
+    font-size: 0.85rem;
+    color: #334155;
+    font-weight: 500;
+}
+
+.tom-slider-row__label strong {
+    margin-left: auto;
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.tom-slider-row input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 99px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #e2e8f0;
+}
+
+.tom-slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid currentColor;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════
+   TEKLİF KARTLARI
+   ═══════════════════════════════════════════════════ */
+.tom-offer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tom-offer-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.tom-offer-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.tom-offer-card--expanded {
+    border-color: #93c5fd;
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.1);
+}
+
+.tom-offer-card--compare {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Bildirimden gelen teklif highlight efekti */
+.tom-offer-card--highlight {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25), 0 0 20px rgba(37, 99, 235, 0.15);
+    animation: tomHighlightPulse 2s ease-in-out 2;
+}
+
+@keyframes tomHighlightPulse {
+    0% { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25), 0 0 20px rgba(37, 99, 235, 0.15); }
+    50% { box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.35), 0 0 30px rgba(37, 99, 235, 0.25); }
+    100% { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25), 0 0 20px rgba(37, 99, 235, 0.15); }
+}
+
+/* Sıralama rozeti */
+.tom-rank {
+    position: absolute;
+    top: -1px;
+    left: 12px;
+    padding: 4px 10px 6px;
+    border-radius: 0 0 10px 10px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    z-index: 2;
+}
+
+.tom-rank--1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; }
+.tom-rank--2 { background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color: #334155; }
+.tom-rank--3 { background: linear-gradient(135deg, #fdba74, #f97316); color: #7c2d12; }
+
+/* Teklif kartı ana satırı */
+.tom-offer-card__main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tom-offer-card__main:hover { background: #fafbfc; }
+
+/* Score Ring */
+.tom-score-ring {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tom-score-ring svg { display: block; }
+
+.tom-score-ring__val {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+/* Teklif bilgileri */
+.tom-offer-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.tom-offer-card__company {
+    margin-bottom: 4px;
+}
+
+.tom-offer-card__company strong {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tom-offer-card__email {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.tom-offer-card__metrics {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.tom-metric {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+    color: #475569;
+}
+
+.tom-metric .material-symbols-outlined { font-size: 16px; color: #94a3b8; }
+.tom-metric strong { font-weight: 700; color: #0f172a; }
+.tom-metric small { font-size: 0.68rem; color: #94a3b8; margin-left: 2px; }
+
+/* Teklif durumu */
+.tom-offer-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.tom-offer-status .material-symbols-outlined { font-size: 13px; }
+
+.tom-offer-status--accepted { background: #dcfce7; color: #166534; }
+.tom-offer-status--rejected { background: #fee2e2; color: #991b1b; }
+.tom-offer-status--review { background: #dbeafe; color: #1e40af; }
+.tom-offer-status--draft { background: #f1f5f9; color: #475569; }
+
+.tom-offer-card__time {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+/* Hızlı aksiyonlar */
+.tom-offer-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.tom-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: all 0.15s ease;
+}
+
+.tom-icon-btn:hover { border-color: #fbbf24; color: #f59e0b; }
+
+.tom-icon-btn--starred {
+    background: #fffbeb;
+    border-color: #fbbf24;
+    color: #f59e0b;
+}
+
+.tom-icon-btn .material-symbols-outlined { font-size: 18px; }
+
+.tom-compare-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: all 0.15s ease;
+}
+
+.tom-compare-check:hover { border-color: #a78bfa; color: #7c3aed; }
+
+.tom-compare-check:has(input:checked) {
+    background: #f5f3ff;
+    border-color: #a78bfa;
+    color: #7c3aed;
+}
+
+.tom-compare-check input { display: none; }
+.tom-compare-check .material-symbols-outlined { font-size: 18px; }
+
+/* Enes Doğanay | 13 Nisan 2026: tom-expand-icon kaldırıldı — fonksiyonelsiz eleman temizlendi */
+
+/* ═══════════════════════════════════════════════════
+   GENİŞLETİLMİŞ TEKLİF DETAYI
+   ═══════════════════════════════════════════════════ */
+.tom-offer-card__detail {
+    padding: 0 16px 16px;
+    border-top: 1px solid #f1f5f9;
+    animation: tomSlideIn 0.25s ease;
+}
+
+/* Puan Detayı */
+.tom-score-breakdown {
+    padding: 14px 0;
+}
+
+.tom-score-breakdown h4 {
+    margin: 0 0 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.tom-score-bars {
+    display: grid;
+    gap: 10px;
+}
+
+.tom-score-bar {
+    display: grid;
+    grid-template-columns: 60px 1fr 36px;
+    align-items: center;
+    gap: 10px;
+}
+
+.tom-score-bar > span {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.tom-score-bar > strong {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #0f172a;
+    text-align: right;
+}
+
+/* Progress bar */
+.tom-bar {
+    height: 8px;
+    border-radius: 99px;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+.tom-bar--sm { height: 6px; }
+
+.tom-bar__fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 2px;
+}
+
+.tom-bar__fill--green { background: linear-gradient(90deg, #059669, #34d399); }
+.tom-bar__fill--amber { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.tom-bar__fill--purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.tom-bar__fill--blue { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+
+/* Detay satırları */
+.tom-detail-row {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid #f8fafc;
+}
+
+.tom-detail-row .material-symbols-outlined {
+    font-size: 18px;
+    color: #3b82f6;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.tom-detail-row small {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.tom-detail-row p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+/* Teklif Kalemleri */
+.tom-kalemler {
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.tom-kalemler h4 {
+    margin: 0 0 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tom-kalemler h4 .material-symbols-outlined { font-size: 18px; color: #3b82f6; }
+
+.tom-kalemler__wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #f1f5f9;
+}
+
+.tom-kalemler__wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.tom-kalemler__wrap th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.tom-kalemler__wrap td {
+    padding: 8px 10px;
+    color: #334155;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.tom-kalemler__wrap td strong { font-weight: 600; color: #0f172a; }
+
+.tom-kalemler__wrap tbody tr:hover { background: #fafbfc; }
+
+/* Kişisel Not */
+.tom-my-note {
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.tom-my-note label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.tom-my-note label .material-symbols-outlined { font-size: 18px; color: #3b82f6; }
+
+.tom-my-note textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: #0f172a;
+    resize: vertical;
+    min-height: 48px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fafbfc;
+}
+
+.tom-my-note textarea:focus {
+    outline: none;
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: #fff;
+}
+
+/* Aksiyon butonları */
+.tom-offer-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.tom-offer-card__footer-right {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Aksiyon butonları */
+.tom-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+    white-space: nowrap;
+}
+
+.tom-btn .material-symbols-outlined { font-size: 18px; }
+
+.tom-btn--outline {
+    background: #fff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.tom-btn--outline:hover {
+    border-color: #93c5fd;
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.tom-btn--accept {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+}
+
+.tom-btn--accept:hover {
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+    transform: translateY(-1px);
+}
+
+.tom-btn--accept:disabled { opacity: 0.6; pointer-events: none; }
+
+.tom-btn--reject {
+    background: #fff;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.tom-btn--reject:hover {
+    background: #fef2f2;
+    border-color: #f87171;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.1);
+}
+
+.tom-btn--reject:disabled { opacity: 0.6; pointer-events: none; }
+
+.tom-btn-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.tom-btn-text:hover { color: #dc2626; background: #fef2f2; }
+.tom-btn-text .material-symbols-outlined { font-size: 16px; }
+
+/* ═══════════════════════════════════════════════════
+   KARŞILAŞTIRMA MODU
+   ═══════════════════════════════════════════════════ */
+.tom-compare {
+    margin-top: 16px;
+    border: 2px solid #a78bfa;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 50%, #ede9fe 100%);
+    overflow: hidden;
+    animation: tomSlideIn 0.3s ease;
+}
+
+.tom-compare__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+}
+
+.tom-compare__head h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #5b21b6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tom-compare__head h3 .material-symbols-outlined { font-size: 22px; }
+
+.tom-compare__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    padding: 16px 20px 20px;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Karşılaştırma kartları */
+.tom-compare-card {
+    background: #fff;
+    border: 1px solid #e9e5f5;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.tom-compare-card--best {
+    border-color: #a78bfa;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
+}
+
+.tom-compare-card__crown {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #78350f;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.tom-compare-card__crown .material-symbols-outlined { font-size: 14px; }
+
+.tom-compare-card h4 {
+    margin: 0 0 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.tom-compare-card__score {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.tom-compare-card__rows {
+    display: grid;
+    gap: 10px;
+    text-align: left;
+}
+
+.tom-compare-row {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.tom-compare-row__label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 13 Nisan 2026: İletişime Geç butonu ve popup
+   ═══════════════════════════════════════════════════ */
+.tom-icon-btn--contact {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+}
+
+.tom-icon-btn--contact:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+    color: #1d4ed8;
+}
+
+.tom-contact-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: tomFadeIn 0.2s ease;
+}
+
+.tom-contact-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    width: 380px;
+    max-width: 92vw;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    text-align: center;
+    position: relative;
+    animation: tomSlideUp 0.3s ease;
+}
+
+@keyframes tomSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tomFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.tom-contact-card__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.tom-contact-card__close:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.tom-contact-card__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #fff;
+}
+
+.tom-contact-card__avatar .material-symbols-outlined {
+    font-size: 28px;
+}
+
+.tom-contact-card h3 {
+    margin: 0 0 2px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.tom-contact-card__firma {
+    margin: 0 0 16px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.tom-contact-card__rows {
+    display: grid;
+    gap: 8px;
+    text-align: left;
+}
+
+.tom-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+}
+
+.tom-contact-row:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.tom-contact-row .material-symbols-outlined {
+    font-size: 22px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.tom-contact-row div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.tom-contact-row small {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tom-contact-row span:not(.material-symbols-outlined) {
+    font-size: 0.92rem;
+    color: #1e293b;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.tom-contact-card__empty {
+    margin: 12px 0 0;
+    font-size: 0.88rem;
+    color: #94a3b8;
+}
+
+.tom-compare-row__label > span:first-child {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.tom-trophy {
+    font-size: 14px !important;
+    color: #f59e0b;
+}
+
+.tom-compare-row strong {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tom-compare-row--best strong { color: #059669; font-weight: 800; }
+
+.tom-winner { color: #059669 !important; }
+
+/* ═══════════════════════════════════════════════════
+   BOŞ DURUMLAR ve YÜKLEME
+   ═══════════════════════════════════════════════════ */
+.tom-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.tom-empty .material-symbols-outlined {
+    font-size: 48px;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+}
+
+.tom-empty h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.tom-empty p {
+    margin: 6px 0 0;
+    font-size: 0.88rem;
+    color: #94a3b8;
+    max-width: 340px;
+}
+
+.tom-empty-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.tom-empty-mini .material-symbols-outlined { font-size: 36px; margin-bottom: 8px; }
+.tom-empty-mini p { margin: 0; font-size: 0.85rem; }
+
+/* Yükleme */
+.tom-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+    gap: 16px;
+}
+
+.tom-loading__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: tomSpin 0.8s linear infinite;
+}
+
+.tom-loading p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.tom-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+}
+
+.tom-error-state .material-symbols-outlined {
+    font-size: 48px;
+    color: #f87171;
+    margin-bottom: 12px;
+}
+
+.tom-error-state h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #991b1b;
+}
+
+.tom-error-state p {
+    margin: 6px 0 0;
+    font-size: 0.88rem;
+    color: #dc2626;
+}
+
+/* ═══════════════════════════════════════════════════
+   ANİMASYONLAR
+   ═══════════════════════════════════════════════════ */
+@keyframes tomSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tomSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes tomPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+    .tom-body {
+        grid-template-columns: 1fr;
+    }
+
+    .tom-sidebar {
+        max-height: 300px;
+    }
+
+    .tom-sidebar__list {
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .tom-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+    }
+
+    .tom-hero__stats {
+        width: 100%;
+    }
+
+    .tom-stat {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 12px;
+    }
+
+    .tom-stat strong { font-size: 1.1rem; }
+
+    .tom-offer-card__main {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tom-offer-card__info {
+        flex-basis: calc(100% - 72px);
+    }
+
+    .tom-offer-card__actions {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 4px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .tom-offers-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tom-offers-toolbar__right {
+        justify-content: flex-end;
+    }
+
+    .tom-info-card__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tom-compare__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .tom-hero__text h1 { font-size: 1.15rem; }
+    .tom-hero__stats { gap: 6px; }
+    .tom-stat { padding: 8px 10px; gap: 6px; }
+    .tom-stat strong { font-size: 1rem; }
+
+    .tom-offer-card__metrics {
+        gap: 6px;
+    }
+
+    .tom-offer-card__footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tom-offer-card__footer-right {
+        margin-left: 0;
+    }
+
+    .tom-btn { justify-content: center; width: 100%; }
+}
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 13 Nisan 2026: İhale Aksiyon Butonları
+   ═══════════════════════════════════════════════════ */
+.tom-tender-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.tom-btn--edit {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.tom-btn--edit:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+
+/* Enes Doğanay | 13 Nisan 2026: Kapanan ihalede düzenle butonu deaktif */
+.tom-btn--edit:disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+}
+.tom-btn--edit:disabled:hover {
+    background: #e2e8f0;
+    transform: none;
+    box-shadow: none;
+}
+
+.tom-btn--close-tender {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.tom-btn--close-tender:hover { background: linear-gradient(135deg, #d97706, #b45309); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(245,158,11,0.3); }
+
+.tom-btn--delete-tender {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.tom-btn--delete-tender:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(239,68,68,0.3); }
+
+.tom-btn--edit .material-symbols-outlined,
+.tom-btn--close-tender .material-symbols-outlined,
+.tom-btn--delete-tender .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Confirm inline */
+.tom-confirm-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #92400e;
+    font-weight: 500;
+    animation: tomSlideIn 0.2s ease;
+}
+
+.tom-btn--confirm {
+    background: #f59e0b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tom-btn--confirm:hover { background: #d97706; }
+
+.tom-btn--confirm-red {
+    background: #ef4444;
+}
+
+.tom-btn--confirm-red:hover { background: #dc2626; }
+
+.tom-btn--cancel-sm {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tom-btn--cancel-sm:hover { background: #e2e8f0; color: #334155; }
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 13 Nisan 2026: Düzenleme Modal
+   ═══════════════════════════════════════════════════ */
+.tom-edit-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: tomFadeIn 0.2s ease;
+}
+
+@keyframes tomFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.tom-edit-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: tomSlideUp 0.25s ease;
+}
+
+@keyframes tomSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tom-edit-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tom-edit-modal__header h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tom-edit-modal__header h2 .material-symbols-outlined {
+    font-size: 24px;
+    color: #2563eb;
+}
+
+.tom-edit-modal__close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.tom-edit-modal__close:hover { background: #e2e8f0; color: #1e293b; }
+
+.tom-edit-error {
+    margin: 12px 24px 0;
+    padding: 10px 14px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tom-edit-error .material-symbols-outlined { font-size: 18px; }
+
+.tom-edit-modal__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.tom-edit-section h3 {
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tom-edit-section h3 .material-symbols-outlined {
+    font-size: 20px;
+    color: #2563eb;
+}
+
+.tom-edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.tom-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.tom-edit-field--full {
+    grid-column: 1 / -1;
+}
+
+.tom-edit-field label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.tom-edit-field input,
+.tom-edit-field select,
+.tom-edit-field textarea {
+    padding: 9px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+}
+
+.tom-edit-field input:focus,
+.tom-edit-field select:focus,
+.tom-edit-field textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: #fff;
+}
+
+.tom-edit-field textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* Gereksinimler */
+.tom-edit-req-input {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.tom-edit-req-input input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: border-color 0.15s;
+}
+
+.tom-edit-req-input input:focus {
+    border-color: #2563eb;
+    outline: none;
+    background: #fff;
+}
+
+.tom-btn--add-req {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    border: none;
+    background: #2563eb;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.tom-btn--add-req:hover { background: #1d4ed8; }
+.tom-btn--add-req:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.tom-edit-req-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tom-edit-req-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.tom-edit-req-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tom-edit-req-madde {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1e293b;
+    flex: 1;
+    min-width: 0;
+}
+
+.tom-edit-req-aciklama {
+    font-size: 0.8rem;
+    color: #64748b;
+    flex: 1;
+    min-width: 0;
+}
+
+.tom-edit-req-remove {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: #fee2e2;
+    color: #ef4444;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.tom-edit-req-remove:hover { background: #fecaca; }
+.tom-edit-req-remove .material-symbols-outlined { font-size: 16px; }
+
+/* Footer */
+.tom-edit-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 0 0 16px 16px;
+}
+
+.tom-btn--cancel {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tom-btn--cancel:hover { background: #e2e8f0; color: #334155; }
+
+.tom-btn--save {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 24px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.tom-btn--save:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+.tom-btn--save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.tom-btn--save .material-symbols-outlined { font-size: 18px; }
+
+/* ═══ Edit Modal Responsive ═══ */
+@media (max-width: 768px) {
+    .tom-edit-modal { max-width: 100%; margin: 0 10px; }
+    .tom-edit-grid { grid-template-columns: 1fr; }
+    .tom-edit-req-input { flex-direction: column; }
+    .tom-tender-actions { gap: 8px; }
+}
+
+@media (max-width: 480px) {
+    .tom-edit-modal__header { padding: 16px; }
+    .tom-edit-modal__body { padding: 16px; }
+    .tom-edit-modal__footer { padding: 12px 16px; }
+    .tom-confirm-inline { flex-wrap: wrap; font-size: 0.78rem; }
+}

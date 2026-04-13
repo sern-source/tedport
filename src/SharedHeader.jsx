@@ -253,6 +253,22 @@ const SharedHeader = ({
                                                 </span>
                                                 {pendingQuoteCount > 0 && <span className="shared-menu-badge">{pendingQuoteCount}</span>}
                                             </button>
+                                            {/* Enes Doğanay | 13 Nisan 2026: İhale Yönetimi menü girişi — kurumsal */}
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/firma-profil?tab=ihale-yonetimi');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    gavel
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    İhale Yönetimi
+                                                </span>
+                                            </button>
                                             <button
                                                 type="button"
                                                 className="shared-user-menu-item"
@@ -342,6 +358,23 @@ const SharedHeader = ({
                                                     {pendingQuoteCount > 0 && <span className="shared-menu-badge">{pendingQuoteCount}</span>}
                                                 </button>
 
+                                                {/* Enes Doğanay | 13 Nisan 2026: İhale Tekliflerim menü girişi — bireysel */}
+                                                <button
+                                                    type="button"
+                                                    className="shared-user-menu-item"
+                                                    onClick={() => {
+                                                        setIsDropdownOpen(false);
+                                                        navigate('/profile?tab=my-offers');
+                                                    }}
+                                                >
+                                                    <span className="material-symbols-outlined shared-user-menu-icon">
+                                                        assignment_turned_in
+                                                    </span>
+                                                    <span className="shared-user-menu-label">
+                                                        İhale Tekliflerim
+                                                    </span>
+                                                </button>
+
                                                 <button
                                                     type="button"
                                                     className="shared-user-menu-item"
@@ -420,6 +453,11 @@ const SharedHeader = ({
                                         Teklif Yönetimi
                                         {pendingQuoteCount > 0 && <span className="shared-mobile-badge">{pendingQuoteCount}</span>}
                                     </Link>
+                                    {/* Enes Doğanay | 13 Nisan 2026: İhale Yönetimi mobil menü — kurumsal */}
+                                    <Link to="/firma-profil?tab=ihale-yonetimi" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">gavel</span>
+                                        İhale Yönetimi
+                                    </Link>
                                     <Link to="/firma-profil?tab=bildirimler" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>
                                         Bildirimler
@@ -441,6 +479,11 @@ const SharedHeader = ({
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">request_quote</span>
                                         Teklif Taleplerim
                                         {pendingQuoteCount > 0 && <span className="shared-mobile-badge">{pendingQuoteCount}</span>}
+                                    </Link>
+                                    {/* Enes Doğanay | 13 Nisan 2026: İhale Tekliflerim mobil menü — bireysel */}
+                                    <Link to="/profile?tab=my-offers" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">assignment_turned_in</span>
+                                        İhale Tekliflerim
                                     </Link>
                                     <Link to="/profile?tab=notifications" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>

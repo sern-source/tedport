@@ -352,6 +352,14 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
   const navigate = useNavigate();
   // Enes Doğanay | 7 Nisan 2026: İletişime Geç popup state'i
   const [showContact, setShowContact] = useState(false);
+  // Enes Doğanay | 13 Nisan 2026: Dışarı tıklayınca dropdown kapansın (transform stacking context fix)
+  const contactRef = useRef(null);
+  useEffect(() => {
+    if (!showContact) return;
+    const handler = (e) => { if (contactRef.current && !contactRef.current.contains(e.target)) setShowContact(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showContact]);
 
   // Enes Doğanay | 8 Nisan 2026: Teklif iste popup state'leri (Firmalar sayfasından doğrudan)
   const [showQuoteModal, setShowQuoteModal] = useState(false);
@@ -510,12 +518,10 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
         <div className="card-footer">
           <div className="actions">
             {/* Enes Doğanay | 7 Nisan 2026: İletişime Geç — butona yapışık minimal dropdown */}
-            <div className="contact-dropdown-wrap">
+            <div className="contact-dropdown-wrap" ref={contactRef}>
               <button className="btn-outline" onClick={() => setShowContact(!showContact)}>İletişime Geç</button>
               {showContact && (
-                <>
-                  <div className="contact-dropdown-backdrop" onClick={() => setShowContact(false)} />
-                  <div className="contact-dropdown">
+                <div className="contact-dropdown">
                     {/* Enes Doğanay | 11 Nisan 2026: Giriş yapmayan kullanıcıya inline login prompt */}
                     {!isLoggedIn ? (
                       <div className="contact-gated-panel">
@@ -556,7 +562,6 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                       </>
                     )}
                   </div>
-                </>
               )}
             </div>
             {/* Enes Doğanay | 8 Nisan 2026: Profili Görüntüle butonu geçici olarak kaldırıldı */}
@@ -754,6 +759,14 @@ function App() {
   const [currentUserId, setCurrentUserId] = useState(null);
   // Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişim dropdown hangi satırda açık
   const [openContactId, setOpenContactId] = useState(null);
+  // Enes Doğanay | 13 Nisan 2026: Liste görünümü dışarı tıklama ile dropdown kapatma
+  const listContactRef = useRef(null);
+  useEffect(() => {
+    if (!openContactId) return;
+    const handler = (e) => { if (listContactRef.current && !listContactRef.current.contains(e.target)) setOpenContactId(null); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [openContactId]);
   // Enes Doğanay | 8 Nisan 2026: Liste görünümü - teklif iste modal state
   const [listQuoteSupplier, setListQuoteSupplier] = useState(null);
   const [listQuoteForm, setListQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
@@ -1232,11 +1245,9 @@ function App() {
                           {favoriteIds.has(supplier.id) ? 'bookmark_added' : 'bookmark_add'}
                         </span>
                       </button>
-                      <div className="contact-dropdown-wrap">
+                      <div className="contact-dropdown-wrap" ref={openContactId === supplier.id ? listContactRef : undefined}>
                         <button className="btn-outline firmalar-list-contact-btn" onClick={() => setOpenContactId(openContactId === supplier.id ? null : supplier.id)}>İletişime Geç</button>
                         {openContactId === supplier.id && (
-                          <>
-                            <div className="contact-dropdown-backdrop" onClick={() => setOpenContactId(null)} />
                             <div className="contact-dropdown firmalar-list-contact-dropdown">
                               {/* Enes Doğanay | 11 Nisan 2026: Liste görünümünde de inline login prompt */}
                               {!isLoggedIn ? (
@@ -1278,7 +1289,6 @@ function App() {
                                 </>
                               )}
                             </div>
-                          </>
                         )}
                       </div>
                     </span>

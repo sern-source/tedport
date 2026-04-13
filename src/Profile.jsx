@@ -9,6 +9,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import CitySelect from './CitySelect';
 import { useAuth } from './AuthContext';
 import PageLoader from './PageLoader';
+/* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler paneli */
+import MyOffersPanel from './MyOffersPanel';
 
 // Enes Doğanay | 6 Nisan 2026: Deterministik renk üretimi (firma_id hash)
 const hashColor = (str) => {
@@ -1092,6 +1094,10 @@ const ProfilePage = () => {
                 <span className="material-symbols-outlined">request_quote</span> Teklif Taleplerim
                 {pendingQuoteCount > 0 && <span className="nav-item-badge">{pendingQuoteCount}</span>}
               </a>
+              {/* Enes Doğanay | 13 Nisan 2026: İhale Tekliflerim sekmesi */}
+              <a className={`nav-item ${currentTab === 'my-offers' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'my-offers' })}>
+                <span className="material-symbols-outlined">assignment_turned_in</span> İhale Tekliflerim
+              </a>
               <a className={`nav-item ${currentTab === 'notifications' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'notifications' })}>
                 <span className="material-symbols-outlined">notifications</span> Bildirimler
                 {unreadNotificationsCount > 0 && <span className="nav-item-badge">{unreadNotificationsCount}</span>}
@@ -1699,6 +1705,11 @@ const ProfilePage = () => {
               </div>
             )}
 
+            {/* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler tab içeriği */}
+            {currentTab === 'my-offers' && (
+              <MyOffersPanel />
+            )}
+
             {currentTab === 'notifications' && (
               <div className="notifications-section">
                 <div className="notifications-hero">
@@ -1752,21 +1763,37 @@ const ProfilePage = () => {
                         {notifications.map((notification) => (
                           <article
                             key={notification.id}
-                            className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${notification.metadata?.teklif_id || notification.firma_id ? 'clickable' : ''}`}
+                            className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${notification.metadata?.teklif_id || notification.firma_id || notification.type?.startsWith('tender_') ? 'clickable' : ''}`}
                             onClick={() => {
                               // Enes Doğanay | 9 Nisan 2026: Bildirim kartı tıklanabilir — ilgili sayfaya yönlendir
-                              if (notification.metadata?.teklif_id) {
+                              // Enes Doğanay | 14 Haziran 2025: İhale teklif bildirimleri için navigasyon eklendi
+                              if (notification.type === 'tender_offer_status') {
+                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                /* Enes Doğanay | 13 Nisan 2026: sessionStorage ile highlight — ilgili ihaleyi seç */
+                                if (notification.metadata?.ihale_id) {
+                                    sessionStorage.setItem('mop_highlight_ihale', String(notification.metadata.ihale_id));
+                                }
+                                navigate('/profile?tab=my-offers');
+                              } else if (notification.type === 'tender_new_offer' || notification.type === 'tender_offer_updated') {
+                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                navigate('/profile?tab=quotes');
+                              } else if (notification.type === 'tender_updated' || notification.type === 'tender_closed' || notification.type === 'tender_cancelled') {
+                                // Enes Doğanay | 13 Nisan 2026: İhale durumu değişiklik bildirimleri
+                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                if (notification.metadata?.ihale_id) navigate(`/ihaleler?ihale=${notification.metadata.ihale_id}`);
+                              } else if (notification.metadata?.teklif_id) {
                                 navigateToQuoteChat(notification);
                               } else if (notification.firma_id) {
                                 if (!notification.is_read) handleMarkNotificationRead(notification.id);
                                 navigate(`/firmadetay/${notification.firma_id}`);
                               }
                             }}
-                            style={{ cursor: notification.metadata?.teklif_id || notification.firma_id ? 'pointer' : 'default' }}
+                            style={{ cursor: notification.metadata?.teklif_id || notification.firma_id || notification.type?.startsWith('tender_') ? 'pointer' : 'default' }}
                           >
                             <div className="notification-feed-top">
                               <div>
-                                <span className="notification-feed-type">{notification.type === 'reminder' ? '⏰ Hatırlatma' : notification.type === 'quote_received' ? '📩 Yeni Teklif' : notification.type === 'quote_reply' ? '💬 Yanıt Geldi' : notification.type === 'quote_message' ? '✉️ Yeni Mesaj' : '🔔 Bildirim'}</span>
+                                {/* Enes Doğanay | 14 Haziran 2025: İhale teklif bildirim tipleri eklendi */}
+                              <span className="notification-feed-type">{notification.type === 'reminder' ? '⏰ Hatırlatma' : notification.type === 'quote_received' ? '📩 Yeni Teklif' : notification.type === 'quote_reply' ? '💬 Yanıt Geldi' : notification.type === 'quote_message' ? '✉️ Yeni Mesaj' : notification.type === 'tender_new_offer' ? '📋 Yeni İhale Teklifi' : notification.type === 'tender_offer_updated' ? '✏️ Teklif Güncellendi' : notification.type === 'tender_offer_status' ? '📊 Teklif Durumu' : notification.type === 'tender_updated' ? '📝 İhale Güncellendi' : notification.type === 'tender_closed' ? '🔒 İhale Kapandı' : notification.type === 'tender_cancelled' ? '❌ İhale İptal' : notification.type === 'tender_offer_withdrawn' ? '↩️ Teklif Geri Çekildi' : '🔔 Bildirim'}</span>
                                 <h4>{notification.title}</h4>
                               </div>
                               <span className="notification-feed-time">{formatRelativeNotificationTime(notification.created_at)}</span>
