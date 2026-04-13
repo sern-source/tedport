@@ -850,6 +850,34 @@
     gap: 8px;
 }
 
+/* Enes Doğanay | 13 Nisan 2026: İhalelerim paneli genişlet/küçült butonu */
+.my-tenders-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px 0;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.my-tenders-toggle-btn:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+.my-tenders-toggle-btn .material-symbols-outlined {
+    font-size: 20px;
+}
+
 .my-tender-row {
     display: flex;
     align-items: center;

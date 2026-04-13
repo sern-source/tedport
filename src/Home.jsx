@@ -205,12 +205,13 @@ const SupplierConnect = () => {
                                     </div>
                                 )}
 
-                                <div className="sc-popular-tags">
+                        {/* Enes Doğanay | 13 Nisan 2026: navigate() ile SPA uyumlu yönlendirme — tam sayfa reload önlenir */}
+                        <div className="sc-popular-tags">
                                     <span>Popüler:</span>
-                                    <a href="/firmalar?search=çelik">Çelik Borular</a>
-                                    <a href="/firmalar?search=pamuk">Pamuklu Kumaş</a>
-                                    <a href="/firmalar?search=ambalaj">Ambalaj</a>
-                                    <a href="/firmalar?search=elektronik">Elektronik</a>
+                                    <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=çelik')}>Çelik Borular</span>
+                                    <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=pamuk')}>Pamuklu Kumaş</span>
+                                    <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=ambalaj')}>Ambalaj</span>
+                                    <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=elektronik')}>Elektronik</span>
                                 </div>
                             </div>
                         </div>
@@ -251,60 +252,56 @@ const SupplierConnect = () => {
                                 <h2 className="sc-section-title">Öne Çıkan Kategoriler</h2>
                                 <p className="sc-section-desc">Kapsamlı endüstriyel kategorilerimizi keşfedin.</p>
                             </div>
-                            <a href="/firmalar" className="sc-view-all">
+                        {/* Enes Doğanay | 13 Nisan 2026: navigate() ile SPA uyumlu yönlendirme */}
+                            <span className="sc-view-all" onClick={() => navigate('/firmalar')} style={{ cursor: 'pointer' }}>
                                 Tüm kategorileri gör <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
-                            </a>
+                            </span>
                         </div>
 
+                        {/* Enes Doğanay | 13 Nisan 2026: navigate() ile SPA uyumlu kategori kartları */}
                         <div className="sc-cat-grid">
-                            {/* Kategori 1 */}
-                            <a href="/firmalar?search=tekstil" className="sc-cat-card">
+                            <div className="sc-cat-card" onClick={() => navigate('/firmalar?search=tekstil')} style={{ cursor: 'pointer' }}>
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">checkroom</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Tekstil</h3>
                                     <p className="sc-cat-sub">Kumaş & Hazır Giyim</p>
                                 </div>
-                            </a>
-                            {/* Kategori 2 */}
-                            <a href="/firmalar?search=gıda" className="sc-cat-card">
+                            </div>
+                            <div className="sc-cat-card" onClick={() => navigate('/firmalar?search=gıda')} style={{ cursor: 'pointer' }}>
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">restaurant</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Gıda</h3>
                                     <p className="sc-cat-sub">İçerik & İşlenmiş</p>
                                 </div>
-                            </a>
-                            {/* Kategori 3 */}
-                            <a href="/firmalar?search=makine" className="sc-cat-card">
+                            </div>
+                            <div className="sc-cat-card" onClick={() => navigate('/firmalar?search=makine')} style={{ cursor: 'pointer' }}>
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">build</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Makine</h3>
                                     <p className="sc-cat-sub">Ekipman & Aletler</p>
                                 </div>
-                            </a>
-                            {/* Kategori 4 */}
-                            <a href="/firmalar?search=teknoloji" className="sc-cat-card">
+                            </div>
+                            <div className="sc-cat-card" onClick={() => navigate('/firmalar?search=teknoloji')} style={{ cursor: 'pointer' }}>
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">devices</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Teknoloji</h3>
                                     <p className="sc-cat-sub">Tüketici & Parçalar</p>
                                 </div>
-                            </a>
-                            {/* Kategori 5 */}
-                            <a href="/firmalar?search=lojistik" className="sc-cat-card">
+                            </div>
+                            <div className="sc-cat-card" onClick={() => navigate('/firmalar?search=lojistik')} style={{ cursor: 'pointer' }}>
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">local_shipping</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Lojistik</h3>
                                     <p className="sc-cat-sub">Nakliye & Kargo</p>
                                 </div>
-                            </a>
-                            {/* Kategori 6 */}
-                            <a href="/firmalar?search=kimya" className="sc-cat-card">
+                            </div>
+                            <div className="sc-cat-card" onClick={() => navigate('/firmalar?search=kimya')} style={{ cursor: 'pointer' }}>
                                 <div className="sc-cat-icon"><span className="material-symbols-outlined">science</span></div>
                                 <div>
                                     <h3 className="sc-cat-name">Kimya</h3>
                                     <p className="sc-cat-sub">Lab & Endüstriyel</p>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                     </div>
                 </section>

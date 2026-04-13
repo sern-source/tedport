@@ -1,0 +1,374 @@
+/* Enes Doğanay | 13 Nisan 2026: Admin Firma Düzenleme sayfası stilleri */
+
+.afd-page {
+    min-height: 100vh;
+    background: #f0f4f8;
+    padding: 100px 24px 60px;
+}
+
+.afd-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ── Hero ──────────────────────────────────────────────── */
+.afd-hero {
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: #fff;
+    border-radius: 16px;
+    padding: 32px 36px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 20px rgba(30, 64, 175, .25);
+}
+
+.afd-hero > .material-symbols-outlined {
+    font-size: 48px;
+    opacity: .85;
+}
+
+.afd-hero h1 {
+    margin: 0;
+    font-size: 1.55rem;
+    font-weight: 700;
+}
+
+.afd-hero p {
+    margin: 4px 0 0;
+    font-size: .92rem;
+    opacity: .85;
+}
+
+/* ── Loading / Denied ─────────────────────────────────── */
+.afd-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 60px 0;
+    color: #64748b;
+}
+
+.afd-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3.5px solid #e2e8f0;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: afd-spin .7s linear infinite;
+}
+
+.afd-spinner--sm {
+    width: 18px;
+    height: 18px;
+    border-width: 2.5px;
+}
+
+@keyframes afd-spin {
+    to { transform: rotate(360deg); }
+}
+
+.afd-denied {
+    text-align: center;
+    padding: 80px 24px;
+    color: #64748b;
+}
+
+.afd-denied .material-symbols-outlined {
+    font-size: 56px;
+    color: #ef4444;
+    margin-bottom: 12px;
+}
+
+.afd-denied h2 {
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.afd-denied button {
+    margin-top: 20px;
+    padding: 10px 28px;
+    border-radius: 8px;
+    border: none;
+    background: #3b82f6;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* ── Search Section ───────────────────────────────────── */
+.afd-search-section {
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Search bar + Firma Ekle yan yana */
+.afd-search-top {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+}
+
+.afd-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: border-color .2s;
+    flex: 1;
+}
+
+.afd-search-bar:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+}
+
+.afd-search-bar > .material-symbols-outlined {
+    color: #94a3b8;
+    font-size: 22px;
+}
+
+.afd-search-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: .95rem;
+    background: transparent;
+}
+
+.afd-search-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    padding: 2px;
+}
+
+.afd-search-clear:hover {
+    color: #64748b;
+}
+
+.afd-search-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 0 0;
+    color: #64748b;
+    font-size: .88rem;
+}
+
+/* ── Results ──────────────────────────────────────────── */
+.afd-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 14px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.afd-result-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    transition: all .15s;
+    width: 100%;
+}
+
+.afd-result-card:hover {
+    background: #f0f7ff;
+    border-color: #93c5fd;
+}
+
+.afd-result-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #e0e7ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.afd-result-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.afd-result-avatar span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #4f46e5;
+}
+
+.afd-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.afd-result-info strong {
+    display: block;
+    font-size: .93rem;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.afd-result-info small {
+    color: #64748b;
+    font-size: .8rem;
+}
+
+.afd-result-logo-badge {
+    color: #22c55e;
+    flex-shrink: 0;
+}
+
+.afd-result-logo-badge .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.afd-no-results {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0 0;
+    color: #94a3b8;
+    font-size: .88rem;
+}
+
+.afd-no-results .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* ── Panel Wrapper ────────────────────────────────────── */
+.afd-panel-wrapper {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+    overflow: hidden;
+}
+
+.afd-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.afd-panel-title h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #1e293b;
+}
+
+.afd-panel-title small {
+    color: #64748b;
+    font-size: .82rem;
+}
+
+.afd-firma-id {
+    font-family: monospace;
+    font-size: .75rem;
+    color: #94a3b8;
+}
+
+/* ── Buttons ──────────────────────────────────────────── */
+.afd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: .88rem;
+    cursor: pointer;
+    transition: all .15s;
+    border: none;
+}
+
+.afd-btn--ghost {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.afd-btn--ghost:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.afd-btn--ghost .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Firma Ekle butonu — yeşil */
+.afd-btn--add {
+    background: #059669;
+    color: #fff;
+    border: none;
+    white-space: nowrap;
+}
+
+.afd-btn--add:hover {
+    background: #047857;
+    box-shadow: 0 4px 14px rgba(5, 150, 105, .3);
+}
+
+.afd-btn--add .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 640px) {
+    .afd-page {
+        padding: 80px 12px 40px;
+    }
+
+    .afd-hero {
+        padding: 22px 20px;
+        gap: 14px;
+    }
+
+    .afd-hero > .material-symbols-outlined {
+        font-size: 36px;
+    }
+
+    .afd-hero h1 {
+        font-size: 1.2rem;
+    }
+
+    .afd-search-section {
+        padding: 18px;
+    }
+
+    .afd-search-top {
+        flex-direction: column;
+    }
+
+    .afd-panel-header {
+        padding: 16px 18px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

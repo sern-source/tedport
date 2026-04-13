@@ -485,7 +485,7 @@ const FirmaProfil = () => {
         refreshCounts();
     };
 
-    {/* Enes Doğanay | 10 Nisan 2026: Hatırlatıcı + bağlı notu silme (onay sonrası) */}
+    /* Enes Doğanay | 10 Nisan 2026: Hatırlatıcı + bağlı notu silme (onay sonrası) */
     const handleDeleteReminder = async (reminder) => {
         const { error: reminderError } = await supabase
             .from('kullanici_hatirlaticilari')
@@ -731,7 +731,7 @@ const FirmaProfil = () => {
                         )}
 
                         {/* Enes Doğanay | 9 Nisan 2026: Kayıtlı Tedarikçi sadece favoriler sekmesinde göster */}
-                        {currentTab === 'favorites' && (
+                        {currentTab === 'favoriler' && (
                         <div className="sidebar-stats">
                             <div className="sidebar-stats-label">Kayıtlı Tedarikçi</div>
                             <div className="sidebar-stats-value">{favorites.length}</div>

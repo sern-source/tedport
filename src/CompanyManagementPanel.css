@@ -523,9 +523,10 @@
     box-shadow: 0 6px 18px rgba(19, 127, 236, 0.4);
 }
 
+/* Enes Doğanay | 13 Nisan 2026: Deaktif butonda not-allowed cursor */
 .cmp-btn--save:disabled {
     opacity: 0.65;
-    cursor: wait;
+    cursor: not-allowed;
 }
 
 /* ── FEEDBACK ────────────────────────────────────────────────────────────── */
@@ -1421,6 +1422,171 @@
 
 .quote-chat-attachment-open .material-symbols-outlined {
     font-size: 18px;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Başarılı kaydetme modal popup */
+.cmp-success-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: cmp-success-fadeIn 0.25s ease;
+}
+
+@keyframes cmp-success-fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.cmp-success-card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 40px 36px 32px;
+    width: 400px;
+    max-width: 92vw;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    animation: cmp-success-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cmp-success-pop {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cmp-success-card__icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669, #34d399);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    animation: cmp-success-bounce 0.5s 0.3s ease both;
+}
+
+@keyframes cmp-success-bounce {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.cmp-success-card__icon .material-symbols-outlined {
+    font-size: 36px;
+    color: #fff;
+}
+
+.cmp-success-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #059669;
+}
+
+.cmp-success-card p {
+    margin: 0 0 24px;
+    font-size: 0.92rem;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.cmp-success-card__btn {
+    background: linear-gradient(135deg, #059669, #34d399);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cmp-success-card__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Actions buttons wrapper — kaydet + sil yan yana */
+.cmp-actions__buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Firma silme butonu — kırmızı */
+.cmp-btn--delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    border: 2px solid #ef4444;
+    border-radius: 999px;
+    background: #fff;
+    color: #ef4444;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cmp-btn--delete:hover:not(:disabled) {
+    background: #ef4444;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+}
+
+.cmp-btn--delete:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Silme onay modalı */
+.cmp-delete-card__icon .material-symbols-outlined {
+    color: #ef4444;
+}
+
+.cmp-delete-card__name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.05rem;
+    text-align: center;
+    margin: 4px 0 8px;
+}
+
+.cmp-delete-card__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.cmp-btn--ghost-modal {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 24px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.cmp-btn--ghost-modal:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #94a3b8;
 }
 
 /* Enes Doğanay | 9 Nisan 2026: Sarı arka plan yumuşatıldı, nötr gri tona çekildi */

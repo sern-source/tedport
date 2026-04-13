@@ -22,6 +22,27 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Enes Doğanay | 13 Nisan 2026: Ortak yönlendirme mantığı — login ve session kontrolü için tek fonksiyon
+  const redirectAfterAuth = async (userId) => {
+    const { data: companyData } = await supabase
+      .from('kurumsal_firma_yoneticileri')
+      .select('firma_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+    const managedCompanyId = companyData?.firma_id || null;
+    if (managedCompanyId) {
+      const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
+      if (!localStorage.getItem(visitedKey)) {
+        localStorage.setItem(visitedKey, '1');
+        navigate('/firma-profil?tab=panel');
+      } else {
+        navigate('/');
+      }
+    } else {
+      navigate('/');
+    }
+  };
+
   useEffect(() => {
     setActiveTab(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
   }, [searchParams]);
@@ -32,25 +53,7 @@ const LoginPage = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session && !cancelled) {
-        // Enes Doğanay | 10 Nisan 2026: getManagedCompanyId() yerine direkt sorgu — fazladan getUser() AbortError yaratıyordu
-        const { data: companyData } = await supabase
-          .from('kurumsal_firma_yoneticileri')
-          .select('firma_id')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        if (cancelled) return;
-        const managedCompanyId = companyData?.firma_id || null;
-        if (managedCompanyId) {
-          const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
-          if (!localStorage.getItem(visitedKey)) {
-            localStorage.setItem(visitedKey, '1');
-            navigate('/firma-profil?tab=panel');
-          } else {
-            navigate('/');
-          }
-        } else {
-          navigate('/');
-        }
+        await redirectAfterAuth(session.user.id);
       }
     };
     checkSession();
@@ -91,26 +94,8 @@ const LoginPage = () => {
         setError("E-posta veya şifre hatalı!");
       }
     } else {
-      console.log("Giriş başarılı:", data.user);
-      // Enes Doğanay | 10 Nisan 2026: getManagedCompanyId() yerine direkt sorgu — AbortError önleme
-      const { data: companyData } = await supabase
-        .from('kurumsal_firma_yoneticileri')
-        .select('firma_id')
-        .eq('user_id', data.user.id)
-        .maybeSingle();
-      const managedCompanyId = companyData?.firma_id || null;
-      // Enes Doğanay | 7 Nisan 2026: İlk girişte firma profil paneline, sonraki girişlerde ana sayfaya yönlendir
-      if (managedCompanyId) {
-        const visitedKey = `tedport_firma_visited_${managedCompanyId}`;
-        if (!localStorage.getItem(visitedKey)) {
-          localStorage.setItem(visitedKey, '1');
-          navigate('/firma-profil?tab=panel');
-        } else {
-          navigate('/');
-        }
-      } else {
-        navigate('/');
-      }
+      // Enes Doğanay | 13 Nisan 2026: console.log kaldırıldı, ortak yönlendirme fonksiyonu kullanılıyor
+      await redirectAfterAuth(data.user.id);
     }
   };
 

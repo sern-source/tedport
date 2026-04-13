@@ -1,12 +1,18 @@
-{/* Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici dropdown — aşağı açılır, fixed pozisyonlu */}
-{/* Enes Doğanay | 10 Nisan 2026: createPortal eklendi — ancestor transform içinde fixed pozisyon düzeltmesi */}
-{/* Enes Doğanay | 10 Nisan 2026: options/placeholder prop desteği — ilçe ve diğer listeler için genelleştirildi */}
+/* Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici dropdown — aşağı açılır, fixed pozisyonlu */
+/* Enes Doğanay | 10 Nisan 2026: createPortal eklendi — ancestor transform içinde fixed pozisyon düzeltmesi */
+/* Enes Doğanay | 10 Nisan 2026: options/placeholder prop desteği — ilçe ve diğer listeler için genelleştirildi */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
 import './CitySelect.css';
 
-const cities = Object.keys(TURKEY_DISTRICTS);
+/* Enes Doğanay | 13 Nisan 2026: İstanbul, Ankara, Kocaeli önce, geri kalanı alfabetik */
+const PRIORITY_CITIES = ['İstanbul', 'Ankara', 'Kocaeli'];
+const allCityKeys = Object.keys(TURKEY_DISTRICTS);
+const cities = [
+  ...PRIORITY_CITIES.filter(c => allCityKeys.includes(c)),
+  ...allCityKeys.filter(c => !PRIORITY_CITIES.includes(c)).sort((a, b) => a.localeCompare(b, 'tr'))
+];
 
 export default function CitySelect({ value, onChange, options, placeholder, icon }) {
   const items = options || cities;

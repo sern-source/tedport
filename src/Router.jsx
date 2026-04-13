@@ -17,6 +17,8 @@ const Ihaleler = lazy(() => import('./Ihaleler'));
 const EmailConfirm = lazy(() => import('./EmailConfirmation'));
 const ResetPassword = lazy(() => import('./ResetPassword'));
 const AdminCorporateApplications = lazy(() => import('./AdminCorporateApplications'));
+/* Enes Doğanay | 13 Nisan 2026: Admin firma düzenleme sayfası */
+const AdminFirmaDuzenle = lazy(() => import('./AdminFirmaDuzenle'));
 const FirmaProfil = lazy(() => import('./FirmaProfil'));
 /* Enes Doğanay | 10 Nisan 2026: E-posta değişikliği onay başarı sayfası */
 const EmailChangeSuccess = lazy(() => import('./EmailChangeSuccess'));
@@ -42,6 +44,8 @@ export default function Router() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin/kurumsal-basvurular" element={<AdminCorporateApplications />} />
         <Route path="/admin/kurumsal-başvurular" element={<AdminCorporateApplications />} />
+        {/* Enes Doğanay | 13 Nisan 2026: Admin firma düzenleme sayfası */}
+        <Route path="/admin/firma-duzenle" element={<AdminFirmaDuzenle />} />
         {/* Enes Doğanay | 7 Nisan 2026: Kurumsal firma profil sayfası — panel + teklifler + bildirimler */}
         <Route path="/firma-profil" element={<FirmaProfil />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />

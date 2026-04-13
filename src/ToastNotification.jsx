@@ -1,5 +1,5 @@
-{/* Enes Doğanay | 8 Nisan 2026: Anlık bildirim toast bileşeni — yukarıdan kayarak gelir, otomatik kaybolur */}
-{/* Enes Doğanay | 9 Nisan 2026: Toast tıklanabilir — ilgili sayfaya yönlendirir */}
+/* Enes Doğanay | 8 Nisan 2026: Anlık bildirim toast bileşeni — yukarıdan kayarak gelir, otomatik kaybolur */
+/* Enes Doğanay | 9 Nisan 2026: Toast tıklanabilir — ilgili sayfaya yönlendirir */
 import React, { useEffect } from 'react';
 import './ToastNotification.css';
 

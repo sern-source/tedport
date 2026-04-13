@@ -41,6 +41,29 @@ const STEPPER_LABELS = [
     { key: 'onizleme', label: 'Önizleme', icon: 'preview' },
 ];
 
+// Enes Doğanay | 13 Nisan 2026: Pure utility fonksiyonlar modül seviyesine taşındı — her render'da yeniden oluşturulması önlendi
+
+// Enes Doğanay | 6 Nisan 2026: DB'den gelen tarih ISO formatında olabilir, <input type="date"> için YYYY-MM-DD'ye çevir
+const toDateInput = (v) => {
+    if (!v) return '';
+    const s = String(v);
+    if (s.includes('T')) return s.split('T')[0];
+    return s.length >= 10 ? s.slice(0, 10) : s;
+};
+
+// Enes Doğanay | 10 Nisan 2026: Kalem toplamı hesapla
+const getKalemToplam = (kalem) => {
+    const birim = parseFloat(kalem.birim_fiyat) || 0;
+    const miktar = parseFloat(kalem.miktar) || 0;
+    return birim * miktar;
+};
+
+// Enes Doğanay | 10 Nisan 2026: Para birimi formatla
+const formatCurrency = (amount, currency) => {
+    const symbols = { TRY: '₺', USD: '$', EUR: '€', GBP: '£' };
+    return `${symbols[currency] || currency} ${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
+
 const IhalelerPage = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -69,6 +92,8 @@ const IhalelerPage = () => {
     const [managedFirmaId, setManagedFirmaId] = useState(null);
     const [myTenders, setMyTenders] = useState([]);
     const [myTendersLoading, setMyTendersLoading] = useState(false);
+    /* Enes Doğanay | 13 Nisan 2026: İhalelerim paneli genişlet/küçült — varsayılan 2 ihale gösterir */
+    const [myTendersExpanded, setMyTendersExpanded] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [editingTender, setEditingTender] = useState(null); // null = yeni, obje = düzenle
     const [form, setForm] = useState(EMPTY_FORM);
@@ -111,6 +136,8 @@ const IhalelerPage = () => {
     const [teklifError, setTeklifError] = useState('');
     /* Enes Doğanay | 13 Nisan 2026: Teklif başarılı gönderildi mesajı */
     const [teklifSuccess, setTeklifSuccess] = useState(false);
+    /* Enes Doğanay | 13 Nisan 2026: İhale yayınlama başarı modalı */
+    const [ihalePublishSuccess, setIhalePublishSuccess] = useState(false);
     /* Enes Doğanay | 13 Nisan 2026: Kullanıcının mevcut teklifleri — 1 ihale 1 teklif kısıtı */
     const [userOffers, setUserOffers] = useState({});
     /* Enes Doğanay | 13 Nisan 2026: Teklifi geri çekme state */
@@ -220,13 +247,7 @@ const IhalelerPage = () => {
         setShowModal(true);
     };
 
-    // Enes Doğanay | 6 Nisan 2026: DB'den gelen tarih ISO formatında olabilir, <input type="date"> için YYYY-MM-DD'ye çevir
-    const toDateInput = (v) => {
-        if (!v) return '';
-        const s = String(v);
-        if (s.includes('T')) return s.split('T')[0];
-        return s.length >= 10 ? s.slice(0, 10) : s;
-    };
+    // Enes Doğanay | 13 Nisan 2026: toDateInput modül seviyesine taşındı (yukarıda tanımlı)
 
     const openEdit = (tender) => {
         setEditingTender(tender);
@@ -429,6 +450,11 @@ const IhalelerPage = () => {
                 await createTender(payload);
             }
             setShowModal(false);
+            // Enes Doğanay | 13 Nisan 2026: Yeni ihale yayınlandığında success modal göster (taslak hariç)
+            if (!editingTender && (forceDurum || form.durum) !== 'draft') {
+                setIhalePublishSuccess(true);
+                setTimeout(() => setIhalePublishSuccess(false), 5000);
+            }
             // Enes Doğanay | 6 Nisan 2026: Hem kendi listemizi hem public listeyi yenile
             await fetchMyTenders();
             await fetchPublicTenders();
@@ -675,12 +701,7 @@ const IhalelerPage = () => {
         });
     };
 
-    // Enes Doğanay | 10 Nisan 2026: Kalem toplamı hesapla
-    const getKalemToplam = (kalem) => {
-        const birim = parseFloat(kalem.birim_fiyat) || 0;
-        const miktar = parseFloat(kalem.miktar) || 0;
-        return birim * miktar;
-    };
+    // Enes Doğanay | 13 Nisan 2026: getKalemToplam modül seviyesine taşındı (yukarıda tanımlı)
 
     // Enes Doğanay | 10 Nisan 2026: Genel toplam hesapla (kalem varsa kalemlerden, yoksa genel_toplam'dan)
     const getTeklifGenelToplam = () => {
@@ -690,11 +711,7 @@ const IhalelerPage = () => {
         return parseFloat(teklifForm.genel_toplam) || 0;
     };
 
-    // Enes Doğanay | 10 Nisan 2026: Para birimi formatla
-    const formatCurrency = (amount, currency) => {
-        const symbols = { TRY: '₺', USD: '$', EUR: '€', GBP: '£' };
-        return `${symbols[currency] || currency} ${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    };
+    // Enes Doğanay | 13 Nisan 2026: formatCurrency modül seviyesine taşındı (yukarıda tanımlı)
 
     // Enes Doğanay | 10 Nisan 2026: Teklif gönder / taslak kaydet
     // Enes Doğanay | 13 Nisan 2026: Mevcut teklif varsa güncelle (upsert), yoksa yeni oluştur
@@ -908,7 +925,8 @@ const IhalelerPage = () => {
                             </div>
                         ) : (
                             <div className="my-tenders-list">
-                                {myTenders.map(t => {
+                                {/* Enes Doğanay | 13 Nisan 2026: Varsayılan 2 ihale göster, genişletildiğinde tamamını göster */}
+                                {(myTendersExpanded ? myTenders : myTenders.slice(0, 2)).map(t => {
                                     const sm = getTenderStatusMeta(t);
                                     return (
                                         <div key={t.id} className="my-tender-row">
@@ -939,6 +957,19 @@ const IhalelerPage = () => {
                                         </div>
                                     );
                                 })}
+                                {/* Enes Doğanay | 13 Nisan 2026: 2'den fazla ihale varsa genişlet/küçült butonu */}
+                                {myTenders.length > 2 && (
+                                    <button
+                                        type="button"
+                                        className="my-tenders-toggle-btn"
+                                        onClick={() => setMyTendersExpanded(prev => !prev)}
+                                    >
+                                        <span className="material-symbols-outlined">
+                                            {myTendersExpanded ? 'expand_less' : 'expand_more'}
+                                        </span>
+                                        {myTendersExpanded ? 'Küçült' : `Tümünü Göster (${myTenders.length})`}
+                                    </button>
+                                )}
                             </div>
                         )}
                     </section>
@@ -1522,8 +1553,9 @@ const IhalelerPage = () => {
                                     <span className="tenders-list-col tenders-list-col--firma">Firma</span>
                                     <span className="tenders-list-col tenders-list-col--baslik">Başlık</span>
                                     <span className="tenders-list-col tenders-list-col--konum">Teslim Yeri</span>
-                                    <span className="tenders-list-col tenders-list-col--tarih">Açılış</span>
-                                    <span className="tenders-list-col tenders-list-col--tarih">Kapanış</span>
+                                    {/* Enes Doğanay | 13 Nisan 2026: Liste başlıkları İhale Açılış / İhale Kapanış olarak güncellendi */}
+                                    <span className="tenders-list-col tenders-list-col--tarih">İhale Açılış</span>
+                                    <span className="tenders-list-col tenders-list-col--tarih">İhale Kapanış</span>
                                     <span className="tenders-list-col tenders-list-col--durum">Durum</span>
                                     <span className="tenders-list-col tenders-list-col--actions">İşlem</span>
                                 </div>
@@ -1625,15 +1657,16 @@ const IhalelerPage = () => {
                                             </div>
 
                                             {/* Bilgi satırları */}
+                                            {/* Enes Doğanay | 13 Nisan 2026: Kart görünümünde İhale Açılış Tarihi / İhale Kapanış Tarihi uzun etiket */}
                                             <div className="tender-card__info">
                                                 <div className="tender-card__info-row">
                                                     <span className="material-symbols-outlined">event</span>
-                                                    <span className="tender-card__info-label">Açılış</span>
+                                                    <span className="tender-card__info-label">İhale Açılış Tarihi</span>
                                                     <span className="tender-card__info-value">{formatTenderDate(tender.yayin_tarihi)}</span>
                                                 </div>
                                                 <div className="tender-card__info-row">
                                                     <span className="material-symbols-outlined">event_busy</span>
-                                                    <span className="tender-card__info-label">Kapanış</span>
+                                                    <span className="tender-card__info-label">İhale Kapanış Tarihi</span>
                                                     <span className="tender-card__info-value">{formatTenderDate(tender.son_basvuru_tarihi)}</span>
                                                 </div>
                                                 {tender.teslim_suresi && (
@@ -2170,6 +2203,22 @@ const IhalelerPage = () => {
                                 : 'Teklifiniz ihale sahibine başarıyla iletildi. Durumunu profil sayfanızdan takip edebilirsiniz.'
                             }</p>
                             <button className="teklif-success-card__btn" onClick={() => setTeklifSuccess(false)}>
+                                Tamam
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Enes Doğanay | 13 Nisan 2026: İhale yayınlama başarı modalı */}
+                {ihalePublishSuccess && (
+                    <div className="teklif-success-overlay" onClick={() => setIhalePublishSuccess(false)}>
+                        <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+                            <div className="teklif-success-card__icon">
+                                <span className="material-symbols-outlined">check_circle</span>
+                            </div>
+                            <h3>İhaleniz Yayınlandı!</h3>
+                            <p>İhaleniz başarıyla yayınlanmıştır. Tedarikçiler artık ihalenizi görebilir ve teklif verebilir.</p>
+                            <button className="teklif-success-card__btn" onClick={() => setIhalePublishSuccess(false)}>
                                 Tamam
                             </button>
                         </div>

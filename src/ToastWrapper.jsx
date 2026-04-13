@@ -1,5 +1,5 @@
-{/* Enes Doğanay | 8 Nisan 2026: AuthContext'ten toast verilerini alıp ToastNotification bileşenini render eden wrapper */}
-{/* Enes Doğanay | 9 Nisan 2026: Toast tıklandığında ilgili sayfaya yönlendirme + okundu işaretleme */}
+/* Enes Doğanay | 8 Nisan 2026: AuthContext'ten toast verilerini alıp ToastNotification bileşenini render eden wrapper */
+/* Enes Doğanay | 9 Nisan 2026: Toast tıklandığında ilgili sayfaya yönlendirme + okundu işaretleme */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';

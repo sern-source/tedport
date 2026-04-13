@@ -1,5 +1,5 @@
-{/* Enes Doğanay | 13 Nisan 2026: İhalelerim & Gelen Teklifler — tamamen yeniden tasarlandı */}
-{/* Enes Doğanay | 13 Nisan 2026: İhale düzenle/sil/kapat + bildirim entegrasyonu */}
+/* Enes Doğanay | 13 Nisan 2026: İhalelerim & Gelen Teklifler — tamamen yeniden tasarlandı */
+/* Enes Doğanay | 13 Nisan 2026: İhale düzenle/sil/kapat + bildirim entegrasyonu */
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from './supabaseClient';
@@ -37,6 +37,14 @@ const timeAgo = (iso) => {
     const days = Math.round(hr / 24);
     if (days < 30) return `${days} gün önce`;
     return formatDate(iso);
+};
+
+/* Enes Doğanay | 13 Nisan 2026: Tarih formatlayıcı — input[type=date] uyumlu */
+const toDateInput = (v) => {
+    if (!v) return '';
+    const s = String(v);
+    if (s.includes('T')) return s.split('T')[0];
+    return s.length >= 10 ? s.slice(0, 10) : s;
 };
 
 /* Enes Doğanay | 13 Nisan 2026: İhale ve teklif durum haritaları */
@@ -445,14 +453,6 @@ const TenderOffersManagement = ({ companyId }) => {
 
         setContactPopup(info);
         setContactLoading(false);
-    };
-
-    /* Enes Doğanay | 13 Nisan 2026: Tarih formatlayıcı — input[type=date] uyumlu */
-    const toDateInput = (v) => {
-        if (!v) return '';
-        const s = String(v);
-        if (s.includes('T')) return s.split('T')[0];
-        return s.length >= 10 ? s.slice(0, 10) : s;
     };
 
     /* Enes Doğanay | 13 Nisan 2026: İhaleye teklif veren herkese bildirim gönder */

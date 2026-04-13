@@ -7,7 +7,7 @@ import Router from './Router';
 import { AuthProvider } from './AuthContext';
 // Enes Doğanay | 8 Nisan 2026: Anlık toast bildirimleri — AuthProvider içinden alınıp render edilir
 import ToastWrapper from './ToastWrapper';
-import { supabase } from './supabaseClient';
+import { supabase, supabaseUrl } from './supabaseClient';
 
 // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik onayı — SPA yüklenmeden önce hash'i yakala ve işle
 // Bu sayede AuthContext, Realtime, vs. hiç kirlenmiyor
@@ -35,7 +35,8 @@ if (hash.includes('type=email_change')) {
         // Enes Doğanay | 10 Nisan 2026: scope: global ile TÜM cihazlardaki refresh token'ları revoke et
         await supabase.auth.signOut({ scope: 'global' });
         // Storage'ı da temizle (kalıntı kalmasın)
-        const pRef = new URL('https://gsdbutprqfnxjtppwwhn.supabase.co').host.split('.')[0];
+        // Enes Doğanay | 13 Nisan 2026: supabaseUrl import'u kullanıldı — hardcoded URL kaldırıldı
+        const pRef = new URL(supabaseUrl).host.split('.')[0];
         window.localStorage.removeItem(`sb-${pRef}-auth-token`);
         window.sessionStorage.removeItem(`sb-${pRef}-auth-token`);
         window.localStorage.removeItem('tedport-auth-storage-mode');

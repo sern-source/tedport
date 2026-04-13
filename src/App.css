@@ -12,7 +12,8 @@
   --bg-white: #ffffff;
   --border-color: #e2e8f0;
   --yellow-star: #facc15;
-  --max-width: 80%
+  /* Enes Doğanay | 13 Nisan 2026: eksik semicolon düzeltildi */
+  --max-width: 80%;
 }
 
 * {

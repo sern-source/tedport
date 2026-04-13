@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
@@ -49,6 +49,9 @@ const SharedHeader = ({
     const dropdownRef = useRef(null);
     // Enes Doğanay | 5 Nisan 2026: Search bar dışına tıklayınca öneri dropdown'ını kapatmak için ref
     const searchBarRef = useRef(null);
+    // Enes Doğanay | 13 Nisan 2026: onSuggestionClick ref ile stabilize — useEffect dependency sorunu önlenir
+    const onSuggestionClickRef = useRef(onSuggestionClick);
+    onSuggestionClickRef.current = onSuggestionClick;
 
     // Handle dropdown close on click outside
     useEffect(() => {
@@ -58,7 +61,7 @@ const SharedHeader = ({
             }
             // Enes Doğanay | 5 Nisan 2026: Search öneri dropdown'ı dış tıklamada kapat
             if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
-                if (onSuggestionClick) onSuggestionClick(null);
+                if (onSuggestionClickRef.current) onSuggestionClickRef.current(null);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -322,6 +325,25 @@ const SharedHeader = ({
                                             </button>
                                         )}
 
+                                        {/* Enes Doğanay | 13 Nisan 2026: Admin firma düzenleme menü girişi */}
+                                        {isCurrentUserAdmin && (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/admin/firma-duzenle');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    edit_note
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Firma Düzenleme
+                                                </span>
+                                            </button>
+                                        )}
+
                                         {!managedCompanyId && (
                                             <>
                                                 {/* Enes Doğanay | 9 Nisan 2026: Sıralama güncellendi — Favorilerim öne, isimler düzeltildi */}
@@ -496,6 +518,13 @@ const SharedHeader = ({
                                 <Link to="/admin/kurumsal-basvurular" onClick={() => setIsMobileMenuOpen(false)}>
                                     <span className="material-symbols-outlined shared-mobile-menu-icon">admin_panel_settings</span>
                                     Kurumsal Başvurular
+                                </Link>
+                            )}
+                            {/* Enes Doğanay | 13 Nisan 2026: Admin firma düzenleme — mobil menü */}
+                            {isCurrentUserAdmin && (
+                                <Link to="/admin/firma-duzenle" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span className="material-symbols-outlined shared-mobile-menu-icon">edit_note</span>
+                                    Firma Düzenleme
                                 </Link>
                             )}
                             <button

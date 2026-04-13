@@ -553,10 +553,12 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
-.supplier-connect-wrapper .sc-popular-tags a {
+/* Enes Doğanay | 13 Nisan 2026: a yerine span — SPA uyumlu navigate() kullanımı */
+.supplier-connect-wrapper .sc-popular-tags .sc-popular-tag {
     color: white;
     text-decoration: underline;
     text-decoration-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
 }
 
 /* Stats Section */

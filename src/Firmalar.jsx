@@ -26,6 +26,14 @@ import { getManagedCompanyId } from './companyManagementApi';
 
 /* ================= SIDEBAR ================= */
 
+/* Enes Doğanay | 13 Nisan 2026: Sabit dizi modül seviyesine taşındı — her render'da yeniden oluşturulması önlendi */
+const SEKTORLER = [
+  "Makine", "Metal", "Otomasyon", "Elektrik", "Elektronik", "Enerji",
+  "Mekanik", "Hırdavat", "İnşaat", "Kimya", "Plastik", "Ambalaj",
+  "Lojistik", "Tekstil", "Gıda", "Otomotiv", "Medikal", "Bilişim",
+  "Güvenlik", "Hizmet"
+];
+
 /**
  * Sidebar Component - Advanced Filter System
  * 
@@ -65,13 +73,6 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
     sectors: 5,
     categories: 5
   });
-
-  const SEKTORLER = [
-    "Makine", "Metal", "Otomasyon", "Elektrik", "Elektronik", "Enerji",
-    "Mekanik", "Hırdavat", "İnşaat", "Kimya", "Plastik", "Ambalaj",
-    "Lojistik", "Tekstil", "Gıda", "Otomotiv", "Medikal", "Bilişim",
-    "Güvenlik", "Hizmet"
-  ];
 
   const [loading, setLoading] = useState(true);
 
@@ -119,7 +120,19 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
       .from("firmalar")
       .select("category_name");
 
-    if (cityData) setCities(cityData);
+    /* Enes Doğanay | 13 Nisan 2026: İstanbul, Ankara, Kocaeli önce, geri kalanı alfabetik */
+    if (cityData) {
+      const priorityCities = ['İstanbul', 'Ankara', 'Kocaeli'];
+      const sorted = [...cityData].sort((a, b) => {
+        const ai = priorityCities.indexOf(a.sehir);
+        const bi = priorityCities.indexOf(b.sehir);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return a.sehir.localeCompare(b.sehir, 'tr');
+      });
+      setCities(sorted);
+    }
 
     if (categoryData) {
       const uniqueCategories = [
@@ -466,7 +479,8 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
         </span>
       </button>
       {/* Enes Doğanay | 6 Nisan 2026: logo_url varsa gerçek logo gösterilir, yoksa baş harf avatar */}
-      <div className="card-images">
+      {/* Enes Doğanay | 13 Nisan 2026: <a> ile sarmalandı — orta tuş yeni sekmede açar */}
+      <a href={`/firmadetay/${data.id}`} className="card-images" onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${data.id}`); }} style={{ cursor: 'pointer' }}>
         <div className="main-image">
           {data.images ? (
             <img
@@ -483,11 +497,11 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
             {data.name?.charAt(0)}
           </div>
         </div>
-      </div>
+      </a>
 
       <div className="card-content">
-        {/* Enes Doğanay | 14 Temmuz 2025: firma adına tıklayınca profil sayfasına yönlendirir */}
-        <h3 className="supplier-name" onClick={() => navigate(`/firmadetay/${data.id}`)} style={{ cursor: 'pointer' }}>
+        {/* Enes Doğanay | 13 Nisan 2026: <a> ile sarmalandı — orta tuş yeni sekmede açar */}
+        <h3 className="supplier-name"><a href={`/firmadetay/${data.id}`} onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${data.id}`); }} style={{ cursor: 'pointer', color: 'inherit', textDecoration: 'none' }}>
           {data.name}
           {/* Enes Doğanay | 11 Nisan 2026: Verified = 'Onaylı Firma' yazısı eklendi */}
           {data.isVerified && (
@@ -496,7 +510,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
               <span className="verified-text">Onaylı Firma</span>
             </span>
           )}
-        </h3>
+        </a></h3>
 
         <div className="meta-info">📍 {data.location}</div>
 
@@ -724,6 +738,30 @@ const getSmartPages = (current, total) => {
   return pages;
 };
 
+/* ================= YARDIMCI FONKSİYONLAR ================= */
+
+// Enes Doğanay | 13 Nisan 2026: Pure utility — modül seviyesine taşındı, her render'da yeniden oluşturulması önlendi
+const sanitizeSearch = (input) => {
+  return input.replace(/[\\"\%#_]/g, '').trim();
+};
+
+// Enes Doğanay | 13 Nisan 2026: Pure utility — modül seviyesine taşındı
+function degerleriDiziyeCevir(rawData) {
+  if (!rawData) return [];
+  let data = rawData;
+  if (typeof rawData === 'string') {
+    try { data = JSON.parse(rawData); }
+    catch (e) { return []; }
+  }
+  if (!Array.isArray(data)) return [];
+
+  const sonuc = [];
+  data.forEach((kategori) => {
+    if (kategori.ana_kategori) sonuc.push(kategori.ana_kategori);
+  });
+  return sonuc;
+}
+
 /* ================= APP ================= */
 
 function App() {
@@ -911,10 +949,7 @@ function App() {
   }, [search, filters, page, viewMode]);
 
   // Enes Doğanay | 5 Nisan 2026: ilike özel karakterlerini escape eden yardımcı fonksiyon
-  // _ (tek karakter wildcard) ve \\ (escape karakteri) de temizlenir
-  const sanitizeSearch = (input) => {
-    return input.replace(/[\\"%#_]/g, '').trim();
-  };
+  // Enes Doğanay | 13 Nisan 2026: Modül seviyesine taşındı (yukarıda tanımlı)
 
   // Enes Doğanay | 5 Nisan 2026: URL'deki search parametresi değiştiğinde state'i senkronize et
   useEffect(() => {
@@ -982,8 +1017,12 @@ function App() {
       query = query.or(categoryQuery);
     }
 
-    /* Enes Doğanay | 13 Nisan 2026: İkincil sıralama (firmaID) — best aynı olduğunda sayfalama tutarlılığı sağlar */
-    query = query.order('best', { ascending: false }).order('firmaID', { ascending: true });
+    /* Enes Doğanay | 13 Nisan 2026: Sıralama: 1) has_logo önce 2) onaylı hesap önce 3) best önce 4) firmaID tutarlılık */
+    query = query
+      .order('has_logo', { ascending: false, nullsFirst: false })
+      .order('onayli_hesap', { ascending: false, nullsFirst: false })
+      .order('best', { ascending: false })
+      .order('firmaID', { ascending: true });
 
     const { data, error, count } = await query.range(from, to);
 
@@ -991,22 +1030,6 @@ function App() {
       // Enes Doğanay | 10 Nisan 2026: AbortError'da loading state'i düzgün kapat, sayfayı kilitlemesin
       if (error.message?.includes('abort')) { setLoading(false); return; }
       console.error("SUPABASE SORGUSU HATASI:", error);
-    }
-
-    function degerleriDiziyeCevir(rawData) {
-      if (!rawData) return [];
-      let data = rawData;
-      if (typeof rawData === 'string') {
-        try { data = JSON.parse(rawData); }
-        catch (e) { return []; }
-      }
-      if (!Array.isArray(data)) return [];
-
-      const sonuc = [];
-      data.forEach((kategori) => {
-        if (kategori.ana_kategori) sonuc.push(kategori.ana_kategori);
-      });
-      return sonuc;
     }
 
     if (!error && data) {
@@ -1027,12 +1050,18 @@ function App() {
         adres: item.adres || ''
       }));
 
-      /* Enes Doğanay | 6 Nisan 2026: Sıralama önceliği: 1) best=true her zaman önce 2) Arama varsa alaka puanı
-       * Aynı best değerindeki firmalar arasında relevance skoru geçerli.
-       * best=true + yüksek relevance > best=true + düşük relevance > best=false + yüksek relevance */
+      /* Enes Doğanay | 13 Nisan 2026: Arama varken sayfa içi relevance sıralamasına logo+onaylı+best önceliği ekle */
       if (trimmedSearch.length >= 2) {
         const lowerSearch = trimmedSearch.toLowerCase();
         mappedSuppliers.sort((a, b) => {
+          const logoA = a.images ? 1 : 0;
+          const logoB = b.images ? 1 : 0;
+          if (logoB !== logoA) return logoB - logoA;
+
+          const verifiedA = a.isVerified ? 1 : 0;
+          const verifiedB = b.isVerified ? 1 : 0;
+          if (verifiedB !== verifiedA) return verifiedB - verifiedA;
+
           const bestA = a.isBest ? 1 : 0;
           const bestB = b.isBest ? 1 : 0;
           if (bestB !== bestA) return bestB - bestA;
@@ -1216,19 +1245,19 @@ function App() {
                 </div>
                 {suppliers.map(supplier => (
                   <div key={supplier.id} className="firmalar-list-row">
-                    <span className="firmalar-list-col firmalar-list-col--logo" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>
+                    <a href={`/firmadetay/${supplier.id}`} className="firmalar-list-col firmalar-list-col--logo" onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${supplier.id}`); }} style={{ cursor: 'pointer' }}>
                       {supplier.images ? (
                         <img src={supplier.images} alt="" className="firmalar-list-avatar-img" onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }} />
                       ) : null}
                       <span className="firmalar-list-avatar-placeholder" style={{ display: supplier.images ? 'none' : 'flex' }}>
                         {supplier.name?.charAt(0)}
                       </span>
-                    </span>
-                    <span className="firmalar-list-col firmalar-list-col--name" onClick={() => navigate(`/firmadetay/${supplier.id}`)}>
+                    </a>
+                    <a href={`/firmadetay/${supplier.id}`} className="firmalar-list-col firmalar-list-col--name" onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${supplier.id}`); }} style={{ color: 'inherit', textDecoration: 'none' }}>
                       {supplier.name}
                       {/* Enes Doğanay | 11 Nisan 2026: Liste görünümünde de 'Onaylı Firma' yazısı eklendi */}
                       {supplier.isVerified && <span className="verified-badge-inline" style={{ marginLeft: '4px', verticalAlign: 'middle' }}><span className="material-symbols-outlined verified-icon" style={{ fontSize: '16px' }}>verified</span> <span className="verified-text">Onaylı Firma</span></span>}
-                    </span>
+                    </a>
                     <span className="firmalar-list-col firmalar-list-col--sector" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{(supplier.tags || []).slice(0, 2).join(', ') || '—'}</span>
                     <span className="firmalar-list-col firmalar-list-col--location" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{supplier.location || '—'}</span>
                     {/* Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişime geç (kart ile birebir aynı, küçük boyut) */}

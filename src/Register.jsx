@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// Enes Doğanay | 13 Nisan 2026: useRef destructured import olarak eklendi
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import './Register.css';
 import SharedHeader from './SharedHeader';
@@ -59,8 +60,8 @@ const RegistrationPage = () => {
   /* Enes Doğanay | 8 Nisan 2026: Firma autocomplete state'leri */
   const [firmaSuggestions, setFirmaSuggestions] = useState([]);
   const [showFirmaSuggestions, setShowFirmaSuggestions] = useState(false);
-  const firmaSearchRef = React.useRef(null);
-  const firmaDebounceRef = React.useRef(null);
+  const firmaSearchRef = useRef(null);
+  const firmaDebounceRef = useRef(null);
 
   useEffect(() => {
     setRegistrationType(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
@@ -216,10 +217,10 @@ const RegistrationPage = () => {
 
     try {
       // Enes Doğanay | 7 Nisan 2026: Bireysel kayit oncesi e-posta musaitlik kontrolu
+      // Enes Doğanay | 13 Nisan 2026: finally bloğu setLoading(false) yaptığı için burada tekrar gerekmiyor
       const emailCheck = await checkEmailAvailability(email);
       if (emailCheck && !emailCheck.available) {
         showMessage('error', emailCheck.reason);
-        setLoading(false);
         return;
       }
 
@@ -336,10 +337,10 @@ const RegistrationPage = () => {
 
     try {
       // Enes Doğanay | 7 Nisan 2026: Kurumsal kayit oncesi e-posta musaitlik kontrolu
+      // Enes Doğanay | 13 Nisan 2026: finally bloğu setLoading(false) yaptığı için burada tekrar gerekmiyor
       const emailCheck = await checkEmailAvailability(corporateForm.corporateEmail);
       if (emailCheck && !emailCheck.available) {
         showMessage('error', emailCheck.reason);
-        setLoading(false);
         return;
       }
 
@@ -564,7 +565,7 @@ const RegistrationPage = () => {
                     <div className="input-group">
                       <label>Kurumsal E-posta</label>
                       <div className="input-wrapper">
-                        <input className={`form-input${corporateErrors.corporateEmail ? ' form-input--error' : ''}`} type="email" placeholder="adiniz@sirketiniz.com" value={corporateForm.corporateEmail} onChange={(event) => handleCorporateInputChange('corporateEmail', event.target.value)} name="crp_ce_x" autoComplete="one-time-code" />
+                        <input className={`form-input${corporateErrors.corporateEmail ? ' form-input--error' : ''}`} type="email" placeholder="tedport@sirketiniz.com" value={corporateForm.corporateEmail} onChange={(event) => handleCorporateInputChange('corporateEmail', event.target.value)} name="crp_ce_x" autoComplete="one-time-code" />
                         <span className="material-symbols-outlined input-icon">mail</span>
                       </div>
                       <span className="field-hint">Test için kişisel e-posta kullanabilirsiniz; canlıda şirket adresi tercih edilir.</span>

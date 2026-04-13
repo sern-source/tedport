@@ -4,6 +4,7 @@
  */
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from './supabaseClient';
+import { supabaseUrl } from './supabaseClient';
 import { isAdminEmail } from './adminAccess';
 import { resolveIsAdminUser } from './corporateApplicationsApi';
 import { getManagedCompanyId } from './companyManagementApi';
@@ -43,7 +44,8 @@ export function AuthProvider({ children }) {
   // Enes Doğanay | 10 Nisan 2026: Logout sırasında auto-refresh yarış koşulunu engelleyen flag
   const isLoggingOutRef = useRef(false);
 
-  const loadUserData = async () => {
+  // Enes Doğanay | 13 Nisan 2026: useCallback ile sarıldı — stabil referans, gereksiz yeniden oluşturma önlenir
+  const loadUserData = useCallback(async () => {
     // Enes Doğanay | 10 Nisan 2026: Logout sırasında session tekrar yüklenmesin
     if (isLoggingOutRef.current) return;
     try {
@@ -83,24 +85,25 @@ export function AuthProvider({ children }) {
       setUserProfile(profileResult.data || { first_name: 'Profilime', last_name: 'Git' });
       setUnreadNotifCount(notifResult.count || 0);
 
-        if (companyId) {
-          const [firmResult, quoteResult] = await Promise.all([
-            supabase.from('firmalar').select('firma_adi').eq('firmaID', companyId).single(),
-            supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', companyId).eq('durum', 'pending')
-          ]);
-          setManagedCompanyName(firmResult.data?.firma_adi || null);
-          setPendingQuoteCount(quoteResult.count || 0);
-        } else {
-          setManagedCompanyName(null);
-          /* Enes Doğanay | 9 Nisan 2026: Bireysel kullanıcı için okunmamış teklif yanıt/mesaj bildirimlerini say */
-          const { count: quoteNotifCount } = await supabase
-            .from('bildirimler')
-            .select('id', { count: 'exact', head: true })
-            .eq('user_id', session.user.id)
-            .eq('is_read', false)
-            .in('type', ['quote_reply', 'quote_message']);
-          setPendingQuoteCount(quoteNotifCount || 0);
-        }
+      // Enes Doğanay | 13 Nisan 2026: Girintileme düzeltildi
+      if (companyId) {
+        const [firmResult, quoteResult] = await Promise.all([
+          supabase.from('firmalar').select('firma_adi').eq('firmaID', companyId).single(),
+          supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', companyId).eq('durum', 'pending')
+        ]);
+        setManagedCompanyName(firmResult.data?.firma_adi || null);
+        setPendingQuoteCount(quoteResult.count || 0);
+      } else {
+        setManagedCompanyName(null);
+        /* Enes Doğanay | 9 Nisan 2026: Bireysel kullanıcı için okunmamış teklif yanıt/mesaj bildirimlerini say */
+        const { count: quoteNotifCount } = await supabase
+          .from('bildirimler')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('is_read', false)
+          .in('type', ['quote_reply', 'quote_message']);
+        setPendingQuoteCount(quoteNotifCount || 0);
+      }
     } catch (err) {
       // Enes Doğanay | 10 Nisan 2026: AbortError = race condition, state'i temizleme — onAuthStateChange tekrar tetikleyecek
       if (err?.message?.includes('abort')) return;
@@ -109,7 +112,7 @@ export function AuthProvider({ children }) {
     } finally {
       setAuthChecked(true);
     }
-  };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     loadUserData();
@@ -144,8 +147,9 @@ export function AuthProvider({ children }) {
       await supabase.auth.signOut({ scope: 'global' });
     } catch {}
     // Storage'ı manuel temizle — auto-refresh kalıntısı kalmasın
+    // Enes Doğanay | 13 Nisan 2026: supabaseUrl import'u kullanıldı — hardcoded URL kaldırıldı
     try {
-      const projectRef = new URL('https://gsdbutprqfnxjtppwwhn.supabase.co').host.split('.')[0];
+      const projectRef = new URL(supabaseUrl).host.split('.')[0];
       window.localStorage.removeItem(`sb-${projectRef}-auth-token`);
       window.sessionStorage.removeItem(`sb-${projectRef}-auth-token`);
       window.localStorage.removeItem('tedport-auth-storage-mode');

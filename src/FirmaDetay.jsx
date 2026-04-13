@@ -69,6 +69,111 @@ const formatReminderLabel = (isoValue) => {
     return `${date.toLocaleDateString('tr-TR')} • ${date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
 };
 
+// Enes Doğanay | 13 Nisan 2026: Pure utility fonksiyonlar modül seviyesine taşındı — her render'da yeniden oluşturulması önlendi
+
+function degerleriDiziyeCevir(rawData) {
+    if (!rawData) return [];
+    let data = rawData;
+    if (typeof rawData === 'string') {
+        try {
+            data = JSON.parse(rawData);
+        } catch (e) {
+            console.error("JSON parse hatası:", e);
+            return [];
+        }
+    }
+    if (!Array.isArray(data)) return [];
+
+    const sonuc = [];
+    data.forEach((kategori) => {
+        if (kategori.ana_kategori) sonuc.push(kategori.ana_kategori);
+        if (kategori.alt_kategoriler && Array.isArray(kategori.alt_kategoriler)) {
+            kategori.alt_kategoriler.forEach((alt) => {
+                if (alt.baslik) sonuc.push(alt.baslik);
+                if (alt.urunler && Array.isArray(alt.urunler)) {
+                    sonuc.push(...alt.urunler);
+                }
+            });
+        }
+    });
+    return sonuc;
+}
+
+function convertFlatToCategorized(rawData) {
+    if (!rawData) return [];
+    const items = degerleriDiziyeCevir(rawData);
+    if (items.length === 0) return [];
+    return [
+        {
+            ana_kategori: "Tüm Ürünler",
+            alt_kategoriler: [
+                {
+                    baslik: "Ürün Listesi",
+                    urunler: items
+                }
+            ]
+        }
+    ];
+}
+
+function parseHiyerarsikKategoriler(rawData) {
+    if (!rawData) return [];
+    let data = rawData;
+    if (typeof rawData === 'string') {
+        try {
+            data = JSON.parse(rawData);
+        } catch (e) {
+            console.error("JSON parse hatası:", e);
+            return [];
+        }
+    }
+    if (!Array.isArray(data)) return [];
+    if (data.length > 0 && data[0].ana_kategori) {
+        return data;
+    } else {
+        return convertFlatToCategorized(rawData);
+    }
+}
+
+const parseNotePayload = (rawNoteText) => {
+    if (!rawNoteText) {
+        return { title: '', tag: '', body: '' };
+    }
+    try {
+        const parsed = JSON.parse(rawNoteText);
+        if (parsed && typeof parsed === 'object' && 'body' in parsed) {
+            return {
+                title: parsed.title || '',
+                tag: parsed.tag || '',
+                body: parsed.body || ''
+            };
+        }
+    } catch (error) {
+        // Eski düz metin notlar için sessizce fallback yapılır.
+    }
+    return { title: '', tag: '', body: rawNoteText };
+};
+
+const serializeNotePayload = (title, body) => {
+    return JSON.stringify({
+        title: title.trim(),
+        tag: '',
+        body: body.trim()
+    });
+};
+
+const getNoteGroupLabel = (dateValue) => {
+    const noteDate = new Date(dateValue);
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(todayStart.getDate() - 1);
+    const noteStart = new Date(noteDate.getFullYear(), noteDate.getMonth(), noteDate.getDate());
+    if (noteStart.getTime() === todayStart.getTime()) return 'Bugün';
+    if (noteStart.getTime() === yesterdayStart.getTime()) return 'Dün';
+    return 'Daha Eski';
+};
+
 const SupplierProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -192,85 +297,7 @@ const SupplierProfile = () => {
     // Enes Doğanay | 4 Nisan 2026: Ürün kategorilerini accordion olarak göstermek için state eklendi
     const [expandedCategories, setExpandedCategories] = useState(new Set());
 
-    // Diziye Çevirme Fonksiyonu
-    function degerleriDiziyeCevir(rawData) {
-        if (!rawData) return [];
-        let data = rawData;
-        if (typeof rawData === 'string') {
-            try {
-                data = JSON.parse(rawData);
-            } catch (e) {
-                console.error("JSON parse hatası:", e);
-                return [];
-            }
-        }
-        if (!Array.isArray(data)) return [];
-
-        const sonuc = [];
-        data.forEach((kategori) => {
-            if (kategori.ana_kategori) sonuc.push(kategori.ana_kategori);
-            if (kategori.alt_kategoriler && Array.isArray(kategori.alt_kategoriler)) {
-                kategori.alt_kategoriler.forEach((alt) => {
-                    if (alt.baslik) sonuc.push(alt.baslik);
-                    if (alt.urunler && Array.isArray(alt.urunler)) {
-                        sonuc.push(...alt.urunler);
-                    }
-                });
-            }
-        });
-        return sonuc;
-    }
-
-    // Düz listeyi hiyerarşik yapıya çevir (Gelecekte DB hiyerarşik olduğunda buna gerek kalmayacak)
-    // Enes Doğanay | 4 Nisan 2026: DB'de üst kategori olmadığı için düz ürün listesini 
-    // "Tüm Ürünler" ana kategorisinde sarmalayan fonksiyon
-    function convertFlatToCategorized(rawData) {
-        if (!rawData) return [];
-
-        // Düz listeyi al
-        const items = degerleriDiziyeCevir(rawData);
-
-        if (items.length === 0) return [];
-
-        // "Tüm Ürünler" ana kategorisinde bir yapı oluştur
-        return [
-            {
-                ana_kategori: "Tüm Ürünler",
-                alt_kategoriler: [
-                    {
-                        baslik: "Ürün Listesi",
-                        urunler: items
-                    }
-                ]
-            }
-        ];
-    }
-
-    // Hiyerarşik Kategori Parse Fonksiyonu (Accordion için)
-    // Enes Doğanay | 4 Nisan 2026: Veri yapısını kontrol ederek hiyerarşik mi düz mi olduğunu belirler
-    // Hiyerarşik veri varsa direkt kullanır, yoksa convertFlatToCategorized ile dönüştürür
-    function parseHiyerarsikKategoriler(rawData) {
-        if (!rawData) return [];
-        let data = rawData;
-        if (typeof rawData === 'string') {
-            try {
-                data = JSON.parse(rawData);
-            } catch (e) {
-                console.error("JSON parse hatası:", e);
-                return [];
-            }
-        }
-        if (!Array.isArray(data)) return [];
-
-        // Eğer veri zaten hiyerarşik ise direkt döndür
-        // Yoksa düz listeyi hiyerarşiye çevir
-        if (data.length > 0 && data[0].ana_kategori) {
-            return data; // Hiyerarşik yapı var
-        } else {
-            // Düz liste - hiyerarşiye çevir
-            return convertFlatToCategorized(rawData);
-        }
-    }
+    // Enes Doğanay | 13 Nisan 2026: degerleriDiziyeCevir, convertFlatToCategorized, parseHiyerarsikKategoriler modül seviyesine taşındı (yukarıda tanımlı)
 
     // Accordion Toggle Fonksiyonu
     // Enes Doğanay | 4 Nisan 2026: Kategorileri açıp kapatmak için toggle fonksiyonu
@@ -284,50 +311,7 @@ const SupplierProfile = () => {
         setExpandedCategories(newExpanded);
     };
 
-    // Enes Doğanay | 6 Nisan 2026: Notlar baslik/etiket govdesiyle JSON veya eski duz metin olarak okunabilir
-    const parseNotePayload = (rawNoteText) => {
-        if (!rawNoteText) {
-            return { title: '', tag: '', body: '' };
-        }
-
-        try {
-            const parsed = JSON.parse(rawNoteText);
-            if (parsed && typeof parsed === 'object' && 'body' in parsed) {
-                return {
-                    title: parsed.title || '',
-                    tag: parsed.tag || '',
-                    body: parsed.body || ''
-                };
-            }
-        } catch (error) {
-            // Eski düz metin notlar için sessizce fallback yapılır.
-        }
-
-        return { title: '', tag: '', body: rawNoteText };
-    };
-
-    // Enes Doğanay | 6 Nisan 2026: Not verisi tek kolon icinde geriye uyumlu sekilde saklanir
-    const serializeNotePayload = (title, body) => {
-        return JSON.stringify({
-            title: title.trim(),
-            tag: '',
-            body: body.trim()
-        });
-    };
-
-    // Enes Doğanay | 6 Nisan 2026: Notlar bugun/dun/daha eski olarak gruplanir
-    const getNoteGroupLabel = (dateValue) => {
-        const noteDate = new Date(dateValue);
-        const today = new Date();
-        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const yesterdayStart = new Date(todayStart);
-        yesterdayStart.setDate(todayStart.getDate() - 1);
-        const noteStart = new Date(noteDate.getFullYear(), noteDate.getMonth(), noteDate.getDate());
-
-        if (noteStart.getTime() === todayStart.getTime()) return 'Bugün';
-        if (noteStart.getTime() === yesterdayStart.getTime()) return 'Dün';
-        return 'Daha Eski';
-    };
+    // Enes Doğanay | 13 Nisan 2026: parseNotePayload, serializeNotePayload, getNoteGroupLabel modül seviyesine taşındı (yukarıda tanımlı)
 
     // Enes Doğanay | 6 Nisan 2026: Her not icin aktif hatirlatici tek noktadan bulunur
     const getReminderForNote = (noteId, reminderList = noteReminders) => {
