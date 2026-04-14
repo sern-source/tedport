@@ -584,6 +584,27 @@
     color: #334155;
 }
 
+/* Enes Doğanay | 14 Nisan 2026: Parçalı para birimi — gruplu toplam */
+.mop-kalemler__grouped-total {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+    border-top: 2px solid #e2e8f0;
+    font-size: 0.86rem;
+}
+
+.mop-kalemler__grouped-total strong {
+    color: #334155;
+    font-weight: 600;
+}
+
+.mop-kalemler__grouped-total span {
+    font-weight: 700;
+    color: #0f172a;
+}
+
 /* ═══════════════════════════════════════════════════
    FOOTER AKSIYONLAR
    ═══════════════════════════════════════════════════ */

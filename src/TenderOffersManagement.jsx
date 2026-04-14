@@ -14,7 +14,36 @@ import './TenderOffersManagement.css';
 const formatMoney = (amount, currency) => {
     const v = Number(amount || 0);
     if (!v) return '—';
-    return v.toLocaleString('tr-TR', { style: 'currency', currency: currency || 'TRY', maximumFractionDigits: 0 });
+    try {
+        return v.toLocaleString('tr-TR', { style: 'currency', currency: currency || 'TRY', maximumFractionDigits: 0 });
+    } catch {
+        return `${currency || ''} ${v.toLocaleString('tr-TR')}`;
+    }
+};
+
+/* Enes Doğanay | 14 Nisan 2026: Teklifin kalemlerinden para birimine göre gruplu toplamları hesapla */
+const getOfferGroupedTotals = (offer) => {
+    const kalemler = Array.isArray(offer.kalemler) ? offer.kalemler : [];
+    if (kalemler.length === 0) return null;
+    const hasMixedCurs = kalemler.some(k => k.para_birimi && k.para_birimi !== (offer.para_birimi || 'TRY'));
+    if (!hasMixedCurs) return null;
+    const groups = {};
+    kalemler.forEach(k => {
+        const c = k.para_birimi || offer.para_birimi || 'TRY';
+        const t = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+        if (t > 0) groups[c] = (groups[c] || 0) + t;
+    });
+    return Object.keys(groups).length > 0 ? groups : null;
+};
+
+/* Enes Doğanay | 14 Nisan 2026: Gruplu toplamı render et — farklı para birimleri varsa parçalı göster */
+const renderOfferAmount = (offer) => {
+    const grouped = getOfferGroupedTotals(offer);
+    if (!grouped) return formatMoney(offer.toplam_tutar, offer.para_birimi);
+    const entries = Object.entries(grouped);
+    return entries.map(([c, v], i) => (
+        <span key={c}>{i > 0 && ' + '}{formatMoney(v, c)}</span>
+    ));
 };
 
 const formatDate = (iso) => {
@@ -991,7 +1020,7 @@ const TenderOffersManagement = ({ companyId }) => {
                                                             <div className="tom-offer-card__metrics">
                                                                 <div className="tom-metric">
                                                                     <span className="material-symbols-outlined">payments</span>
-                                                                    <strong>{formatMoney(offer.toplam_tutar, offer.para_birimi)}</strong>
+                                                                    <strong>{renderOfferAmount(offer)}</strong>
                                                                     {offer.kdv_dahil !== undefined && (
                                                                         <small>{offer.kdv_dahil ? 'KDV Dahil' : 'KDV Hariç'}</small>
                                                                     )}
@@ -1069,6 +1098,8 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                 </div>
                                                             )}
 
+                                                            {/* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — her kalemde para_birimi göster */}
+                                                            {/* Enes Doğanay | 14 Nisan 2026: Birim sütunu kaldırıldı — teklif formunda girilmiyor */}
                                                             {/* Teklif Kalemleri */}
                                                             {kalemler.length > 0 && (
                                                                 <div className="tom-kalemler">
@@ -1082,23 +1113,48 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                                 <tr>
                                                                                     <th>Madde</th>
                                                                                     <th>Miktar</th>
-                                                                                    <th>Birim</th>
                                                                                     <th>Birim Fiyat</th>
+                                                                                    <th>Para Birimi</th>
+                                                                                    <th>Toplam</th>
                                                                                     <th>Açıklama</th>
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
-                                                                                {kalemler.map((k, i) => (
-                                                                                    <tr key={i}>
-                                                                                        <td><strong>{k.madde || '—'}</strong></td>
-                                                                                        <td>{k.miktar || '—'}</td>
-                                                                                        <td>{k.birim || '—'}</td>
-                                                                                        <td>{k.birim_fiyat ? Number(k.birim_fiyat).toLocaleString('tr-TR') : '—'}</td>
-                                                                                        <td>{k.aciklama || k.not || '—'}</td>
-                                                                                    </tr>
-                                                                                ))}
+                                                                                {kalemler.map((k, i) => {
+                                                                                    const kCur = k.para_birimi || offer.para_birimi || 'TRY';
+                                                                                    const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+                                                                                    return (
+                                                                                        <tr key={i}>
+                                                                                            <td><strong>{k.madde || '—'}</strong></td>
+                                                                                            <td>{k.miktar || '—'}</td>
+                                                                                            <td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td>
+                                                                                            <td>{kCur}</td>
+                                                                                            <td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td>
+                                                                                            <td>{k.aciklama || k.not || '—'}</td>
+                                                                                        </tr>
+                                                                                    );
+                                                                                })}
                                                                             </tbody>
                                                                         </table>
+                                                                        {/* Enes Doğanay | 14 Nisan 2026: Parçalı para birimi — gruplu toplam */}
+                                                                        {(() => {
+                                                                            const groups = {};
+                                                                            kalemler.forEach(k => {
+                                                                                const c = k.para_birimi || offer.para_birimi || 'TRY';
+                                                                                const t = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+                                                                                groups[c] = (groups[c] || 0) + t;
+                                                                            });
+                                                                            const entries = Object.entries(groups).filter(([, v]) => v > 0);
+                                                                            if (entries.length <= 1) return null;
+                                                                            return (
+                                                                                <div className="tom-kalemler__grouped-total">
+                                                                                    <strong>Toplamlar:</strong>
+                                                                                    {entries.map(([c, v]) => (
+                                                                                        <span key={c}>{formatMoney(v, c)}</span>
+                                                                                    ))}
+                                                                                </div>
+                                                                            );
+                                                                        })()}
                                                                     </div>
                                                                 </div>
                                                             )}
@@ -1175,7 +1231,7 @@ const TenderOffersManagement = ({ companyId }) => {
                                                         </div>
                                                         <div className="tom-compare-card__rows">
                                                             {[
-                                                                { label: 'Fiyat', val: formatMoney(offer.toplam_tutar, offer.para_birimi), score: offer._score.price, cls: 'green', best: bestPrice },
+                                                                { label: 'Fiyat', val: renderOfferAmount(offer), score: offer._score.price, cls: 'green', best: bestPrice },
                                                                 { label: 'Teslim', val: offer.teslim_suresi_gun ? `${offer.teslim_suresi_gun} gün` : '—', score: offer._score.delivery, cls: 'amber', best: bestDel },
                                                                 { label: 'Genel Puan', val: offer._score.overall, score: offer._score.overall, cls: 'blue', best: bestScore },
                                                             ].map(r => (

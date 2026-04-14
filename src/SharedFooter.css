@@ -1,0 +1,144 @@
+/* Enes Doğanay | 14 Nisan 2026: Ortak site footer stilleri */
+
+.sf-footer {
+    background: #0f172a;
+    color: #cbd5e1;
+    padding: 48px 0 0;
+    margin-top: auto;
+}
+
+.sf-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Grid */
+.sf-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 900px) {
+    .sf-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+    }
+}
+
+@media (max-width: 540px) {
+    .sf-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+}
+
+/* Brand */
+.sf-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sf-logo-link {
+    display: inline-flex;
+    align-items: center;
+}
+
+.sf-logo {
+    height: 42px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.sf-brand-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #94a3b8;
+    margin: 0;
+    max-width: 300px;
+}
+
+/* Socials */
+.sf-socials {
+    display: flex;
+    gap: 10px;
+}
+
+.sf-social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.sf-social-link:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+}
+
+/* Links */
+.sf-links h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f1f5f9;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 0 0 16px;
+}
+
+.sf-links ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sf-links li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sf-links a,
+.sf-links li > span:not(.sf-contact-icon) {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.18s;
+}
+
+.sf-links a:hover {
+    color: #e2e8f0;
+}
+
+/* Contact column icons */
+.sf-contact-icon {
+    font-size: 16px;
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+/* Bottom */
+.sf-bottom {
+    padding: 20px 0;
+    text-align: center;
+}
+
+.sf-bottom p {
+    margin: 0;
+    font-size: 13px;
+    color: #475569;
+}

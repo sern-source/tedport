@@ -87,42 +87,29 @@ const SupplierConnect = () => {
         }
     };
 
-    // Enes Doğanay | 8 Nisan 2026: Verified firmalar öncelikli, kalan slotlar best=true (iso1000) ile doldurulur
+    /* Enes Doğanay | 14 Nisan 2026: Akıllı Sıralama — Firmalar sayfasıyla aynı önceliklendirme mantığı */
     useEffect(() => {
         const fetchRandomSuppliers = async () => {
-            // Enes Doğanay | 8 Nisan 2026: onayli_hesap=true olan firmaları doğrudan çek
-            const { data: verifiedData } = await supabase
+            const { data } = await supabase
                 .from('firmalar')
-                .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri')
-                .eq('onayli_hesap', true);
-            const verifiedFirmalar = (verifiedData || []).map(f => ({ ...f, _isVerified: true }));
+                .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri, onayli_hesap, best, has_logo')
+                .order('has_logo', { ascending: false, nullsFirst: false })
+                .order('onayli_hesap', { ascending: false, nullsFirst: false })
+                .order('best', { ascending: false })
+                .order('firmaID', { ascending: true })
+                .limit(8);
 
-            // Enes Doğanay | 8 Nisan 2026: Kalan slotları best=true firmalardan rastgele doldur
-            const remainingSlots = 4 - Math.min(verifiedFirmalar.length, 4);
-            let bestPool = [];
-            if (remainingSlots > 0) {
-                const excludeIds = verifiedFirmalar.map(f => f.firmaID);
-                let q = supabase
-                    .from('firmalar')
-                    .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri')
-                    .eq('best', true)
-                    .eq('onayli_hesap', false);
-                if (excludeIds.length > 0) {
-                    q = q.not('firmaID', 'in', `(${excludeIds.join(',')})`);
-                }
-                const { data } = await q;
-                bestPool = (data || []).map(f => ({ ...f, _isVerified: false }));
-            }
+            const pool = (data || []).map(f => ({
+                ...f,
+                _isVerified: f.onayli_hesap === true
+            }));
 
-            // Fisher-Yates shuffle
-            for (let i = bestPool.length - 1; i > 0; i--) {
+            // İlk 8'den rastgele 4 seç (Fisher-Yates)
+            for (let i = pool.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [bestPool[i], bestPool[j]] = [bestPool[j], bestPool[i]];
+                [pool[i], pool[j]] = [pool[j], pool[i]];
             }
-
-            // Verified önce, kalan slotları random best ile doldur
-            const result = [...verifiedFirmalar.slice(0, 4), ...bestPool.slice(0, remainingSlots)];
-            setTopSuppliers(result.slice(0, 4));
+            setTopSuppliers(pool.slice(0, 4));
         };
 
         fetchRandomSuppliers();

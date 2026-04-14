@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import './hakkimizda.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
+import SharedFooter from './SharedFooter';
 
 const About = () => {
     const navigate = useNavigate();
@@ -45,34 +46,36 @@ const About = () => {
                                 <span className="about-badge">Hakkımızda</span>
                                 <h1 className="about-hero-title">Biz Kimiz?</h1>
                                 <p className="about-hero-desc">
-                                    Tedport olarak, işletmeleri en güvenilir ve kaliteli tedarikçilerle buluşturuyoruz. B2B dünyasında şeffaflık, hız ve güven inşa ederek ticaretin geleceğini şekillendiriyoruz. Modern çözümlerimizle iş süreçlerinizi optimize etmenize yardımcı oluyoruz.
+                                    Tedport olarak, Türkiye'deki işletmeleri en güvenilir ve kaliteli tedarikçilerle buluşturuyoruz. B2B dünyasında şeffaflık, hız ve güven inşa ederek ticaretin geleceğini şekillendiriyoruz.
                                 </p>
+                                {/* Enes Doğanay | 14 Nisan 2026: İletişime Geçin → /iletisim, Ekibimizle Tanışın kaldırıldı */}
                                 <div className="about-hero-buttons">
-                                    <button className="about-btn-primary">İletişime Geçin</button>
-                                    <button className="about-btn-outline">Ekibimizle Tanışın</button>
+                                    <button className="about-btn-primary" onClick={() => navigate('/iletisim')}>İletişime Geçin</button>
                                 </div>
                             </div>
+                            {/* Enes Doğanay | 14 Nisan 2026: Ofiste çalışan ekip fotoğrafı */}
                             <div className="about-hero-image">
-                                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" alt="Ofis ortamı" />
+                                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Tedport Ekibi" />
                             </div>
                         </div>
                     </section>
 
                     {/* Stats Section */}
+                    {/* Enes Doğanay | 14 Nisan 2026: Gerçekçi istatistikler — yeni kurulan startup verileri */}
                     <section className="about-stats-section">
                         <div className="about-container">
                             <div className="about-stats-grid">
                                 <div className="about-stat-item">
-                                    <span className="about-stat-num">5K+</span>
-                                    <span className="about-stat-label">Onaylı Tedarikçi</span>
+                                    <span className="about-stat-num">500+</span>
+                                    <span className="about-stat-label">Kayıtlı Firma</span>
                                 </div>
                                 <div className="about-stat-item">
-                                    <span className="about-stat-num">120+</span>
-                                    <span className="about-stat-label">Hizmet Verilen Ülke</span>
+                                    <span className="about-stat-num">20+</span>
+                                    <span className="about-stat-label">Sektör</span>
                                 </div>
                                 <div className="about-stat-item">
-                                    <span className="about-stat-num">500M₺</span>
-                                    <span className="about-stat-label">Yıllık İşlem Hacmi</span>
+                                    <span className="about-stat-num">81</span>
+                                    <span className="about-stat-label">İl Kapsamı</span>
                                 </div>
                                 <div className="about-stat-item">
                                     <span className="about-stat-num">7/24</span>
@@ -89,6 +92,7 @@ const About = () => {
                                 <h2>Değerlerimiz & Hedeflerimiz</h2>
                                 <p>Bizi biz yapan temel prensiplerimiz ve geleceğe bakış açımız.</p>
                             </div>
+                            {/* Enes Doğanay | 14 Nisan 2026: Misyon/Vizyon gerçekçi hale getirildi */}
                             <div className="about-values-grid">
                                 {/* Mission */}
                                 <div className="about-value-card">
@@ -96,7 +100,7 @@ const About = () => {
                                         <span className="material-symbols-outlined">target</span>
                                     </div>
                                     <h3>Misyonumuz</h3>
-                                    <p>İşletmelerin tedarik süreçlerini hızlandırmak, maliyetlerini düşürmek ve en güvenilir iş ortaklıklarını kurmalarını sağlamak. Teknolojinin gücünü kullanarak karmaşık B2B süreçlerini basitleştirmek ve herkes için erişilebilir kılmak.</p>
+                                    <p>Türkiye’deki işletmelerin tedarik süreçlerini hızlandırmak, doğru iş ortaklıkları kurmalarını sağlamak ve B2B süreçlerini dijitalleştirerek herkes için erişilebilir kılmak.</p>
                                     <div className="about-value-glow glow-blue"></div>
                                 </div>
                                 {/* Vision */}
@@ -105,7 +109,7 @@ const About = () => {
                                         <span className="material-symbols-outlined">visibility</span>
                                     </div>
                                     <h3>Vizyonumuz</h3>
-                                    <p>Dünyanın en kapsamlı, güvenilir ve tercih edilen B2B tedarikçi ağı olmak. Küresel ticarette sınırları kaldırarak, sürdürülebilir ve etik ticaretin öncüsü haline gelmek ve sektör standartlarını belirlemek.</p>
+                                    <p>Türkiye’nin en kapsamlı ve güvenilir B2B tedarikçi platformu olarak sektörün dijital dönüşümüne öncülük etmek ve sürdürülebilir ticaretin standartlarını belirlemek.</p>
                                     <div className="about-value-glow glow-purple"></div>
                                 </div>
                             </div>
@@ -142,8 +146,8 @@ const About = () => {
                                                 <span className="material-symbols-outlined">hub</span>
                                             </div>
                                             <div className="about-feature-text">
-                                                <h4>Geniş Tedarikçi Ağı</h4>
-                                                <p>Yerel üreticilerden global distribütörlere kadar uzanan geniş ağımızla, her sektörden ve her ölçekten ihtiyaca cevap veriyoruz.</p>
+                                                <h4>Geniş Firma Ağı</h4>
+                                                <p>Türkiye’nin 81 ilinde farklı sektörlerden yüzlerce kayıtlı firma ile her ölçekten ihtiyaca cevap veriyoruz.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -155,15 +159,16 @@ const About = () => {
                     {/* Timeline Section */}
                     <section className="about-section">
                         <div className="about-container">
+                            {/* Enes Doğanay | 14 Nisan 2026: Tarihçe gerçekçi hale getirildi — 2026 başlangıç */}
                             <h2 className="about-timeline-title">Tarihçemiz</h2>
                             <div className="about-timeline">
                                 <div className="about-timeline-line"></div>
 
                                 <div className="about-timeline-item left">
                                     <div className="about-timeline-content text-right">
-                                        <h3>2018</h3>
-                                        <h4>Kuruluş</h4>
-                                        <p>İstanbul'da küçük bir ofiste, 3 kişilik kurucu ekiple yolculuğumuza başladık.</p>
+                                        <h3>Ocak 2026</h3>
+                                        <h4>Fikrin Doğuşu</h4>
+                                        <p>Tedport fikri, Türkiye’deki B2B tedarik süreçlerinin dijitalleştirilmesi ihtiyacından doğdu. 3 kişilik kurucu ekip olarak yolculuğumuza başladık.</p>
                                     </div>
                                     <div className="about-timeline-dot"><div></div></div>
                                     <div className="about-timeline-empty"></div>
@@ -173,30 +178,20 @@ const About = () => {
                                     <div className="about-timeline-empty"></div>
                                     <div className="about-timeline-dot outline"><div></div></div>
                                     <div className="about-timeline-content text-left">
-                                        <h3>2020</h3>
-                                        <h4>İlk 1000 Tedarikçi</h4>
-                                        <p>Platformumuz hızla büyüdü ve onaylı tedarikçi sayımız 1000'i aştı.</p>
+                                        <h3>Mart 2026</h3>
+                                        <h4>Platform Lansmanı</h4>
+                                        <p>Tedport.com yayına alındı. Firma kayıtları, arama, filtreleme ve teklif sistemi ile hizmete başlandı.</p>
                                     </div>
                                 </div>
 
                                 <div className="about-timeline-item left">
                                     <div className="about-timeline-content text-right">
-                                        <h3>2022</h3>
-                                        <h4>Global Açılım</h4>
-                                        <p>Avrupa ve Orta Doğu pazarlarına açılarak ilk uluslararası ofisimizi kurduk.</p>
+                                        <h3>Nisan 2026</h3>
+                                        <h4>Büyüme Dönemi</h4>
+                                        <p>İhale sistemi, kurumsal hesaplar ve gelişmiş filtreleme özellikleri eklendi. 81 il kapsamında hizmet verilmeye başlandı.</p>
                                     </div>
                                     <div className="about-timeline-dot outline"><div></div></div>
                                     <div className="about-timeline-empty"></div>
-                                </div>
-
-                                <div className="about-timeline-item right">
-                                    <div className="about-timeline-empty"></div>
-                                    <div className="about-timeline-dot outline"><div></div></div>
-                                    <div className="about-timeline-content text-left">
-                                        <h3>2024</h3>
-                                        <h4>Sektör Liderliği</h4>
-                                        <p>B2B pazar yerleri arasında Türkiye'nin en çok tercih edilen platformu olduk.</p>
-                                    </div>
                                 </div>
 
                             </div>
@@ -216,56 +211,8 @@ const About = () => {
                     </section>
                 </main>
 
-                {/* Footer */}
-                <footer className="about-footer">
-                    <div className="about-container">
-                        <div className="about-footer-grid">
-                            <div className="about-footer-brand">
-                                {/* FOOTER LOGO BURAYA EKLENDİ */}
-                                <div className="about-footer-logo">
-                                    <img src="/tedport-logo.jpg" alt="Tedport Logo" />
-                                </div>
-                                <p>Türkiye'nin en güvenilir B2B tedarik platformu. İşinizi büyütmek için doğru adres.</p>
-                                <div className="about-socials">
-                                    <a href="#"></a><a href="#"></a><a href="#"></a>
-                                </div>
-                            </div>
-
-                            <div className="about-footer-links">
-                                <h3>Kurumsal</h3>
-                                <ul>
-                                    <li><a href="/hakkimizda">Hakkımızda</a></li>
-                                    <li><a href="#">Kariyer</a></li>
-                                    <li><a href="#">Basın Odası</a></li>
-                                    <li><a href="/iletisim">İletişim</a></li>
-                                </ul>
-                            </div>
-
-                            <div className="about-footer-links">
-                                <h3>Platform</h3>
-                                <ul>
-                                    <li><a href="/register">Tedarikçi Ol</a></li>
-                                    <li><a href="/firmalar">Tedarikçi Bul</a></li>
-                                    <li><a href="#">Fiyatlandırma</a></li>
-                                    <li><a href="#">Yardım Merkezi</a></li>
-                                </ul>
-                            </div>
-
-                            <div className="about-footer-links">
-                                <h3>Yasal</h3>
-                                <ul>
-                                    <li><a href="#">Kullanım Şartları</a></li>
-                                    <li><a href="#">Gizlilik Politikası</a></li>
-                                    <li><a href="#">Çerezler</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div className="about-footer-bottom">
-                            <p>© 2026 Tedport Teknoloji A.Ş. Tüm hakları saklıdır.</p>
-                        </div>
-                    </div>
-                </footer>
+                {/* Enes Doğanay | 14 Nisan 2026: Ortak footer bileşeni */}
+                <SharedFooter />
             </div>
         </>
     );

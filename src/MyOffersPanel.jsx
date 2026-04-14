@@ -29,7 +29,35 @@ const getTenderStatus = (v) => TENDER_STATUS_MAP[String(v || '').toLowerCase()] 
 const formatMoney = (amount, currency) => {
     const v = Number(amount || 0);
     if (!v) return '—';
-    return v.toLocaleString('tr-TR', { style: 'currency', currency: currency || 'TRY', maximumFractionDigits: 0 });
+    try {
+        return v.toLocaleString('tr-TR', { style: 'currency', currency: currency || 'TRY', maximumFractionDigits: 0 });
+    } catch {
+        return `${currency || ''} ${v.toLocaleString('tr-TR')}`;
+    }
+};
+
+/* Enes Doğanay | 14 Nisan 2026: Teklifin kalemlerinden gruplu toplam — farklı para birimleri varsa parçalı göster */
+const getOfferGroupedTotals = (offer) => {
+    const kalemler = Array.isArray(offer.kalemler) ? offer.kalemler : [];
+    if (kalemler.length === 0) return null;
+    const hasMixedCurs = kalemler.some(k => k.para_birimi && k.para_birimi !== (offer.para_birimi || 'TRY'));
+    if (!hasMixedCurs) return null;
+    const groups = {};
+    kalemler.forEach(k => {
+        const c = k.para_birimi || offer.para_birimi || 'TRY';
+        const t = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+        if (t > 0) groups[c] = (groups[c] || 0) + t;
+    });
+    return Object.keys(groups).length > 0 ? groups : null;
+};
+
+const renderOfferAmount = (offer) => {
+    const grouped = getOfferGroupedTotals(offer);
+    if (!grouped) return formatMoney(offer.toplam_tutar, offer.para_birimi);
+    const entries = Object.entries(grouped);
+    return entries.map(([c, v], i) => (
+        <span key={c}>{i > 0 && ' + '}{formatMoney(v, c)}</span>
+    ));
 };
 
 const formatDate = (iso) => {
@@ -292,7 +320,7 @@ const MyOffersPanel = () => {
                                     <div className="mop-card__summary">
                                         <div className="mop-card__amount">
                                             <span className="material-symbols-outlined">payments</span>
-                                            <strong>{formatMoney(offer.toplam_tutar, offer.para_birimi)}</strong>
+                                            <strong>{renderOfferAmount(offer)}</strong>
                                         </div>
                                         {offer.teslim_suresi_gun && (
                                             <div className="mop-card__delivery">
@@ -324,7 +352,7 @@ const MyOffersPanel = () => {
                                                 <span className="material-symbols-outlined">payments</span>
                                                 <div>
                                                     <small>Teklif Tutarı</small>
-                                                    <strong>{formatMoney(offer.toplam_tutar, offer.para_birimi)}</strong>
+                                                    <strong>{renderOfferAmount(offer)}</strong>
                                                     {offer.kdv_dahil !== undefined && <span className="mop-tag">{offer.kdv_dahil ? 'KDV Dahil' : 'KDV Hariç'}</span>}
                                                 </div>
                                             </div>
@@ -365,6 +393,7 @@ const MyOffersPanel = () => {
                                             </div>
                                         )}
 
+                                        {/* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — her kalemde para_birimi göster */}
                                         {kalemler.length > 0 && (
                                             <div className="mop-kalemler">
                                                 <h4>
@@ -378,20 +407,45 @@ const MyOffersPanel = () => {
                                                                 <th>Madde</th>
                                                                 <th>Miktar</th>
                                                                 <th>Birim Fiyat</th>
+                                                                <th>Para Birimi</th>
                                                                 <th>Toplam</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {kalemler.map((k, i) => (
-                                                                <tr key={i}>
-                                                                    <td><strong>{k.madde || '—'}</strong></td>
-                                                                    <td>{k.miktar || '—'}</td>
-                                                                    <td>{k.birim_fiyat ? Number(k.birim_fiyat).toLocaleString('tr-TR') : '—'}</td>
-                                                                    <td>{k.birim_fiyat && k.miktar ? (Number(k.birim_fiyat) * Number(k.miktar)).toLocaleString('tr-TR') : '—'}</td>
-                                                                </tr>
-                                                            ))}
+                                                            {kalemler.map((k, i) => {
+                                                                const kCur = k.para_birimi || offer.para_birimi || 'TRY';
+                                                                const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+                                                                return (
+                                                                    <tr key={i}>
+                                                                        <td><strong>{k.madde || '—'}</strong></td>
+                                                                        <td>{k.miktar || '—'}</td>
+                                                                        <td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td>
+                                                                        <td>{kCur}</td>
+                                                                        <td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td>
+                                                                    </tr>
+                                                                );
+                                                            })}
                                                         </tbody>
                                                     </table>
+                                                    {/* Enes Doğanay | 14 Nisan 2026: Parçalı para birimi — gruplu toplam */}
+                                                    {(() => {
+                                                        const groups = {};
+                                                        kalemler.forEach(k => {
+                                                            const c = k.para_birimi || offer.para_birimi || 'TRY';
+                                                            const t = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+                                                            groups[c] = (groups[c] || 0) + t;
+                                                        });
+                                                        const entries = Object.entries(groups).filter(([, v]) => v > 0);
+                                                        if (entries.length <= 1) return null;
+                                                        return (
+                                                            <div className="mop-kalemler__grouped-total">
+                                                                <strong>Toplamlar:</strong>
+                                                                {entries.map(([c, v]) => (
+                                                                    <span key={c}>{formatMoney(v, c)}</span>
+                                                                ))}
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </div>
                                         )}

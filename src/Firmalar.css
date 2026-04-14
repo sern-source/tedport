@@ -485,11 +485,13 @@ summary {
     }
 }
 
+/* Enes Doğanay | 14 Nisan 2026: Avatar harfinin altındaki link çizgiyi kaldır */
 .card-images {
     display: flex;
     flex-direction: row;
     gap: 0.35rem;
     max-width: 72px;
+    text-decoration: none;
 }
 
 @media (min-width: 540px) {
@@ -505,9 +507,10 @@ summary {
     }
 }
 
+/* Enes Doğanay | 14 Nisan 2026: Harf avatarı kartın tamamını kaplar ve ortalanır */
 .supp-avatar2 {
-    width: 72px;
-    height: 28px;
+    width: 100%;
+    height: 100%;
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -518,16 +521,12 @@ summary {
 
 @media (min-width: 540px) {
     .supp-avatar2 {
-        width: 84px;
-        height: 32px;
         font-size: 38px;
     }
 }
 
 @media (min-width: 768px) {
     .supp-avatar2 {
-        width: 96px;
-        height: 36px;
         font-size: 42px;
     }
 }
@@ -1248,7 +1247,6 @@ summary {
   color: #64748b;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
-  margin-left: auto;
 }
 
 .firmalar-view-toggle:hover {
@@ -1259,6 +1257,71 @@ summary {
 
 .firmalar-view-toggle .material-symbols-outlined {
   font-size: 20px;
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Sıralama + görünüm toggle kapsayıcı */
+.firmalar-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.firmalar-sort-wrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 0 10px 0 8px;
+  height: 40px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.firmalar-sort-wrap:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.firmalar-sort-icon {
+  font-size: 18px;
+  color: #64748b;
+  pointer-events: none;
+  margin-right: 4px;
+}
+
+.firmalar-sort-select {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  outline: none;
+  padding: 0 4px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font-family: inherit;
+}
+
+.firmalar-sort-select option {
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
+  .firmalar-sort-wrap {
+    height: 36px;
+    border-radius: 10px;
+    padding: 0 8px 0 6px;
+  }
+  .firmalar-sort-select {
+    font-size: 12px;
+  }
+  .firmalar-sort-icon {
+    font-size: 16px;
+  }
 }
 
 /* Liste görünümü */

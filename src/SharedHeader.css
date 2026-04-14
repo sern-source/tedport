@@ -30,13 +30,12 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* Enes Doğanay | 9 Nisan 2026: max-width ile yatay taşma engellendi */
+/* Enes Doğanay | 14 Nisan 2026: 3 bölgeli sabit layout — sol/orta/sağ */
 .shared-header-inner {
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0 16px;
     gap: 12px;
     position: relative;
@@ -58,6 +57,58 @@
     }
 }
 
+/* Enes Doğanay | 14 Nisan 2026: Sol grup — geri butonu + logo her sayfada aynı konumda */
+.shared-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Sağ grup — nav + kullanıcı her sayfada sağa sabit */
+.shared-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+/* Enes Doğanay | 16 Nisan 2026: Site içi geri butonu — ana sayfa hariç tüm sayfalarda */
+/* ========== BACK BUTTON ========== */
+
+.shared-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #475569;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+
+.shared-back-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #cbd5e1;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.shared-back-btn:active {
+    background: #cbd5e1;
+    transform: scale(0.95);
+}
+
+.shared-back-btn .material-symbols-outlined {
+    font-size: 20px;
+    line-height: 1;
+}
+
 /* ========== LOGO ========== */
 
 .shared-logo-area {
@@ -77,11 +128,13 @@
 
 /* ========== SEARCH BAR ========== */
 
+/* Enes Doğanay | 14 Nisan 2026: Arama çubuğu — ortalanmış, esnek genişlik */
 .shared-search-bar {
     position: relative;
     flex: 1;
     min-width: 120px;
     max-width: 300px;
+    margin: 0 auto;
 }
 
 @media (min-width: 640px) {

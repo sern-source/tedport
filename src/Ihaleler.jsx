@@ -17,6 +17,73 @@ import { useAuth } from './AuthContext';
 // Enes Doğanay | 6 Nisan 2026: Ihale tablosu henuz kurulmamissa ekran kirilmasin diye iliski hatasi yumusatilir
 const isMissingRelationError = (error) => error?.code === '42P01' || error?.message?.toLowerCase().includes('relation');
 
+// Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — 5 ana + diğer seçeneği
+const MAIN_CURRENCIES = [
+    { code: 'TRY', symbol: '₺', name: 'Türk Lirası' },
+    { code: 'USD', symbol: '$', name: 'Amerikan Doları' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'İngiliz Sterlini' },
+    { code: 'CHF', symbol: 'CHF', name: 'İsviçre Frangı' },
+];
+
+const ALL_CURRENCIES = [
+    { code: 'TRY', symbol: '₺', name: 'Türk Lirası' },
+    { code: 'USD', symbol: '$', name: 'Amerikan Doları' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'İngiliz Sterlini' },
+    { code: 'CHF', symbol: 'CHF', name: 'İsviçre Frangı' },
+    { code: 'JPY', symbol: '¥', name: 'Japon Yeni' },
+    { code: 'CNY', symbol: '¥', name: 'Çin Yuanı' },
+    { code: 'RUB', symbol: '₽', name: 'Rus Rublesi' },
+    { code: 'SAR', symbol: 'SR', name: 'Suudi Riyali' },
+    { code: 'AED', symbol: 'د.إ', name: 'BAE Dirhemi' },
+    { code: 'AUD', symbol: 'A$', name: 'Avustralya Doları' },
+    { code: 'CAD', symbol: 'C$', name: 'Kanada Doları' },
+    { code: 'SEK', symbol: 'kr', name: 'İsveç Kronu' },
+    { code: 'NOK', symbol: 'kr', name: 'Norveç Kronu' },
+    { code: 'DKK', symbol: 'kr', name: 'Danimarka Kronu' },
+    { code: 'PLN', symbol: 'zł', name: 'Polonya Zlotisi' },
+    { code: 'CZK', symbol: 'Kč', name: 'Çek Korunası' },
+    { code: 'HUF', symbol: 'Ft', name: 'Macar Forinti' },
+    { code: 'RON', symbol: 'lei', name: 'Romen Leyi' },
+    { code: 'BGN', symbol: 'лв', name: 'Bulgar Levası' },
+    { code: 'INR', symbol: '₹', name: 'Hint Rupisi' },
+    { code: 'KRW', symbol: '₩', name: 'Güney Kore Wonu' },
+    { code: 'BRL', symbol: 'R$', name: 'Brezilya Reali' },
+    { code: 'MXN', symbol: 'Mex$', name: 'Meksika Pesosu' },
+    { code: 'ZAR', symbol: 'R', name: 'Güney Afrika Randı' },
+    { code: 'SGD', symbol: 'S$', name: 'Singapur Doları' },
+    { code: 'HKD', symbol: 'HK$', name: 'Hong Kong Doları' },
+    { code: 'NZD', symbol: 'NZ$', name: 'Yeni Zelanda Doları' },
+    { code: 'ILS', symbol: '₪', name: 'İsrail Şekeli' },
+    { code: 'QAR', symbol: 'QR', name: 'Katar Riyali' },
+    { code: 'KWD', symbol: 'د.ك', name: 'Kuveyt Dinarı' },
+    { code: 'BHD', symbol: 'BD', name: 'Bahreyn Dinarı' },
+    { code: 'OMR', symbol: 'OMR', name: 'Umman Riyali' },
+    { code: 'EGP', symbol: 'E£', name: 'Mısır Lirası' },
+    { code: 'GEL', symbol: '₾', name: 'Gürcistan Larisi' },
+    { code: 'UAH', symbol: '₴', name: 'Ukrayna Grivnası' },
+    { code: 'KZT', symbol: '₸', name: 'Kazakistan Tengesi' },
+    { code: 'AZN', symbol: '₼', name: 'Azerbaycan Manatı' },
+    { code: 'THB', symbol: '฿', name: 'Tayland Bahtı' },
+    { code: 'MYR', symbol: 'RM', name: 'Malezya Ringgiti' },
+    { code: 'IDR', symbol: 'Rp', name: 'Endonezya Rupisi' },
+    { code: 'PKR', symbol: 'Rs', name: 'Pakistan Rupisi' },
+    { code: 'NGN', symbol: '₦', name: 'Nijerya Nairası' },
+    { code: 'MAD', symbol: 'MAD', name: 'Fas Dirhemi' },
+    { code: 'TND', symbol: 'DT', name: 'Tunus Dinarı' },
+    { code: 'JOD', symbol: 'JD', name: 'Ürdün Dinarı' },
+    { code: 'IQD', symbol: 'IQD', name: 'Irak Dinarı' },
+    { code: 'IRR', symbol: 'IRR', name: 'İran Riyali' },
+    { code: 'LYD', symbol: 'LYD', name: 'Libya Dinarı' },
+    { code: 'DZD', symbol: 'DA', name: 'Cezayir Dinarı' },
+];
+
+const getCurrencySymbol = (code) => {
+    const c = ALL_CURRENCIES.find(cur => cur.code === code);
+    return c ? c.symbol : code;
+};
+
 // Enes Doğanay | 10 Nisan 2026: Kategori, bütçe notu kaldırıldı; kdv, teslim il/ilçe, gereksinimler, davet emailleri, davetli firmalar eklendi
 // Enes Doğanay | 10 Nisan 2026: Stepper form yapısına geçildi, teslim_suresi eklendi
 const EMPTY_FORM = {
@@ -59,9 +126,10 @@ const getKalemToplam = (kalem) => {
 };
 
 // Enes Doğanay | 10 Nisan 2026: Para birimi formatla
+// Enes Doğanay | 14 Nisan 2026: Tüm para birimlerini destekleyecek şekilde güncellendi
 const formatCurrency = (amount, currency) => {
-    const symbols = { TRY: '₺', USD: '$', EUR: '€', GBP: '£' };
-    return `${symbols[currency] || currency} ${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const symbol = getCurrencySymbol(currency);
+    return `${symbol} ${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
 const IhalelerPage = () => {
@@ -143,6 +211,9 @@ const IhalelerPage = () => {
     /* Enes Doğanay | 13 Nisan 2026: Teklifi geri çekme state */
     const [withdrawConfirm, setWithdrawConfirm] = useState(false);
     const [withdrawing, setWithdrawing] = useState(false);
+    /* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — diğer para birimi modal state */
+    const [currencyModalIdx, setCurrencyModalIdx] = useState(null);
+    const [currencySearch, setCurrencySearch] = useState('');
     const teklifDosyaRef = useRef(null);
     /* Enes Doğanay | 13 Nisan 2026: Giriş yapmamış kullanıcı için login prompt popup */
     const [loginPromptTenderId, setLoginPromptTenderId] = useState(null);
@@ -606,6 +677,16 @@ const IhalelerPage = () => {
             return matchesQuery && matchesStatus;
         })
         .sort((firstTender, secondTender) => {
+            /* Enes Doğanay | 14 Nisan 2026: Tümü sekmesinde canlı→yaklaşan→kapalı sıralama */
+            if (statusFilter === 'all') {
+                const STATUS_ORDER = { canli: 0, yaklasan: 1, kapali: 2 };
+                const aKey = getTenderStatusMeta(firstTender).key;
+                const bKey = getTenderStatusMeta(secondTender).key;
+                const aOrder = STATUS_ORDER[aKey] ?? 3;
+                const bOrder = STATUS_ORDER[bKey] ?? 3;
+                if (aOrder !== bOrder) return aOrder - bOrder;
+            }
+
             if (sortBy === 'newest') {
                 return (secondTender.yayin_tarihi || '').localeCompare(firstTender.yayin_tarihi || '');
             }
@@ -658,8 +739,13 @@ const IhalelerPage = () => {
         const existing = userOffers[String(tender.id)];
         if (existing) {
             /* Mevcut teklifi düzenleme — formu mevcut verilerle doldur */
+            /* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — backward compat: eski tekliflerde para_birimi yoksa offer seviyesinden al */
+            const loadedKalemler = Array.isArray(existing.kalemler) ? existing.kalemler.map(k => ({
+                ...k,
+                para_birimi: k.para_birimi || existing.para_birimi || 'TRY',
+            })) : [];
             setTeklifForm({
-                kalemler: Array.isArray(existing.kalemler) ? existing.kalemler : [],
+                kalemler: loadedKalemler,
                 genel_toplam: existing.toplam_tutar ? String(existing.toplam_tutar) : '',
                 para_birimi: existing.para_birimi || 'TRY',
                 kdv_dahil: existing.kdv_dahil || false,
@@ -670,12 +756,14 @@ const IhalelerPage = () => {
         } else {
             /* Yeni teklif — gereksinimlerden boş kalem tablosu oluştur */
             const gereksinimler = Array.isArray(tender.gereksinimler) ? tender.gereksinimler : [];
+            /* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — her yeni kaleme varsayılan para_birimi eklendi */
             const kalemler = gereksinimler.map(g => ({
                 gereksinim_id: g.id,
                 madde: g.madde,
                 birim_fiyat: '',
                 miktar: '1',
                 aciklama: '',
+                para_birimi: 'TRY',
             }));
             setTeklifForm({
                 kalemler,
@@ -709,6 +797,21 @@ const IhalelerPage = () => {
             return teklifForm.kalemler.reduce((sum, k) => sum + getKalemToplam(k), 0);
         }
         return parseFloat(teklifForm.genel_toplam) || 0;
+    };
+
+    // Enes Doğanay | 14 Nisan 2026: Para birimine göre gruplu toplam — parçalı para birimi desteği
+    const getGroupedTotals = () => {
+        if (teklifForm.kalemler.length > 0) {
+            const groups = {};
+            teklifForm.kalemler.forEach(k => {
+                const cur = k.para_birimi || 'TRY';
+                const total = getKalemToplam(k);
+                groups[cur] = (groups[cur] || 0) + total;
+            });
+            return groups;
+        }
+        const total = parseFloat(teklifForm.genel_toplam) || 0;
+        return { [teklifForm.para_birimi]: total };
     };
 
     // Enes Doğanay | 13 Nisan 2026: formatCurrency modül seviyesine taşındı (yukarıda tanımlı)
@@ -756,10 +859,18 @@ const IhalelerPage = () => {
             const existingOffer = userOffers[String(teklifTender.id)];
             const isUpdate = !!existingOffer;
 
+            /* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — para_birimi alanını ilk kalemin para biriminden al */
+            const effectiveParaBirimi = teklifForm.kalemler.length > 0
+                ? (teklifForm.kalemler[0]?.para_birimi || 'TRY')
+                : teklifForm.para_birimi;
+            /* Enes Doğanay | 14 Nisan 2026: DB CHECK constraint uyumu — sadece izin verilen 4 değer */
+            const DB_ALLOWED = ['TRY', 'USD', 'EUR', 'GBP'];
+            const safeParaBirimi = DB_ALLOWED.includes(effectiveParaBirimi) ? effectiveParaBirimi : 'TRY';
+
             const payload = {
                 kalemler: teklifForm.kalemler.length > 0 ? teklifForm.kalemler : null,
                 toplam_tutar: toplam,
-                para_birimi: teklifForm.para_birimi,
+                para_birimi: safeParaBirimi,
                 kdv_dahil: teklifForm.kdv_dahil,
                 teslim_suresi_gun: parseInt(teklifForm.teslim_suresi_gun, 10) || null,
                 teslim_aciklamasi: teklifForm.teslim_aciklamasi || null,
@@ -800,19 +911,22 @@ const IhalelerPage = () => {
             }
 
             /* Enes Doğanay | 13 Nisan 2026: Bildirim gönder — yeni teklif veya güncelleme */
+            /* Enes Doğanay | 14 Nisan 2026: Taslak→gönder geçişinde "yeni teklif" bildirimi gönder */
             if (!isDraft && teklifTender?.firma_id) {
+                const isDraftToSubmit = isUpdate && existingOffer?.durum === 'taslak';
                 const { data: managers } = await supabase
                     .from('kurumsal_firma_yoneticileri')
                     .select('user_id')
                     .eq('firma_id', String(teklifTender.firma_id));
                 if (managers?.length) {
-                    const notifTitle = isUpdate ? 'Teklif güncellendi' : 'Yeni teklif geldi!';
-                    const notifMessage = isUpdate
+                    const isRealUpdate = isUpdate && !isDraftToSubmit;
+                    const notifTitle = isRealUpdate ? 'Teklif güncellendi' : 'Yeni teklif geldi!';
+                    const notifMessage = isRealUpdate
                         ? `"${teklifTender.baslik || 'İhale'}" ihalenize gelen bir teklifte güncelleme yapıldı.`
                         : `"${teklifTender.baslik || 'İhale'}" ihalenize yeni bir teklif gönderildi.`;
                     const notifRows = managers.map(m => ({
                         user_id: m.user_id,
-                        type: isUpdate ? 'tender_offer_updated' : 'tender_new_offer',
+                        type: isRealUpdate ? 'tender_offer_updated' : 'tender_new_offer',
                         title: notifTitle,
                         message: notifMessage,
                         firma_id: String(teklifTender.firma_id),
@@ -833,7 +947,9 @@ const IhalelerPage = () => {
             if (isDraft) {
                 setTeklifSuccess('draft');
             } else {
-                setTeklifSuccess(isUpdate ? 'update' : true);
+                /* Enes Doğanay | 14 Nisan 2026: Taslak→gönder geçişinde "gönderildi" mesajı göster */
+                const isDraftToSubmit = isUpdate && existingOffer?.durum === 'taslak';
+                setTeklifSuccess(isDraftToSubmit ? true : (isUpdate ? 'update' : true));
             }
             setTimeout(() => setTeklifSuccess(false), 4500);
         } catch (err) {
@@ -1540,6 +1656,19 @@ const IhalelerPage = () => {
                     </section>
                 ) : (
                     <>
+                        {/* Enes Doğanay | 14 Nisan 2026: Giriş yapmayan kullanıcılar ihaleleri bulanık görür */}
+                        {!userProfile && (
+                            <div className="tenders-blur-overlay">
+                                <div className="tenders-blur-cta">
+                                    <span className="material-symbols-outlined">lock</span>
+                                    <h3>İhaleleri görüntülemek için giriş yapın</h3>
+                                    <p>İhale detaylarını görmek ve teklif vermek için hesabınıza giriş yapın.</p>
+                                    <button type="button" className="tenders-blur-login-btn" onClick={() => navigate('/login')}>Giriş Yap</button>
+                                    <span className="tenders-blur-register">Hesabınız yok mu? <button type="button" onClick={() => navigate('/register')}>Kayıt Ol</button></span>
+                                </div>
+                            </div>
+                        )}
+                        <div className={!userProfile ? 'tenders-blurred-content' : undefined}>
                         {(searchTerm.trim().length >= 2 || statusFilter !== 'all') && (
                             <p className="tenders-result-count">
                                 <span>{filteredTenders.length}</span> ihale listeleniyor
@@ -1736,6 +1865,7 @@ const IhalelerPage = () => {
                                 })}
                             </section>
                         )}
+                        </div>
                     </>
                 )}
 
@@ -1928,19 +2058,21 @@ const IhalelerPage = () => {
                                         <h3><span className="material-symbols-outlined">payments</span> Teklif Detay</h3>
 
                                         {hasKalemler ? (
-                                            /* Kalem kalem teklif tablosu */
+                                            /* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — her satırda ayrı para birimi seçimi */
                                             <div className="teklif-kalem-table">
                                                 <div className="teklif-kalem-table__head">
                                                     <span className="teklif-kalem-col teklif-kalem-col--no">#</span>
                                                     <span className="teklif-kalem-col teklif-kalem-col--madde">Kalem</span>
                                                     <span className="teklif-kalem-col teklif-kalem-col--miktar">Miktar</span>
                                                     <span className="teklif-kalem-col teklif-kalem-col--fiyat">Birim Fiyat</span>
+                                                    <span className="teklif-kalem-col teklif-kalem-col--currency">Para Birimi</span>
                                                     <span className="teklif-kalem-col teklif-kalem-col--toplam">Toplam</span>
                                                 </div>
                                                 {teklifForm.kalemler.map((kalem, idx) => {
                                                     const kalemTotal = getKalemToplam(kalem);
+                                                    const kalemCurrency = kalem.para_birimi || 'TRY';
                                                     return (
-                                                        <div key={kalem.gereksinim_id} className="teklif-kalem-table__row">
+                                                        <div key={kalem.gereksinim_id || idx} className="teklif-kalem-table__row">
                                                             <span className="teklif-kalem-col teklif-kalem-col--no">{idx + 1}</span>
                                                             <div className="teklif-kalem-col teklif-kalem-col--madde">
                                                                 <strong>{kalem.madde}</strong>
@@ -1972,19 +2104,47 @@ const IhalelerPage = () => {
                                                                     className="teklif-kalem-input"
                                                                 />
                                                             </div>
+                                                            <div className="teklif-kalem-col teklif-kalem-col--currency">
+                                                                <select
+                                                                    value={MAIN_CURRENCIES.some(c => c.code === kalemCurrency) ? kalemCurrency : '_other'}
+                                                                    onChange={(e) => {
+                                                                        if (e.target.value === '_other') {
+                                                                            setCurrencyModalIdx(idx);
+                                                                            setCurrencySearch('');
+                                                                        } else {
+                                                                            updateKalem(idx, 'para_birimi', e.target.value);
+                                                                        }
+                                                                    }}
+                                                                    className="teklif-kalem-currency-select"
+                                                                >
+                                                                    {MAIN_CURRENCIES.map(c => (
+                                                                        <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
+                                                                    ))}
+                                                                    <option value="_other">Diğer…</option>
+                                                                </select>
+                                                                {!MAIN_CURRENCIES.some(c => c.code === kalemCurrency) && kalemCurrency !== 'TRY' && (
+                                                                    <span className="teklif-kalem-currency-badge">{getCurrencySymbol(kalemCurrency)} {kalemCurrency}</span>
+                                                                )}
+                                                            </div>
                                                             <span className="teklif-kalem-col teklif-kalem-col--toplam teklif-kalem-col--amount">
-                                                                {formatCurrency(kalemTotal, teklifForm.para_birimi)}
+                                                                {formatCurrency(kalemTotal, kalemCurrency)}
                                                             </span>
                                                         </div>
                                                     );
                                                 })}
+                                                {/* Enes Doğanay | 14 Nisan 2026: Parçalı para birimi — gruplu toplam */}
                                                 <div className="teklif-kalem-table__footer">
                                                     <span>Genel Toplam</span>
-                                                    <strong>{formatCurrency(genelToplam, teklifForm.para_birimi)}</strong>
+                                                    <div className="teklif-kalem-table__footer-totals">
+                                                        {Object.entries(getGroupedTotals()).filter(([, amt]) => amt > 0).map(([cur, amt]) => (
+                                                            <strong key={cur}>{formatCurrency(amt, cur)}</strong>
+                                                        ))}
+                                                        {Object.values(getGroupedTotals()).every(v => v === 0) && <strong>{formatCurrency(0, 'TRY')}</strong>}
+                                                    </div>
                                                 </div>
                                             </div>
                                         ) : (
-                                            /* Tek tutar girişi */
+                                            /* Enes Doğanay | 14 Nisan 2026: Tek tutar modda 5 ana + diğer para birimi */
                                             <div className="teklif-popup__single-amount">
                                                 <label>Teklif Tutarı</label>
                                                 <div className="teklif-popup__amount-row">
@@ -1998,35 +2158,32 @@ const IhalelerPage = () => {
                                                         className="teklif-popup__amount-input"
                                                     />
                                                     <select
-                                                        value={teklifForm.para_birimi}
-                                                        onChange={(e) => setTeklifForm(p => ({ ...p, para_birimi: e.target.value }))}
+                                                        value={MAIN_CURRENCIES.some(c => c.code === teklifForm.para_birimi) ? teklifForm.para_birimi : '_other'}
+                                                        onChange={(e) => {
+                                                            if (e.target.value === '_other') {
+                                                                setCurrencyModalIdx('single');
+                                                                setCurrencySearch('');
+                                                            } else {
+                                                                setTeklifForm(p => ({ ...p, para_birimi: e.target.value }));
+                                                            }
+                                                        }}
                                                         className="teklif-popup__currency-select"
                                                     >
-                                                        <option value="TRY">₺ TRY</option>
-                                                        <option value="USD">$ USD</option>
-                                                        <option value="EUR">€ EUR</option>
-                                                        <option value="GBP">£ GBP</option>
+                                                        {MAIN_CURRENCIES.map(c => (
+                                                            <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
+                                                        ))}
+                                                        <option value="_other">Diğer…</option>
                                                     </select>
+                                                    {!MAIN_CURRENCIES.some(c => c.code === teklifForm.para_birimi) && teklifForm.para_birimi !== 'TRY' && (
+                                                        <span className="teklif-kalem-currency-badge">{getCurrencySymbol(teklifForm.para_birimi)} {teklifForm.para_birimi}</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* Para birimi + KDV (kalemli modda) */}
+                                        {/* Enes Doğanay | 14 Nisan 2026: Kalemli modda artık para birimi satır bazlı — burada sadece KDV toggle */}
                                         {hasKalemler && (
                                             <div className="teklif-popup__inline-row">
-                                                <div className="teklif-popup__inline-field">
-                                                    <label>Para Birimi</label>
-                                                    <select
-                                                        value={teklifForm.para_birimi}
-                                                        onChange={(e) => setTeklifForm(p => ({ ...p, para_birimi: e.target.value }))}
-                                                        className="teklif-popup__currency-select"
-                                                    >
-                                                        <option value="TRY">₺ TRY</option>
-                                                        <option value="USD">$ USD</option>
-                                                        <option value="EUR">€ EUR</option>
-                                                        <option value="GBP">£ GBP</option>
-                                                    </select>
-                                                </div>
                                                 <label className="teklif-popup__toggle">
                                                     <input
                                                         type="checkbox"
@@ -2132,11 +2289,20 @@ const IhalelerPage = () => {
                                     )}
                                 </div>
 
-                                {/* Footer — Gönder + Taslak */}
+                                {/* Enes Doğanay | 14 Nisan 2026: Footer — gruplu toplam + gönder/taslak */}
                                 <div className="teklif-popup__footer">
                                     <div className="teklif-popup__footer-total">
                                         <span>Toplam Teklif</span>
-                                        <strong>{formatCurrency(genelToplam, teklifForm.para_birimi)}</strong>
+                                        <div className="teklif-popup__footer-amounts">
+                                            {(() => {
+                                                const grouped = getGroupedTotals();
+                                                const entries = Object.entries(grouped).filter(([, amt]) => amt > 0);
+                                                if (entries.length === 0) return <strong>{formatCurrency(0, 'TRY')}</strong>;
+                                                return entries.map(([cur, amt]) => (
+                                                    <strong key={cur}>{formatCurrency(amt, cur)}</strong>
+                                                ));
+                                            })()}
+                                        </div>
                                         {teklifForm.kdv_dahil && <small>KDV Dahil</small>}
                                     </div>
                                     <div className="teklif-popup__footer-actions">
@@ -2162,6 +2328,74 @@ const IhalelerPage = () => {
                         </div>
                     );
                 })()}
+
+                {/* Enes Doğanay | 14 Nisan 2026: Diğer para birimi seçim modalı */}
+                {currencyModalIdx !== null && (
+                    <div className="teklif-popup-overlay" style={{ zIndex: 10001 }} onClick={() => setCurrencyModalIdx(null)}>
+                        <div className="teklif-currency-modal" onClick={e => e.stopPropagation()}>
+                            <div className="teklif-currency-modal__head">
+                                <h3><span className="material-symbols-outlined">currency_exchange</span> Para Birimi Seçin</h3>
+                                <button type="button" onClick={() => setCurrencyModalIdx(null)}>
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                            <div className="teklif-currency-modal__search">
+                                <span className="material-symbols-outlined">search</span>
+                                <input
+                                    type="text"
+                                    placeholder="Para birimi ara… (ör: JPY, Yen)"
+                                    value={currencySearch}
+                                    onChange={e => setCurrencySearch(e.target.value)}
+                                    autoFocus
+                                />
+                                {currencySearch && (
+                                    <button type="button" onClick={() => setCurrencySearch('')}>
+                                        <span className="material-symbols-outlined">close</span>
+                                    </button>
+                                )}
+                            </div>
+                            <div className="teklif-currency-modal__list">
+                                {ALL_CURRENCIES
+                                    .filter(c => {
+                                        if (!currencySearch.trim()) return true;
+                                        const q = currencySearch.trim().toLocaleLowerCase('tr-TR');
+                                        return c.code.toLocaleLowerCase('tr-TR').includes(q)
+                                            || c.name.toLocaleLowerCase('tr-TR').includes(q)
+                                            || c.symbol.toLocaleLowerCase('tr-TR').includes(q);
+                                    })
+                                    .map(c => (
+                                        <button
+                                            key={c.code}
+                                            className="teklif-currency-modal__item"
+                                            onClick={() => {
+                                                if (currencyModalIdx === 'single') {
+                                                    setTeklifForm(p => ({ ...p, para_birimi: c.code }));
+                                                } else {
+                                                    updateKalem(currencyModalIdx, 'para_birimi', c.code);
+                                                }
+                                                setCurrencyModalIdx(null);
+                                            }}
+                                        >
+                                            <span className="teklif-currency-modal__symbol">{c.symbol}</span>
+                                            <span className="teklif-currency-modal__code">{c.code}</span>
+                                            <span className="teklif-currency-modal__name">{c.name}</span>
+                                        </button>
+                                    ))
+                                }
+                                {ALL_CURRENCIES.filter(c => {
+                                    if (!currencySearch.trim()) return true;
+                                    const q = currencySearch.trim().toLocaleLowerCase('tr-TR');
+                                    return c.code.toLocaleLowerCase('tr-TR').includes(q) || c.name.toLocaleLowerCase('tr-TR').includes(q) || c.symbol.toLocaleLowerCase('tr-TR').includes(q);
+                                }).length === 0 && (
+                                    <div className="teklif-currency-modal__empty">
+                                        <span className="material-symbols-outlined">search_off</span>
+                                        <p>Para birimi bulunamadı</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Enes Doğanay | 13 Nisan 2026: Teklifi Geri Çek onay modal */}
                 {withdrawConfirm && (

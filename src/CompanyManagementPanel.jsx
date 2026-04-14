@@ -321,7 +321,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                     <div className="cmp-grid cmp-grid--3">
                         <label className="cmp-field">
                             <span>Telefon</span>
-                            <input type="text" name="cmp_t_x" value={fields.telefon} onChange={e => set('telefon', e.target.value)} placeholder="0 (5XX) XXX XX XX" autoComplete="one-time-code" />
+                            <input type="text" name="cmp_t_x" value={fields.telefon} onChange={e => set('telefon', e.target.value)} placeholder="0 (XXX) XXX XX XX" autoComplete="one-time-code" />
                         </label>
                         <label className="cmp-field">
                             <span>E-posta</span>

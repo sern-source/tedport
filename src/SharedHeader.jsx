@@ -86,20 +86,35 @@ const SharedHeader = ({
 
     const items = navItems || defaultNavItems;
 
+    {/* Enes Doğanay | 16 Nisan 2026: Ana sayfa dışında tüm sayfalarda geri butonu */}
+    const isHomePage = location.pathname === '/';
+
     return (
         <header className="shared-header">
             <div className="shared-header-inner">
-                {/* Logo */}
-                <Link to="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
-                    <img
-                        className="shared-logo-image"
-                        src="/tedport-logo.jpg"
-                        alt="Tedport Logo"
-                    />
-                </Link>
+                {/* Enes Doğanay | 14 Nisan 2026: Sol grup — geri butonu + logo sabit konumda */}
+                <div className="shared-header-left">
+                    <button
+                        type="button"
+                        className="shared-back-btn"
+                        onClick={() => navigate(-1)}
+                        aria-label="Geri dön"
+                        title="Geri dön"
+                        style={isHomePage ? { visibility: 'hidden' } : undefined}
+                    >
+                        <span className="material-symbols-outlined">arrow_back</span>
+                    </button>
 
-                {/* Search Bar (optional) */}
-                {/* Enes Doğanay | 5 Nisan 2026: Autocomplete öneri dropdown desteği eklendi */}
+                    <Link to="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
+                        <img
+                            className="shared-logo-image"
+                            src="/tedport-logo.jpg"
+                            alt="Tedport Logo"
+                        />
+                    </Link>
+                </div>
+
+                {/* Enes Doğanay | 5 Nisan 2026: Search Bar (optional) — orta alan */}
                 {showSearchBar && search !== undefined && setSearch && (
                     <div className="shared-search-bar" ref={searchBarRef}>
                         <div className="shared-search-icon">
@@ -117,7 +132,6 @@ const SharedHeader = ({
                             }}
                         />
 
-                        {/* Enes Doğanay | 5 Nisan 2026: Arama kutusunu tek tıkla temizleyen X butonu */}
                         {search && search.length > 0 && (
                             <button
                                 className="shared-search-clear"
@@ -128,7 +142,6 @@ const SharedHeader = ({
                             </button>
                         )}
 
-                        {/* Enes Doğanay | 5 Nisan 2026: Autocomplete öneri listesi veya sonuç bulunamadı mesajı */}
                         {suggestions.length > 0 && (
                             <div className="shared-search-suggestions">
                                 {suggestions.map((item) => (
@@ -149,7 +162,6 @@ const SharedHeader = ({
                             </div>
                         )}
 
-                        {/* Enes Doğanay | 5 Nisan 2026: Sonuç bulunamadı mesajı */}
                         {noResults && suggestions.length === 0 && (
                             <div className="shared-search-suggestions">
                                 <div className="shared-suggestion-no-result">
@@ -161,27 +173,29 @@ const SharedHeader = ({
                     </div>
                 )}
 
-                {/* Mobile Hamburger */}
-                <button
-                    className="shared-hamburger"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    aria-label="Menu"
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                {/* Enes Doğanay | 14 Nisan 2026: Sağ grup — nav + kullanıcı sabit konumda */}
+                <div className="shared-header-right">
+                    {/* Mobile Hamburger */}
+                    <button
+                        className="shared-hamburger"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="Menu"
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
 
-                {/* Desktop Navigation */}
-                <div className="shared-nav">
-                    <div className="shared-nav-links">
-                        {items.map((item, idx) => (
-                            <Link key={idx} to={item.href}>
-                                {item.label}
-                            </Link>
-                        ))}
-                        {authChecked && !userProfile && <Link to="/login">Giriş Yap</Link>}
-                    </div>
+                    {/* Desktop Navigation */}
+                    <div className="shared-nav">
+                        <div className="shared-nav-links">
+                            {items.map((item, idx) => (
+                                <Link key={idx} to={item.href}>
+                                    {item.label}
+                                </Link>
+                            ))}
+                            {authChecked && !userProfile && <Link to="/login">Giriş Yap</Link>}
+                        </div>
 
                     {/* User Actions */}
                     <div className="shared-user-actions">
@@ -344,6 +358,25 @@ const SharedHeader = ({
                                             </button>
                                         )}
 
+                                        {/* Enes Doğanay | 14 Nisan 2026: Admin iletişim mesajları menü girişi */}
+                                        {isCurrentUserAdmin && (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/admin/iletisim-mesajlari');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    contact_mail
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    İletişim Mesajları
+                                                </span>
+                                            </button>
+                                        )}
+
                                         {!managedCompanyId && (
                                             <>
                                                 {/* Enes Doğanay | 9 Nisan 2026: Sıralama güncellendi — Favorilerim öne, isimler düzeltildi */}
@@ -445,6 +478,7 @@ const SharedHeader = ({
                         )}
                     </div>
                 </div>
+                </div>
             </div>
 
             {/* Mobile Navigation Menu */}
@@ -525,6 +559,13 @@ const SharedHeader = ({
                                 <Link to="/admin/firma-duzenle" onClick={() => setIsMobileMenuOpen(false)}>
                                     <span className="material-symbols-outlined shared-mobile-menu-icon">edit_note</span>
                                     Firma Düzenleme
+                                </Link>
+                            )}
+                            {/* Enes Doğanay | 14 Nisan 2026: Admin iletişim mesajları — mobil menü */}
+                            {isCurrentUserAdmin && (
+                                <Link to="/admin/iletisim-mesajlari" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span className="material-symbols-outlined shared-mobile-menu-icon">contact_mail</span>
+                                    İletişim Mesajları
                                 </Link>
                             )}
                             <button

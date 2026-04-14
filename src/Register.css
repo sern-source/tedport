@@ -49,6 +49,46 @@ body {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
+/* Enes Doğanay | 14 Nisan 2026: Google ile kayıt ol butonu */
+.register-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.register-google-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.register-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.register-divider::before,
+.register-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
 /* Main Content Styles */
 .main-content {
   flex: 1;
@@ -221,6 +261,15 @@ body {
 
 .form-input::placeholder {
   color: #a0aec0;
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Chrome/Safari autofill mavi arka planını engelle */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #111 !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Enes Doğanay | 11 Nisan 2026: Şifre uyuşmazlık hata stili */
@@ -523,16 +572,16 @@ body {
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Kurumsal kayit akisinda sureci aciklayan ust panel eklendi */
+/* Enes Doğanay | 14 Nisan 2026: margin-bottom eklendi — gradient label'a taşmasın, box-shadow kaldırıldı */
 .corporate-intro-panel {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  margin: 4px 32px 0;
+  margin: 4px 32px 20px;
   padding: 18px 20px;
   border-radius: 18px;
   background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%);
   color: #fff;
-  box-shadow: 0 18px 36px rgba(30, 58, 138, 0.15);
 }
 
 .corporate-intro-icon {

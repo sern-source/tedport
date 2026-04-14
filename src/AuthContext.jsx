@@ -72,11 +72,33 @@ export function AuthProvider({ children }) {
         supabase.from('bildirimler').select('id', { count: 'exact', head: true }).eq('user_id', session.user.id).eq('is_read', false)
       ]);
 
-      // Enes Doğanay | 10 Nisan 2026: Profil sorgusu RLS ile başarısız olduysa token geçersiz demektir
+      // Enes Doğanay | 14 Nisan 2026: Google OAuth kullanıcıları için profil satırı yoksa otomatik oluştur
       if (profileResult.error) {
-        try { await supabase.auth.signOut(); } catch {}
-        clearAuthState();
-        return;
+        const meta = session.user.user_metadata;
+        if (meta && (meta.full_name || meta.name || meta.email)) {
+          const fullName = meta.full_name || meta.name || '';
+          const nameParts = fullName.trim().split(/\s+/);
+          const autoFirstName = nameParts[0] || meta.email?.split('@')[0] || 'Kullanıcı';
+          const autoLastName = nameParts.slice(1).join(' ') || '';
+          const autoProfile = {
+            id: session.user.id,
+            first_name: autoFirstName,
+            last_name: autoLastName,
+            email: meta.email || session.user.email || '',
+            avatar: meta.avatar_url || null
+          };
+          const { error: insertError } = await supabase.from('profiles').upsert(autoProfile);
+          if (insertError) {
+            try { await supabase.auth.signOut(); } catch {}
+            clearAuthState();
+            return;
+          }
+          profileResult.data = { first_name: autoFirstName, last_name: autoLastName };
+        } else {
+          try { await supabase.auth.signOut(); } catch {}
+          clearAuthState();
+          return;
+        }
       }
 
       const companyId = companyResult.data?.firma_id || null;

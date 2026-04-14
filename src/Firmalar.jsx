@@ -21,6 +21,7 @@ import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
+import { TURKEY_DISTRICTS } from './turkeyDistricts'; // Enes Doğanay | 14 Nisan 2026: İl/ilçe ayrımı için
 import { getManagedCompanyId } from './companyManagementApi';
 
 
@@ -33,6 +34,29 @@ const SEKTORLER = [
   "Lojistik", "Tekstil", "Gıda", "Otomotiv", "Medikal", "Bilişim",
   "Güvenlik", "Hizmet"
 ];
+
+/* Enes Doğanay | 14 Nisan 2026: İstanbul Avrupa/Anadolu yakası ilçe ayrımı */
+const ISTANBUL_AVRUPA = ['Arnavutköy','Avcılar','Bağcılar','Bahçelievler','Bakırköy','Başakşehir','Bayrampaşa','Beşiktaş','Beylikdüzü','Beyoğlu','Büyükçekmece','Çatalca','Esenler','Esenyurt','Eyüpsultan','Fatih','Gaziosmanpaşa','Güngören','Kağıthane','Küçükçekmece','Sarıyer','Silivri','Sultangazi','Şişli','Zeytinburnu'];
+const ISTANBUL_ANADOLU = ['Adalar','Ataşehir','Beykoz','Çekmeköy','Kadıköy','Kartal','Maltepe','Pendik','Sancaktepe','Sultanbeyli','Şile','Tuzla','Ümraniye','Üsküdar'];
+
+/* Enes Doğanay | 14 Nisan 2026: il_ilce verisini "İlçe, İl" tutarlı formatına çevirir */
+const CITY_SET = new Set(Object.keys(TURKEY_DISTRICTS));
+function formatLocation(raw) {
+  if (!raw) return '';
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+  const parts = trimmed.split(/\s*[\/,\-]\s*/).filter(Boolean);
+  if (parts.length === 1) return trimmed;
+  let cityPart = null;
+  const districtParts = [];
+  for (const p of parts) {
+    if (CITY_SET.has(p) && !cityPart) cityPart = p;
+    else districtParts.push(p);
+  }
+  if (!cityPart) return parts.join(', ');
+  if (districtParts.length === 0) return cityPart;
+  return `${districtParts.join(', ')}, ${cityPart}`;
+}
 
 /**
  * Sidebar Component - Advanced Filter System
@@ -120,10 +144,19 @@ const Sidebar = ({ activeFilters, onApplyFilters, isOpen }) => {
       .from("firmalar")
       .select("category_name");
 
-    /* Enes Doğanay | 13 Nisan 2026: İstanbul, Ankara, Kocaeli önce, geri kalanı alfabetik */
+    /* Enes Doğanay | 14 Nisan 2026: İstanbul'u Avrupa/Anadolu yakası olarak ikiye ayır, öncelik sırası güncellendi */
     if (cityData) {
-      const priorityCities = ['İstanbul', 'Ankara', 'Kocaeli'];
-      const sorted = [...cityData].sort((a, b) => {
+      const priorityCities = ['İstanbul (Avrupa)', 'İstanbul (Anadolu)', 'Ankara', 'Kocaeli'];
+      const expanded = [];
+      cityData.forEach(c => {
+        if (c.sehir === 'İstanbul') {
+          expanded.push({ sehir: 'İstanbul (Avrupa)' });
+          expanded.push({ sehir: 'İstanbul (Anadolu)' });
+        } else {
+          expanded.push(c);
+        }
+      });
+      const sorted = expanded.sort((a, b) => {
         const ai = priorityCities.indexOf(a.sehir);
         const bi = priorityCities.indexOf(b.sehir);
         if (ai !== -1 && bi !== -1) return ai - bi;
@@ -492,7 +525,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
           ) : null}
           <div
             className='supp-avatar2'
-            style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '90%', display: data.images ? 'none' : 'flex' }}
+            style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '100%', display: data.images ? 'none' : 'flex' }}
           >
             {data.name?.charAt(0)}
           </div>
@@ -794,6 +827,8 @@ function App() {
 
   // Enes Doğanay | 9 Nisan 2026: Görünüm modu kullanıcıya özel — giriş yapılmamışsa daima grid, giriş yapılmışsa user-key ile localStorage'dan okunur
   const [viewMode, setViewMode] = useState('grid');
+  // Enes Doğanay | 14 Nisan 2026: Sıralama modu state'i
+  const [sortMode, setSortMode] = useState(savedState?.sortMode || 'default');
   const [currentUserId, setCurrentUserId] = useState(null);
   // Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişim dropdown hangi satırda açık
   const [openContactId, setOpenContactId] = useState(null);
@@ -943,10 +978,11 @@ function App() {
         search: search,
         filters: filters,
         page: page,
-        viewMode: viewMode
+        viewMode: viewMode,
+        sortMode: sortMode
       }));
     } catch {}
-  }, [search, filters, page, viewMode]);
+  }, [search, filters, page, viewMode, sortMode]);
 
   // Enes Doğanay | 5 Nisan 2026: ilike özel karakterlerini escape eden yardımcı fonksiyon
   // Enes Doğanay | 13 Nisan 2026: Modül seviyesine taşındı (yukarıda tanımlı)
@@ -970,7 +1006,7 @@ function App() {
 
   useEffect(() => {
     fetchSuppliers();
-  }, [page, debouncedSearch, filters]);
+  }, [page, debouncedSearch, filters, sortMode]);
 
 
   const fetchSuppliers = async () => {
@@ -996,11 +1032,19 @@ function App() {
     }
 
     // --- FİLTRELER (LIKE KULLANILARAK) ---
+    /* Enes Doğanay | 14 Nisan 2026: İstanbul Avrupa/Anadolu filtresi — ilçe bazlı sorgu */
     if (filters.cities && filters.cities.length > 0) {
-      const cityQuery = filters.cities
-        .map(city => `il_ilce.ilike."%${sanitizeSearch(city)}%"`)
-        .join(',');
-      query = query.or(cityQuery);
+      const cityQueryParts = [];
+      filters.cities.forEach(city => {
+        if (city === 'İstanbul (Avrupa)') {
+          ISTANBUL_AVRUPA.forEach(d => cityQueryParts.push(`il_ilce.ilike."%${sanitizeSearch(d)}%"`));
+        } else if (city === 'İstanbul (Anadolu)') {
+          ISTANBUL_ANADOLU.forEach(d => cityQueryParts.push(`il_ilce.ilike."%${sanitizeSearch(d)}%"`));
+        } else {
+          cityQueryParts.push(`il_ilce.ilike."%${sanitizeSearch(city)}%"`);
+        }
+      });
+      query = query.or(cityQueryParts.join(','));
     }
 
     if (filters.sectors && filters.sectors.length > 0) {
@@ -1017,12 +1061,18 @@ function App() {
       query = query.or(categoryQuery);
     }
 
-    /* Enes Doğanay | 13 Nisan 2026: Sıralama: 1) has_logo önce 2) onaylı hesap önce 3) best önce 4) firmaID tutarlılık */
-    query = query
-      .order('has_logo', { ascending: false, nullsFirst: false })
-      .order('onayli_hesap', { ascending: false, nullsFirst: false })
-      .order('best', { ascending: false })
-      .order('firmaID', { ascending: true });
+    /* Enes Doğanay | 14 Nisan 2026: Sıralama modu desteği — kullanıcı seçimine göre */
+    if (sortMode === 'a-z') {
+      query = query.order('firma_adi', { ascending: true });
+    } else if (sortMode === 'z-a') {
+      query = query.order('firma_adi', { ascending: false });
+    } else {
+      query = query
+        .order('has_logo', { ascending: false, nullsFirst: false })
+        .order('onayli_hesap', { ascending: false, nullsFirst: false })
+        .order('best', { ascending: false })
+        .order('firmaID', { ascending: true });
+    }
 
     const { data, error, count } = await query.range(from, to);
 
@@ -1039,7 +1089,8 @@ function App() {
         isBest: item.best,
         /* Enes Doğanay | 8 Nisan 2026: onayli_hesap doğrudan firmalar tablosundan okunuyor */
         isVerified: item.onayli_hesap === true,
-        location: item.il_ilce,
+        /* Enes Doğanay | 14 Nisan 2026: İlçe, İl formatı — tutarlı konum gösterimi */
+        location: formatLocation(item.il_ilce),
         tags: (degerleriDiziyeCevir(item.urun_kategorileri) || []),
         description: item.description,
         /* Enes Doğanay | 8 Nisan 2026: Sadece firma-logolari bucket'ından yüklenen logoyu kabul et, eski sahte avatarları ele */
@@ -1050,8 +1101,8 @@ function App() {
         adres: item.adres || ''
       }));
 
-      /* Enes Doğanay | 13 Nisan 2026: Arama varken sayfa içi relevance sıralamasına logo+onaylı+best önceliği ekle */
-      if (trimmedSearch.length >= 2) {
+      /* Enes Doğanay | 14 Nisan 2026: Kullanıcı sıralama seçtiyse arama relevance sıralamasını atla */
+      if (trimmedSearch.length >= 2 && sortMode === 'default') {
         const lowerSearch = trimmedSearch.toLowerCase();
         mappedSuppliers.sort((a, b) => {
           const logoA = a.images ? 1 : 0;
@@ -1086,7 +1137,7 @@ function App() {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, filters]);
+  }, [debouncedSearch, filters, sortMode]);
 
   /* Enes Doğanay | 5 Nisan 2026: Sayfa değiştiğinde scroll en üste gider */
   useEffect(() => {
@@ -1179,7 +1230,7 @@ function App() {
               </div>
             )}
 
-            {/* Enes Doğanay | 8 Nisan 2026: Sonuç sayısı + Grid/Liste toggle */}
+            {/* Enes Doğanay | 14 Nisan 2026: Sıralama seçici + Sonuç sayısı + Grid/Liste toggle */}
             {!loading && suppliers.length > 0 && (
               <div className="firmalar-toolbar-row">
                 {(debouncedSearch?.trim().length >= 2 || activeTags.length > 0) && (
@@ -1187,14 +1238,29 @@ function App() {
                     <span>{totalCount}</span> firma listeleniyor
                   </p>
                 )}
-                <button
-                  type="button"
-                  className="firmalar-view-toggle"
-                  onClick={toggleViewMode}
-                  title={viewMode === 'grid' ? 'Liste görünümüne geç' : 'Kart görünümüne geç'}
-                >
-                  <span className="material-symbols-outlined">{viewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
-                </button>
+                <div className="firmalar-toolbar-actions">
+                  <div className="firmalar-sort-wrap">
+                    <span className="material-symbols-outlined firmalar-sort-icon">sort</span>
+                    <select
+                      className="firmalar-sort-select"
+                      value={sortMode}
+                      onChange={(e) => setSortMode(e.target.value)}
+                    >
+                      {/* Enes Doğanay | 14 Nisan 2026: Akıllı Sıralama + alfabetik seçenekler */}
+                      <option value="default">Akıllı Sıralama</option>
+                      <option value="a-z">A'dan Z'ye</option>
+                      <option value="z-a">Z'den A'ya</option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    className="firmalar-view-toggle"
+                    onClick={toggleViewMode}
+                    title={viewMode === 'grid' ? 'Liste görünümüne geç' : 'Kart görünümüne geç'}
+                  >
+                    <span className="material-symbols-outlined">{viewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
+                  </button>
+                </div>
               </div>
             )}
 
