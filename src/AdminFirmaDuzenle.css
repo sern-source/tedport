@@ -165,12 +165,508 @@
 }
 
 /* ── Results ──────────────────────────────────────────── */
+
+/* Enes Doğanay | 15 Nisan 2026: A-Z / Z-A sıralama satırı */
+.afd-sort-row {
+    display: flex;
+    gap: 8px;
+    padding: 14px 0 0;
+}
+
+.afd-btn--sort {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    padding: 6px 14px;
+    font-size: .82rem;
+}
+
+.afd-btn--sort .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.afd-btn--sort:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.afd-btn--sort.active {
+    background: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Benzer kayıtlar butonu özel stili */
+.afd-btn--dup {
+    margin-left: auto;
+}
+
+.afd-btn--dup.active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #fff;
+}
+
+.afd-btn--dup:hover:not(.active) {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+/* ── Duplike Sonuçlar ─────────────────────────────────── */
+.afd-dup-results {
+    margin-top: 14px;
+    max-height: 560px;
+    overflow-y: auto;
+}
+
+.afd-dup-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    background: #fef9c3;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    color: #92400e;
+    font-size: .88rem;
+    font-weight: 600;
+}
+
+.afd-dup-summary .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.afd-dup-group {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.afd-dup-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #fef3c7;
+    border-bottom: 1px solid #fde68a;
+    font-size: .82rem;
+    font-weight: 600;
+    color: #92400e;
+}
+
+.afd-dup-group-header .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.afd-dup-group .afd-result-card {
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.afd-dup-group .afd-result-card:last-child {
+    border-bottom: none;
+}
+
+.afd-dup-id {
+    font-family: monospace;
+    font-size: .72rem;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Duplike sil butonu */
+.afd-btn--purge {
+    margin-left: 4px;
+}
+
+.afd-btn--purge:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+/* ── Silme sonuç banner'ı ─────────────────────────────── */
+.afd-purge-result {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    border-radius: 10px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    font-size: .88rem;
+    font-weight: 500;
+}
+
+.afd-purge-result--warn {
+    background: #fef9c3;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.afd-purge-result .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.afd-purge-result-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: .6;
+    display: flex;
+    padding: 2px;
+}
+
+.afd-purge-result-close:hover {
+    opacity: 1;
+}
+
+/* ── Duplike silme overlay + modal ────────────────────── */
+.afd-purge-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.afd-purge-modal {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, .18);
+    overflow: hidden;
+}
+
+.afd-purge-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fef2f2;
+}
+
+.afd-purge-modal-header > .material-symbols-outlined {
+    font-size: 32px;
+    color: #ef4444;
+    flex-shrink: 0;
+}
+
+.afd-purge-modal-header--ok {
+    background: #f0fdf4;
+}
+
+.afd-purge-modal-header--ok > .material-symbols-outlined {
+    color: #22c55e;
+}
+
+.afd-purge-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+.afd-purge-modal-header p {
+    margin: 2px 0 0;
+    font-size: .82rem;
+    color: #64748b;
+}
+
+.afd-purge-modal-body {
+    padding: 16px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.afd-purge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.afd-purge-group {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.afd-purge-keep,
+.afd-purge-remove {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    font-size: .88rem;
+    flex-wrap: wrap;
+}
+
+.afd-purge-keep {
+    background: #f0fdf4;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.afd-purge-remove {
+    background: #fef2f2;
+    border-bottom: 1px solid #fecaca;
+}
+
+.afd-purge-remove:last-child {
+    border-bottom: none;
+}
+
+.afd-purge-keep strong,
+.afd-purge-remove strong {
+    color: #1e293b;
+}
+
+.afd-purge-keep small,
+.afd-purge-remove small {
+    color: #64748b;
+    font-size: .75rem;
+    margin-left: auto;
+}
+
+.afd-purge-badge {
+    font-size: .65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: .5px;
+    flex-shrink: 0;
+}
+
+.afd-purge-badge--keep {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.afd-purge-badge--remove {
+    background: #fecaca;
+    color: #991b1b;
+}
+
+.afd-purge-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.afd-btn--danger {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+}
+
+.afd-btn--danger:hover {
+    background: #dc2626;
+}
+
+.afd-btn--danger-confirm {
+    background: #991b1b;
+    animation: afd-pulse-danger .8s ease-in-out infinite alternate;
+}
+
+@keyframes afd-pulse-danger {
+    from { box-shadow: 0 0 0 0 rgba(239, 68, 68, .4); }
+    to { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+/* ── Zayıf Firmalar ──────────────────────────────────── */
+
+/* Enes Doğanay | 15 Nisan 2026: Zayıf firma butonu */
+.afd-btn--weak:hover:not(.active) {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.afd-btn--weak.active {
+    background: #ea580c;
+    border-color: #ea580c;
+    color: #fff;
+}
+
+.afd-btn--sm {
+    padding: 5px 12px;
+    font-size: .78rem;
+    border-radius: 6px;
+}
+
+.afd-btn--sm .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.afd-dup-summary--weak {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #9a3412;
+}
+
+.afd-weak-results {
+    margin-top: 14px;
+}
+
+.afd-weak-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.afd-weak-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.afd-weak-select-all {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .85rem;
+    color: #475569;
+    cursor: pointer;
+    user-select: none;
+}
+
+.afd-weak-select-all input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.afd-weak-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 520px;
+    overflow-y: auto;
+}
+
+.afd-weak-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    transition: all .15s;
+}
+
+.afd-weak-card.selected {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+.afd-weak-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #ef4444;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.afd-weak-card-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.afd-weak-card-body:hover .afd-result-info strong {
+    color: #3b82f6;
+}
+
+.afd-weak-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.afd-weak-score {
+    font-size: .75rem;
+    font-weight: 700;
+    color: #f59e0b;
+    background: #fef9c3;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.afd-weak-score--zero {
+    color: #ef4444;
+    background: #fee2e2;
+}
+
+.afd-weak-meta small {
+    font-size: .72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.afd-weak-del-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #94a3b8;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all .15s;
+}
+
+.afd-weak-del-btn:hover:not(:disabled) {
+    background: #fef2f2;
+    color: #ef4444;
+    border-color: #fecaca;
+}
+
+.afd-weak-del-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.afd-weak-del-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
 .afd-results {
     display: flex;
     flex-direction: column;
     gap: 6px;
     margin-top: 14px;
-    max-height: 380px;
+    max-height: 520px;
     overflow-y: auto;
 }
 
@@ -364,6 +860,23 @@
 
     .afd-search-top {
         flex-direction: column;
+    }
+
+    /* Enes Doğanay | 15 Nisan 2026: Küçük ekranda butonlar alt alta */
+    .afd-sort-row {
+        flex-wrap: wrap;
+    }
+
+    .afd-weak-card-body {
+        flex-wrap: wrap;
+    }
+
+    .afd-weak-meta {
+        align-items: flex-start;
+        margin-left: 0;
+        width: 100%;
+        flex-direction: row;
+        gap: 8px;
     }
 
     .afd-panel-header {

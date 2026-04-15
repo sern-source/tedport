@@ -184,6 +184,42 @@
     resize: vertical;
 }
 
+/* Enes Doğanay | 15 Nisan 2026: Web sitesi inputu yanında açma linki */
+.cmp-field-web {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.cmp-field-web input {
+    flex: 1;
+    min-width: 0;
+}
+
+.cmp-field-web__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: #f8fafc;
+    color: var(--primary);
+    text-decoration: none;
+    transition: all .15s;
+    flex-shrink: 0;
+}
+
+.cmp-field-web__link:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.cmp-field-web__link .material-symbols-outlined {
+    font-size: 18px;
+}
+
 /* ── CATALOG ─────────────────────────────────────────────────────────────── */
 .cmp-catalog {
     display: flex;

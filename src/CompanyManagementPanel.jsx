@@ -277,7 +277,21 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                         </label>
                         <label className="cmp-field">
                             <span>Web Sitesi</span>
-                            <input type="text" value={fields.web_sitesi} onChange={e => set('web_sitesi', e.target.value)} placeholder="www.ornekfirma.com" />
+                            <div className="cmp-field-web">
+                                <input type="text" value={fields.web_sitesi} onChange={e => set('web_sitesi', e.target.value)} placeholder="www.ornekfirma.com" />
+                                {/* Enes Doğanay | 15 Nisan 2026: Web sitesi yeni sekmede açılabilir link */}
+                                {fields.web_sitesi && fields.web_sitesi.trim() && (
+                                    <a
+                                        href={/^https?:\/\//i.test(fields.web_sitesi.trim()) ? fields.web_sitesi.trim() : `https://${fields.web_sitesi.trim()}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="cmp-field-web__link"
+                                        title="Web sitesini aç"
+                                    >
+                                        <span className="material-symbols-outlined">open_in_new</span>
+                                    </a>
+                                )}
+                            </div>
                         </label>
                     </div>
 

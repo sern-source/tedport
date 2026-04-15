@@ -1,0 +1,78 @@
+<!--
+  Enes Doğanay | 15 Nisan 2026: Android / iOS / Outlook uyumlu e-posta adresi değiştirildi bildirimi şablonu
+  Supabase Dashboard > Authentication > Email Templates > (ilgili email changed notification template)
+  Subject: Tedport — E-posta Adresiniz Değiştirildi
+  NOT: Bu template'te buton yok, sadece bilgilendirme.
+-->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:480px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
+        <!-- Header -->
+        <tr>
+          <td align="center" bgcolor="#1d4ed8" style="background-color:#1d4ed8;padding:32px 24px;">
+            <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;letter-spacing:-0.3px;">Tedport</h1>
+            <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:13px;font-family:'Segoe UI',Arial,sans-serif;">İhale ve Tedarik Platformu</p>
+          </td>
+        </tr>
+        <!-- Body -->
+        <tr>
+          <td style="padding:32px 28px 0;font-family:'Segoe UI',Arial,sans-serif;">
+            <h2 style="margin:0 0 8px;color:#0f172a;font-size:18px;font-weight:700;">E-posta Adresiniz Değiştirildi ✉️</h2>
+            <p style="margin:0 0 20px;color:#64748b;font-size:14px;line-height:1.6;">
+              Hesabınıza ait e-posta adresi değiştirildi.
+            </p>
+          </td>
+        </tr>
+        <!-- Old email box -->
+        <tr>
+          <td style="padding:0 28px 12px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-radius:10px;" bgcolor="#f1f5f9">
+              <tr>
+                <td style="background-color:#f1f5f9;padding:14px 16px;border-radius:10px;">
+                  <p style="margin:0;color:#64748b;font-size:12px;font-family:'Segoe UI',Arial,sans-serif;">Eski e-posta</p>
+                  <p style="margin:4px 0 0;color:#0f172a;font-size:14px;font-weight:600;font-family:'Segoe UI',Arial,sans-serif;">{{ .OldEmail }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- New email box -->
+        <tr>
+          <td style="padding:0 28px 12px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-radius:10px;border:1px solid #bbf7d0;" bgcolor="#f0fdf4">
+              <tr>
+                <td style="background-color:#f0fdf4;padding:14px 16px;border-radius:10px;">
+                  <p style="margin:0;color:#15803d;font-size:12px;font-family:'Segoe UI',Arial,sans-serif;">Yeni e-posta</p>
+                  <p style="margin:4px 0 0;color:#15803d;font-size:14px;font-weight:600;font-family:'Segoe UI',Arial,sans-serif;">{{ .Email }}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- Warning box -->
+        <tr>
+          <td style="padding:0 28px 24px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-radius:10px;border:1px solid #fde68a;" bgcolor="#fef9c3">
+              <tr>
+                <td style="background-color:#fef9c3;padding:14px 16px;border-radius:10px;">
+                  <p style="margin:0;color:#92400e;font-size:13px;line-height:1.5;font-family:'Segoe UI',Arial,sans-serif;">
+                    &#9888;&#65039; Bu işlemi siz yapmadıysanız lütfen hemen şifrenizi değiştirin ve hesabınızın güvenliğini sağlayın.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <!-- Copyright -->
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:480px;">
+        <tr>
+          <td align="center" style="padding:16px 0 0;">
+            <p style="margin:0;font-size:11px;color:#94a3b8;font-family:'Segoe UI',Arial,sans-serif;">© 2026 Tedport. Tüm hakları saklıdır.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
