@@ -656,12 +656,14 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                   <div className="quote-form-row">
                     <div className="quote-form-group">
                       <label>Miktar</label>
+                      {/* Enes Doğanay | 15 Nisan 2026: Miktar alanı sayısal, max 99999 */}
                       <input
-                        type="text"
-                        placeholder="Ör: 500 metre, 100 adet"
+                        type="number"
+                        placeholder="Ör: 500"
                         value={quoteForm.miktar}
-                        onChange={(e) => setQuoteForm(prev => ({ ...prev, miktar: e.target.value }))}
-                        maxLength={100}
+                        onChange={(e) => { const v = e.target.value; if (v === '' || (Number(v) >= 0 && Number(v) <= 99999)) setQuoteForm(prev => ({ ...prev, miktar: v })); }}
+                        min={1}
+                        max={99999}
                       />
                     </div>
                     <div className="quote-form-group">
@@ -1476,7 +1478,8 @@ function App() {
                   <div className="quote-form-row">
                     <div className="quote-form-group">
                       <label>Miktar</label>
-                      <input type="text" placeholder="Ör: 500 metre, 100 adet" value={listQuoteForm.miktar} onChange={(e) => setListQuoteForm(prev => ({ ...prev, miktar: e.target.value }))} maxLength={100} />
+                      {/* Enes Doğanay | 15 Nisan 2026: Miktar alanı sayısal, max 99999 */}
+                      <input type="number" placeholder="Ör: 500" value={listQuoteForm.miktar} onChange={(e) => { const v = e.target.value; if (v === '' || (Number(v) >= 0 && Number(v) <= 99999)) setListQuoteForm(prev => ({ ...prev, miktar: v })); }} min={1} max={99999} />
                     </div>
                     <div className="quote-form-group">
                       <label>Talep Edilen Teslim Tarihi</label>

@@ -982,6 +982,175 @@
     }
 }
 
+/* Enes Doğanay | 15 Nisan 2026: Mobil uygulama yakında banner stilleri */
+.sc-app-banner {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+}
+
+.sc-app-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    max-width: 960px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px 48px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.sc-app-banner-inner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #7c3aed, #06b6d4);
+    border-radius: 20px 20px 0 0;
+}
+
+.sc-app-banner-icon {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    border-radius: 18px;
+    border: 1px solid #c7d2fe;
+}
+
+.sc-app-banner-icon .material-symbols-outlined {
+    font-size: 36px;
+    color: #4f46e5;
+}
+
+.sc-app-banner-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.sc-app-banner-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.sc-app-banner-content h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+.sc-app-banner-content p {
+    font-size: 15px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.sc-app-banner-stores {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.sc-store-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    background: #0f172a;
+    color: #fff;
+    cursor: default;
+    min-width: 170px;
+    transition: transform 0.2s;
+}
+
+.sc-store-btn:hover {
+    transform: translateY(-1px);
+}
+
+.sc-store-btn svg {
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+
+.sc-store-btn div {
+    display: flex;
+    flex-direction: column;
+}
+
+.sc-store-label {
+    font-size: 10px;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+}
+
+.sc-store-name {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+@media (max-width: 768px) {
+    .sc-app-banner {
+        padding: 40px 0;
+    }
+
+    .sc-app-banner-inner {
+        flex-direction: column;
+        text-align: center;
+        padding: 32px 24px;
+        gap: 24px;
+    }
+
+    .sc-app-banner-content h3 {
+        font-size: 19px;
+    }
+
+    .sc-app-banner-stores {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .sc-store-btn {
+        min-width: 150px;
+        padding: 10px 16px;
+    }
+}
+
+@media (max-width: 420px) {
+    .sc-app-banner-stores {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .sc-store-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 @media (min-width: 640px) {
     .supplier-connect-wrapper .sc-cta-buttons {
         flex-direction: row;
