@@ -1028,6 +1028,35 @@
 .tom-compare-check input { display: none; }
 .tom-compare-check .material-symbols-outlined { font-size: 18px; }
 
+/* Enes Doğanay | 15 Nisan 2026: Hint aktifken buton pulse efekti */
+.tom-compare-check--hint {
+    border-color: #a78bfa;
+    color: #7c3aed;
+    background: #f5f3ff;
+    animation: tomComparePulse 2s ease-in-out infinite;
+    position: relative;
+}
+
+.tom-compare-check--hint::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 12px;
+    border: 2px solid #a78bfa;
+    animation: tomCompareRing 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes tomComparePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.25); }
+    50% { box-shadow: 0 0 0 6px rgba(124, 58, 237, 0); }
+}
+
+@keyframes tomCompareRing {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.08); }
+}
+
 /* Enes Doğanay | 13 Nisan 2026: tom-expand-icon kaldırıldı — fonksiyonelsiz eleman temizlendi */
 
 /* ═══════════════════════════════════════════════════
@@ -1335,6 +1364,115 @@
 
 .tom-btn-text:hover { color: #dc2626; background: #fef2f2; }
 .tom-btn-text .material-symbols-outlined { font-size: 16px; }
+
+/* ═══════════════════════════════════════════════════
+   KARŞILAŞTIRMA İPUCU & NUDGE
+   Enes Doğanay | 15 Nisan 2026
+   ═══════════════════════════════════════════════════ */
+.tom-compare-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+    border: 1.5px solid #ddd6fe;
+    border-radius: 14px;
+    animation: tomSlideIn 0.3s ease;
+}
+
+.tom-compare-hint__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    color: #fff;
+}
+
+.tom-compare-hint__icon .material-symbols-outlined { font-size: 22px; }
+
+.tom-compare-hint__content {
+    flex: 1;
+}
+
+.tom-compare-hint__content strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #5b21b6;
+    margin-bottom: 3px;
+}
+
+.tom-compare-hint__content p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #6d28d9;
+    line-height: 1.55;
+    opacity: 0.85;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Bir daha gösterme checkbox */
+.tom-compare-hint__never {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.78rem;
+    color: #7c3aed;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tom-compare-hint__never input {
+    accent-color: #7c3aed;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.tom-compare-hint__dismiss {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border: none;
+    background: transparent;
+    color: #a78bfa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tom-compare-hint__dismiss:hover {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.tom-compare-hint__dismiss .material-symbols-outlined { font-size: 18px; }
+
+.tom-compare-nudge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 10px 16px;
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: 10px;
+    font-size: 0.84rem;
+    color: #92400e;
+    animation: tomSlideIn 0.25s ease;
+}
+
+.tom-compare-nudge .material-symbols-outlined {
+    font-size: 18px;
+    color: #d97706;
+}
 
 /* ═══════════════════════════════════════════════════
    KARŞILAŞTIRMA MODU

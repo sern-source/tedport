@@ -1215,10 +1215,11 @@ summary {
 }
 
 /* Enes Doğanay | 8 Nisan 2026: Grid/Liste toggle toolbar + liste görünümü */
+/* Enes Doğanay | 15 Nisan 2026: Toolbar 3 bölüm — sol (sonuç), orta (pagination), sağ (sıralama+toggle) */
 .firmalar-toolbar-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 10px;
 }
 
@@ -1227,6 +1228,7 @@ summary {
   color: #64748b;
   font-weight: 500;
   margin: 0;
+  flex-shrink: 0;
 }
 
 .firmalar-result-count span {
@@ -1265,6 +1267,7 @@ summary {
   align-items: center;
   gap: 8px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .firmalar-sort-wrap {
@@ -1321,6 +1324,85 @@ summary {
   }
   .firmalar-sort-icon {
     font-size: 16px;
+  }
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Üst mini pagination — toolbar içinde kompakt sayfa gezinme */
+.mini-pagination {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 0 2px;
+  height: 40px;
+  transition: border-color 0.2s;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.mini-pagination:hover {
+  border-color: #93c5fd;
+}
+
+.mini-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #475569;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mini-page-btn:hover:not(:disabled) {
+  background: #e0f2fe;
+  color: #1d4ed8;
+}
+
+.mini-page-btn:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+.mini-page-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.mini-page-info {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  padding: 0 6px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.mini-page-current {
+  color: #137fec;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .mini-pagination {
+    height: 36px;
+    border-radius: 10px;
+  }
+  .mini-page-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .mini-page-btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+  .mini-page-info {
+    font-size: 12px;
+    padding: 0 4px;
   }
 }
 

@@ -1240,6 +1240,31 @@ function App() {
                     <span>{totalCount}</span> firma listeleniyor
                   </p>
                 )}
+                {/* Enes Doğanay | 15 Nisan 2026: Üst mini pagination — ortada, sayfa değiştirmek için alta kaydırmaya gerek kalmaz */}
+                {totalPages > 1 && (
+                  <div className="mini-pagination">
+                    <button
+                      className="mini-page-btn"
+                      disabled={page === 1}
+                      onClick={() => setPage(p => p - 1)}
+                      title="Önceki sayfa"
+                    >
+                      <span className="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <span className="mini-page-info">
+                      <span className="mini-page-current">{page}</span> / {totalPages}
+                    </span>
+                    <button
+                      className="mini-page-btn"
+                      disabled={page === totalPages}
+                      onClick={() => setPage(p => p + 1)}
+                      title="Sonraki sayfa"
+                    >
+                      <span className="material-symbols-outlined">chevron_right</span>
+                    </button>
+                  </div>
+                )}
+
                 <div className="firmalar-toolbar-actions">
                   <div className="firmalar-sort-wrap">
                     <span className="material-symbols-outlined firmalar-sort-icon">sort</span>

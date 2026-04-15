@@ -3872,6 +3872,25 @@
     transform: translateY(-1px);
 }
 
+/* Enes Doğanay | 15 Nisan 2026: Taslağı Sil butonu */
+.teklif-btn--delete-draft {
+    background: #fff;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
+}
+
+.teklif-btn--delete-draft:hover {
+    background: #fef2f2;
+    border-color: #f87171;
+    transform: translateY(-1px);
+}
+
+.teklif-btn--delete-draft:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .teklif-btn--submit {
     background: linear-gradient(135deg, #2563eb, #3b82f6);
     color: #fff;

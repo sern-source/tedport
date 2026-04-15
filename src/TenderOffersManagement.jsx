@@ -170,6 +170,10 @@ const TenderOffersManagement = ({ companyId }) => {
     const [offerFilter, setOfferFilter] = useState('all');
     const [offerSort, setOfferSort] = useState('score');
     const [compareIds, setCompareIds] = useState([]);
+    /* Enes Doğanay | 15 Nisan 2026: Karşılaştırma özelliği onboarding ipucu */
+    const [compareHintDismissed, setCompareHintDismissed] = useState(() =>
+        localStorage.getItem('tom_compare_hint_never') === '1' || sessionStorage.getItem('tom_compare_hint_dismissed') === '1'
+    );
     const [expandedOfferId, setExpandedOfferId] = useState(null);
     const [showScorePanel, setShowScorePanel] = useState(false);
     const [showTenderInfo, setShowTenderInfo] = useState(true);
@@ -1333,6 +1337,34 @@ const TenderOffersManagement = ({ companyId }) => {
                                     </div>
                                 )}
 
+                                {/* Enes Doğanay | 15 Nisan 2026: Karşılaştırma ipucu banner */}
+                                {displayOffers.length >= 2 && compareIds.length === 0 && !compareHintDismissed && (
+                                    <div className="tom-compare-hint">
+                                        <div className="tom-compare-hint__icon">
+                                            <span className="material-symbols-outlined">compare_arrows</span>
+                                        </div>
+                                        <div className="tom-compare-hint__content">
+                                            <strong>Teklifleri Karşılaştırın</strong>
+                                            <p>Teklif kartlarının sağındaki <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: 'middle' }}>compare_arrows</span> butonuna tıklayarak en az <b>2</b>, en fazla <b>3</b> teklif seçin. Seçtiğiniz teklifler fiyat, teslim süresi ve genel puan üzerinden otomatik olarak karşılaştırılır.</p>
+                                            <label className="tom-compare-hint__never">
+                                                <input type="checkbox" id="compareHintNever" />
+                                                <span>Bir daha gösterme</span>
+                                            </label>
+                                        </div>
+                                        <button className="tom-compare-hint__dismiss" onClick={() => { setCompareHintDismissed(true); if (document.getElementById('compareHintNever')?.checked) { localStorage.setItem('tom_compare_hint_never', '1'); } else { sessionStorage.setItem('tom_compare_hint_dismissed', '1'); } }} title="Kapat">
+                                            <span className="material-symbols-outlined">close</span>
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Enes Doğanay | 15 Nisan 2026: 1 teklif seçiliyken nudge */}
+                                {compareIds.length === 1 && (
+                                    <div className="tom-compare-nudge">
+                                        <span className="material-symbols-outlined">info</span>
+                                        Karşılaştırma için <b>1 teklif daha</b> seçin
+                                    </div>
+                                )}
+
                                 {/* Teklif Kartları */}
                                 {displayOffers.length === 0 ? (
                                     <div className="tom-empty">
@@ -1407,7 +1439,7 @@ const TenderOffersManagement = ({ companyId }) => {
                                                             >
                                                                 <span className="material-symbols-outlined">contact_phone</span>
                                                             </button>
-                                                            <label className="tom-compare-check" title="Karşılaştır">
+                                                            <label className={`tom-compare-check${!compareHintDismissed && compareIds.length === 0 ? ' tom-compare-check--hint' : ''}`} title="Karşılaştır">
                                                                 <input type="checkbox" checked={isCompare} onChange={() => toggleCompare(offer.id)} />
                                                                 <span className="material-symbols-outlined">compare_arrows</span>
                                                             </label>

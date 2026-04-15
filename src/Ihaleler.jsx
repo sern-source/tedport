@@ -217,6 +217,9 @@ const IhalelerPage = () => {
     /* Enes Doğanay | 13 Nisan 2026: Teklifi geri çekme state */
     const [withdrawConfirm, setWithdrawConfirm] = useState(false);
     const [withdrawing, setWithdrawing] = useState(false);
+    /* Enes Doğanay | 15 Nisan 2026: Taslağı sil onay state */
+    const [draftDeleteConfirm, setDraftDeleteConfirm] = useState(false);
+    const [draftDeleting, setDraftDeleting] = useState(false);
     /* Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — diğer para birimi modal state */
     const [currencyModalIdx, setCurrencyModalIdx] = useState(null);
     const [currencySearch, setCurrencySearch] = useState('');
@@ -1038,6 +1041,34 @@ const IhalelerPage = () => {
             setTeklifError(err.message || 'Teklif gönderilemedi.');
         } finally {
             setTeklifSaving(false);
+        }
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: Taslağı sil — taslak teklifi veritabanından kaldır */
+    const handleDeleteDraft = async () => {
+        if (!teklifTender) return;
+        const existing = userOffers[String(teklifTender.id)];
+        if (!existing || existing.durum !== 'taslak') return;
+        setDraftDeleting(true);
+        try {
+            const { error: delErr } = await supabase
+                .from('ihale_teklifleri')
+                .delete()
+                .eq('id', existing.id);
+            if (delErr) throw delErr;
+            setUserOffers(prev => {
+                const next = { ...prev };
+                delete next[String(teklifTender.id)];
+                return next;
+            });
+            setTeklifTender(null);
+            setDraftDeleteConfirm(false);
+            setTeklifSuccess('draft_deleted');
+            setTimeout(() => setTeklifSuccess(false), 4500);
+        } catch (err) {
+            setTeklifError(err.message || 'Taslak silinemedi.');
+        } finally {
+            setDraftDeleting(false);
         }
     };
 
@@ -2493,6 +2524,13 @@ const IhalelerPage = () => {
                                     </div>
                                     <div className="teklif-popup__footer-actions">
                                         {/* Enes Doğanay | 13 Nisan 2026: Gönderilmiş → Geri Çek, Taslak/Yeni → Taslak Kaydet */}
+                                        {/* Enes Doğanay | 15 Nisan 2026: Taslak modunda Taslağı Sil butonu eklendi */}
+                                        {isDraftMode && (
+                                            <button type="button" className="teklif-btn teklif-btn--delete-draft" disabled={teklifSaving || draftDeleting} onClick={() => setDraftDeleteConfirm(true)}>
+                                                <span className="material-symbols-outlined">delete</span>
+                                                Taslağı Sil
+                                            </button>
+                                        )}
                                         {isUpdateMode && !isDraftMode ? (
                                             <button type="button" className="teklif-btn teklif-btn--withdraw" disabled={teklifSaving || withdrawing} onClick={() => setWithdrawConfirm(true)}>
                                                 <span className="material-symbols-outlined">undo</span>
@@ -2605,21 +2643,45 @@ const IhalelerPage = () => {
                     </div>
                 )}
 
+                {/* Enes Doğanay | 15 Nisan 2026: Taslağı Sil onay modal */}
+                {draftDeleteConfirm && (
+                    <div className="teklif-success-overlay" onClick={() => !draftDeleting && setDraftDeleteConfirm(false)}>
+                        <div className="teklif-success-card teklif-success-card--withdraw-confirm" onClick={e => e.stopPropagation()}>
+                            <div className="teklif-success-card__icon teklif-success-card__icon--warn">
+                                <span className="material-symbols-outlined">warning</span>
+                            </div>
+                            <h3>Taslağı Silmek İstediğinize Emin Misiniz?</h3>
+                            <p>Bu işlem geri alınamaz. Taslak teklifiniz tamamen silinecektir.</p>
+                            <div className="teklif-withdraw-modal-actions">
+                                <button className="teklif-withdraw-modal-btn teklif-withdraw-modal-btn--cancel" onClick={() => setDraftDeleteConfirm(false)} disabled={draftDeleting}>
+                                    Vazgeç
+                                </button>
+                                <button className="teklif-withdraw-modal-btn teklif-withdraw-modal-btn--confirm" onClick={handleDeleteDraft} disabled={draftDeleting}>
+                                    <span className="material-symbols-outlined">delete</span>
+                                    {draftDeleting ? 'Siliniyor…' : 'Evet, Sil'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Enes Doğanay | 13 Nisan 2026: Teklif başarıyla gönderildi/güncellendi/geri çekildi overlay */}
                 {/* Enes Doğanay | 13 Nisan 2026: Teklif başarıyla gönderildi/güncellendi/taslak kaydedildi/geri çekildi overlay */}
                 {teklifSuccess && (
                     <div className="teklif-success-overlay" onClick={() => setTeklifSuccess(false)}>
-                        <div className={`teklif-success-card${teklifSuccess === 'withdrawn' ? ' teklif-success-card--withdrawn' : ''}${teklifSuccess === 'draft' ? ' teklif-success-card--draft' : ''}`} onClick={e => e.stopPropagation()}>
-                            <div className={`teklif-success-card__icon${teklifSuccess === 'withdrawn' ? ' teklif-success-card__icon--withdrawn' : ''}${teklifSuccess === 'draft' ? ' teklif-success-card__icon--draft' : ''}`}>
-                                <span className="material-symbols-outlined">{teklifSuccess === 'withdrawn' ? 'remove_circle' : teklifSuccess === 'draft' ? 'draft' : 'check_circle'}</span>
+                        <div className={`teklif-success-card${teklifSuccess === 'withdrawn' ? ' teklif-success-card--withdrawn' : ''}${teklifSuccess === 'draft' ? ' teklif-success-card--draft' : ''}${teklifSuccess === 'draft_deleted' ? ' teklif-success-card--withdrawn' : ''}`} onClick={e => e.stopPropagation()}>
+                            <div className={`teklif-success-card__icon${teklifSuccess === 'withdrawn' ? ' teklif-success-card__icon--withdrawn' : ''}${teklifSuccess === 'draft' ? ' teklif-success-card__icon--draft' : ''}${teklifSuccess === 'draft_deleted' ? ' teklif-success-card__icon--withdrawn' : ''}`}>
+                                <span className="material-symbols-outlined">{teklifSuccess === 'withdrawn' ? 'remove_circle' : teklifSuccess === 'draft' ? 'draft' : teklifSuccess === 'draft_deleted' ? 'delete' : 'check_circle'}</span>
                             </div>
-                            <h3>{teklifSuccess === 'draft' ? 'Taslak Kaydedildi!' : teklifSuccess === 'update' ? 'Teklifiniz Güncellendi!' : teklifSuccess === 'withdrawn' ? 'Teklifiniz Geri Çekildi' : 'Teklifiniz Gönderildi!'}</h3>
+                            <h3>{teklifSuccess === 'draft' ? 'Taslak Kaydedildi!' : teklifSuccess === 'update' ? 'Teklifiniz Güncellendi!' : teklifSuccess === 'withdrawn' ? 'Teklifiniz Geri Çekildi' : teklifSuccess === 'draft_deleted' ? 'Taslak Silindi' : 'Teklifiniz Gönderildi!'}</h3>
                             <p>{teklifSuccess === 'draft'
                                 ? 'Teklifiniz taslak olarak kaydedildi. İstediğiniz zaman düzenleyip gönderebilirsiniz.'
                                 : teklifSuccess === 'update'
                                 ? 'Teklifiniz başarıyla güncellendi. İhale sahibi güncel teklifinizi görebilir.'
                                 : teklifSuccess === 'withdrawn'
                                 ? 'Teklifiniz bu ihaleden başarıyla geri çekildi.'
+                                : teklifSuccess === 'draft_deleted'
+                                ? 'Taslak teklifiniz başarıyla silindi.'
                                 : 'Teklifiniz ihale sahibine başarıyla iletildi. Durumunu profil sayfanızdan takip edebilirsiniz.'
                             }</p>
                             <button className="teklif-success-card__btn" onClick={() => setTeklifSuccess(false)}>

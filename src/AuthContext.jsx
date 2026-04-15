@@ -178,6 +178,8 @@ export function AuthProvider({ children }) {
       window.sessionStorage.removeItem(`sb-${projectRef}-auth-token`);
       window.localStorage.removeItem('tedport-auth-storage-mode');
       window.sessionStorage.removeItem('tedport-auth-storage-mode');
+      /* Enes Doğanay | 15 Nisan 2026: Çıkışta onboarding ipuçlarını sıfırla */
+      window.sessionStorage.removeItem('tom_compare_hint_dismissed');
     } catch {}
     clearAuthState();
     setAuthChecked(true);
