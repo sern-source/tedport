@@ -1060,13 +1060,13 @@
 
 .my-tender-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 14px 16px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border-radius: 12px;
 }
 
 .my-tender-row__info {
@@ -1076,6 +1076,8 @@
     gap: 10px;
     font-size: 14px;
     color: #1e293b;
+    flex: 1;
+    min-width: 0;
 }
 
 .my-tender-row__info strong {
@@ -1087,66 +1089,239 @@
     color: #64748b;
 }
 
+/* Enes Doğanay | 15 Nisan 2026: İhalelerim butonları — TOM stiliyle eşleşen renkli yazılı butonlar */
 .my-tender-row__actions {
     display: flex;
     gap: 6px;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .my-tender-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 5px;
     border: none;
-    border-radius: 7px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 6px 10px;
-    transition: background 0.15s;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 7px 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .my-tender-btn .material-symbols-outlined {
-    font-size: 17px;
+    font-size: 16px;
 }
 
+/* Düzenle — mavi */
 .my-tender-btn--edit {
-    background: #eff6ff;
-    color: #2563eb;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
 }
-
 .my-tender-btn--edit:hover {
-    background: #dbeafe;
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    transform: translateY(-1px);
 }
 
 /* Enes Doğanay | 13 Nisan 2026: Kapanan ihalede düzenle butonu deaktif */
 .my-tender-btn--edit:disabled {
-    background: #f1f5f9;
-    color: #cbd5e1;
+    background: #e2e8f0;
+    color: #94a3b8;
     cursor: not-allowed;
-    opacity: 0.5;
+    transform: none;
+    box-shadow: none;
 }
 .my-tender-btn--edit:disabled:hover {
-    background: #f1f5f9;
+    background: #e2e8f0;
+    transform: none;
+    box-shadow: none;
 }
 
-.my-tender-btn--delete {
-    background: #fff1f2;
-    color: #e11d48;
-}
-
-.my-tender-btn--delete:hover {
-    background: #ffe4e6;
-}
-
-.my-tender-btn--confirm {
-    background: #e11d48;
+/* İhaleyi Kapat — turuncu/amber */
+.my-tender-btn--close {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: #fff;
+}
+.my-tender-btn--close:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Sil — kırmızı */
+.my-tender-btn--delete {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+}
+.my-tender-btn--delete:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+/* İhaleyi Tekrarla — yeşil */
+.my-tender-btn--repeat {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+}
+.my-tender-btn--repeat:hover {
+    background: linear-gradient(135deg, #047857, #059669);
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Onay/İptal inline */
+.my-tender-btn--confirm {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+}
+.my-tender-btn--confirm:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-1px);
 }
 
 .my-tender-btn--cancel {
     background: #f1f5f9;
     color: #475569;
+    border: 1px solid #e2e8f0;
+}
+.my-tender-btn--cancel:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Satır içi onay bloğu */
+.my-tender-confirm-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Kalıcı silme uyarısı — TOM stiliyle birebir */
+.my-tender-confirm-inline--danger {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: #991b1b;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+.my-tender-btn--cancel-link {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    font-family: inherit;
+    transition: color 0.15s;
+}
+.my-tender-btn--cancel-link:hover {
+    color: #334155;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: İhale kapatma görünürlük popup */
+.ihale-close-visibility-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    width: 420px;
+    max-width: 92vw;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    text-align: center;
+    position: relative;
+    animation: ihaleSlideUp 0.3s ease;
+}
+
+.ihale-close-visibility-card__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #fff;
+}
+.ihale-close-visibility-card__icon .material-symbols-outlined { font-size: 28px; }
+
+.ihale-close-visibility-card h3 {
+    margin: 0 0 4px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.ihale-close-visibility-card p {
+    color: #64748b;
+    font-size: 0.88rem;
+    margin: 8px 0 20px;
+}
+
+.ihale-close-visibility-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ihale-close-visibility-card__actions .my-tender-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+}
+
+@keyframes ihaleSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Enes Doğanay | 15 Nisan 2026: İhalelerim butonları mobil responsive */
+@media (max-width: 768px) {
+    .my-tender-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .my-tender-row__actions {
+        justify-content: flex-start;
+    }
+    .my-tender-btn {
+        font-size: 0.72rem;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .my-tender-row__actions {
+        flex-direction: column;
+    }
+    .my-tender-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .my-tender-confirm-inline {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .my-tender-confirm-inline .my-tender-btn {
+        width: 100%;
+    }
 }
 
 /* �� Modal ����������������������������������������������������������������� */
@@ -1905,16 +2080,6 @@
 
 .ihale-file-item button .material-symbols-outlined {
     font-size: 16px;
-}
-
-/* Enes Doğanay | 10 Nisan 2026: Klonla butonu */
-.my-tender-btn--clone {
-    color: #6366f1;
-}
-
-.my-tender-btn--clone:hover {
-    background: #eef2ff;
-    color: #4f46e5;
 }
 
 /* ── Enes Doğanay | 10 Nisan 2026: Stepper bar + navigasyon + önizleme stilleri ── */

@@ -170,6 +170,10 @@ const IhalelerPage = () => {
     const [formSaving, setFormSaving] = useState(false);
     const [formError, setFormError] = useState('');
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    /* Enes Doğanay | 15 Nisan 2026: İhaleyi kapat state'leri */
+    const [closeConfirmId, setCloseConfirmId] = useState(null);
+    const [closeVisibilityPopup, setCloseVisibilityPopup] = useState(null);
+    const [closingTenderId, setClosingTenderId] = useState(null);
 
     // Enes Doğanay | 10 Nisan 2026: Stepper adım kontrolü (0-3)
     const [stepperStep, setStepperStep] = useState(0);
@@ -549,6 +553,41 @@ const IhalelerPage = () => {
             await fetchPublicTenders();
         } catch (err) {
             alert(err.message || 'Silinemedi.');
+        }
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: İhaleyi kapat — görünürlük seçimi ile */
+    const handleCloseTender = async (id, gorunurluk) => {
+        setClosingTenderId(id);
+        try {
+            const tender = myTenders.find(t => t.id === id);
+            if (!tender) throw new Error('İhale bulunamadı.');
+            await updateTender(id, {
+                baslik: tender.baslik,
+                aciklama: tender.aciklama || '',
+                ihale_tipi: tender.ihale_tipi || 'Açık İhale',
+                kdv_durumu: tender.kdv_durumu || 'haric',
+                yayin_tarihi: tender.yayin_tarihi || '',
+                son_basvuru_tarihi: tender.son_basvuru_tarihi || '',
+                teslim_suresi: tender.teslim_suresi || '',
+                teslim_il: tender.teslim_il || '',
+                teslim_ilce: tender.teslim_ilce || '',
+                referans_no: tender.referans_no || '',
+                gereksinimler: tender.gereksinimler || null,
+                davet_emailleri: tender.davet_emailleri || null,
+                davetli_firmalar: tender.davetli_firmalar || null,
+                ek_dosyalar: tender.ek_dosyalar || null,
+                durum: 'kapali',
+                kapali_gorunurluk: gorunurluk || 'gizle',
+            });
+            setCloseConfirmId(null);
+            setCloseVisibilityPopup(null);
+            await fetchMyTenders();
+            await fetchPublicTenders();
+        } catch (err) {
+            alert(err.message || 'İhale kapatılamadı.');
+        } finally {
+            setClosingTenderId(null);
         }
     };
 
@@ -1094,22 +1133,44 @@ const IhalelerPage = () => {
                                                 <strong>{t.baslik}</strong>
                                                 {t.son_basvuru_tarihi && <span className="my-tender-row__date">Son: {formatTenderDate(t.son_basvuru_tarihi)}</span>}
                                             </div>
+                                            {/* Enes Doğanay | 15 Nisan 2026: Butonlar TOM stiliyle yeniden tasarlandı */}
                                             <div className="my-tender-row__actions">
-                                                <button type="button" className="my-tender-btn my-tender-btn--clone" onClick={() => handleClone(t)} title="İhaleyi Tekrarla">
-                                                    <span className="material-symbols-outlined">content_copy</span>
-                                                </button>
-                                                {/* Enes Doğanay | 13 Nisan 2026: Kapanan ihalede düzenle deaktif */}
                                                 <button type="button" className="my-tender-btn my-tender-btn--edit" onClick={() => openEdit(t)} disabled={sm.key === 'kapali' || sm.key === 'iptal'} title={sm.key === 'kapali' || sm.key === 'iptal' ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
                                                     <span className="material-symbols-outlined">edit</span>
+                                                    Düzenle
                                                 </button>
+                                                {(sm.key === 'kapali' || sm.key === 'iptal') ? (
+                                                    <button type="button" className="my-tender-btn my-tender-btn--repeat" onClick={() => handleClone(t)}>
+                                                        <span className="material-symbols-outlined">replay</span>
+                                                        İhaleyi Tekrarla
+                                                    </button>
+                                                ) : (
+                                                    closeConfirmId === t.id ? (
+                                                        <div className="my-tender-confirm-inline">
+                                                            <span>Kapatmak istediğinize emin misiniz?</span>
+                                                            <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => { setCloseConfirmId(null); setCloseVisibilityPopup(t.id); }}>Evet</button>
+                                                            <button type="button" className="my-tender-btn my-tender-btn--cancel" onClick={() => setCloseConfirmId(null)}>İptal</button>
+                                                        </div>
+                                                    ) : (
+                                                        <button type="button" className="my-tender-btn my-tender-btn--close" onClick={() => setCloseConfirmId(t.id)}>
+                                                            <span className="material-symbols-outlined">lock</span>
+                                                            İhaleyi Kapat
+                                                        </button>
+                                                    )
+                                                )}
                                                 {deleteConfirmId === t.id ? (
-                                                    <>
-                                                        <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => handleDelete(t.id)}>Evet, Sil</button>
-                                                        <button type="button" className="my-tender-btn my-tender-btn--cancel" onClick={() => setDeleteConfirmId(null)}>İptal</button>
-                                                    </>
+                                                    <div className="my-tender-confirm-inline my-tender-confirm-inline--danger">
+                                                        <div>
+                                                            <span style={{ fontWeight: 700, color: '#991b1b' }}>⚠ Dikkat!</span>
+                                                            <span style={{ display: 'block', fontSize: '0.78rem', marginTop: 2 }}>Bu işlem kalıcıdır. İhale ve tüm teklifler geri getirilemez şekilde silinecektir.</span>
+                                                        </div>
+                                                        <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => handleDelete(t.id)}>Kalıcı Olarak Sil</button>
+                                                        <button type="button" className="my-tender-btn my-tender-btn--cancel-link" onClick={() => setDeleteConfirmId(null)}>İptal</button>
+                                                    </div>
                                                 ) : (
                                                     <button type="button" className="my-tender-btn my-tender-btn--delete" onClick={() => setDeleteConfirmId(t.id)}>
                                                         <span className="material-symbols-outlined">delete</span>
+                                                        Sil
                                                     </button>
                                                 )}
                                             </div>
@@ -1132,6 +1193,30 @@ const IhalelerPage = () => {
                             </div>
                         )}
                     </section>
+                )}
+
+                {/* Enes Doğanay | 15 Nisan 2026: İhale kapatma → görünürlük sorusu popup */}
+                {closeVisibilityPopup && (
+                    <div className="ihale-modal-overlay" onClick={() => setCloseVisibilityPopup(null)}>
+                        <div className="ihale-close-visibility-card" onClick={e => e.stopPropagation()}>
+                            <div className="ihale-close-visibility-card__icon">
+                                <span className="material-symbols-outlined">visibility</span>
+                            </div>
+                            <h3>İhale Görünürlüğü</h3>
+                            <p>Kapattığınız ihale, İhaleler sayfasında diğer kullanıcılara gösterilmeye devam etsin mi?</p>
+                            <div className="ihale-close-visibility-card__actions">
+                                <button className="my-tender-btn my-tender-btn--repeat" onClick={() => handleCloseTender(closeVisibilityPopup, 'goster')} disabled={closingTenderId === closeVisibilityPopup}>
+                                    <span className="material-symbols-outlined">visibility</span>
+                                    {closingTenderId === closeVisibilityPopup ? 'Kapatılıyor…' : 'Evet, Görüntülensin'}
+                                </button>
+                                <button className="my-tender-btn my-tender-btn--edit" onClick={() => handleCloseTender(closeVisibilityPopup, 'gizle')} disabled={closingTenderId === closeVisibilityPopup}>
+                                    <span className="material-symbols-outlined">visibility_off</span>
+                                    {closingTenderId === closeVisibilityPopup ? 'Kapatılıyor…' : 'Hayır, Gizlensin'}
+                                </button>
+                                <button className="my-tender-btn my-tender-btn--cancel" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setCloseVisibilityPopup(null)}>İptal</button>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {/* ── Enes Doğanay | 10 Nisan 2026: Stepper modal — 4 adımlı ihale oluşturma sihirbazı ── */}
