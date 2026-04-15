@@ -72,6 +72,30 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Enes Doğanay | 15 Nisan 2026: LinkedIn ile kayıt ol butonu */
+.register-linkedin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #3c4043;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  margin-top: 10px;
+}
+
+.register-linkedin-btn:hover {
+  background: #f0f7ff;
+  box-shadow: 0 2px 8px rgba(10, 102, 194, 0.15);
+}
+
 .register-divider {
   display: flex;
   align-items: center;
