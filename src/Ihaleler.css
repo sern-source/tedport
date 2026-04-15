@@ -325,10 +325,41 @@
     animation: tenderHighlightPulse 0.6s ease 2;
 }
 
+/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesini ayırt etmek için farklı arka plan */
+.tender-card--own {
+    background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+    border: 1.5px solid #93c5fd;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.tender-card--own::before {
+    background: linear-gradient(90deg, #2563eb, #3b82f6) !important;
+}
+.tender-card--own .tender-card__header::after {
+    content: 'Sizin İhaleniz';
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-left: auto;
+}
+
 .tenders-list-row--highlight {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5) inset;
     animation: tenderHighlightPulse 0.6s ease 2;
     background: #eff6ff !important;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi — list view arka plan */
+.tenders-list-row--own {
+    background: linear-gradient(90deg, #eff6ff, #e0f2fe) !important;
+    border-left: 3px solid #3b82f6;
 }
 
 @keyframes tenderHighlightPulse {
@@ -513,8 +544,10 @@
 .tender-card__ref .material-symbols-outlined { font-size: 14px; }
 
 /* Aksiyon butonları */
+/* Enes Doğanay | 15 Nisan 2026: flex-wrap eklendi — 3 buton sığmadığında alt satıra geçsin */
 .tender-card__actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     padding: 16px 20px 18px;
     margin-top: auto;
@@ -557,6 +590,23 @@
 .tender-action--join:hover {
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
     transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi düzenle butonu — grid card + detail drawer */
+.tender-action--own-edit {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+}
+.tender-action--own-edit:hover {
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
+    transform: translateY(-1px);
+}
+.tender-action--own-edit:disabled {
+    background: #94a3b8;
+    cursor: default;
+    box-shadow: none;
+    transform: none;
 }
 
 /* Enes Doğanay | 13 Nisan 2026: Teklifi Güncelle butonu stili */
@@ -615,12 +665,15 @@
 }
 
 /* Enes Doğanay | 13 Nisan 2026: Kabul edilmiş teklif — yeşil badge (grid + detail) */
+/* Enes Doğanay | 15 Nisan 2026: font-size küçültüldü — kart taşmasını önler */
 .tender-action--accepted {
     background: linear-gradient(135deg, #059669, #34d399);
     color: #fff;
     box-shadow: 0 4px 12px rgba(5, 150, 105, 0.18);
     cursor: default;
     font-weight: 700;
+    font-size: 0.72rem;
+    padding: 8px 10px;
 }
 
 /* Enes Doğanay | 13 Nisan 2026: Kabul edilmiş teklif — list view ikon */
@@ -635,6 +688,42 @@
     color: #059669;
     border: 1px solid #a7f3d0;
     cursor: default;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Kabul edilen teklif — firma ile iletişime geç butonu (grid) */
+.tender-action--contact {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+    font-weight: 600;
+    font-size: 0.72rem;
+    padding: 8px 10px;
+}
+
+.tender-action--contact:hover {
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Firma iletişim butonu — list view */
+.tenders-list-action-btn--contact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tenders-list-action-btn--contact:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-color: #93c5fd;
 }
 
 /* Enes Doğanay | 13 Nisan 2026: Reddedilmiş teklif — yeniden teklif butonu (grid + detail) */
@@ -2373,6 +2462,14 @@
 
 .tenders-list-action-btn--join:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); }
 
+/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi düzenle butonu — list view */
+.tenders-list-action-btn--own-edit {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+}
+.tenders-list-action-btn--own-edit:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); }
+.tenders-list-action-btn--own-edit:disabled { background: #94a3b8; cursor: default; box-shadow: none; transform: none; }
+
 .tenders-list-action-btn--detail {
     background: #f1f5f9;
     color: #64748b;
@@ -2602,6 +2699,7 @@
     gap: 8px;
 }
 
+/* Enes Doğanay | 15 Nisan 2026: button olarak değiştirildi, border/cursor eklendi */
 .tender-detail__file-link {
     display: inline-flex;
     align-items: center;
@@ -2614,6 +2712,9 @@
     font-weight: 600;
     text-decoration: none;
     transition: background 0.15s;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
 }
 
 .tender-detail__file-link:hover { background: #dbeafe; }
@@ -3174,6 +3275,147 @@
     color: #0f172a;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 15 Nisan 2026: Firma İletişim Popup
+   ═══════════════════════════════════════════════════ */
+.firma-contact-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: firmaContactFadeIn 0.2s ease;
+}
+
+@keyframes firmaContactFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.firma-contact-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    width: 400px;
+    max-width: 92vw;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    text-align: center;
+    position: relative;
+    animation: firmaContactSlideUp 0.3s ease;
+}
+
+@keyframes firmaContactSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.firma-contact-card__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.firma-contact-card__close:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.firma-contact-card__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #fff;
+}
+
+.firma-contact-card__avatar .material-symbols-outlined {
+    font-size: 28px;
+}
+
+.firma-contact-card h3 {
+    margin: 0 0 2px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.firma-contact-card__name {
+    margin: 0 0 16px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.firma-contact-card__rows {
+    display: grid;
+    gap: 8px;
+    text-align: left;
+}
+
+.firma-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+}
+
+.firma-contact-row:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.firma-contact-row .material-symbols-outlined {
+    font-size: 22px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.firma-contact-row div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.firma-contact-row small {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.firma-contact-row span:not(.material-symbols-outlined) {
+    font-size: 0.92rem;
+    color: #1e293b;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.firma-contact-card__empty {
+    margin: 12px 0 0;
+    font-size: 0.88rem;
+    color: #94a3b8;
 }
 
 .teklif-popup__amount-input:focus {

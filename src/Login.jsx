@@ -84,19 +84,45 @@ const LoginPage = () => {
       password,
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       // Supabase'in kendi dönen İngilizce hatalarını da baz alarak uyarıları kişiselleştirebiliriz
       if (error.message.includes("Email not confirmed")) {
         setError("Lütfen önce e-posta adresinizi onaylayın.");
       } else {
         setError("E-posta veya şifre hatalı!");
       }
-    } else {
-      // Enes Doğanay | 13 Nisan 2026: console.log kaldırıldı, ortak yönlendirme fonksiyonu kullanılıyor
-      await redirectAfterAuth(data.user.id);
+      return;
     }
+
+    // Enes Doğanay | 15 Nisan 2026: Bireysel/Kurumsal sekme kontrolü — yanlış sekmeden giriş engellenir
+    const { data: companyCheck } = await supabase
+      .from('kurumsal_firma_yoneticileri')
+      .select('firma_id')
+      .eq('user_id', data.user.id)
+      .maybeSingle();
+
+    const isCorporateUser = !!companyCheck?.firma_id;
+
+    if (activeTab === 'individual' && isCorporateUser) {
+      // Kurumsal hesap bireysel sekmeden giriş yapmaya çalışıyor
+      await supabase.auth.signOut();
+      setLoading(false);
+      setError('Bu hesap bir kurumsal hesaptır. Lütfen "Kurumsal Giriş" sekmesinden giriş yapın.');
+      return;
+    }
+
+    if (activeTab === 'corporate' && !isCorporateUser) {
+      // Bireysel hesap kurumsal sekmeden giriş yapmaya çalışıyor
+      await supabase.auth.signOut();
+      setLoading(false);
+      setError('Bu hesap bir bireysel hesaptır. Lütfen "Bireysel Giriş" sekmesinden giriş yapın.');
+      return;
+    }
+
+    setLoading(false);
+    // Enes Doğanay | 13 Nisan 2026: console.log kaldırıldı, ortak yönlendirme fonksiyonu kullanılıyor
+    await redirectAfterAuth(data.user.id);
   };
 
   // Enes Doğanay | 6 Nisan 2026: Sifre sifirlama maili gonderme akisi eklendi
@@ -224,9 +250,22 @@ const LoginPage = () => {
               </div>
 
               {error && (
-                <p className="login-error">
-                  {error}
-                </p>
+                <div className="login-error">
+                  <span>{error}</span>
+                  {/* Enes Doğanay | 15 Nisan 2026: Yanlış sekme hatasında doğru sekmeye yönlendirme butonu */}
+                  {error.includes('Kurumsal Giriş') && (
+                    <button type="button" className="login-error-switch" onClick={() => handleTabChange('corporate')}>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                      Kurumsal Girişe Geç
+                    </button>
+                  )}
+                  {error.includes('Bireysel Giriş') && (
+                    <button type="button" className="login-error-switch" onClick={() => handleTabChange('individual')}>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                      Bireysel Girişe Geç
+                    </button>
+                  )}
+                </div>
               )}
 
               {successMessage && (

@@ -128,7 +128,8 @@ export function AuthProvider({ children }) {
       }
     } catch (err) {
       // Enes Doğanay | 10 Nisan 2026: AbortError = race condition, state'i temizleme — onAuthStateChange tekrar tetikleyecek
-      if (err?.message?.includes('abort')) return;
+      // Enes Doğanay | 16 Nisan 2026: name kontrolü eklendi — DOMException AbortError'ları da yakala
+      if (err?.name === 'AbortError' || err?.message?.includes('abort')) return;
       console.error('Auth hatası:', err);
       clearAuthState();
     } finally {
@@ -137,7 +138,8 @@ export function AuthProvider({ children }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    loadUserData();
+    // Enes Doğanay | 16 Nisan 2026: Unhandled promise rejection önlenir — loadUserData kendi içinde catch eder ama güvenlik için
+    loadUserData().catch(() => {});
 
     // Enes Doğanay | 10 Nisan 2026: Event tipine göre akıllı handling — SIGNED_OUT'ta loadUserData çağırma
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -155,8 +157,8 @@ export function AuthProvider({ children }) {
       if (session?.access_token) {
         supabase.realtime.setAuth(session.access_token);
       }
-      // Login, token refresh vb. — kullanıcı verisini yenile
-      setTimeout(() => loadUserData(), 100);
+      // Enes Doğanay | 16 Nisan 2026: setTimeout içindeki promise yakalanır — Uncaught AbortError önlenir
+      setTimeout(() => loadUserData().catch(() => {}), 100);
     });
 
     return () => subscription.unsubscribe();

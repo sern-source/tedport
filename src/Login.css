@@ -229,11 +229,44 @@ body {
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Inline style yerine CSS class */
+/* Enes Doğanay | 15 Nisan 2026: Yanlış sekme hata mesajı — uyarı kutusu + sekme geçiş butonu */
 .login-error {
-  color: #ef4444;
+  color: #991b1b;
   font-size: 0.875rem;
   margin-top: 0.5rem;
   text-align: center;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-error-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.login-error-switch:hover {
+  background: #1e40af;
+}
+
+.login-error-switch .material-symbols-outlined {
+  font-size: 16px;
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Sifre sifirlama akisi icin basari ve bilgi mesajlari eklendi */

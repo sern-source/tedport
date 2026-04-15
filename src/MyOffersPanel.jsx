@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import './MyOffersPanel.css';
+/* Enes Doğanay | 15 Nisan 2026: Firma iletişim popup stilleri Ihaleler.css'ten */
+import './Ihaleler.css';
 
 /* Enes Doğanay | 13 Nisan 2026: Durum haritası */
 const STATUS_MAP = {
@@ -89,6 +91,9 @@ const MyOffersPanel = () => {
     /* Enes Doğanay | 13 Nisan 2026: Bildirimden gelen highlight */
     const [highlightId, setHighlightId] = useState(null);
     const highlightRef = useRef(null);
+    /* Enes Doğanay | 15 Nisan 2026: Firma ile iletişime geç popup state */
+    const [firmaContactPopup, setFirmaContactPopup] = useState(null);
+    const [firmaContactLoading, setFirmaContactLoading] = useState(false);
 
     /* Enes Doğanay | 13 Nisan 2026: Veri çekme — teklifler + ilgili ihaleler + firmalar */
     useEffect(() => {
@@ -184,6 +189,33 @@ const MyOffersPanel = () => {
         accepted: offers.filter(o => getStatus(o.durum).tone === 'accepted').length,
         rejected: offers.filter(o => getStatus(o.durum).tone === 'rejected').length,
     }), [offers]);
+
+    /* Enes Doğanay | 15 Nisan 2026: Firma ile iletişime geç — firma + yönetici bilgilerini getir */
+    const openFirmaContact = async (firmaId, firmaAdi) => {
+        setFirmaContactLoading(true);
+        const info = { name: null, firma: firmaAdi || null, email: null, phone: null, firmaPhone: null, firmaEmail: null };
+        try {
+            if (firmaId) {
+                const { data: firma } = await supabase.from('firmalar').select('firma_adi, telefon, eposta').eq('firmaID', firmaId).maybeSingle();
+                if (firma) {
+                    info.firma = firma.firma_adi || info.firma;
+                    if (firma.telefon) info.firmaPhone = firma.telefon;
+                    if (firma.eposta) info.firmaEmail = firma.eposta;
+                }
+                const { data: mgr } = await supabase.from('kurumsal_firma_yoneticileri').select('user_id').eq('firma_id', firmaId).maybeSingle();
+                if (mgr?.user_id) {
+                    const { data: prof } = await supabase.from('profiles').select('first_name, last_name, phone, email').eq('id', mgr.user_id).maybeSingle();
+                    if (prof) {
+                        info.name = [prof.first_name, prof.last_name].filter(Boolean).join(' ') || null;
+                        if (prof.email) info.email = prof.email;
+                        if (prof.phone) info.phone = prof.phone;
+                    }
+                }
+            }
+        } catch (e) { console.error('Firma iletişim bilgisi alınamadı:', e); }
+        setFirmaContactPopup(info);
+        setFirmaContactLoading(false);
+    };
 
     if (loading) {
         return (
@@ -453,18 +485,38 @@ const MyOffersPanel = () => {
                                         {(offer.ek_dosya_url || offer.ek_dosya_adi) && (
                                             <div className="mop-detail-row mop-detail-row--file">
                                                 <span className="material-symbols-outlined">attach_file</span>
-                                                <a href={offer.ek_dosya_url} target="_blank" rel="noopener noreferrer">
+                                                {/* Enes Doğanay | 15 Nisan 2026: teklif-ekleri private bucket — signed URL ile aç */}
+                                                <button type="button" className="mop-file-link" onClick={async () => {
+                                                    let filePath = offer.ek_dosya_url;
+                                                    if (filePath.startsWith('http')) {
+                                                        try {
+                                                            const url = new URL(filePath);
+                                                            const marker = '/teklif-ekleri/';
+                                                            const idx = url.pathname.indexOf(marker);
+                                                            if (idx !== -1) filePath = decodeURIComponent(url.pathname.substring(idx + marker.length));
+                                                        } catch { /* */ }
+                                                    }
+                                                    const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(filePath, 300);
+                                                    if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+                                                }}>
                                                     {offer.ek_dosya_adi || 'Ek Dosya'}
-                                                </a>
+                                                </button>
                                             </div>
                                         )}
 
                                         {/* Enes Doğanay | 13 Nisan 2026: İhaleye Git → detay modal, Teklifi/Taslağı Güncelle → teklif popup */}
+                                        {/* Enes Doğanay | 15 Nisan 2026: Firma ile iletişime geç butonu eklendi */}
                                         <div className="mop-card__footer">
                                             <button className="mop-btn mop-btn--outline" onClick={() => navigate(`/ihaleler?ihale=${offer.ihale_id}`)}>
                                                 <span className="material-symbols-outlined">gavel</span>
                                                 İhaleye Git
                                             </button>
+                                            {tender.firma_id && (
+                                                <button className="mop-btn mop-btn--contact" onClick={() => openFirmaContact(tender.firma_id, firmaAdi)}>
+                                                    <span className="material-symbols-outlined">contact_phone</span>
+                                                    Firma ile İletişime Geç
+                                                </button>
+                                            )}
                                             {tenderSt.tone === 'active' && st.tone !== 'accepted' && (
                                                 <button className="mop-btn mop-btn--primary" onClick={() => navigate(`/ihaleler?ihale=${offer.ihale_id}&teklif=1`)}>
                                                     <span className="material-symbols-outlined">edit</span>
@@ -477,6 +529,53 @@ const MyOffersPanel = () => {
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Enes Doğanay | 15 Nisan 2026: Firma ile İletişime Geç popup */}
+            {firmaContactPopup && (
+                <div className="firma-contact-overlay" onClick={() => setFirmaContactPopup(null)}>
+                    <div className="firma-contact-card" onClick={e => e.stopPropagation()}>
+                        <button className="firma-contact-card__close" onClick={() => setFirmaContactPopup(null)}>
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                        <div className="firma-contact-card__avatar">
+                            <span className="material-symbols-outlined">apartment</span>
+                        </div>
+                        {firmaContactPopup.firma && <h3>{firmaContactPopup.firma}</h3>}
+                        {firmaContactPopup.name && <p className="firma-contact-card__name">{firmaContactPopup.name}</p>}
+
+                        <div className="firma-contact-card__rows">
+                            {firmaContactPopup.firmaEmail && (
+                                <a href={`mailto:${firmaContactPopup.firmaEmail}`} className="firma-contact-row">
+                                    <span className="material-symbols-outlined">mail</span>
+                                    <div><small>E-POSTA</small><span>{firmaContactPopup.firmaEmail}</span></div>
+                                </a>
+                            )}
+                            {firmaContactPopup.email && firmaContactPopup.email !== firmaContactPopup.firmaEmail && (
+                                <a href={`mailto:${firmaContactPopup.email}`} className="firma-contact-row">
+                                    <span className="material-symbols-outlined">person</span>
+                                    <div><small>YÖNETİCİ E-POSTA</small><span>{firmaContactPopup.email}</span></div>
+                                </a>
+                            )}
+                            {firmaContactPopup.firmaPhone && (
+                                <a href={`tel:${firmaContactPopup.firmaPhone}`} className="firma-contact-row">
+                                    <span className="material-symbols-outlined">call</span>
+                                    <div><small>TELEFON</small><span>{firmaContactPopup.firmaPhone}</span></div>
+                                </a>
+                            )}
+                            {firmaContactPopup.phone && firmaContactPopup.phone !== firmaContactPopup.firmaPhone && (
+                                <a href={`tel:${firmaContactPopup.phone}`} className="firma-contact-row">
+                                    <span className="material-symbols-outlined">person</span>
+                                    <div><small>YÖNETİCİ TELEFON</small><span>{firmaContactPopup.phone}</span></div>
+                                </a>
+                            )}
+                        </div>
+
+                        {!firmaContactPopup.email && !firmaContactPopup.phone && !firmaContactPopup.firmaPhone && !firmaContactPopup.firmaEmail && (
+                            <p className="firma-contact-card__empty">Bu firma için iletişim bilgisi bulunamadı.</p>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

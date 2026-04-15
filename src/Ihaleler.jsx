@@ -140,6 +140,8 @@ const IhalelerPage = () => {
     const ihaleParam = searchParams.get('ihale') || '';
     /* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler'den teklif popup'ı doğrudan açmak için */
     const teklifParam = searchParams.get('teklif') || '';
+    /* Enes Doğanay | 15 Nisan 2026: İhale yönetim sayfasından yeni ihale oluşturma */
+    const yeniIhaleParam = searchParams.get('yeniIhale') || '';
     // Enes Doğanay | 10 Nisan 2026: Auth context — teklif popup'ında kullanıcı bilgisi için
     const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
 
@@ -219,6 +221,9 @@ const IhalelerPage = () => {
     const [loginPromptTenderId, setLoginPromptTenderId] = useState(null);
     const [loginPromptPos, setLoginPromptPos] = useState(null);
     const loginPromptRef = useRef(null);
+    /* Enes Doğanay | 15 Nisan 2026: Firma ile iletişime geç popup state */
+    const [firmaContactPopup, setFirmaContactPopup] = useState(null);
+    const [firmaContactLoading, setFirmaContactLoading] = useState(false);
 
     // Kurumsal giriş kontrolü
     // Enes Doğanay | 10 Nisan 2026: Stale session'da hata yutulur, sayfa kırılmaz + verified firma kontrolü
@@ -590,7 +595,9 @@ const IhalelerPage = () => {
                     firma_kategori: firm.category_name || '',
                     firma_konum: firm.il_ilce || tender.il_ilce || 'Konum belirtilmedi'
                 };
-            });
+            })
+            // Enes Doğanay | 15 Nisan 2026: Kapalı ve gizli ihaleleri herkese açık listeden filtrele
+            .filter(t => !(t.durum === 'kapali' && t.kapali_gorunurluk === 'gizle'));
 
             setTenders(mappedTenders);
             setSelectedFirmaName(firmaFilter ? mappedTenders[0]?.firma_adi || '' : '');
@@ -632,6 +639,15 @@ const IhalelerPage = () => {
         params.delete('teklif');
         setSearchParams(params, { replace: true });
     }, [ihaleParam, loading, tenders]);
+
+    /* Enes Doğanay | 15 Nisan 2026: yeniIhale URL param ile ihale oluşturma modalını otomatik aç */
+    useEffect(() => {
+        if (!yeniIhaleParam || !managedFirmaId) return;
+        openCreate();
+        const params = new URLSearchParams(searchParams);
+        params.delete('yeniIhale');
+        setSearchParams(params, { replace: true });
+    }, [yeniIhaleParam, managedFirmaId]);
 
     useEffect(() => {
         if (highlightTenderId && highlightTenderRef.current) {
@@ -707,6 +723,33 @@ const IhalelerPage = () => {
         const next = viewMode === 'grid' ? 'list' : 'grid';
         setViewMode(next);
         try { localStorage.setItem('tedport_ihale_view', next); } catch {}
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: Firma ile iletişime geç — firma + yönetici bilgilerini getir */
+    const openFirmaContact = async (tender) => {
+        setFirmaContactLoading(true);
+        const info = { name: null, firma: tender.firma_adi || null, email: null, phone: null, firmaPhone: null, firmaEmail: null };
+        try {
+            if (tender.firma_id) {
+                const { data: firma } = await supabase.from('firmalar').select('firma_adi, telefon, eposta').eq('firmaID', tender.firma_id).maybeSingle();
+                if (firma) {
+                    info.firma = firma.firma_adi || info.firma;
+                    if (firma.telefon) info.firmaPhone = firma.telefon;
+                    if (firma.eposta) info.firmaEmail = firma.eposta;
+                }
+                const { data: mgr } = await supabase.from('kurumsal_firma_yoneticileri').select('user_id').eq('firma_id', tender.firma_id).maybeSingle();
+                if (mgr?.user_id) {
+                    const { data: prof } = await supabase.from('profiles').select('first_name, last_name, phone, email').eq('id', mgr.user_id).maybeSingle();
+                    if (prof) {
+                        info.name = [prof.first_name, prof.last_name].filter(Boolean).join(' ') || null;
+                        if (prof.email) info.email = prof.email;
+                        if (prof.phone) info.phone = prof.phone;
+                    }
+                }
+            }
+        } catch (e) { console.error('Firma iletişim bilgisi alınamadı:', e); }
+        setFirmaContactPopup(info);
+        setFirmaContactLoading(false);
     };
 
     // Enes Doğanay | 10 Nisan 2026: Teklif Ver popup açma — ihale gereksinimlerinden kalem tablosu oluştur
@@ -848,8 +891,8 @@ const IhalelerPage = () => {
                 const path = `${session.user.id}/${Date.now()}.${ext}`;
                 const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(path, teklifDosya);
                 if (uploadErr) { setTeklifError('Dosya yüklenemedi: ' + uploadErr.message); setTeklifSaving(false); return; }
-                const { data: urlData } = supabase.storage.from('teklif-ekleri').getPublicUrl(path);
-                dosyaUrl = urlData?.publicUrl || path;
+                // Enes Doğanay | 15 Nisan 2026: teklif-ekleri private bucket — public URL yerine path kaydet, signed URL ile açılacak
+                dosyaUrl = path;
                 dosyaAdi = teklifDosya.name;
             }
 
@@ -1691,8 +1734,10 @@ const IhalelerPage = () => {
                                 {filteredTenders.map((tender) => {
                                     const statusMeta = getTenderStatusMeta(tender);
                                     const isHighlighted = highlightTenderId === tender.id;
+                                    // Enes Doğanay | 15 Nisan 2026: Kendi ihalesi farklı renk — list view
+                                    const isOwnTender = authManagedCompanyId && String(tender.firma_id) === String(authManagedCompanyId);
                                     return (
-                                        <div key={tender.id} ref={isHighlighted ? highlightTenderRef : null} className={`tenders-list-row${isHighlighted ? ' tenders-list-row--highlight' : ''}`} onClick={() => setDetailTender(tender)}>
+                                        <div key={tender.id} ref={isHighlighted ? highlightTenderRef : null} className={`tenders-list-row${isHighlighted ? ' tenders-list-row--highlight' : ''}${isOwnTender ? ' tenders-list-row--own' : ''}`} onClick={() => setDetailTender(tender)}>
                                             <span className="tenders-list-col tenders-list-col--firma" onClick={(e) => { e.stopPropagation(); navigate(`/firmadetay/${tender.firma_id}`); }}>{tender.firma_adi}</span>
                                             <span className="tenders-list-col tenders-list-col--baslik">{tender.baslik}</span>
                                             <span className="tenders-list-col tenders-list-col--konum">{[tender.teslim_il, tender.teslim_ilce].filter(Boolean).join(' / ') || '—'}</span>
@@ -1701,16 +1746,31 @@ const IhalelerPage = () => {
                                             <span className={`tenders-list-col tenders-list-col--durum tender-card-status tender-card-status-${statusMeta.className}`}>{statusMeta.label}</span>
                                             <span className="tenders-list-col tenders-list-col--actions" onClick={(e) => e.stopPropagation()}>
                                                 {/* Enes Doğanay | 13 Nisan 2026: Kabul/red durumuna göre buton ayrımı — list view */}
+                                                {/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi → düzenle butonu — list view */}
                                                 {(() => {
+                                                    if (isOwnTender) {
+                                                        const isClosed = statusMeta.key === 'kapali' || statusMeta.key === 'iptal';
+                                                        return (
+                                                            <button type="button" className="tenders-list-action-btn tenders-list-action-btn--own-edit" title="İhaleyi Düzenle" onClick={(e) => { e.stopPropagation(); openEdit(tender); }} disabled={isClosed}>
+                                                                <span className="material-symbols-outlined">edit_square</span>
+                                                            </button>
+                                                        );
+                                                    }
                                                     const offer = userOffers[String(tender.id)];
                                                     const hasOffer = !!offer;
                                                     const isAccepted = hasOffer && offer.durum === 'kabul';
                                                     const isRejected = hasOffer && offer.durum === 'red';
                                                     const isDraft = hasOffer && offer.durum === 'taslak';
                                                     if (isAccepted) return (
-                                                        <span className="tenders-list-action-btn tenders-list-action-btn--accepted" title="Teklifiniz Kabul Edildi">
-                                                            <span className="material-symbols-outlined">check_circle</span>
-                                                        </span>
+                                                        <>
+                                                            <span className="tenders-list-action-btn tenders-list-action-btn--accepted" title="Teklifiniz Kabul Edildi">
+                                                                <span className="material-symbols-outlined">check_circle</span>
+                                                            </span>
+                                                            {/* Enes Doğanay | 15 Nisan 2026: Kabul edilen teklif — firma iletişim butonu (list view) */}
+                                                            <button type="button" className="tenders-list-action-btn tenders-list-action-btn--contact" title="Firma ile İletişime Geç" onClick={(e) => { e.stopPropagation(); openFirmaContact(tender); }}>
+                                                                <span className="material-symbols-outlined">contact_phone</span>
+                                                            </button>
+                                                        </>
                                                     );
                                                     return (
                                                         <>
@@ -1748,8 +1808,11 @@ const IhalelerPage = () => {
                                     const gereksinimCount = Array.isArray(tender.gereksinimler) ? tender.gereksinimler.length : 0;
                                     const teslimYeri = [tender.teslim_il, tender.teslim_ilce].filter(Boolean).join(', ');
 
+                                    // Enes Doğanay | 15 Nisan 2026: Kendi ihalesi farklı renk + düzenle butonu
+                                    const isOwnTender = authManagedCompanyId && String(tender.firma_id) === String(authManagedCompanyId);
+
                                     return (
-                                        <article key={tender.id} ref={highlightTenderId === tender.id ? highlightTenderRef : null} className={`tender-card tender-card--${statusMeta.className}${highlightTenderId === tender.id ? ' tender-card--highlight' : ''}`}>
+                                        <article key={tender.id} ref={highlightTenderId === tender.id ? highlightTenderRef : null} className={`tender-card tender-card--${statusMeta.className}${highlightTenderId === tender.id ? ' tender-card--highlight' : ''}${isOwnTender ? ' tender-card--own' : ''}`}>
                                             {/* Üst şerit: Firma + Durum */}
                                             <div className="tender-card__header">
                                                 <button type="button" className="tender-card__company" onClick={() => navigate(`/firmadetay/${tender.firma_id}`)}>
@@ -1832,21 +1895,34 @@ const IhalelerPage = () => {
 
                                             {/* Aksiyon butonları */}
                                             <div className="tender-card__actions">
-                                                {/* Enes Doğanay | 13 Nisan 2026: Kabul/red durumuna göre buton ayrımı — grid card */}
+                                                {/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi → düzenle butonu, başkası → teklif ver */}
                                                 {(() => {
                                                     const st = getTenderStatusMeta(tender);
+                                                    const isClosed = st.key === 'kapali' || st.key === 'iptal';
+                                                    if (isOwnTender) return (
+                                                        <button type="button" className="tender-action tender-action--own-edit" onClick={() => openEdit(tender)} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'İhaleyi Düzenle'}>
+                                                            <span className="material-symbols-outlined">edit_square</span>
+                                                            İhaleyi Düzenle
+                                                        </button>
+                                                    );
                                                     const offer = userOffers[String(tender.id)];
                                                     const hasOffer = !!offer;
                                                     const isDraft = hasOffer && offer.durum === 'taslak';
                                                     const isAccepted = hasOffer && offer.durum === 'kabul';
                                                     const isRejected = hasOffer && offer.durum === 'red';
-                                                    const isClosed = st.key === 'kapali' || st.key === 'iptal';
                                                     if (isClosed && !hasOffer) return null;
                                                     if (isAccepted) return (
-                                                        <span className="tender-action tender-action--accepted">
-                                                            <span className="material-symbols-outlined">verified</span>
-                                                            Teklifiniz Kabul Edildi
-                                                        </span>
+                                                        <>
+                                                            <span className="tender-action tender-action--accepted">
+                                                                <span className="material-symbols-outlined">verified</span>
+                                                                Teklifiniz Kabul Edildi
+                                                            </span>
+                                                            {/* Enes Doğanay | 15 Nisan 2026: Kabul edilen teklif — firma ile iletişime geç butonu */}
+                                                            <button type="button" className="tender-action tender-action--contact" onClick={() => openFirmaContact(tender)}>
+                                                                <span className="material-symbols-outlined">contact_phone</span>
+                                                                İletişime Geç
+                                                            </button>
+                                                        </>
                                                     );
                                                     return (
                                                         <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'}`} onClick={(e) => openTeklifPopup(tender, e)} disabled={isClosed && hasOffer && !isDraft}>
@@ -1874,7 +1950,12 @@ const IhalelerPage = () => {
                     const dt = detailTender;
                     const statusMeta = getTenderStatusMeta(dt);
                     const gereksinimler = Array.isArray(dt.gereksinimler) ? dt.gereksinimler : [];
-                    const ekDosyalar = Array.isArray(dt.ek_dosyalar) ? dt.ek_dosyalar : [];
+                    // Enes Doğanay | 15 Nisan 2026: ek_dosyalar string olarak gelebilir, defansif parse
+                    const ekDosyalar = (() => {
+                        let raw = dt.ek_dosyalar;
+                        if (typeof raw === 'string') try { raw = JSON.parse(raw); } catch { raw = []; }
+                        return Array.isArray(raw) ? raw : [];
+                    })();
                     const teslimYeri = [dt.teslim_il, dt.teslim_ilce].filter(Boolean).join(' / ');
                     return (
                         <div className="tender-detail-overlay tender-detail-overlay--center" onClick={() => setDetailTender(null)}>
@@ -1956,11 +2037,19 @@ const IhalelerPage = () => {
                                         <div className="tender-detail__section">
                                             <h3><span className="material-symbols-outlined">attach_file</span> Ek Dokümanlar ({ekDosyalar.length})</h3>
                                             <div className="tender-detail__files">
+                                                {/* Enes Doğanay | 15 Nisan 2026: Public URL veya signed URL ile dosya aç */}
                                                 {ekDosyalar.map((f, i) => (
-                                                    <a key={i} href={f.url} target="_blank" rel="noopener noreferrer" className="tender-detail__file-link">
+                                                    <button key={i} type="button" className="tender-detail__file-link" onClick={async () => {
+                                                        if (f.url && f.url.startsWith('http')) {
+                                                            window.open(f.url, '_blank', 'noopener,noreferrer');
+                                                        } else if (f.path) {
+                                                            const { data } = await supabase.storage.from('ihale-ekleri').createSignedUrl(f.path, 300);
+                                                            if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+                                                        }
+                                                    }}>
                                                         <span className="material-symbols-outlined">download</span>
                                                         {f.name || `Dosya ${i + 1}`}
-                                                    </a>
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
@@ -1969,8 +2058,20 @@ const IhalelerPage = () => {
 
                                 {/* Enes Doğanay | 13 Nisan 2026: 1 ihale 1 teklif — detail drawer güncelleme butonu */}
                                 {/* Enes Doğanay | 13 Nisan 2026: Kabul/red durumuna göre buton ayrımı — detail drawer */}
+                                {/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi → düzenle butonu — detail drawer */}
                                 <div className="tender-detail__footer">
                                     {(() => {
+                                        const isOwnTender = authManagedCompanyId && String(dt.firma_id) === String(authManagedCompanyId);
+                                        if (isOwnTender) {
+                                            const stMeta = getTenderStatusMeta(dt);
+                                            const isClosed = stMeta.key === 'kapali' || stMeta.key === 'iptal';
+                                            return (
+                                                <button type="button" className="tender-action tender-action--own-edit tender-action--full" onClick={() => { setDetailTender(null); openEdit(dt); }} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'İhaleyi Düzenle'}>
+                                                    <span className="material-symbols-outlined">edit_square</span>
+                                                    İhaleyi Düzenle
+                                                </button>
+                                            );
+                                        }
                                         const offer = userOffers[String(dt.id)];
                                         const hasOffer = !!offer;
                                         const isDraft = hasOffer && offer.durum === 'taslak';
@@ -2465,6 +2566,53 @@ const IhalelerPage = () => {
                         <span className="material-symbols-outlined tender-login-prompt__icon">lock</span>
                         <p className="tender-login-prompt__text">İhaleye teklif vermek için giriş yapın.</p>
                         <button className="tender-login-prompt__btn" onClick={() => navigate('/login')}>Giriş Yap</button>
+                    </div>
+                )}
+
+                {/* Enes Doğanay | 15 Nisan 2026: Firma ile İletişime Geç popup */}
+                {firmaContactPopup && (
+                    <div className="firma-contact-overlay" onClick={() => setFirmaContactPopup(null)}>
+                        <div className="firma-contact-card" onClick={e => e.stopPropagation()}>
+                            <button className="firma-contact-card__close" onClick={() => setFirmaContactPopup(null)}>
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                            <div className="firma-contact-card__avatar">
+                                <span className="material-symbols-outlined">apartment</span>
+                            </div>
+                            {firmaContactPopup.firma && <h3>{firmaContactPopup.firma}</h3>}
+                            {firmaContactPopup.name && <p className="firma-contact-card__name">{firmaContactPopup.name}</p>}
+
+                            <div className="firma-contact-card__rows">
+                                {firmaContactPopup.firmaEmail && (
+                                    <a href={`mailto:${firmaContactPopup.firmaEmail}`} className="firma-contact-row">
+                                        <span className="material-symbols-outlined">mail</span>
+                                        <div><small>E-POSTA</small><span>{firmaContactPopup.firmaEmail}</span></div>
+                                    </a>
+                                )}
+                                {firmaContactPopup.email && firmaContactPopup.email !== firmaContactPopup.firmaEmail && (
+                                    <a href={`mailto:${firmaContactPopup.email}`} className="firma-contact-row">
+                                        <span className="material-symbols-outlined">person</span>
+                                        <div><small>YÖNETİCİ E-POSTA</small><span>{firmaContactPopup.email}</span></div>
+                                    </a>
+                                )}
+                                {firmaContactPopup.firmaPhone && (
+                                    <a href={`tel:${firmaContactPopup.firmaPhone}`} className="firma-contact-row">
+                                        <span className="material-symbols-outlined">call</span>
+                                        <div><small>TELEFON</small><span>{firmaContactPopup.firmaPhone}</span></div>
+                                    </a>
+                                )}
+                                {firmaContactPopup.phone && firmaContactPopup.phone !== firmaContactPopup.firmaPhone && (
+                                    <a href={`tel:${firmaContactPopup.phone}`} className="firma-contact-row">
+                                        <span className="material-symbols-outlined">person</span>
+                                        <div><small>YÖNETİCİ TELEFON</small><span>{firmaContactPopup.phone}</span></div>
+                                    </a>
+                                )}
+                            </div>
+
+                            {!firmaContactPopup.email && !firmaContactPopup.phone && !firmaContactPopup.firmaPhone && !firmaContactPopup.firmaEmail && (
+                                <p className="firma-contact-card__empty">Bu firma için iletişim bilgisi bulunamadı.</p>
+                            )}
+                        </div>
                     </div>
                 )}
             </main>

@@ -3,10 +3,11 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from './supabaseClient';
-import { updateTender, deleteTender } from './ihaleManagementApi';
+import { updateTender, deleteTender, createTender as createTenderApi } from './ihaleManagementApi';
 import CitySelect from './CitySelect';
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
 import './TenderOffersManagement.css';
+import './Ihaleler.css';
 
 /* ─── Yardımcı Fonksiyonlar ─── */
 
@@ -193,6 +194,50 @@ const TenderOffersManagement = ({ companyId }) => {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [closingTenderId, setClosingTenderId] = useState(null);
     const [closeConfirmId, setCloseConfirmId] = useState(null);
+
+    /* Enes Doğanay | 15 Nisan 2026: Akıllı puanlama bilgilendirme popup */
+    const [showScoringInfo, setShowScoringInfo] = useState(false);
+
+    /* Enes Doğanay | 15 Nisan 2026: Red nedeni notu */
+    const [rejectNotePopup, setRejectNotePopup] = useState(null);
+    const [rejectNote, setRejectNote] = useState('');
+
+    /* Enes Doğanay | 15 Nisan 2026: Teklif kabul → ihaleyi kapat mı sorusu */
+    const [acceptClosePopup, setAcceptClosePopup] = useState(null);
+
+    /* Enes Doğanay | 15 Nisan 2026: İhale kapatma → görünürlük sorusu */
+    const [closeVisibilityPopup, setCloseVisibilityPopup] = useState(null);
+
+    /* Enes Doğanay | 15 Nisan 2026: Kabul edilen teklif statü değiştirme dropdown */
+    const [statusDropdownId, setStatusDropdownId] = useState(null);
+    /* Enes Doğanay | 15 Nisan 2026: Dropdown statü değişikliği onay popup'ı */
+    const [statusConfirmPopup, setStatusConfirmPopup] = useState(null);
+    /* Enes Doğanay | 15 Nisan 2026: Statü değişikliği başarı modal */
+    const [statusSuccessModal, setStatusSuccessModal] = useState(null);
+
+    /* Enes Doğanay | 15 Nisan 2026: Yeni ihale oluşturma — Ihaleler sayfasındaki 4 adımlı stepper modal */
+    const STEPPER_LABELS = [
+        { key: 'temel', label: 'Temel Bilgiler', icon: 'edit_note' },
+        { key: 'detay', label: 'İhale Detayları', icon: 'tune' },
+        { key: 'sartlar', label: 'Teknik Şartlar', icon: 'checklist' },
+        { key: 'onizleme', label: 'Önizleme', icon: 'preview' },
+    ];
+    const CREATE_EMPTY_FORM = { baslik: '', aciklama: '', ihale_tipi: 'Açık İhale', kdv_durumu: 'haric', yayin_tarihi: '', son_basvuru_tarihi: '', teslim_suresi: '', durum: 'canli', referans_no: '', teslim_il: '', teslim_ilce: '', gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [] };
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [createForm, setCreateForm] = useState(CREATE_EMPTY_FORM);
+    const [createFormError, setCreateFormError] = useState('');
+    const [createFormSaving, setCreateFormSaving] = useState(false);
+    const [createStepperStep, setCreateStepperStep] = useState(0);
+    const [createYeniGereksinimMadde, setCreateYeniGereksinimMadde] = useState('');
+    const [createYeniGereksinimAciklama, setCreateYeniGereksinimAciklama] = useState('');
+    const [createEmailInput, setCreateEmailInput] = useState('');
+    const [createFirmaSearchTerm, setCreateFirmaSearchTerm] = useState('');
+    const [createFirmaSearchResults, setCreateFirmaSearchResults] = useState([]);
+    const [createFirmaSearching, setCreateFirmaSearching] = useState(false);
+    const createFirmaSearchTimeout = useRef(null);
+    const createFileInputRef = useRef(null);
+    const createFirmaResultsRef = useRef(null);
+    const [createIsVerifiedUser, setCreateIsVerifiedUser] = useState(false);
 
     /* Enes Doğanay | 13 Nisan 2026: Favoriler ve notlar localStorage ile kalıcı */
     const [shortlist, setShortlist] = useState(() => {
@@ -414,7 +459,8 @@ const TenderOffersManagement = ({ companyId }) => {
         });
     };
 
-    const updateStatus = async (offerId, status) => {
+    /* Enes Doğanay | 15 Nisan 2026: Teklif statüsünü güncelle + bildirim + e-posta gönder */
+    const updateStatus = async (offerId, status, redNedeni) => {
         setStatusUpdating(offerId);
         const { error: err } = await supabase.from('ihale_teklifleri').update({ durum: status }).eq('id', offerId);
         setStatusUpdating(null);
@@ -424,15 +470,27 @@ const TenderOffersManagement = ({ companyId }) => {
             return { ...prev, [k]: (prev[k] || []).map(o => o.id === offerId ? { ...o, durum: status } : o) };
         });
 
+        /* Enes Doğanay | 15 Nisan 2026: Statü değişikliği başarı modal */
+        const successMap = {
+            kabul: { icon: 'check_circle', title: 'Teklif Kabul Edildi', text: 'Teklif başarıyla kabul edildi. Teklif veren kişiye bildirim ve e-posta gönderildi.', color: '#059669' },
+            red: { icon: 'cancel', title: 'Teklif Reddedildi', text: 'Teklif reddedildi. Teklif veren kişiye bildirim ve e-posta gönderildi.', color: '#dc2626' },
+            gonderildi: { icon: 'hourglass_top', title: 'Değerlendirmeye Alındı', text: 'Teklif tekrar değerlendirmeye alındı. Teklif veren kişiye bildirim ve e-posta gönderildi.', color: '#2563eb' },
+        };
+        const sm = successMap[status];
+        if (sm) setStatusSuccessModal(sm);
+
         /* Enes Doğanay | 13 Nisan 2026: Kabul/Red bildirimini teklif veren kullanıcıya gönder */
         const offer = rawOffers.find(o => o.id === offerId);
         if (offer?.user_id && selectedTender) {
-            const statusLabel = status === 'kabul' ? 'kabul edildi' : 'reddedildi';
+            const statusLabel = status === 'kabul' ? 'kabul edildi' : (status === 'red' ? 'reddedildi' : 'değerlendirmeye alındı');
+            const message = redNedeni
+                ? `"${selectedTender.baslik}" ihalesine verdiğiniz teklif ${statusLabel}. Red nedeni: ${redNedeni}`
+                : `"${selectedTender.baslik}" ihalesine verdiğiniz teklif ${statusLabel}.`;
             supabase.from('bildirimler').insert({
                 user_id: offer.user_id,
                 type: 'tender_offer_status',
                 title: `Teklifiniz ${statusLabel}`,
-                message: `"${selectedTender.baslik}" ihalesine verdiğiniz teklif ${statusLabel}.`,
+                message,
                 firma_id: String(companyId),
                 is_read: false,
                 metadata: {
@@ -440,18 +498,65 @@ const TenderOffersManagement = ({ companyId }) => {
                     ihale_baslik: selectedTender.baslik,
                     teklif_id: offerId,
                     durum: status,
+                    red_nedeni: redNedeni || null,
                 },
             }).then(() => {});
+
+            /* Enes Doğanay | 15 Nisan 2026: Kabul/Red/Değerlendirme e-postası gönder */
+            sendOfferStatusEmail(offer, status, redNedeni);
         }
     };
 
+    /* Enes Doğanay | 15 Nisan 2026: Teklif kabul/red e-postası — Resend API üzerinden Edge Function ile */
+    /* Enes Doğanay | 16 Nisan 2026: Hata detayı eklendi — e-posta gönderim başarısızlığında kullanıcıyı bilgilendir */
+    const sendOfferStatusEmail = async (offer, status, redNedeni) => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token || !offer.gonderen_email) {
+                console.warn('E-posta gönderilemedi: oturum veya alıcı e-posta eksik', { hasToken: !!session?.access_token, email: offer.gonderen_email });
+                return;
+            }
+            console.log('E-posta gönderiliyor:', { to: offer.gonderen_email, status, ihale_baslik: selectedTender?.baslik, gonderen_ad: offer.gonderen_ad_soyad });
+            const { data, error: fnError } = await supabase.functions.invoke('ihale-management', {
+                body: {
+                    action: 'send_offer_status_email',
+                    to: offer.gonderen_email,
+                    status,
+                    ihale_baslik: selectedTender?.baslik || '',
+                    gonderen_ad: offer.gonderen_ad_soyad || '',
+                    red_nedeni: redNedeni || null,
+                    ihale_id: selectedTender?.id || null,
+                },
+            });
+            if (fnError) {
+                /* Enes Doğanay | 15 Nisan 2026: Response body'yi oku — edge function hata detayını göster */
+                let detail = '';
+                try { detail = fnError.context ? await fnError.context.json() : ''; } catch { /* */ }
+                console.error('Edge function hatası:', fnError, 'Detay:', detail);
+            } else {
+                console.log('Teklif durum e-postası gönderildi:', data);
+            }
+        } catch (e) {
+            console.error('Teklif durum e-postası gönderilemedi:', e);
+        }
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: teklif-ekleri private bucket — her zaman signed URL ile aç */
     const openFile = async (offer) => {
         if (!offer?.ek_dosya_url) return;
-        if (offer.ek_dosya_url.startsWith('http')) {
-            window.open(offer.ek_dosya_url, '_blank', 'noopener,noreferrer');
-            return;
+        // Eski kayıtlarda public URL saklanmış olabilir — path kısmını çıkar
+        let filePath = offer.ek_dosya_url;
+        if (filePath.startsWith('http')) {
+            try {
+                const url = new URL(filePath);
+                const marker = '/teklif-ekleri/';
+                const idx = url.pathname.indexOf(marker);
+                if (idx !== -1) {
+                    filePath = decodeURIComponent(url.pathname.substring(idx + marker.length));
+                }
+            } catch { /* orijinal path kullan */ }
         }
-        const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(offer.ek_dosya_url, 300);
+        const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(filePath, 300);
         if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
     };
 
@@ -597,8 +702,8 @@ const TenderOffersManagement = ({ companyId }) => {
     };
 
     /* Enes Doğanay | 13 Nisan 2026: İhaleyi erken kapat */
-    /* Enes Doğanay | 13 Nisan 2026: Tüm mevcut alanları gönder — Edge Function null alanları DB'ye yazıyor */
-    const handleCloseTender = async (id) => {
+    /* Enes Doğanay | 15 Nisan 2026: Görünürlük parametresi eklendi — firma kapattığı ihaleyi herkese göstermek isteyip istemediğini belirler */
+    const handleCloseTender = async (id, gorunurluk) => {
         setClosingTenderId(id);
         try {
             const tender = tenders.find(t => t.id === id);
@@ -619,9 +724,11 @@ const TenderOffersManagement = ({ companyId }) => {
                 davetli_firmalar: tender.davetli_firmalar || null,
                 ek_dosyalar: tender.ek_dosyalar || null,
                 durum: 'kapali',
+                kapali_gorunurluk: gorunurluk || 'gizle',
             });
-            setTenders(prev => prev.map(t => t.id === id ? { ...t, durum: 'kapali' } : t));
+            setTenders(prev => prev.map(t => t.id === id ? { ...t, durum: 'kapali', kapali_gorunurluk: gorunurluk || 'gizle' } : t));
             setCloseConfirmId(null);
+            setCloseVisibilityPopup(null);
             if (tender) {
                 await notifyOfferSubmitters(tender, 'tender_closed', 'İhale kapandı', `"${tender.baslik}" ihalesi kapanmıştır.`);
             }
@@ -640,6 +747,202 @@ const TenderOffersManagement = ({ companyId }) => {
             .eq('firma_id', String(companyId))
             .order('created_at', { ascending: false });
         if (res.data) setTenders(res.data);
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: İhaleyi tekrarla — kapanan ihaleyi yeni referansla canli olarak kopyalar */
+    const handleRepeatTender = async (tender) => {
+        try {
+            const payload = {
+                baslik: tender.baslik,
+                aciklama: tender.aciklama || '',
+                ihale_tipi: tender.ihale_tipi || 'Açık İhale',
+                kdv_durumu: tender.kdv_durumu || 'haric',
+                yayin_tarihi: new Date().toISOString().split('T')[0],
+                son_basvuru_tarihi: '',
+                teslim_suresi: tender.teslim_suresi || '',
+                teslim_il: tender.teslim_il || '',
+                teslim_ilce: tender.teslim_ilce || '',
+                referans_no: (tender.referans_no || '') + '-R',
+                gereksinimler: tender.gereksinimler || null,
+                davet_emailleri: tender.davet_emailleri || null,
+                davetli_firmalar: tender.davetli_firmalar || null,
+                ek_dosyalar: tender.ek_dosyalar || null,
+                durum: 'canli',
+            };
+            await createTenderApi(payload);
+            await reloadTenders();
+        } catch (err) {
+            setError(err.message || 'İhale tekrarlanamadı.');
+        }
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: Kabul et akışı — kabul sonrası ihaleyi kapat mı sor */
+    const handleAcceptOffer = (offerId) => {
+        setAcceptClosePopup(offerId);
+    };
+
+    const confirmAcceptOffer = async (offerId, shouldClose) => {
+        setAcceptClosePopup(null);
+        await updateStatus(offerId, 'kabul');
+        if (shouldClose && selectedTender) {
+            setCloseVisibilityPopup(selectedTender.id);
+        }
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: Reddet akışı — opsiyonel not popup */
+    const handleRejectOffer = (offerId) => {
+        setRejectNotePopup(offerId);
+        setRejectNote('');
+    };
+
+    const confirmRejectOffer = async () => {
+        if (!rejectNotePopup) return;
+        await updateStatus(rejectNotePopup, 'red', rejectNote.trim() || null);
+        setRejectNotePopup(null);
+        setRejectNote('');
+    };
+
+    /* Enes Doğanay | 15 Nisan 2026: Stepper modal — referans no üretimi */
+    const generateCreateRefNo = useCallback(async () => {
+        if (!companyId) return '';
+        try {
+            const { data: firma } = await supabase.from('firmalar').select('firma_adi, onayli_hesap').eq('firmaID', companyId).maybeSingle();
+            if (!firma?.firma_adi) return '';
+            setCreateIsVerifiedUser(firma.onayli_hesap === true);
+            const prefix = firma.firma_adi.trim().slice(0, 3).toLocaleUpperCase('tr-TR');
+            const year = new Date().getFullYear();
+            const { data: existing } = await supabase.from('firma_ihaleleri').select('referans_no').eq('firma_id', companyId);
+            const myRefs = (existing || []).map(r => r.referans_no).filter(Boolean);
+            const pattern = new RegExp(`^TED-${prefix}\\d*-${year}-(\\d+)$`);
+            let maxSeq = 0;
+            myRefs.forEach(ref => { const m = ref.match(pattern); if (m) maxSeq = Math.max(maxSeq, parseInt(m[1], 10)); });
+            const nextSeq = String(maxSeq + 1).padStart(4, '0');
+            const { data: others } = await supabase.from('firma_ihaleleri').select('referans_no').neq('firma_id', companyId).like('referans_no', `TED-${prefix}%-${year}-%`);
+            const hasSamePrefix = (others || []).length > 0;
+            const suffix = hasSamePrefix ? `${prefix}2` : prefix;
+            if (hasSamePrefix) {
+                const p2 = new RegExp(`^TED-${suffix}-${year}-(\\d+)$`);
+                myRefs.forEach(ref => { const m = ref.match(p2); if (m) maxSeq = Math.max(maxSeq, parseInt(m[1], 10)); });
+                return `TED-${suffix}-${year}-${String(maxSeq + 1).padStart(4, '0')}`;
+            }
+            return `TED-${prefix}-${year}-${nextSeq}`;
+        } catch { return `TED-${Date.now()}`; }
+    }, [companyId]);
+
+    /* Enes Doğanay | 15 Nisan 2026: Stepper modal açma */
+    const openCreateModal = async () => {
+        const refNo = await generateCreateRefNo();
+        setCreateForm({ ...CREATE_EMPTY_FORM, referans_no: refNo, gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [] });
+        setCreateFormError('');
+        setCreateYeniGereksinimMadde('');
+        setCreateYeniGereksinimAciklama('');
+        setCreateEmailInput('');
+        setCreateFirmaSearchTerm('');
+        setCreateFirmaSearchResults([]);
+        setCreateStepperStep(0);
+        setShowCreateModal(true);
+    };
+
+    // Enes Doğanay | 15 Nisan 2026: Gereksinim ekleme
+    const createAddGereksinim = () => {
+        if (!createYeniGereksinimMadde.trim()) return;
+        const newItem = { id: Date.now(), madde: createYeniGereksinimMadde.trim(), aciklama: createYeniGereksinimAciklama.trim() };
+        setCreateForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, newItem] }));
+        setCreateYeniGereksinimMadde('');
+        setCreateYeniGereksinimAciklama('');
+    };
+    const createRemoveGereksinim = (id) => setCreateForm(p => ({ ...p, gereksinimler: p.gereksinimler.filter(g => g.id !== id) }));
+
+    // Enes Doğanay | 15 Nisan 2026: E-posta tag input
+    const createAddEmail = () => {
+        const email = createEmailInput.trim().toLowerCase();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+        if (createForm.davet_emailleri.includes(email)) return;
+        setCreateForm(p => ({ ...p, davet_emailleri: [...p.davet_emailleri, email] }));
+        setCreateEmailInput('');
+    };
+    const createRemoveEmail = (email) => setCreateForm(p => ({ ...p, davet_emailleri: p.davet_emailleri.filter(e => e !== email) }));
+    const createHandleEmailKeyDown = (e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); createAddEmail(); } };
+
+    // Enes Doğanay | 15 Nisan 2026: Davetli firma arama
+    const createSearchFirmalar = useCallback(async (term) => {
+        if (!term || term.length < 2) { setCreateFirmaSearchResults([]); return; }
+        setCreateFirmaSearching(true);
+        try {
+            const { data } = await supabase.from('firmalar').select('firmaID, firma_adi, onayli_hesap').ilike('firma_adi', `%${term}%`).limit(8);
+            setCreateFirmaSearchResults(data || []);
+            setTimeout(() => createFirmaResultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+        } catch { setCreateFirmaSearchResults([]); } finally { setCreateFirmaSearching(false); }
+    }, []);
+    const createHandleFirmaSearch = (val) => {
+        setCreateFirmaSearchTerm(val);
+        if (createFirmaSearchTimeout.current) clearTimeout(createFirmaSearchTimeout.current);
+        createFirmaSearchTimeout.current = setTimeout(() => createSearchFirmalar(val), 300);
+    };
+    const createAddDavetliFirma = (firma) => {
+        if (createForm.davetli_firmalar.some(f => f.firma_id === firma.firmaID)) return;
+        setCreateForm(p => ({ ...p, davetli_firmalar: [...p.davetli_firmalar, { firma_id: firma.firmaID, firma_adi: firma.firma_adi, onayli: firma.onayli_hesap === true }] }));
+        setCreateFirmaSearchTerm('');
+        setCreateFirmaSearchResults([]);
+    };
+    const createRemoveDavetliFirma = (firmaId) => setCreateForm(p => ({ ...p, davetli_firmalar: p.davetli_firmalar.filter(f => f.firma_id !== firmaId) }));
+
+    // Enes Doğanay | 15 Nisan 2026: Ek dosya yönetimi
+    const createHandleFileAdd = (e) => {
+        const files = Array.from(e.target.files || []);
+        const valid = files.filter(f => f.size <= 10 * 1024 * 1024);
+        if (valid.length < files.length) setCreateFormError('10 MB üzeri dosyalar eklenmedi.');
+        setCreateForm(p => ({ ...p, ek_dosyalar: [...p.ek_dosyalar, ...valid] }));
+        if (createFileInputRef.current) createFileInputRef.current.value = '';
+    };
+    const createRemoveFile = (idx) => setCreateForm(p => ({ ...p, ek_dosyalar: p.ek_dosyalar.filter((_, i) => i !== idx) }));
+
+    // Enes Doğanay | 15 Nisan 2026: Form gönderimi — Taslak / Yayınla
+    const handleCreateFormSubmit = async (e, forceDurum) => {
+        if (e) e.preventDefault();
+        setCreateFormSaving(true);
+        setCreateFormError('');
+        try {
+            if (createForm.ihale_tipi === 'Davetli İhale' && createForm.davetli_firmalar.length === 0) {
+                setCreateFormError('Davetli ihale için en az bir firma eklemeniz gerekiyor.');
+                setCreateFormSaving(false);
+                return;
+            }
+            const onaysizFirma = createForm.davetli_firmalar.find(f => !f.onayli);
+            if (onaysizFirma) {
+                setCreateFormError(`"${onaysizFirma.firma_adi}" henüz onaylı bir firma değil. Lütfen onaysız firmaları kaldırın.`);
+                setCreateFormSaving(false);
+                return;
+            }
+            const uploadedFiles = [];
+            const newFiles = createForm.ek_dosyalar.filter(f => f instanceof File);
+            for (const file of newFiles) {
+                const timestamp = Date.now();
+                const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const filePath = `${createForm.referans_no || 'temp'}/${timestamp}_${safeName}`;
+                const { error: uploadError } = await supabase.storage.from('ihale-ekleri').upload(filePath, file, { upsert: false });
+                if (uploadError) {
+                    setCreateFormError(`"${file.name}" yüklenemedi: ${uploadError.message}`);
+                    setCreateFormSaving(false);
+                    return;
+                }
+                const { data: urlData } = supabase.storage.from('ihale-ekleri').getPublicUrl(filePath);
+                uploadedFiles.push({ name: file.name, path: filePath, size: file.size, url: urlData.publicUrl });
+            }
+            const payload = {
+                ...createForm,
+                durum: forceDurum || createForm.durum,
+                il_ilce: [createForm.teslim_il, createForm.teslim_ilce].filter(Boolean).join(' / '),
+                ek_dosyalar: uploadedFiles,
+            };
+            await createTenderApi(payload);
+            setShowCreateModal(false);
+            await reloadTenders();
+        } catch (err) {
+            setCreateFormError(err.message || 'Kaydedilemedi.');
+        } finally {
+            setCreateFormSaving(false);
+        }
     };
 
     /* ─── Render ─── */
@@ -687,13 +990,10 @@ const TenderOffersManagement = ({ companyId }) => {
                         <span className="material-symbols-outlined">radio_button_checked</span>
                         <div><strong>{activeTenders}</strong><span>Aktif</span></div>
                     </div>
+                    {/* Enes Doğanay | 15 Nisan 2026: Bekleyen stat kaldırıldı */}
                     <div className="tom-stat">
                         <span className="material-symbols-outlined">mail</span>
                         <div><strong>{totalOffers}</strong><span>Gelen Teklif</span></div>
-                    </div>
-                    <div className="tom-stat tom-stat--amber">
-                        <span className="material-symbols-outlined">pending</span>
-                        <div><strong>{pendingOffers}</strong><span>Bekleyen</span></div>
                     </div>
                 </div>
             </div>
@@ -713,7 +1013,14 @@ const TenderOffersManagement = ({ companyId }) => {
                 <aside className="tom-sidebar">
                     <div className="tom-sidebar__head">
                         <h2>İhale Listesi</h2>
-                        <span className="tom-sidebar__count">{filteredTenders.length}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span className="tom-sidebar__count">{filteredTenders.length}</span>
+                            {/* Enes Doğanay | 15 Nisan 2026: Yeni ihale oluşturma butonu — stepper modal açar */}
+                            <button className="tom-btn tom-btn--create-tender" onClick={openCreateModal}>
+                                <span className="material-symbols-outlined">add</span>
+                                Yeni İhale Oluştur
+                            </button>
+                        </div>
                     </div>
 
                     <div className="tom-sidebar__search">
@@ -851,25 +1158,61 @@ const TenderOffersManagement = ({ companyId }) => {
                                                 </div>
                                             )}
                                         </div>
+                                        {/* Enes Doğanay | 15 Nisan 2026: İhale ek dokümanlarını göster */}
+                                        {(() => {
+                                            let rawEk = selectedTender.ek_dosyalar;
+                                            if (typeof rawEk === 'string') try { rawEk = JSON.parse(rawEk); } catch { rawEk = []; }
+                                            const ekDosyalar = Array.isArray(rawEk) ? rawEk : [];
+                                            if (!ekDosyalar.length) return null;
+                                            return (
+                                                <div className="tom-info-card__files">
+                                                    <h4><span className="material-symbols-outlined">attach_file</span> Ek Dokümanlar ({ekDosyalar.length})</h4>
+                                                    <div className="tom-info-card__files-list">
+                                                        {ekDosyalar.map((f, i) => (
+                                                            <button key={i} type="button" className="tom-info-card__file-btn" onClick={async () => {
+                                                                if (f.url && f.url.startsWith('http')) {
+                                                                    window.open(f.url, '_blank', 'noopener,noreferrer');
+                                                                } else if (f.path) {
+                                                                    const { data } = await supabase.storage.from('ihale-ekleri').createSignedUrl(f.path, 300);
+                                                                    if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+                                                                }
+                                                            }}>
+                                                                <span className="material-symbols-outlined">download</span>
+                                                                {f.name || `Dosya ${i + 1}`}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
                                         {/* Enes Doğanay | 13 Nisan 2026: İhale yönetim aksiyonları — düzenle/kapat/sil */}
-                                        {/* Enes Doğanay | 13 Nisan 2026: Kapanan/iptal edilen ihalede düzenle deaktif */}
+                                        {/* Enes Doğanay | 15 Nisan 2026: İhaleyi tekrarla butonu + silme uyarısı iyileştirildi + kapatma görünürlük sorusu */}
                                         <div className="tom-tender-actions">
                                             {(() => {
                                                 const tenderTone = getTenderStatus(selectedTender.durum).tone;
                                                 const isClosed = tenderTone === 'closed' || tenderTone === 'cancelled';
                                                 return (
-                                                    <button className="tom-btn tom-btn--edit" onClick={() => openEditModal(selectedTender)} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
-                                                        <span className="material-symbols-outlined">edit</span>
-                                                        Düzenle
-                                                    </button>
+                                                    <>
+                                                        <button className="tom-btn tom-btn--edit" onClick={() => openEditModal(selectedTender)} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
+                                                            <span className="material-symbols-outlined">edit</span>
+                                                            Düzenle
+                                                        </button>
+                                                        {/* Enes Doğanay | 15 Nisan 2026: Kapanan ihaleyi tekrarla butonu */}
+                                                        {isClosed && (
+                                                            <button className="tom-btn tom-btn--repeat" onClick={() => handleRepeatTender(selectedTender)}>
+                                                                <span className="material-symbols-outlined">replay</span>
+                                                                İhaleyi Tekrarla
+                                                            </button>
+                                                        )}
+                                                    </>
                                                 );
                                             })()}
                                             {getTenderStatus(selectedTender.durum).tone === 'active' && (
                                                 closeConfirmId === selectedTender.id ? (
                                                     <div className="tom-confirm-inline">
                                                         <span>İhaleyi kapatmak istediğinize emin misiniz?</span>
-                                                        <button className="tom-btn tom-btn--confirm" onClick={() => handleCloseTender(selectedTender.id)} disabled={closingTenderId === selectedTender.id}>
-                                                            {closingTenderId === selectedTender.id ? 'Kapatılıyor…' : 'Evet, Kapat'}
+                                                        <button className="tom-btn tom-btn--confirm" onClick={() => { setCloseConfirmId(null); setCloseVisibilityPopup(selectedTender.id); }}>
+                                                            Evet, Kapat
                                                         </button>
                                                         <button className="tom-btn tom-btn--cancel-sm" onClick={() => setCloseConfirmId(null)}>İptal</button>
                                                     </div>
@@ -881,9 +1224,12 @@ const TenderOffersManagement = ({ companyId }) => {
                                                 )
                                             )}
                                             {deleteConfirmId === selectedTender.id ? (
-                                                <div className="tom-confirm-inline">
-                                                    <span>Silmek istediğinize emin misiniz?</span>
-                                                    <button className="tom-btn tom-btn--confirm tom-btn--confirm-red" onClick={() => handleDeleteTender(selectedTender.id)}>Evet, Sil</button>
+                                                <div className="tom-confirm-inline tom-confirm-inline--danger">
+                                                    <div>
+                                                        <span style={{ fontWeight: 700, color: '#991b1b' }}>⚠ Dikkat!</span>
+                                                        <span style={{ display: 'block', fontSize: '0.78rem', marginTop: 2 }}>Bu işlem kalıcıdır. İhale ve tüm teklifler geri getirilemez şekilde silinecektir.</span>
+                                                    </div>
+                                                    <button className="tom-btn tom-btn--confirm tom-btn--confirm-red" onClick={() => handleDeleteTender(selectedTender.id)}>Kalıcı Olarak Sil</button>
                                                     <button className="tom-btn tom-btn--cancel-sm" onClick={() => setDeleteConfirmId(null)}>İptal</button>
                                                 </div>
                                             ) : (
@@ -914,6 +1260,14 @@ const TenderOffersManagement = ({ companyId }) => {
                                             title="Puanlama Ayarları"
                                         >
                                             <span className="material-symbols-outlined">tune</span>
+                                        </button>
+                                        {/* Enes Doğanay | 15 Nisan 2026: Akıllı puanlama bilgilendirme butonu */}
+                                        <button
+                                            className="tom-btn-icon"
+                                            onClick={() => setShowScoringInfo(true)}
+                                            title="Akıllı Puanlama Nasıl Çalışır?"
+                                        >
+                                            <span className="material-symbols-outlined">help</span>
                                         </button>
                                         <div className="tom-sort-wrap">
                                             <span className="material-symbols-outlined">sort</span>
@@ -1169,12 +1523,62 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                         {offer.ek_dosya_adi || 'Ek Dosya'}
                                                                     </button>
                                                                 )}
-                                                                {/* Enes Doğanay | 13 Nisan 2026: Kabul/Red butonları sadece henüz karar verilmemiş tekliflerde gösterilsin */}
+                                                                {/* Enes Doğanay | 15 Nisan 2026: Kabul edilen teklif → iletişime geç + statü değiştir */}
+                                                                {String(offer.durum || '').toLowerCase() === 'kabul' && (
+                                                                    <div className="tom-offer-card__footer-right">
+                                                                        <button className="tom-btn tom-btn--outline" onClick={() => openContact(offer)}>
+                                                                            <span className="material-symbols-outlined">contact_phone</span>
+                                                                            İletişime Geç
+                                                                        </button>
+                                                                        <div className="tom-status-dropdown-wrap">
+                                                                            <button className="tom-btn tom-btn--status-change" onClick={() => setStatusDropdownId(statusDropdownId === offer.id ? null : offer.id)}>
+                                                                                <span className="material-symbols-outlined">swap_horiz</span>
+                                                                                Statüyü Değiştir
+                                                                            </button>
+                                                                            {statusDropdownId === offer.id && (
+                                                                                <div className="tom-status-dropdown">
+                                                                                    <button onClick={() => { setStatusConfirmPopup({ offerId: offer.id, status: 'gonderildi' }); setStatusDropdownId(null); }}>
+                                                                                        <span className="material-symbols-outlined" style={{ color: '#2563eb' }}>hourglass_top</span>
+                                                                                        Değerlendiriliyor
+                                                                                    </button>
+                                                                                    <button onClick={() => { handleRejectOffer(offer.id); setStatusDropdownId(null); }}>
+                                                                                        <span className="material-symbols-outlined" style={{ color: '#dc2626' }}>cancel</span>
+                                                                                        Reddedildi
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {/* Enes Doğanay | 15 Nisan 2026: Reddedilen teklif → statü değiştir */}
+                                                                {String(offer.durum || '').toLowerCase() === 'red' && (
+                                                                    <div className="tom-offer-card__footer-right">
+                                                                        <div className="tom-status-dropdown-wrap">
+                                                                            <button className="tom-btn tom-btn--status-change" onClick={() => setStatusDropdownId(statusDropdownId === offer.id ? null : offer.id)}>
+                                                                                <span className="material-symbols-outlined">swap_horiz</span>
+                                                                                Statüyü Değiştir
+                                                                            </button>
+                                                                            {statusDropdownId === offer.id && (
+                                                                                <div className="tom-status-dropdown">
+                                                                                    <button onClick={() => { setStatusConfirmPopup({ offerId: offer.id, status: 'gonderildi' }); setStatusDropdownId(null); }}>
+                                                                                        <span className="material-symbols-outlined" style={{ color: '#2563eb' }}>hourglass_top</span>
+                                                                                        Değerlendiriliyor
+                                                                                    </button>
+                                                                                    <button onClick={() => { handleAcceptOffer(offer.id); setStatusDropdownId(null); }}>
+                                                                                        <span className="material-symbols-outlined" style={{ color: '#059669' }}>check_circle</span>
+                                                                                        Kabul Et
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {/* Enes Doğanay | 15 Nisan 2026: Henüz karar verilmemiş teklifler */}
                                                                 {!['kabul', 'red'].includes(String(offer.durum || '').toLowerCase()) && (
                                                                 <div className="tom-offer-card__footer-right">
                                                                     <button
                                                                         className="tom-btn tom-btn--reject"
-                                                                        onClick={() => updateStatus(offer.id, 'red')}
+                                                                        onClick={() => handleRejectOffer(offer.id)}
                                                                         disabled={isUpdating}
                                                                     >
                                                                         <span className="material-symbols-outlined">close</span>
@@ -1182,7 +1586,7 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                     </button>
                                                                     <button
                                                                         className="tom-btn tom-btn--accept"
-                                                                        onClick={() => updateStatus(offer.id, 'kabul')}
+                                                                        onClick={() => handleAcceptOffer(offer.id)}
                                                                         disabled={isUpdating}
                                                                     >
                                                                         <span className="material-symbols-outlined">check</span>
@@ -1444,6 +1848,558 @@ const TenderOffersManagement = ({ companyId }) => {
                         {!contactPopup.email && !contactPopup.phone && !contactPopup.firmaPhone && !contactPopup.firmaEmail && (
                             <p className="tom-contact-card__empty">Bu kişi/firma için iletişim bilgisi bulunamadı.</p>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 15 Nisan 2026: Akıllı puanlama bilgilendirme popup */}
+            {showScoringInfo && (
+                <div className="tom-contact-overlay" onClick={() => setShowScoringInfo(false)}>
+                    <div className="tom-scoring-info-card" onClick={e => e.stopPropagation()}>
+                        <button className="tom-contact-card__close" onClick={() => setShowScoringInfo(false)}>
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                        <div className="tom-scoring-info-card__icon">
+                            <span className="material-symbols-outlined">psychology</span>
+                        </div>
+                        <h3>Akıllı Puanlama Nasıl Çalışır?</h3>
+                        <div className="tom-scoring-info-card__body">
+                            <p>Akıllı puanlama sistemi, gelen teklifleri otomatik olarak değerlendirerek size en uygun teklifi hızlıca bulmanıza yardımcı olur.</p>
+                            <div className="tom-scoring-info-item">
+                                <span className="material-symbols-outlined" style={{ color: '#059669' }}>payments</span>
+                                <div>
+                                    <strong>Fiyat Puanı</strong>
+                                    <p>Teklif edilen fiyat ne kadar düşükse puan o kadar yüksek olur. Tüm teklifler arasındaki en düşük ve en yüksek fiyatlar baz alınarak hesaplanır.</p>
+                                </div>
+                            </div>
+                            <div className="tom-scoring-info-item">
+                                <span className="material-symbols-outlined" style={{ color: '#d97706' }}>local_shipping</span>
+                                <div>
+                                    <strong>Teslim Hızı Puanı</strong>
+                                    <p>Teslim süresi ne kadar kısa ise puan o kadar yüksek olur. Daha hızlı teslimat daha iyi skor demektir.</p>
+                                </div>
+                            </div>
+                            <div className="tom-scoring-info-item">
+                                <span className="material-symbols-outlined" style={{ color: '#2563eb' }}>tune</span>
+                                <div>
+                                    <strong>Ağırlık Ayarları</strong>
+                                    <p>Kaydırıcılarla Fiyat ve Teslim Hızı kriterlerinin ağırlığını değiştirebilirsiniz. Örnek: fiyat %80, teslim %20 yaparsanız fiyat daha belirleyici olur.</p>
+                                </div>
+                            </div>
+                            <div className="tom-scoring-info-item">
+                                <span className="material-symbols-outlined" style={{ color: '#7c3aed' }}>compare_arrows</span>
+                                <div>
+                                    <strong>Karşılaştırma</strong>
+                                    <p>En fazla 3 teklifi seçerek yan yana karşılaştırabilirsiniz. En iyi teklif otomatik olarak vurgulanır.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button className="tom-btn tom-btn--accept" style={{ width: '100%', justifyContent: 'center', marginTop: 16 }} onClick={() => setShowScoringInfo(false)}>
+                            <span className="material-symbols-outlined">check</span>
+                            Anladım
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 15 Nisan 2026: Red nedeni popup */}
+            {rejectNotePopup && (
+                <div className="tom-contact-overlay" onClick={() => setRejectNotePopup(null)}>
+                    <div className="tom-reject-note-card" onClick={e => e.stopPropagation()}>
+                        <button className="tom-contact-card__close" onClick={() => setRejectNotePopup(null)}>
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
+                        <div className="tom-scoring-info-card__icon" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+                            <span className="material-symbols-outlined">cancel</span>
+                        </div>
+                        <h3>Teklifi Reddet</h3>
+                        <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 16px', textAlign: 'center' }}>İsteğe bağlı olarak red nedeninizi yazabilirsiniz. Bu not, teklif veren kişiye e-posta ile iletilecektir.</p>
+                        <textarea
+                            className="tom-reject-note-textarea"
+                            rows={3}
+                            value={rejectNote}
+                            onChange={e => setRejectNote(e.target.value)}
+                            placeholder="Red nedeni (opsiyonel)..."
+                        />
+                        <div className="tom-reject-note-actions">
+                            <button className="tom-btn tom-btn--cancel-sm" onClick={() => setRejectNotePopup(null)}>İptal</button>
+                            <button className="tom-btn tom-btn--reject" onClick={confirmRejectOffer}>
+                                <span className="material-symbols-outlined">close</span>
+                                Reddet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 15 Nisan 2026: Kabul → İhaleyi kapat mı sorusu */}
+            {acceptClosePopup && (
+                <div className="tom-contact-overlay" onClick={() => setAcceptClosePopup(null)}>
+                    <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+                        <div className="tom-scoring-info-card__icon" style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}>
+                            <span className="material-symbols-outlined">check_circle</span>
+                        </div>
+                        <h3>Teklif Kabul Edilecek</h3>
+                        <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>Bu teklifi kabul ettikten sonra ihaleyi kapatmak ister misiniz?</p>
+                        <div className="tom-accept-close-actions">
+                            <button className="tom-btn tom-btn--accept" onClick={() => confirmAcceptOffer(acceptClosePopup, true)}>
+                                <span className="material-symbols-outlined">lock</span>
+                                Kabul Et ve İhaleyi Kapat
+                            </button>
+                            <button className="tom-btn tom-btn--outline" onClick={() => confirmAcceptOffer(acceptClosePopup, false)}>
+                                <span className="material-symbols-outlined">check</span>
+                                Kabul Et, İhale Açık Kalsın
+                            </button>
+                            <button className="tom-btn tom-btn--cancel-sm" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setAcceptClosePopup(null)}>İptal</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 15 Nisan 2026: İhale kapatma → görünürlük sorusu */}
+            {closeVisibilityPopup && (
+                <div className="tom-contact-overlay" onClick={() => setCloseVisibilityPopup(null)}>
+                    <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+                        <div className="tom-scoring-info-card__icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+                            <span className="material-symbols-outlined">visibility</span>
+                        </div>
+                        <h3>İhale Görünürlüğü</h3>
+                        <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>Kapattığınız ihale, İhaleler sayfasında diğer kullanıcılara gösterilmeye devam etsin mi?</p>
+                        <div className="tom-accept-close-actions">
+                            <button className="tom-btn tom-btn--accept" onClick={() => handleCloseTender(closeVisibilityPopup, 'goster')} disabled={closingTenderId === closeVisibilityPopup}>
+                                <span className="material-symbols-outlined">visibility</span>
+                                {closingTenderId === closeVisibilityPopup ? 'Kapatılıyor…' : 'Evet, Görüntülensin'}
+                            </button>
+                            <button className="tom-btn tom-btn--outline" onClick={() => handleCloseTender(closeVisibilityPopup, 'gizle')} disabled={closingTenderId === closeVisibilityPopup}>
+                                <span className="material-symbols-outlined">visibility_off</span>
+                                {closingTenderId === closeVisibilityPopup ? 'Kapatılıyor…' : 'Hayır, Gizlensin'}
+                            </button>
+                            <button className="tom-btn tom-btn--cancel-sm" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setCloseVisibilityPopup(null)}>İptal</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 16 Haziran 2025: Değerlendirmeye alma onay popup */}
+            {statusConfirmPopup && (
+                <div className="tom-contact-overlay" onClick={() => setStatusConfirmPopup(null)}>
+                    <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+                        <div className="tom-scoring-info-card__icon" style={{ background: 'linear-gradient(135deg, #2563eb, #3b82f6)' }}>
+                            <span className="material-symbols-outlined">hourglass_top</span>
+                        </div>
+                        <h3>Değerlendirmeye Al</h3>
+                        <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>Bu teklifi tekrar değerlendirmeye almak istediğinize emin misiniz?</p>
+                        <div className="tom-accept-close-actions">
+                            <button className="tom-btn tom-btn--accept" style={{ background: 'linear-gradient(135deg, #2563eb, #3b82f6)' }} onClick={() => { updateStatus(statusConfirmPopup.offerId, statusConfirmPopup.status); setStatusConfirmPopup(null); }}>
+                                <span className="material-symbols-outlined">hourglass_top</span>
+                                Değerlendirmeye Al
+                            </button>
+                            <button className="tom-btn tom-btn--cancel-sm" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setStatusConfirmPopup(null)}>İptal</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 16 Haziran 2025: Statü değişikliği başarı modal */}
+            {statusSuccessModal && (
+                <div className="tom-contact-overlay" onClick={() => setStatusSuccessModal(null)}>
+                    <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+                        <div className="tom-scoring-info-card__icon" style={{ background: statusSuccessModal.color }}>
+                            <span className="material-symbols-outlined">{statusSuccessModal.icon}</span>
+                        </div>
+                        <h3>{statusSuccessModal.title}</h3>
+                        <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>{statusSuccessModal.text}</p>
+                        <button className="tom-btn tom-btn--accept" style={{ width: '100%', justifyContent: 'center', background: statusSuccessModal.color }} onClick={() => setStatusSuccessModal(null)}>
+                            <span className="material-symbols-outlined">check</span>
+                            Tamam
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 15 Nisan 2026: Yeni İhale Oluştur — 4 adımlı stepper modal (Ihaleler sayfasıyla birebir aynı) */}
+            {showCreateModal && (
+                <div className="ihale-modal-overlay">
+                    <div className="ihale-modal ihale-modal--stepper">
+                        <div className="ihale-modal__head">
+                            <h3>Yeni İhale Oluştur</h3>
+                            <button type="button" className="ihale-modal__close" onClick={() => setShowCreateModal(false)}>
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <div className="ihale-stepper-bar">
+                            {STEPPER_LABELS.map((s, i) => (
+                                <React.Fragment key={s.key}>
+                                    <button
+                                        type="button"
+                                        className={`ihale-stepper-item ${i === createStepperStep ? 'ihale-stepper-item--active' : ''} ${i < createStepperStep ? 'ihale-stepper-item--done' : ''}`}
+                                        onClick={() => i <= createStepperStep && setCreateStepperStep(i)}
+                                    >
+                                        <span className="ihale-stepper-num">
+                                            {i < createStepperStep
+                                                ? <span className="material-symbols-outlined">check</span>
+                                                : <span className="material-symbols-outlined">{s.icon}</span>
+                                            }
+                                        </span>
+                                        <span className="ihale-stepper-label">{s.label}</span>
+                                    </button>
+                                    {i < STEPPER_LABELS.length - 1 && (
+                                        <div className={`ihale-stepper-track ${i < createStepperStep ? 'ihale-stepper-track--done' : ''} ${i === createStepperStep ? 'ihale-stepper-track--active' : ''}`} />
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </div>
+
+                        <form className="ihale-modal__form" onSubmit={e => e.preventDefault()}>
+
+                            {/* ═══════ ADIM 1: TEMEL BİLGİLER ═══════ */}
+                            {createStepperStep === 0 && (
+                                <div className="ihale-step-content">
+                                    <label className="ihale-field">
+                                        <span>Başlık *</span>
+                                        <input type="text" value={createForm.baslik} onChange={e => setCreateForm(p => ({ ...p, baslik: e.target.value }))} placeholder="Örn. 500 adet laptop alımı" />
+                                    </label>
+                                    <label className="ihale-field ihale-field--full">
+                                        <span>Açıklama</span>
+                                        <textarea rows={4} value={createForm.aciklama} onChange={e => setCreateForm(p => ({ ...p, aciklama: e.target.value }))} placeholder="İhale kapsamı, genel bilgiler, teknik gereksinimler…" />
+                                    </label>
+                                    <div className="ihale-modal__grid">
+                                        <div className="ihale-field">
+                                            <span>Teslim Yeri İl *</span>
+                                            <CitySelect value={createForm.teslim_il} onChange={val => setCreateForm(p => ({ ...p, teslim_il: val, teslim_ilce: '' }))} />
+                                        </div>
+                                        <div className="ihale-field">
+                                            <span>Teslim Yeri İlçe *</span>
+                                            <CitySelect
+                                                value={createForm.teslim_ilce}
+                                                onChange={val => setCreateForm(p => ({ ...p, teslim_ilce: val }))}
+                                                options={TURKEY_DISTRICTS[createForm.teslim_il] || []}
+                                                placeholder="İlçe seçiniz"
+                                                icon="map"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* ═══════ ADIM 2: İHALE DETAYLARI ═══════ */}
+                            {createStepperStep === 1 && (
+                                <div className="ihale-step-content">
+                                    <div className="ihale-modal__grid">
+                                        <label className="ihale-field">
+                                            <span>İhale Tipi *</span>
+                                            <select value={createForm.ihale_tipi} onChange={e => {
+                                                const val = e.target.value;
+                                                if (val === 'Davetli İhale' && !createIsVerifiedUser) return;
+                                                setCreateForm(p => ({
+                                                    ...p,
+                                                    ihale_tipi: val,
+                                                    ...(val !== 'Davetli İhale' ? { davetli_firmalar: [] } : {}),
+                                                }));
+                                            }}>
+                                                <option value="Açık İhale">Açık İhale</option>
+                                                <option value="Davetli İhale" disabled={!createIsVerifiedUser}>
+                                                    Davetli İhale {!createIsVerifiedUser ? '(Onaylı hesap gerekli)' : ''}
+                                                </option>
+                                            </select>
+                                        </label>
+                                        <label className="ihale-field">
+                                            <span>KDV Durumu</span>
+                                            <select value={createForm.kdv_durumu} onChange={e => setCreateForm(p => ({ ...p, kdv_durumu: e.target.value }))}>
+                                                <option value="haric">KDV Hariç</option>
+                                                <option value="dahil">KDV Dahil</option>
+                                            </select>
+                                        </label>
+                                        <label className="ihale-field">
+                                            <span>İhale Açılış Tarihi *</span>
+                                            <input type="date" value={createForm.yayin_tarihi} onChange={e => setCreateForm(p => ({ ...p, yayin_tarihi: e.target.value }))} />
+                                        </label>
+                                        <label className="ihale-field">
+                                            <span>İhale Kapanış Tarihi *</span>
+                                            <input type="date" value={createForm.son_basvuru_tarihi} onChange={e => setCreateForm(p => ({ ...p, son_basvuru_tarihi: e.target.value }))} />
+                                        </label>
+                                        <label className="ihale-field">
+                                            <span>Talep Edilen Teslim Süresi *</span>
+                                            <input type="text" value={createForm.teslim_suresi} onChange={e => setCreateForm(p => ({ ...p, teslim_suresi: e.target.value }))} placeholder="Örn. 30 iş günü" />
+                                        </label>
+                                        <label className="ihale-field">
+                                            <span>Referans No</span>
+                                            <input type="text" value={createForm.referans_no} readOnly className="ihale-field--readonly" tabIndex={-1} />
+                                        </label>
+                                    </div>
+
+                                    {createForm.son_basvuru_tarihi && (
+                                        <div className="ihale-deadline-sticky">
+                                            <span className="material-symbols-outlined">timer</span>
+                                            <span>İhale Kapanış: <strong>{new Date(createForm.son_basvuru_tarihi).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</strong></span>
+                                        </div>
+                                    )}
+
+                                    <div className="ihale-section">
+                                        <span className="ihale-section__title">
+                                            <span className="material-symbols-outlined">mail</span>
+                                            Davet Edilecek E-postalar
+                                        </span>
+                                        <p className="ihale-section__desc">İhale yayınlandığında bu adreslere bildirim gönderilecek.</p>
+                                        <div className="ihale-email-input-row">
+                                            <input type="email" placeholder="ornek@firma.com" value={createEmailInput} onChange={e => setCreateEmailInput(e.target.value)} onKeyDown={createHandleEmailKeyDown} />
+                                            <button type="button" className="ihale-email-add-btn" onClick={createAddEmail}>
+                                                <span className="material-symbols-outlined">add</span>
+                                            </button>
+                                        </div>
+                                        {createForm.davet_emailleri.length > 0 && (
+                                            <div className="ihale-email-tags">
+                                                {createForm.davet_emailleri.map(email => (
+                                                    <div key={email} className="ihale-email-tag">
+                                                        <span>{email}</span>
+                                                        <button type="button" onClick={() => createRemoveEmail(email)}>
+                                                            <span className="material-symbols-outlined">close</span>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {createForm.ihale_tipi === 'Davetli İhale' && (
+                                        <div className="ihale-section">
+                                            <span className="ihale-section__title">
+                                                <span className="material-symbols-outlined">group_add</span>
+                                                Davet Edilecek Firmalar
+                                            </span>
+                                            <div className="ihale-firma-search">
+                                                <input type="text" placeholder="Firma adı ile arayın…" value={createFirmaSearchTerm} onChange={e => createHandleFirmaSearch(e.target.value)} />
+                                                {createFirmaSearching && <span className="ihale-firma-search__spinner">Aranıyor…</span>}
+                                                {createFirmaSearchResults.length > 0 && (
+                                                    <div className="ihale-firma-search__results" ref={createFirmaResultsRef}>
+                                                        {createFirmaSearchResults.map(f => {
+                                                            const alreadyAdded = createForm.davetli_firmalar.some(df => df.firma_id === f.firmaID);
+                                                            const isOnayli = f.onayli_hesap === true;
+                                                            return (
+                                                                <div key={f.firmaID} className={`ihale-firma-search__item ${!isOnayli ? 'ihale-firma-search__item--disabled' : ''}`}>
+                                                                    <div className="ihale-firma-search__info">
+                                                                        <strong>{f.firma_adi}</strong>
+                                                                        {isOnayli
+                                                                            ? <span className="ihale-firma-badge ihale-firma-badge--ok"><span className="material-symbols-outlined">verified</span> Onaylı</span>
+                                                                            : <span className="ihale-firma-badge ihale-firma-badge--warn"><span className="material-symbols-outlined">info</span> Onaylı firma değil</span>
+                                                                        }
+                                                                    </div>
+                                                                    {isOnayli ? (
+                                                                        <button type="button" disabled={alreadyAdded} className="ihale-firma-add-btn" onClick={() => createAddDavetliFirma(f)}>
+                                                                            {alreadyAdded ? 'Eklendi' : '+ Ekle'}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <span className="ihale-firma-warn-text">Firmayla iletişime geçip profilini onaylamasını talep edebilirsiniz.</span>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {createForm.davetli_firmalar.length > 0 && (
+                                                <div className="ihale-firma-tags">
+                                                    {createForm.davetli_firmalar.map(f => (
+                                                        <div key={f.firma_id} className="ihale-firma-tag">
+                                                            <span className="material-symbols-outlined">business</span>
+                                                            <span>{f.firma_adi}</span>
+                                                            <button type="button" onClick={() => createRemoveDavetliFirma(f.firma_id)}>
+                                                                <span className="material-symbols-outlined">close</span>
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* ═══════ ADIM 3: TEKNİK / TİCARİ ŞARTLAR ═══════ */}
+                            {createStepperStep === 2 && (
+                                <div className="ihale-step-content">
+                                    <div className="ihale-section ihale-section--no-border">
+                                        <span className="ihale-section__title">
+                                            <span className="material-symbols-outlined">checklist</span>
+                                            İhale Gereksinimleri *
+                                        </span>
+                                        <p className="ihale-section__desc">Kalem kalem gereksinimlerinizi ekleyin.</p>
+                                        <div className="ihale-req-input-row">
+                                            <input type="text" placeholder="Gereksinim maddesi *" value={createYeniGereksinimMadde} onChange={e => setCreateYeniGereksinimMadde(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); createAddGereksinim(); } }} />
+                                            <input type="text" placeholder="Açıklama (opsiyonel)" value={createYeniGereksinimAciklama} onChange={e => setCreateYeniGereksinimAciklama(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); createAddGereksinim(); } }} />
+                                            <button type="button" className="ihale-req-add-btn" onClick={createAddGereksinim} disabled={!createYeniGereksinimMadde.trim()}>
+                                                <span className="material-symbols-outlined">add</span>
+                                            </button>
+                                        </div>
+                                        {createForm.gereksinimler.length > 0 && (
+                                            <div className="ihale-req-table">
+                                                <div className="ihale-req-table__header">
+                                                    <span>#</span>
+                                                    <span>Madde</span>
+                                                    <span>Açıklama</span>
+                                                    <span></span>
+                                                </div>
+                                                {createForm.gereksinimler.map((g, i) => (
+                                                    <div key={g.id} className="ihale-req-table__row">
+                                                        <span className="ihale-req-table__num">{i + 1}</span>
+                                                        <span className="ihale-req-table__madde">{g.madde}</span>
+                                                        <span className="ihale-req-table__aciklama">{g.aciklama || '—'}</span>
+                                                        <button type="button" className="ihale-req-table__remove" onClick={() => createRemoveGereksinim(g.id)}>
+                                                            <span className="material-symbols-outlined">close</span>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="ihale-section">
+                                        <span className="ihale-section__title">
+                                            <span className="material-symbols-outlined">attach_file</span>
+                                            Ek Dokümanlar
+                                        </span>
+                                        <p className="ihale-section__desc">Teknik şartname, çizim veya diğer dokümanları ekleyin. (Maks. 10 MB / dosya)</p>
+                                        <div className="ihale-file-upload">
+                                            <button type="button" className="ihale-file-btn" onClick={() => createFileInputRef.current?.click()}>
+                                                <span className="material-symbols-outlined">upload_file</span>
+                                                Dosya Seç
+                                            </button>
+                                            <input ref={createFileInputRef} type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip,.dwg" style={{ display: 'none' }} onChange={createHandleFileAdd} />
+                                        </div>
+                                        {createForm.ek_dosyalar.length > 0 && (
+                                            <div className="ihale-file-list">
+                                                {createForm.ek_dosyalar.map((f, i) => (
+                                                    <div key={i} className="ihale-file-item">
+                                                        <span className="material-symbols-outlined">description</span>
+                                                        <span className="ihale-file-name">{f.name}</span>
+                                                        <span className="ihale-file-size">{(f.size / 1024).toFixed(0)} KB</span>
+                                                        <button type="button" onClick={() => createRemoveFile(i)}>
+                                                            <span className="material-symbols-outlined">close</span>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* ═══════ ADIM 4: ÖNİZLEME ═══════ */}
+                            {createStepperStep === 3 && (
+                                <div className="ihale-step-content ihale-preview">
+                                    <div className="ihale-preview__card">
+                                        <div className="ihale-preview__header">
+                                            <h4>{createForm.baslik || 'Başlık belirtilmedi'}</h4>
+                                            <span className={`tender-card-status tender-card-status-canli`}>{createForm.ihale_tipi}</span>
+                                        </div>
+                                        {createForm.aciklama && <p className="ihale-preview__desc">{createForm.aciklama}</p>}
+                                        <div className="ihale-preview__grid">
+                                            <div className="ihale-preview__item">
+                                                <span className="material-symbols-outlined">event</span>
+                                                <div><strong>İhale Açılış</strong><span>{createForm.yayin_tarihi ? new Date(createForm.yayin_tarihi).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}</span></div>
+                                            </div>
+                                            <div className="ihale-preview__item">
+                                                <span className="material-symbols-outlined">hourglass_bottom</span>
+                                                <div><strong>İhale Kapanış</strong><span>{createForm.son_basvuru_tarihi ? new Date(createForm.son_basvuru_tarihi).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}</span></div>
+                                            </div>
+                                            <div className="ihale-preview__item">
+                                                <span className="material-symbols-outlined">local_shipping</span>
+                                                <div><strong>Teslim Süresi</strong><span>{createForm.teslim_suresi || '—'}</span></div>
+                                            </div>
+                                            <div className="ihale-preview__item">
+                                                <span className="material-symbols-outlined">receipt_long</span>
+                                                <div><strong>KDV</strong><span>{createForm.kdv_durumu === 'dahil' ? 'KDV Dahil' : 'KDV Hariç'}</span></div>
+                                            </div>
+                                            <div className="ihale-preview__item">
+                                                <span className="material-symbols-outlined">location_on</span>
+                                                <div><strong>Teslim Yeri</strong><span>{[createForm.teslim_il, createForm.teslim_ilce].filter(Boolean).join(' / ') || '—'}</span></div>
+                                            </div>
+                                            <div className="ihale-preview__item">
+                                                <span className="material-symbols-outlined">badge</span>
+                                                <div><strong>Referans</strong><span>{createForm.referans_no || '—'}</span></div>
+                                            </div>
+                                        </div>
+
+                                        {createForm.gereksinimler.length > 0 && (
+                                            <div className="ihale-preview__section">
+                                                <strong><span className="material-symbols-outlined">checklist</span> Gereksinimler ({createForm.gereksinimler.length})</strong>
+                                                <ul>{createForm.gereksinimler.map((g, i) => (<li key={g.id}><span>{i + 1}.</span> {g.madde}{g.aciklama ? ` — ${g.aciklama}` : ''}</li>))}</ul>
+                                            </div>
+                                        )}
+                                        {createForm.davet_emailleri.length > 0 && (
+                                            <div className="ihale-preview__section">
+                                                <strong><span className="material-symbols-outlined">mail</span> Davet E-postaları ({createForm.davet_emailleri.length})</strong>
+                                                <div className="ihale-preview__tags">{createForm.davet_emailleri.map(e => <span key={e}>{e}</span>)}</div>
+                                            </div>
+                                        )}
+                                        {createForm.davetli_firmalar.length > 0 && (
+                                            <div className="ihale-preview__section">
+                                                <strong><span className="material-symbols-outlined">business</span> Davetli Firmalar ({createForm.davetli_firmalar.length})</strong>
+                                                <div className="ihale-preview__tags">{createForm.davetli_firmalar.map(f => <span key={f.firma_id}>{f.firma_adi}</span>)}</div>
+                                            </div>
+                                        )}
+                                        {createForm.ek_dosyalar.length > 0 && (
+                                            <div className="ihale-preview__section">
+                                                <strong><span className="material-symbols-outlined">attach_file</span> Ek Dokümanlar ({createForm.ek_dosyalar.length})</strong>
+                                                <div className="ihale-preview__tags">{createForm.ek_dosyalar.map((f, i) => <span key={i}>{f.name}</span>)}</div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {createFormError && <p className="ihale-form-error">{createFormError}</p>}
+
+                                    <div className="ihale-modal__footer ihale-modal__footer--preview">
+                                        <button type="button" className="ihale-btn-cancel" onClick={() => setShowCreateModal(false)}>İptal</button>
+                                        <button type="button" className="ihale-btn-draft" disabled={createFormSaving} onClick={() => handleCreateFormSubmit(null, 'draft')}>
+                                            <span className="material-symbols-outlined">save</span>
+                                            {createFormSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}
+                                        </button>
+                                        <button type="button" className="ihale-btn-save" disabled={createFormSaving} onClick={() => handleCreateFormSubmit(null, null)}>
+                                            {createFormSaving ? 'Kaydediliyor…' : 'İhaleyi Yayınla'}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Stepper navigasyon — Adım 4 (Önizleme) hariç */}
+                            {createStepperStep < 3 && (
+                                <div className="ihale-stepper-nav">
+                                    {createStepperStep > 0 && (
+                                        <button type="button" className="ihale-stepper-back" onClick={() => setCreateStepperStep(s => s - 1)}>
+                                            <span className="material-symbols-outlined">arrow_back</span>
+                                            Geri
+                                        </button>
+                                    )}
+                                    <div className="ihale-stepper-nav__spacer" />
+                                    {createFormError && <p className="ihale-form-error ihale-form-error--inline">{createFormError}</p>}
+                                    <button
+                                        type="button"
+                                        className="ihale-stepper-next"
+                                        onClick={() => {
+                                            if (createStepperStep === 0) {
+                                                if (!createForm.baslik.trim()) { setCreateFormError('İhale başlığı zorunludur.'); return; }
+                                                if (!createForm.teslim_il) { setCreateFormError('Teslim yeri il seçimi zorunludur.'); return; }
+                                                if (!createForm.teslim_ilce) { setCreateFormError('Teslim yeri ilçe seçimi zorunludur.'); return; }
+                                            }
+                                            if (createStepperStep === 1) {
+                                                if (!createForm.yayin_tarihi) { setCreateFormError('İhale açılış tarihi zorunludur.'); return; }
+                                                if (!createForm.son_basvuru_tarihi) { setCreateFormError('İhale kapanış tarihi zorunludur.'); return; }
+                                                if (!createForm.teslim_suresi.trim()) { setCreateFormError('Talep edilen teslim süresi zorunludur.'); return; }
+                                            }
+                                            if (createStepperStep === 2) {
+                                                if (createForm.gereksinimler.length === 0) { setCreateFormError('En az bir ihale gereksinimi eklemelisiniz.'); return; }
+                                            }
+                                            setCreateFormError('');
+                                            setCreateStepperStep(s => s + 1);
+                                        }}
+                                    >
+                                        {createStepperStep === 2 ? 'Önizlemeye Geç' : 'Devam Et'}
+                                        <span className="material-symbols-outlined">arrow_forward</span>
+                                    </button>
+                                </div>
+                            )}
+                        </form>
                     </div>
                 </div>
             )}

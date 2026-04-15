@@ -146,6 +146,7 @@
 }
 
 /* Enes Doğanay | 8 Nisan 2026: Alt kısımda otomatik kaybolan progress bar */
+/* Enes Doğanay | 15 Nisan 2026: CSS custom property ile değişken süre desteği */
 .toast-item::after {
   content: '';
   position: absolute;
@@ -155,7 +156,7 @@
   background: currentColor;
   opacity: 0.15;
   border-radius: 0 0 0 12px;
-  animation: toastProgress 5s linear forwards;
+  animation: toastProgress var(--toast-duration, 5000ms) linear forwards;
 }
 
 @keyframes toastProgress {

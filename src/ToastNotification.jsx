@@ -24,10 +24,14 @@ const ToastItem = ({ toast, onDismiss, onClickToast }) => {
   /* Enes Doğanay | 13 Nisan 2026: ihale_id olan bildirimler de tıklanabilir */
   const isClickable = !!(toast.metadata?.teklif_id || toast.metadata?.ihale_id || toast.firma_id);
 
+  /* Enes Doğanay | 15 Nisan 2026: İhale teklif bildirimleri daha uzun süre kalsın (10sn), diğerleri 5sn */
+  const LONG_DURATION_TYPES = ['tender_new_offer', 'tender_offer_updated', 'tender_offer_withdrawn', 'tender_offer_status'];
+  const duration = LONG_DURATION_TYPES.includes(toast.type) ? 10000 : 5000;
+
   useEffect(() => {
-    const timer = setTimeout(() => onDismiss(toast.id), 5000);
+    const timer = setTimeout(() => onDismiss(toast.id), duration);
     return () => clearTimeout(timer);
-  }, [toast.id, onDismiss]);
+  }, [toast.id, onDismiss, duration]);
 
   const handleClick = () => {
     if (isClickable && onClickToast) {
@@ -40,6 +44,7 @@ const ToastItem = ({ toast, onDismiss, onClickToast }) => {
     <div
       className={`toast-item ${toast.exiting ? 'toast-exit' : 'toast-enter'} ${isClickable ? 'toast-clickable' : ''}`}
       onClick={handleClick}
+      style={{ '--toast-duration': `${duration}ms` }}
     >
       <div className="toast-accent" style={{ background: config.color }} />
       <div className="toast-icon" style={{ color: config.color }}>

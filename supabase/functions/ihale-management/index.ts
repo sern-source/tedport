@@ -1,6 +1,7 @@
 // Enes Doganay | 6 Nisan 2026: Ihale yonetim Edge Function
 // Enes Doganay | 10 Nisan 2026: Yeni modal alanlari — kdv_durumu, gereksinimler, davet_emailleri, davetli_firmalar, teslim_il/teslim_ilce
-// Aksiyonlar: list_my_tenders | create_tender | update_tender | delete_tender
+// Enes Doganay | 15 Nisan 2026: send_offer_status_email aksiyonu — teklif kabul/red e-postası
+// Aksiyonlar: list_my_tenders | create_tender | update_tender | delete_tender | send_offer_status_email
 import { createAdminClient } from "../_shared/supabaseAdmin.ts";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
@@ -8,7 +9,17 @@ type IhalePayload =
     | { action: "list_my_tenders" }
     | { action: "create_tender"; tender: TenderInput }
     | { action: "update_tender"; id: string; tender: TenderInput }
-    | { action: "delete_tender"; id: string };
+    | { action: "delete_tender"; id: string }
+    // Enes Doganay | 15 Nisan 2026: Teklif kabul/red e-postası
+    | {
+        action: "send_offer_status_email";
+        to: string;
+        status: string;
+        ihale_baslik: string;
+        gonderen_ad: string;
+        red_nedeni?: string | null;
+        ihale_id?: string | null;
+    };
 
 // Enes Doganay | 10 Nisan 2026: Gereksinim ve davetli firma tipleri
 interface GereksinimItem {
@@ -43,6 +54,8 @@ interface TenderInput {
     ek_dosyalar?:
         | Array<{ name: string; path: string; size: number; url: string }>
         | null;
+    // Enes Doganay | 15 Nisan 2026: Kapali ihalenin baskalarına gorunurlugu
+    kapali_gorunurluk?: string | null;
 }
 
 // Enes Doganay | 6 Nisan 2026: Bos string -> null donusturur
@@ -160,6 +173,8 @@ Deno.serve(async (request) => {
                 davet_emailleri: t.davet_emailleri ?? null,
                 davetli_firmalar: t.davetli_firmalar ?? null,
                 ek_dosyalar: t.ek_dosyalar ?? null,
+                // Enes Doganay | 15 Nisan 2026: Kapali gorunurluk
+                kapali_gorunurluk: str(t.kapali_gorunurluk),
             };
 
             const { data, error } = await supabaseAdmin
@@ -203,6 +218,8 @@ Deno.serve(async (request) => {
                 davet_emailleri: t.davet_emailleri ?? null,
                 davetli_firmalar: t.davetli_firmalar ?? null,
                 ek_dosyalar: t.ek_dosyalar ?? null,
+                // Enes Doganay | 15 Nisan 2026: Kapali gorunurluk
+                kapali_gorunurluk: str(t.kapali_gorunurluk),
             };
 
             console.log(
@@ -247,6 +264,117 @@ Deno.serve(async (request) => {
                 .eq("firma_id", firmaId);
 
             if (error) throw error;
+            return jsonResponse({ success: true });
+        }
+
+        // ── Teklif Kabul / Red E-postasi ────────────────────────────────
+        // Enes Doganay | 15 Nisan 2026: Resend API ile teklif durumu bilgilendirme e-postası
+        if (payload.action === "send_offer_status_email") {
+            const resendApiKey = Deno.env.get("RESEND_API_KEY");
+            const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL");
+            if (!resendApiKey || !fromEmail) {
+                return jsonResponse(
+                    { error: "E-posta yapilandirmasi eksik." },
+                    500,
+                );
+            }
+            if (!payload.to || !payload.status) {
+                return jsonResponse({
+                    error: "to ve status alanlari zorunludur.",
+                }, 400);
+            }
+
+            const isAccepted = payload.status === "kabul";
+            const isReview = payload.status === "gonderildi";
+            const statusLabel = isAccepted
+                ? "kabul edildi"
+                : isReview
+                ? "değerlendirmeye alındı"
+                : "reddedildi";
+            const statusColor = isAccepted
+                ? "#16a34a"
+                : isReview
+                ? "#2563eb"
+                : "#dc2626";
+            const statusBg = isAccepted
+                ? "#f0fdf4"
+                : isReview
+                ? "#eff6ff"
+                : "#fef2f2";
+            const statusIcon = isAccepted ? "✅" : isReview ? "🔄" : "❌";
+
+            const redNedeniBolumu =
+                (!isAccepted && !isReview && payload.red_nedeni)
+                    ? `<div style="margin: 16px 0; padding: 14px 18px; border-radius: 12px; background: #fffbeb; border-left: 4px solid #f59e0b;">
+                     <strong style="color: #92400e; font-size: 13px;">Red Nedeni:</strong>
+                     <p style="margin: 8px 0 0; color: #78350f; line-height: 1.6;">${
+                        String(payload.red_nedeni).replace(/</g, "&lt;")
+                            .replace(
+                                />/g,
+                                "&gt;",
+                            )
+                    }</p>
+                   </div>`
+                    : "";
+
+            const html = `
+            <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
+              <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
+                <div style="padding: 20px 24px; background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: #fff;">
+                  <h1 style="margin: 0; font-size: 22px;">Tedport İhale Bildirimi</h1>
+                  <p style="margin: 8px 0 0; opacity: 0.9;">Teklif durumunuz güncellendi.</p>
+                </div>
+                <div style="padding: 24px;">
+                  <p style="margin: 0 0 16px; font-size: 15px; color: #475569;">Sayın <strong>${
+                String(payload.gonderen_ad || "Kullanıcı").replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+            }</strong>,</p>
+                  <div style="display: inline-block; padding: 10px 18px; border-radius: 12px; background: ${statusBg}; color: ${statusColor}; font-weight: 700; font-size: 14px; margin-bottom: 16px;">
+                    ${statusIcon} Teklifiniz ${statusLabel}
+                  </div>
+                  <p style="margin: 0 0 8px; font-size: 14px; color: #475569;">İhale: <strong>${
+                String(payload.ihale_baslik || "-").replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+            }</strong></p>
+                  ${redNedeniBolumu}
+                  ${
+                payload.ihale_id
+                    ? `<div style="text-align: center; margin: 20px 0 8px;">
+                    <a href="https://tedport.com/ihaleler?ihale=${
+                        String(payload.ihale_id).replace(/</g, "&lt;").replace(
+                            />/g,
+                            "&gt;",
+                        )
+                    }" style="display: inline-block; padding: 12px 28px; border-radius: 12px; background: linear-gradient(135deg, #1e40af, #3b82f6); color: #fff; text-decoration: none; font-weight: 700; font-size: 14px;">Teklif Detayına Git</a>
+                  </div>`
+                    : ""
+            }
+                  <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+                  <p style="margin: 0; font-size: 13px; color: #94a3b8;">Bu e-posta Tedport ihale sistemi tarafından otomatik olarak gönderilmiştir.</p>
+                </div>
+              </div>
+            </div>`;
+
+            const response = await fetch("https://api.resend.com/emails", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${resendApiKey}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    from: fromEmail,
+                    to: [payload.to],
+                    subject: `Tedport — Teklifiniz ${statusLabel}`,
+                    html,
+                }),
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                console.error("Resend API hatasi:", errText);
+                return jsonResponse({ error: "E-posta gonderilemedi." }, 502);
+            }
+
             return jsonResponse({ success: true });
         }
 
