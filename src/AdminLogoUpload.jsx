@@ -259,7 +259,7 @@ const AdminLogoUpload = () => {
                                         >
                                             <div className="alu-result-avatar">
                                                 {firma.logo_url?.includes('firma-logolari') ? (
-                                                    <img src={firma.logo_url} alt="" />
+                                                    <img src={firma.logo_url} alt="" loading="lazy" />
                                                 ) : (
                                                     <span>{(firma.firma_adi || 'F').charAt(0).toUpperCase()}</span>
                                                 )}
@@ -313,7 +313,7 @@ const AdminLogoUpload = () => {
                                 {/* Enes Doğanay | 13 Nisan 2026: Logo önizleme */}
                                 <div className="alu-preview">
                                     {logoPreview ? (
-                                        <img src={logoPreview} alt="Logo önizleme" />
+                                        <img src={logoPreview} alt="Logo önizleme" loading="lazy" />
                                     ) : (
                                         <div className="alu-preview-placeholder">
                                             <span className="material-symbols-outlined">image</span>

@@ -14,7 +14,7 @@ const EmailChangeSuccess = () => {
       <header className="shared-header">
         <div className="shared-header-inner">
           <a href="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
-            <img className="shared-logo-image" src="/tedport-logo.jpg" alt="Tedport Logo" />
+            <img className="shared-logo-image" src="/tedport-logo.jpg" alt="Tedport Logo" loading="lazy" />
           </a>
           <div className="shared-nav">
             <div className="shared-nav-links">

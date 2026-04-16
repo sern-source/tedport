@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Login.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
+import SEO from './SEO'; // Enes Doğanay | 16 Nisan 2026: SEO meta tag desteği
 import { supabase, setAuthPersistenceMode } from './supabaseClient';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -154,6 +155,7 @@ const LoginPage = () => {
 
   return (
     <div className="app-container">
+      <SEO title="Giriş Yap" description="Tedport hesabınıza giriş yapın." path="/login" noIndex />
 
       {/* HEADER */}
       <SharedHeader

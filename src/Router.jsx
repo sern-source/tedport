@@ -24,6 +24,8 @@ const AdminContactMessages = lazy(() => import('./AdminContactMessages'));
 const FirmaProfil = lazy(() => import('./FirmaProfil'));
 /* Enes Doğanay | 10 Nisan 2026: E-posta değişikliği onay başarı sayfası */
 const EmailChangeSuccess = lazy(() => import('./EmailChangeSuccess'));
+/* Enes Doğanay | 16 Nisan 2026: 404 sayfa bulunamadı */
+const NotFound = lazy(() => import('./NotFound'));
 
 export default function Router() {
   return (
@@ -53,6 +55,8 @@ export default function Router() {
         {/* Enes Doğanay | 7 Nisan 2026: Kurumsal firma profil sayfası — panel + teklifler + bildirimler */}
         <Route path="/firma-profil" element={<FirmaProfil />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />
+        {/* Enes Doğanay | 16 Nisan 2026: Tanımsız rotalar için 404 */}
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
     </Suspense>

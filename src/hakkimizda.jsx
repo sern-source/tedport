@@ -22,12 +22,14 @@ import './hakkimizda.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import SharedFooter from './SharedFooter';
+import SEO from './SEO'; // Enes Doğanay | 16 Nisan 2026: SEO meta tag desteği
 
 const About = () => {
     const navigate = useNavigate();
 
     return (
         <>
+            <SEO title="Hakkımızda" description="Tedport hakkında bilgi edinin. Türkiye'nin B2B tedarik portalı hikayesi ve misyonu." path="/hakkimizda" />
             <SharedHeader
                 navItems={[
                     { label: 'Anasayfa', href: '/' },
@@ -55,7 +57,7 @@ const About = () => {
                             </div>
                             {/* Enes Doğanay | 14 Nisan 2026: Ofiste çalışan ekip fotoğrafı */}
                             <div className="about-hero-image">
-                                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Tedport Ekibi" />
+                                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Tedport Ekibi" loading="lazy" />
                             </div>
                         </div>
                     </section>

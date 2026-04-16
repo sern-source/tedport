@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import './Ihaleler.css';
 import './SharedHeader.css';
 import SharedHeader from './SharedHeader';
+import SEO from './SEO'; // Enes Doğanay | 16 Nisan 2026: SEO meta tag desteği
 import { supabase } from './supabaseClient';
 import { formatTenderDate, getTenderStatusMeta } from './tenderUtils';
 // Enes Doğanay | 6 Nisan 2026: Kurumsal giriş için ihale CRUD API'si eklendi
@@ -1126,6 +1127,7 @@ const IhalelerPage = () => {
 
     return (
         <div className="tenders-page">
+            <SEO title="İhaleler" description="Canlı ihaleleri keşfedin, teklif verin. Türkiye genelinde B2B ihale platformu." path="/ihaleler" />
             <SharedHeader />
 
             <main className="tenders-page-main">

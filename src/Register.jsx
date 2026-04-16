@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import './Register.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
+import SEO from './SEO'; // Enes Doğanay | 16 Nisan 2026: SEO meta tag desteği
 import { supabase } from './supabaseClient';
 import { submitCorporateApplication } from './corporateApplicationsApi';
 // Enes Doğanay | 8 Nisan 2026: İl/İlçe dropdown'ları için Türkiye veri seti
@@ -376,6 +377,7 @@ const RegistrationPage = () => {
 
   return (
     <div className="page-container">
+      <SEO title="Kayıt Ol" description="Tedport'a ücretsiz kayıt olun. Tedarikçi ağına katılın." path="/register" noIndex />
       <SharedHeader
         navItems={[
           { label: 'Anasayfa', href: '/' },
@@ -531,7 +533,7 @@ const RegistrationPage = () => {
                           >
                             <div className="firma-autocomplete-avatar">
                               {firma.logo_url ? (
-                                <img src={firma.logo_url} alt="" />
+                                <img src={firma.logo_url} alt="" loading="lazy" />
                               ) : (
                                 <span>{firma.firma_adi?.charAt(0)}</span>
                               )}

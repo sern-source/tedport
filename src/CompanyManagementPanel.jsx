@@ -299,7 +299,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                     <div className="cmp-logo-upload">
                         <div className="cmp-logo-upload__preview">
                             {logoPreview ? (
-                                <img src={logoPreview} alt="Firma logosu" />
+                                <img src={logoPreview} alt="Firma logosu" loading="lazy" />
                             ) : (
                                 <div className="cmp-logo-upload__placeholder">
                                     <span className="material-symbols-outlined">image</span>

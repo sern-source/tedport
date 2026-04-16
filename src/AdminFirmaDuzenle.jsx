@@ -667,7 +667,7 @@ const AdminFirmaDuzenle = () => {
                                                 >
                                                     <div className="afd-result-avatar">
                                                         {firma.logo_url?.includes('firma-logolari') ? (
-                                                            <img src={firma.logo_url} alt="" />
+                                                            <img src={firma.logo_url} alt="" loading="lazy" />
                                                         ) : (
                                                             <span>{(firma.firma_adi || 'F').charAt(0).toUpperCase()}</span>
                                                         )}
@@ -745,7 +745,7 @@ const AdminFirmaDuzenle = () => {
                                                 >
                                                     <div className="afd-result-avatar">
                                                         {firma.logo_url?.includes('firma-logolari') ? (
-                                                            <img src={firma.logo_url} alt="" />
+                                                            <img src={firma.logo_url} alt="" loading="lazy" />
                                                         ) : (
                                                             <span>{(firma.firma_adi || 'F').charAt(0).toUpperCase()}</span>
                                                         )}
@@ -808,7 +808,7 @@ const AdminFirmaDuzenle = () => {
                                         >
                                             <div className="afd-result-avatar">
                                                 {firma.logo_url?.includes('firma-logolari') ? (
-                                                    <img src={firma.logo_url} alt="" />
+                                                    <img src={firma.logo_url} alt="" loading="lazy" />
                                                 ) : (
                                                     <span>{(firma.firma_adi || 'F').charAt(0).toUpperCase()}</span>
                                                 )}

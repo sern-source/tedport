@@ -22,6 +22,7 @@ import './iletisim.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import SharedFooter from './SharedFooter';
+import SEO from './SEO'; // Enes Doğanay | 16 Nisan 2026: SEO meta tag desteği
 import { supabase } from './supabaseClient';
 
 const Contact = () => {
@@ -81,6 +82,7 @@ const Contact = () => {
 
     return (
         <>
+            <SEO title="İletişim" description="Tedport ile iletişime geçin. Sorularınız ve önerileriniz için bize ulaşın." path="/iletisim" />
             <SharedHeader
                 navItems={[
                     { label: 'Anasayfa', href: '/' },
@@ -97,7 +99,7 @@ const Contact = () => {
                     <div className="contact-hero">
                         <div className="contact-hero-bg">
                             <div className="contact-hero-overlay"></div>
-                            <img alt="Modern building" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1920" />
+                            <img alt="Modern building" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1920" loading="lazy" />
                         </div>
                         <div className="contact-container contact-hero-content">
                             <h1>Bize Ulaşın</h1>

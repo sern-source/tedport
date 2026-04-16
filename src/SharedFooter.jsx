@@ -13,7 +13,7 @@ const SharedFooter = () => {
                     {/* Brand */}
                     <div className="sf-brand">
                         <Link to="/" className="sf-logo-link">
-                            <img src="/tedport-logo.jpg" alt="Tedport Logo" className="sf-logo" />
+                            <img src="/tedport-logo.jpg" alt="Tedport Logo" className="sf-logo" loading="lazy" />
                         </Link>
                         <p className="sf-brand-desc">
                             Türkiye'nin güvenilir B2B tedarik platformu. Firmalar arası ticareti dijitalleştiriyoruz.
