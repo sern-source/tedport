@@ -837,6 +837,13 @@ const SupplierProfile = () => {
                                                     Onaylı Firma
                                                 </span>
                                             )}
+                                            {/* Enes Doğanay | 17 Nisan 2026: Onaysız firmalar için otomatik profil etiketi */}
+                                            {!isVerified && (
+                                                <span className="platform-profile-badge">
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>public</span>
+                                                    Otomatik Profil
+                                                </span>
+                                            )}
                                         </h1>
                                         <p className="hero-meta">• {firma.category_name} • 📍 {firma.il_ilce}</p>
                                         {/* Enes Doğanay | 7 Nisan 2026: Firma yöneticisi için düzenleme butonu hero alanına taşındı */}
@@ -855,6 +862,44 @@ const SupplierProfile = () => {
                         </div>
                     </div>
                 </section>
+
+                {/* Enes Doğanay | 17 Nisan 2026: Onaysız firma profili — sahiplenme banner'ı */}
+                {!isVerified && (
+                    <div className="claim-profile-banner">
+                        <div className="container">
+                            <div className="claim-profile-content">
+                                <div className="claim-profile-info">
+                                    <div className="claim-profile-icon-wrap">
+                                        <span className="material-symbols-outlined">domain_verification</span>
+                                    </div>
+                                    <div className="claim-profile-text">
+                                        <strong>Bu profil platform tarafından oluşturuldu</strong>
+                                        <p>Bu firma henüz Tedport'ta kurumsal hesabını aktifleştirmedi. Firma yetkilisiyseniz profilinizi sahiplenin, bilgilerinizi güncelleyin ve teklif almaya başlayın.</p>
+                                    </div>
+                                </div>
+                                <button
+                                    className="claim-profile-btn"
+                                    onClick={() => {
+                                        const params = new URLSearchParams({
+                                            type: 'corporate',
+                                            firmaId: firma.firmaID?.toString() || '',
+                                            firmaAdi: firma.firma_adi || '',
+                                            ilIlce: firma.il_ilce || '',
+                                            telefon: firma.telefon || '',
+                                            adres: firma.adres || '',
+                                            webSitesi: firma.web_sitesi || '',
+                                            eposta: firma.eposta || ''
+                                        });
+                                        navigate(`/register?${params.toString()}`);
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined">verified_user</span>
+                                    Firma Profilinizi Sahiplenin
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* MAIN CONTENT */}
                 <main className="container">

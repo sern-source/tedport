@@ -85,6 +85,19 @@ const FirmaProfil = () => {
     // Enes Doğanay | 10 Nisan 2026: Hatırlatıcı silme onay state'i
     const [confirmDeleteReminder, setConfirmDeleteReminder] = useState(null);
 
+    /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihleri state'i (kurumsal) */
+    const [notifPrefs, setNotifPrefs] = useState({
+      teklif_talepleri: true,
+      teklif_yanitlari: true,
+      teklif_mesajlari: true,
+      hatirlatmalar: true,
+      ihale_teklifleri: true,
+      ihale_durum_degisiklikleri: true,
+      anlik_bildirimler: true
+    });
+    const [notifPrefsOpen, setNotifPrefsOpen] = useState(false);
+    const [notifPrefSaved, setNotifPrefSaved] = useState(false);
+
     // Enes Doğanay | 8 Nisan 2026: Favoriler state'leri (bireysel profildeki yapının kurumsal kopyası)
     const [myLists, setMyLists] = useState([]);
     const [favorites, setFavorites] = useState([]);
@@ -118,19 +131,34 @@ const FirmaProfil = () => {
             if (!userSession?.user) { navigate('/login'); return; }
             setUserId(userSession.user.id);
 
-            const [firmaRes, notifRes, listsRes, favsRes, remindersRes] = await Promise.all([
+            const [firmaRes, notifRes, listsRes, favsRes, remindersRes, notifPrefsRes] = await Promise.all([
                 supabase.from('firmalar').select('*').eq('firmaID', cid).single(),
                 supabase.from('bildirimler').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(50),
                 // Enes Doğanay | 8 Nisan 2026: Favoriler için listeler ve kayıtlar çekilir
                 supabase.from('kullanici_listeleri').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: true }),
                 supabase.from('kullanici_favorileri').select('*').eq('user_id', userSession.user.id),
-                supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userSession.user.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true })
+                supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userSession.user.id).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true }),
+                /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihlerini çek */
+                supabase.from('bildirim_tercihleri').select('*').eq('user_id', userSession.user.id).maybeSingle()
             ]);
 
             setFirma(firmaRes.data);
             setNotifications(notifRes.data || []);
             setUpcomingReminders((remindersRes.data || []).filter(r => r.status === 'pending'));
             if (listsRes.data) setMyLists(listsRes.data);
+
+            /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihlerini state'e ata */
+            if (notifPrefsRes.data) {
+              setNotifPrefs({
+                teklif_talepleri: notifPrefsRes.data.teklif_talepleri ?? true,
+                teklif_yanitlari: notifPrefsRes.data.teklif_yanitlari ?? true,
+                teklif_mesajlari: notifPrefsRes.data.teklif_mesajlari ?? true,
+                hatirlatmalar: notifPrefsRes.data.hatirlatmalar ?? true,
+                ihale_teklifleri: notifPrefsRes.data.ihale_teklifleri ?? true,
+                ihale_durum_degisiklikleri: notifPrefsRes.data.ihale_durum_degisiklikleri ?? true,
+                anlik_bildirimler: notifPrefsRes.data.anlik_bildirimler ?? true
+              });
+            }
 
             // Enes Doğanay | 8 Nisan 2026: Favori firma detaylarını birleştir
             if (favsRes.data && favsRes.data.length > 0) {
@@ -386,6 +414,14 @@ const FirmaProfil = () => {
         return () => setActiveViewingTeklifId(null);
     }, [activeQuoteChat?.id]);
 
+    /* Enes Doğanay | 17 Nisan 2026: Teklifler tabından çıkınca activeQuoteChat temizle — aksi halde
+       activeViewingTeklifId set kalır ve AuthContext yeni mesajı "kullanıcı chat'te" sanarak toast bastırır */
+    useEffect(() => {
+        if (currentTab !== 'teklifler') {
+            setActiveQuoteChat(null);
+        }
+    }, [currentTab]);
+
     // ── Chat mesajı gönder ──
     const sendChatMessage = async () => {
         if (!chatInput.trim() || !activeQuoteChat) return;
@@ -434,7 +470,7 @@ const FirmaProfil = () => {
     };
 
     // Enes Doğanay | 8 Nisan 2026: Sağ üst menü badge'lerini güncellemek için AuthContext refreshCounts
-    const { refreshCounts, latestNotification, setActiveViewingTeklifId } = useAuth();
+    const { refreshCounts, latestNotification, setActiveViewingTeklifId, updateNotifPrefsCache } = useAuth();
 
     // Enes Doğanay | 9 Nisan 2026: AuthContext'ten gelen yeni bildirimi listeye ekle
     // Enes Doğanay | 9 Nisan 2026: Kullanıcı zaten ilgili teklifin chat'indeyse bildirimi anında okundu yap
@@ -536,6 +572,45 @@ const FirmaProfil = () => {
         if (!notification.is_read) handleMarkNotificationRead(notification.id);
     };
 
+    /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihini toggle et (kurumsal) */
+    const handleToggleNotifPref = async (key) => {
+      const newValue = !notifPrefs[key];
+      const updatedPrefs = { ...notifPrefs, [key]: newValue };
+      setNotifPrefs(updatedPrefs);
+
+      try {
+        const payload = {
+          user_id: userId,
+          teklif_talepleri: updatedPrefs.teklif_talepleri,
+          teklif_yanitlari: updatedPrefs.teklif_yanitlari,
+          teklif_mesajlari: updatedPrefs.teklif_mesajlari,
+          hatirlatmalar: updatedPrefs.hatirlatmalar,
+          ihale_teklifleri: updatedPrefs.ihale_teklifleri,
+          ihale_durum_degisiklikleri: updatedPrefs.ihale_durum_degisiklikleri,
+          anlik_bildirimler: updatedPrefs.anlik_bildirimler,
+          updated_at: new Date().toISOString()
+        };
+
+        const { error: upsertErr } = await supabase
+          .from('bildirim_tercihleri')
+          .upsert(payload, { onConflict: 'user_id' });
+
+        if (upsertErr) {
+          console.error('[Bildirim Tercihleri] Upsert hata:', upsertErr);
+          alert('Bildirim tercihi kaydedilemedi: ' + upsertErr.message);
+          setNotifPrefs(prev => ({ ...prev, [key]: !newValue }));
+          return;
+        }
+
+        updateNotifPrefsCache(updatedPrefs);
+        setNotifPrefSaved(true);
+        setTimeout(() => setNotifPrefSaved(false), 1500);
+      } catch (err) {
+        console.error('[Bildirim Tercihleri] Beklenmeyen hata:', err);
+        setNotifPrefs(prev => ({ ...prev, [key]: !newValue }));
+      }
+    };
+
     // Enes Doğanay | 8 Nisan 2026: Favoriler CRUD fonksiyonları (bireysel profildeki yapının kopyası)
     const handleCreateList = async () => {
         if (!newListName.trim()) return;
@@ -612,7 +687,27 @@ const FirmaProfil = () => {
     if (loading) return <PageLoader />;
 
     const pendingCount = incomingQuotes.filter(q => q.durum === 'pending').length;
-    const unreadNotifCount = notifications.filter(n => !n.is_read).length;
+
+    /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihine göre filtreleme — kapalı tipteki bildirimler görünmez */
+    const notifTypeToPrefKey = {
+      quote_received: 'teklif_talepleri',
+      quote_reply: 'teklif_yanitlari',
+      quote_message: 'teklif_mesajlari',
+      reminder: 'hatirlatmalar',
+      tender_new_offer: 'ihale_teklifleri',
+      tender_offer_updated: 'ihale_teklifleri',
+      tender_offer_withdrawn: 'ihale_teklifleri',
+      tender_offer_status: 'ihale_durum_degisiklikleri',
+      tender_updated: 'ihale_durum_degisiklikleri',
+      tender_closed: 'ihale_durum_degisiklikleri',
+      tender_cancelled: 'ihale_durum_degisiklikleri'
+    };
+    const filteredNotifications = notifications.filter(n => {
+      const prefKey = notifTypeToPrefKey[n.type];
+      if (prefKey && notifPrefs[prefKey] === false) return false;
+      return true;
+    });
+    const unreadNotifCount = filteredNotifications.filter(n => !n.is_read).length;
 
     /* Enes Doğanay | 9 Nisan 2026: Okunmamış teklif bildirimlerinin teklif_id'lerini topla — kart üzerinde yeni mesaj göstergesi için */
     const unreadQuoteIds = new Set(
@@ -1077,6 +1172,54 @@ const FirmaProfil = () => {
                                     </div>
                                 </div>
 
+                                {/* Enes Doğanay | 17 Nisan 2026: Bildirim Tercihleri — açılır/kapanır panel (kurumsal) */}
+                                <div className="notif-prefs-panel">
+                                  <button className="notif-prefs-toggle" onClick={() => setNotifPrefsOpen(p => !p)}>
+                                    <div className="notif-prefs-toggle-left">
+                                      <span className="material-symbols-outlined">tune</span>
+                                      <strong>Bildirim Tercihleri</strong>
+                                      {notifPrefSaved && (
+                                        <span className="notif-pref-saved-badge">
+                                          <span className="material-symbols-outlined">check_circle</span>
+                                          Kaydedildi
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className={`material-symbols-outlined notif-prefs-chevron ${notifPrefsOpen ? 'open' : ''}`}>expand_more</span>
+                                  </button>
+
+                                  {notifPrefsOpen && (
+                                    <div className="notif-prefs-list">
+                                      {[
+                                        { key: 'teklif_talepleri', icon: 'request_quote', label: 'Teklif Talepleri', desc: 'Yeni teklif talebi geldiğinde bildirim al' },
+                                        { key: 'teklif_yanitlari', icon: 'reply', label: 'Teklif Yanıtları', desc: 'Teklif taleplerinize yanıt geldiğinde bildirim al' },
+                                        { key: 'teklif_mesajlari', icon: 'chat', label: 'Teklif Mesajları', desc: 'Teklif sohbetlerinde yeni mesaj geldiğinde bildirim al' },
+                                        { key: 'hatirlatmalar', icon: 'alarm', label: 'Hatırlatmalar', desc: 'Zamanlanmış hatırlatmalarınız geldiğinde bildirim al' },
+                                        { key: 'ihale_teklifleri', icon: 'gavel', label: 'İhale Teklifleri', desc: 'İhalelerinize yeni teklif geldiğinde bildirim al' },
+                                        { key: 'ihale_durum_degisiklikleri', icon: 'swap_horiz', label: 'İhale Durum Değişiklikleri', desc: 'İhale tekliflerinizin durumu değiştiğinde bildirim al' },
+                                        { key: 'anlik_bildirimler', icon: 'notifications_active', label: 'Anlık Bildirimler (Pop-up)', desc: 'Ekranda anlık bildirim pop-up\'ları gösterilsin' }
+                                      ].map(item => (
+                                        <div key={item.key} className="notif-pref-row">
+                                          <div className="notif-pref-info">
+                                            <span className="material-symbols-outlined notif-pref-icon">{item.icon}</span>
+                                            <div>
+                                              <strong>{item.label}</strong>
+                                              <p>{item.desc}</p>
+                                            </div>
+                                          </div>
+                                          <button
+                                            className={`notif-pref-switch ${notifPrefs[item.key] ? 'active' : ''}`}
+                                            onClick={() => handleToggleNotifPref(item.key)}
+                                            aria-label={`${item.label} ${notifPrefs[item.key] ? 'açık' : 'kapalı'}`}
+                                          >
+                                            <span className="notif-pref-switch-knob" />
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+
                                 <div className="notifications-grid">
                                     {/* SOL: SON BİLDİRİMLER */}
                                     <section className="notifications-panel notifications-panel-feed">
@@ -1087,14 +1230,15 @@ const FirmaProfil = () => {
                                             </div>
                                         </div>
 
-                                        {notifications.length === 0 ? (
+                                        {/* Enes Doğanay | 17 Nisan 2026: filteredNotifications — tercih kapalı tipler gizlenir */}
+                                        {filteredNotifications.length === 0 ? (
                                             <div className="notifications-empty-state">
                                                 <span className="material-symbols-outlined">notifications_none</span>
                                                 <p>Henüz bildiriminiz yok. Firmaya teklif geldiğinde veya mesaj aldığınızda burada görünecek.</p>
                                             </div>
                                         ) : (
                                             <div className="notifications-feed-list">
-                                                {notifications.map((notification) => (
+                                                {filteredNotifications.map((notification) => (
                                                     <article
                                                         key={notification.id}
                                                         className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${(notification.metadata?.teklif_id || notification.metadata?.ihale_id) ? 'clickable' : ''}`}

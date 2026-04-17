@@ -543,6 +543,13 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
               <span className="verified-text">Onaylı Firma</span>
             </span>
           )}
+          {/* Enes Doğanay | 17 Nisan 2026: Onaysız firmalar için otomatik profil etiketi */}
+          {!data.isVerified && (
+            <span className="platform-badge-inline">
+              <span className="material-symbols-outlined platform-badge-icon">public</span>
+              <span className="platform-badge-text">Otomatik Profil</span>
+            </span>
+          )}
         </a></h3>
 
         <div className="meta-info">📍 {data.location}</div>
@@ -1350,6 +1357,8 @@ function App() {
                       {supplier.name}
                       {/* Enes Doğanay | 11 Nisan 2026: Liste görünümünde de 'Onaylı Firma' yazısı eklendi */}
                       {supplier.isVerified && <span className="verified-badge-inline" style={{ marginLeft: '4px', verticalAlign: 'middle' }}><span className="material-symbols-outlined verified-icon" style={{ fontSize: '16px' }}>verified</span> <span className="verified-text">Onaylı Firma</span></span>}
+                      {/* Enes Doğanay | 17 Nisan 2026: Liste görünümünde otomatik profil etiketi */}
+                      {!supplier.isVerified && <span className="platform-badge-inline" style={{ marginLeft: '4px', verticalAlign: 'middle' }}><span className="material-symbols-outlined platform-badge-icon" style={{ fontSize: '14px' }}>public</span> <span className="platform-badge-text">Otomatik Profil</span></span>}
                     </a>
                     <span className="firmalar-list-col firmalar-list-col--sector" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{(supplier.tags || []).slice(0, 2).join(', ') || '—'}</span>
                     <span className="firmalar-list-col firmalar-list-col--location" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{supplier.location || '—'}</span>

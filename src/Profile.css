@@ -2712,6 +2712,169 @@
   background: linear-gradient(135deg, #d29a42 0%, #be7c20 100%);
 }
 
+/* Enes Doğanay | 17 Nisan 2026: Bildirim Tercihleri paneli */
+.notif-prefs-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.03);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.notif-prefs-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.notif-prefs-toggle:hover {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+.notif-prefs-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notif-prefs-toggle-left .material-symbols-outlined {
+  font-size: 20px;
+  color: #475569;
+}
+
+.notif-prefs-toggle-left strong {
+  font-size: 0.92rem;
+  color: #0f172a;
+}
+
+/* Enes Doğanay | 17 Nisan 2026: Kaydedildi feedback badge */
+.notif-pref-saved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #16a34a;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  animation: notifSavedFade 1.5s ease-out forwards;
+}
+
+.notif-pref-saved-badge .material-symbols-outlined {
+  font-size: 14px;
+}
+
+@keyframes notifSavedFade {
+  0% { opacity: 0; transform: translateY(-2px); }
+  15% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.notif-prefs-chevron {
+  font-size: 22px;
+  color: #94a3b8;
+  transition: transform 0.25s ease;
+}
+
+.notif-prefs-chevron.open {
+  transform: rotate(180deg);
+}
+
+.notif-prefs-list {
+  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  padding: 6px 0;
+}
+
+.notif-pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  gap: 12px;
+  transition: background 0.15s;
+}
+
+.notif-pref-row:hover {
+  background: rgba(241, 245, 249, 0.5);
+}
+
+.notif-pref-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.notif-pref-icon {
+  font-size: 20px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.notif-pref-info div {
+  min-width: 0;
+}
+
+.notif-pref-info strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.notif-pref-info p {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+/* Enes Doğanay | 17 Nisan 2026: Toggle switch */
+.notif-pref-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
+  background: #cbd5e1;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.25s ease;
+}
+
+.notif-pref-switch.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.notif-pref-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease;
+}
+
+.notif-pref-switch.active .notif-pref-switch-knob {
+  transform: translateX(20px);
+}
+
 /* Enes Doğanay | 9 Nisan 2026: Bildirimler (sol) geniş, Hatırlatmalar (sağ) dar — stat kartlarıyla hizalı */
 /* Enes Doğanay | 12 Nisan 2026: Kompakt grid + panel tasarımı */
 .notifications-grid {

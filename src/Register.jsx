@@ -68,6 +68,40 @@ const RegistrationPage = () => {
     setRegistrationType(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
   }, [searchParams]);
 
+  /* Enes Doğanay | 17 Nisan 2026: Firma detaydan yönlendirmede URL parametrelerinden kurumsal formu doldur */
+  useEffect(() => {
+    const firmaId = searchParams.get('firmaId');
+    const firmaAdi = searchParams.get('firmaAdi');
+    if (!firmaId || !firmaAdi) return;
+
+    let parsedIl = '';
+    let parsedIlce = '';
+    const ilIlce = searchParams.get('ilIlce') || '';
+    if (ilIlce) {
+      const separator = ilIlce.includes(',') ? ',' : '/';
+      const parts = ilIlce.split(separator).map(s => s.trim()).filter(Boolean);
+      if (parts.length >= 2) {
+        if (TURKEY_DISTRICTS[parts[0]]) { parsedIl = parts[0]; parsedIlce = parts[1]; }
+        else if (TURKEY_DISTRICTS[parts[1]]) { parsedIl = parts[1]; parsedIlce = parts[0]; }
+        else { parsedIl = parts[0]; parsedIlce = parts[1]; }
+      } else if (parts.length === 1 && TURKEY_DISTRICTS[parts[0]]) {
+        parsedIl = parts[0];
+      }
+    }
+
+    setCorporateForm(prev => ({
+      ...prev,
+      listedCompanyName: firmaAdi,
+      selectedFirmaId: parseInt(firmaId, 10) || null,
+      ...(parsedIl ? { companyIl: parsedIl } : {}),
+      ...(parsedIlce ? { companyIlce: parsedIlce } : {}),
+      ...(searchParams.get('adres') ? { companyOpenAddress: searchParams.get('adres') } : {}),
+      ...(searchParams.get('telefon') ? { companyPhone: searchParams.get('telefon') } : {}),
+      ...(searchParams.get('webSitesi') ? { websiteUrl: searchParams.get('webSitesi') } : {}),
+      ...(searchParams.get('eposta') ? { corporateEmail: searchParams.get('eposta') } : {})
+    }));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Enes Doğanay | 6 Nisan 2026: Bildirimler kayit akisinda tek fonksiyonla yonetilir
   const showMessage = (type, message) => {
     setNotification({ show: true, type, message });

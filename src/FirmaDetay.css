@@ -150,6 +150,127 @@ body {
   gap: 4px;
 }
 
+/* Enes Doğanay | 17 Nisan 2026: Otomatik Profil badge — onaysız firmalar için */
+.platform-profile-badge {
+  font-size: 0.7rem;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid #fde68a;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+/* Enes Doğanay | 17 Nisan 2026: Onaysız firma — sahiplenme banner'ı */
+.claim-profile-banner {
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  border-bottom: 1px solid #dbeafe;
+  padding: 1.25rem 0;
+}
+
+.claim-profile-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.claim-profile-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.claim-profile-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.claim-profile-icon-wrap .material-symbols-outlined {
+  color: #fff;
+  font-size: 24px;
+}
+
+.claim-profile-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.claim-profile-text strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.claim-profile-text p {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.claim-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+.claim-profile-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+}
+
+.claim-profile-btn:active {
+  transform: translateY(0);
+}
+
+.claim-profile-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+@media (max-width: 640px) {
+  .claim-profile-content {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .claim-profile-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .claim-profile-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 .stats-container {
   display: flex;
   gap: 1rem;

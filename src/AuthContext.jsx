@@ -11,6 +11,21 @@ import { getManagedCompanyId } from './companyManagementApi';
 
 const AuthContext = createContext(null);
 
+/* Enes Doğanay | 17 Nisan 2026: Bildirim tipi → tercih key eşleştirmesi (modül seviyesi) */
+const NOTIF_TYPE_TO_PREF_KEY = {
+  quote_received: 'teklif_talepleri',
+  quote_reply: 'teklif_yanitlari',
+  quote_message: 'teklif_mesajlari',
+  reminder: 'hatirlatmalar',
+  tender_new_offer: 'ihale_teklifleri',
+  tender_offer_updated: 'ihale_teklifleri',
+  tender_offer_withdrawn: 'ihale_teklifleri',
+  tender_offer_status: 'ihale_durum_degisiklikleri',
+  tender_updated: 'ihale_durum_degisiklikleri',
+  tender_closed: 'ihale_durum_degisiklikleri',
+  tender_cancelled: 'ihale_durum_degisiklikleri'
+};
+
 export function AuthProvider({ children }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
@@ -29,6 +44,8 @@ export function AuthProvider({ children }) {
   /* Enes Doğanay | 9 Nisan 2026: Aktif görüntülenen teklif chat id'si — toast bastırmak için */
   const activeViewingTeklifIdRef = useRef(null);
   const setActiveViewingTeklifId = useCallback((id) => { activeViewingTeklifIdRef.current = id; }, []);
+  /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihlerini cache'le — loadUserData ve realtime handler'da kullanılır */
+  const notifPrefsRef = useRef(null);
 
   // Enes Doğanay | 10 Nisan 2026: State'i temizleyen yardımcı — tekrar kullanım için
   const clearAuthState = () => {
@@ -65,11 +82,14 @@ export function AuthProvider({ children }) {
       setRealtimeUserId(session.user.id);
 
       // Enes Doğanay | 10 Nisan 2026: Veri yükleme — hata olursa session temizle (stale token tespiti)
-      const [adminResult, companyResult, profileResult, notifResult] = await Promise.all([
+      const [adminResult, companyResult, profileResult, notifResult, prefsResult] = await Promise.all([
         resolveIsAdminUser(session.user.email, isAdminEmail),
         supabase.from('kurumsal_firma_yoneticileri').select('firma_id').eq('user_id', session.user.id).maybeSingle(),
         supabase.from('profiles').select('first_name, last_name').eq('id', session.user.id).single(),
-        supabase.from('bildirimler').select('id', { count: 'exact', head: true }).eq('user_id', session.user.id).eq('is_read', false)
+        /* Enes Doğanay | 17 Nisan 2026: type dahil çek — tercih filtresi için */
+        supabase.from('bildirimler').select('id, type').eq('user_id', session.user.id).eq('is_read', false),
+        /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihlerini de ilk yüklemede çek */
+        supabase.from('bildirim_tercihleri').select('*').eq('user_id', session.user.id).maybeSingle()
       ]);
 
       // Enes Doğanay | 14 Nisan 2026: Google OAuth kullanıcıları için profil satırı yoksa otomatik oluştur
@@ -105,7 +125,15 @@ export function AuthProvider({ children }) {
       setIsCurrentUserAdmin(adminResult);
       setManagedCompanyId(companyId);
       setUserProfile(profileResult.data || { first_name: 'Profilime', last_name: 'Git' });
-      setUnreadNotifCount(notifResult.count || 0);
+
+      /* Enes Doğanay | 17 Nisan 2026: Tercihleri cache'le ve filtrelenmiş sayacı hesapla */
+      const prefs = prefsResult.data || null;
+      notifPrefsRef.current = prefs;
+      const unreadAll = notifResult.data || [];
+      const filteredUnread = prefs
+        ? unreadAll.filter(n => { const pk = NOTIF_TYPE_TO_PREF_KEY[n.type]; return !(pk && prefs[pk] === false); })
+        : unreadAll;
+      setUnreadNotifCount(filteredUnread.length);
 
       // Enes Doğanay | 13 Nisan 2026: Girintileme düzeltildi
       if (companyId) {
@@ -191,12 +219,17 @@ export function AuthProvider({ children }) {
   const refreshCounts = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) return;
-    const { count: notifCount } = await supabase
+    /* Enes Doğanay | 17 Nisan 2026: Tercih filtresinden geçirilmiş sayaç */
+    const { data: allUnread } = await supabase
       .from('bildirimler')
-      .select('id', { count: 'exact', head: true })
+      .select('id, type')
       .eq('user_id', session.user.id)
       .eq('is_read', false);
-    setUnreadNotifCount(notifCount || 0);
+    const prefs = notifPrefsRef.current;
+    const filtered = prefs
+      ? (allUnread || []).filter(n => { const pk = NOTIF_TYPE_TO_PREF_KEY[n.type]; return !(pk && prefs[pk] === false); })
+      : (allUnread || []);
+    setUnreadNotifCount(filtered.length);
 
     // Enes Doğanay | 8 Nisan 2026: Bekleyen teklif sayısını da yenile
     const cid = await getManagedCompanyId();
@@ -239,27 +272,48 @@ export function AuthProvider({ children }) {
 
     const userId = realtimeUserId;
 
+    /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihlerini DB'den çek ve cache'le */
+    (async () => {
+      const { data } = await supabase
+        .from('bildirim_tercihleri')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      notifPrefsRef.current = data;
+    })();
+
     // Enes Doğanay | 9 Nisan 2026: Yeni bildirimi toast + state'e ekleyen ortak fonksiyon
     /* Enes Doğanay | 9 Nisan 2026: Kullanıcı zaten ilgili teklifin chat'indeyse toast gösterme */
     const handleNewNotification = (n) => {
       if (!n || !n.id) return;
+
+      /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihine göre filtrele — tercih kapalıysa tamamen yok say */
+      const prefs = notifPrefsRef.current;
+      if (prefs) {
+        const prefKey = NOTIF_TYPE_TO_PREF_KEY[n.type];
+        if (prefKey && prefs[prefKey] === false) return;
+      }
+
       const isQuoteNotif = (n.type === 'quote_reply' || n.type === 'quote_message' || n.type === 'quote_received');
       const notifTeklifId = n.metadata?.teklif_id;
       const isViewingThisChat = isQuoteNotif && notifTeklifId && activeViewingTeklifIdRef.current === notifTeklifId;
 
       if (!isViewingThisChat) {
-        setToasts(prev => {
-          if (prev.some(t => t.id === n.id)) return prev;
-          return [...prev, {
-            id: n.id,
-            type: n.type || 'default',
-            title: n.title || 'Yeni Bildirim',
-            message: n.message || '',
-            metadata: n.metadata || null,
-            firma_id: n.firma_id || null,
-            exiting: false
-          }];
-        });
+        /* Enes Doğanay | 17 Nisan 2026: Anlık bildirimler (pop-up) tercihi kapalıysa toast gösterme */
+        if (!prefs || prefs.anlik_bildirimler !== false) {
+          setToasts(prev => {
+            if (prev.some(t => t.id === n.id)) return prev;
+            return [...prev, {
+              id: n.id,
+              type: n.type || 'default',
+              title: n.title || 'Yeni Bildirim',
+              message: n.message || '',
+              metadata: n.metadata || null,
+              firma_id: n.firma_id || null,
+              exiting: false
+            }];
+          });
+        }
         setUnreadNotifCount(prev => prev + 1);
       }
       setLatestNotification(n);
@@ -307,13 +361,17 @@ export function AuthProvider({ children }) {
           if (lastNotifIdRef.current !== latest.id) {
             handleNewNotification(latest);
           }
-          // Okunmamış sayıyı da güncelle
-          const { count } = await supabase
+          /* Enes Doğanay | 17 Nisan 2026: Okunmamış sayısını tercih filtresinden geçir */
+          const { data: allUnread } = await supabase
             .from('bildirimler')
-            .select('id', { count: 'exact', head: true })
+            .select('id, type')
             .eq('user_id', userId)
             .eq('is_read', false);
-          setUnreadNotifCount(count || 0);
+          const prefs = notifPrefsRef.current;
+          const filtered = prefs
+            ? (allUnread || []).filter(n => { const pk = NOTIF_TYPE_TO_PREF_KEY[n.type]; return !(pk && prefs[pk] === false); })
+            : (allUnread || []);
+          setUnreadNotifCount(filtered.length);
         }
       }, 10000);
     })();
@@ -324,6 +382,26 @@ export function AuthProvider({ children }) {
       realtimeChannelRef.current = null;
     };
   }, [authChecked, realtimeUserId]);
+
+  /* Enes Doğanay | 17 Nisan 2026: Profile/FirmaProfil'den tercih değiştiğinde cache + sayacı güncelle */
+  const updateNotifPrefsCache = useCallback(async (newPrefs) => {
+    notifPrefsRef.current = newPrefs;
+    /* Sayacı yeniden hesapla — DB'den okunmamış bildirimleri çekip filtrele */
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data: allUnread } = await supabase
+        .from('bildirimler')
+        .select('id, type')
+        .eq('user_id', session.user.id)
+        .eq('is_read', false);
+      const filtered = (allUnread || []).filter(n => {
+        const pk = NOTIF_TYPE_TO_PREF_KEY[n.type];
+        return !(pk && newPrefs[pk] === false);
+      });
+      setUnreadNotifCount(filtered.length);
+    } catch { /* sessiz */ }
+  }, []);
 
   return (
     <AuthContext.Provider value={{
@@ -339,7 +417,8 @@ export function AuthProvider({ children }) {
       logout,
       refreshCounts,
       latestNotification,
-      setActiveViewingTeklifId
+      setActiveViewingTeklifId,
+      updateNotifPrefsCache
     }}>
       {children}
     </AuthContext.Provider>
