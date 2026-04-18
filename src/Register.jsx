@@ -1,5 +1,6 @@
 // Enes Doğanay | 13 Nisan 2026: useRef destructured import olarak eklendi
 import React, { useEffect, useRef, useState } from 'react';
+// Enes Doğanay | 18 Nisan 2026: Modal için eklenen state ve fonksiyonlar (gpt ile yapıldı)
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import './Register.css';
 import SharedHeader from './SharedHeader';
@@ -34,6 +35,9 @@ const initialCorporateForm = {
 };
 
 const RegistrationPage = () => {
+  // Enes Doğanay | 18 Nisan 2026: Hizmet Şartları ve Gizlilik Politikası modalı için state (gpt ile yapıldı)
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false); // gpt ile yapıldı
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [registrationType, setRegistrationType] = useState(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
@@ -64,9 +68,16 @@ const RegistrationPage = () => {
   const firmaSearchRef = useRef(null);
   const firmaDebounceRef = useRef(null);
 
+
   useEffect(() => {
     setRegistrationType(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
   }, [searchParams]);
+
+  // Enes Doğanay | 18 Nisan 2026: Sekme değişince modal state'lerini sıfırla (gpt ile yapıldı)
+  useEffect(() => {
+    setShowTermsModal(false);
+    setShowPrivacyModal(false);
+  }, [registrationType]);
 
   /* Enes Doğanay | 17 Nisan 2026: Firma detaydan yönlendirmede URL parametrelerinden kurumsal formu doldur */
   useEffect(() => {
@@ -719,18 +730,130 @@ const RegistrationPage = () => {
                     </div>
                   </div>
 
+
                   <div className="corporate-process-box">
                     <span className="material-symbols-outlined">info</span>
                     <p>Onay geldiğinde hesabınız bizim tarafımızdan oluşturulur. Size gönderilecek şifre belirleme bağlantısıyla hesabınızı aktif edip kurumsal giriş yaparsınız.</p>
                   </div>
 
+                  {/* Enes Doğanay | 18 Nisan 2026: Kurumsal kayıt için Hizmet Şartları ve Gizlilik Politikası onayı tekrar eklendi (gpt ile yapıldı) */}
                   <div className="checkbox-group">
-                    <input type="checkbox" id="terms" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
-                    <label htmlFor="terms" className="checkbox-label">
-                      <button type="button" className="text-link-btn" onClick={() => alert('Hizmet Şartları sayfası yakında eklenecek.')}>Hizmet Şartları</button>'nı ve{' '}
-                      <button type="button" className="text-link-btn" onClick={() => alert('Gizlilik Politikası sayfası yakında eklenecek.')}>Gizlilik Politikası</button>'nı okudum ve kabul ediyorum.
+                    <input type="checkbox" id="terms-corporate" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
+                    <label htmlFor="terms-corporate" className="checkbox-label">
+                      <button type="button" className="text-link-btn" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı ve{' '}
+                      <button type="button" className="text-link-btn" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı okudum ve kabul ediyorum.
                     </label>
                   </div>
+
+
+      {/* Enes Doğanay | 18 Nisan 2026: Modal bileşenleri her iki sekmede de çalışsın diye return'un en sonuna taşındı (gpt ile yapıldı) */}
+      {showTermsModal && (
+        <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Hizmet Şartları</h2>
+            <div className="modal-scrollable">
+              <p>Bu platformu (“Tedport”) kullanarak aşağıdaki şartları kabul etmiş sayılırsınız.</p>
+              <ol>
+                <li><strong>Platformun Amacı</strong><br/>Tedport; firmalar, tedarikçiler ve kullanıcılar arasında teklif alma, ihale oluşturma ve iş bağlantıları kurulmasını sağlayan bir aracılık platformudur. Tedport, taraflar arasında gerçekleşen işlemlerin doğrudan tarafı değildir.</li>
+                <li><strong>Firma Profilleri</strong><br/>Platformda yer alan firma profilleri:
+                  <ul>
+                    <li>Kullanıcılar tarafından oluşturulabilir veya</li>
+                    <li>Kamuya açık kaynaklardan derlenerek platform tarafından oluşturulmuş olabilir.</li>
+                  </ul>
+                  Platform tarafından oluşturulan profiller:
+                  <ul>
+                    <li>Resmi temsil niteliği taşımaz</li>
+                    <li>İlgili firmanın onayı olmadan oluşturulmuş olabilir</li>
+                  </ul>
+                  Firma yetkilileri:
+                  <ul>
+                    <li>Profillerini talep ederek sahiplenebilir</li>
+                    <li>Bilgileri güncelleyebilir</li>
+                    <li>Profilin kaldırılmasını talep edebilir</li>
+                  </ul>
+                </li>
+                <li><strong>Sorumluluk Reddi</strong><br/>Tedport:
+                  <ul>
+                    <li>Firma bilgilerinin doğruluğunu garanti etmez</li>
+                    <li>Kullanıcılar arasında gerçekleşen teklif, anlaşma ve işlemlerden sorumlu değildir</li>
+                    <li>Platform üzerindeki içeriklerin doğruluğu veya güncelliği konusunda sorumluluk kabul etmez</li>
+                  </ul>
+                </li>
+                <li><strong>Kullanıcı Yükümlülükleri</strong><br/>Kullanıcılar:
+                  <ul>
+                    <li>Doğru ve güncel bilgi sağlamakla yükümlüdür</li>
+                    <li>Platformu kötüye kullanmamayı kabul eder</li>
+                    <li>Yanıltıcı, sahte veya hukuka aykırı içerik paylaşmamayı kabul eder</li>
+                  </ul>
+                </li>
+                <li><strong>Fikri Mülkiyet</strong><br/>Platformda yer alan marka, logo ve içerikler ilgili hak sahiplerine aittir. Hak sahipleri, talepleri halinde içeriklerin kaldırılmasını isteyebilir.</li>
+                <li><strong>İçerik Kaldırma Talepleri</strong><br/>Firma veya hak sahipleri: info@tedport.com adresine e-posta göndererek
+                  <ul>
+                    <li>Profil güncelleme</li>
+                    <li>Profil kaldırma talebinde bulunabilir.</li>
+                  </ul>
+                  Talepler makul süre içerisinde değerlendirilir.
+                </li>
+                <li><strong>Hizmet Değişiklikleri</strong><br/>TedPort, platform özelliklerini değiştirme, durdurma veya sonlandırma hakkını saklı tutar.</li>
+                <li><strong>Yürürlük</strong><br/>Bu şartlar, kullanıcı platformu kullanmaya başladığı andan itibaren geçerlidir.</li>
+              </ol>
+            </div>
+            <button className="modal-close-btn" onClick={() => setShowTermsModal(false)}>Kapat</button>
+          </div>
+        </div>
+      )}
+      {showPrivacyModal && (
+        <div className="modal-overlay" onClick={() => setShowPrivacyModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Gizlilik Politikası</h2>
+            <div className="modal-scrollable">
+              <p>Bu politika, Tedport platformunda toplanan verilerin nasıl kullanıldığını açıklar.</p>
+              <ol>
+                <li><strong>Toplanan Veriler</strong><br/>Tedport aşağıdaki verileri toplayabilir:
+                  <ul>
+                    <li>Ad, soyad, e-posta gibi kullanıcı bilgileri</li>
+                    <li>Firma adı, iletişim bilgileri</li>
+                    <li>Platform kullanım verileri</li>
+                  </ul>
+                </li>
+                <li><strong>Veri Toplama Yöntemi</strong><br/>Veriler:
+                  <ul>
+                    <li>Kullanıcı tarafından sağlanabilir</li>
+                    <li>Kamuya açık kaynaklardan elde edilebilir</li>
+                  </ul>
+                </li>
+                <li><strong>Veri Kullanım Amaçları</strong><br/>Toplanan veriler:
+                  <ul>
+                    <li>Platform hizmetlerini sunmak</li>
+                    <li>Kullanıcı deneyimini geliştirmek</li>
+                    <li>İletişim sağlamak</li>
+                  </ul>
+                  amaçlarıyla kullanılır.
+                </li>
+                <li><strong>Veri Paylaşımı</strong><br/>Tedport:
+                  <ul>
+                    <li>Kullanıcı verilerini üçüncü kişilerle satmaz</li>
+                    <li>Yasal zorunluluklar dışında paylaşmaz</li>
+                  </ul>
+                </li>
+                <li><strong>Veri Güvenliği</strong><br/>Tedport, verilerin korunması için makul teknik ve idari önlemleri alır.</li>
+                <li><strong>Kullanıcı Hakları</strong><br/>Kullanıcılar:
+                  <ul>
+                    <li>Verilerine erişme</li>
+                    <li>Düzeltme talep etme</li>
+                    <li>Silinmesini isteme</li>
+                  </ul>
+                  haklarına sahiptir.<br/>
+                  Talepler için: info@tedport.com
+                </li>
+                <li><strong>Çerezler (Cookies)</strong><br/>Platform, kullanıcı deneyimini iyileştirmek için çerezler kullanabilir.</li>
+                <li><strong>Güncellemeler</strong><br/>Bu politika zaman zaman güncellenebilir.</li>
+              </ol>
+            </div>
+            <button className="modal-close-btn" onClick={() => setShowPrivacyModal(false)}>Kapat</button>
+          </div>
+        </div>
+      )}
 
                   <button type="button" className="register-btn-primary register-btn-submit" disabled={loading} onClick={handleCorporateSubmit}>
                     {loading ? 'Başvurunuz Gönderiliyor...' : 'Kurumsal Başvuru Gönder'}
@@ -842,14 +965,17 @@ const RegistrationPage = () => {
                 )}
               </div>
 
+
+              {/* Enes Doğanay | 18 Nisan 2026: Hizmet Şartları ve Gizlilik Politikası onayı bireysel kayıt için tekrar eklendi (gpt ile yapıldı) */}
+              {/* Enes Doğanay | 18 Nisan 2026: Bireysel kayıt için Hizmet Şartları ve Gizlilik Politikası onayı tekrar eklendi (gpt ile yapıldı) */}
               <div className="checkbox-group">
-                <input type="checkbox" id="terms" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
-                <label htmlFor="terms" className="checkbox-label">
-                  <button type="button" className="text-link-btn" onClick={() => alert('Hizmet Şartları sayfası yakında eklenecek.')}>Hizmet Şartları</button>'nı ve{' '}
-                  <button type="button" className="text-link-btn" onClick={() => alert('Gizlilik Politikası sayfası yakında eklenecek.')}>Gizlilik Politikası</button>'nı okudum ve kabul ediyorum.
+                <input type="checkbox" id="terms-individual" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
+                <label htmlFor="terms-individual" className="checkbox-label">
+                  <button type="button" className="text-link-btn" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı ve{' '}
+                  <button type="button" className="text-link-btn" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı okudum ve kabul ediyorum.
                 </label>
               </div>
-
+              {/* Modal bileşenleri zaten yukarıda mevcut, tekrar eklenmedi */}
               <button type="submit" className="register-btn-primary register-btn-submit" disabled={loading}>
                 {loading ? 'Kayıt Yapılıyor...' : 'Hesap Oluştur'}
               </button>
@@ -864,6 +990,114 @@ const RegistrationPage = () => {
         </div>
       </main>
 
+      {/* Enes Doğanay | 18 Nisan 2026: Modal bileşenleri page-container'ın içinde, footer'dan hemen önce (gpt ile yapıldı) */}
+      {showTermsModal && (
+        <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Hizmet Şartları</h2>
+            <div className="modal-scrollable">
+              <p>Bu platformu (“Tedport”) kullanarak aşağıdaki şartları kabul etmiş sayılırsınız.</p>
+              <ol>
+                <li><strong>Platformun Amacı</strong><br/>Tedport; firmalar, tedarikçiler ve kullanıcılar arasında teklif alma, ihale oluşturma ve iş bağlantıları kurulmasını sağlayan bir aracılık platformudur. Tedport, taraflar arasında gerçekleşen işlemlerin doğrudan tarafı değildir.</li>
+                <li><strong>Firma Profilleri</strong><br/>Platformda yer alan firma profilleri:
+                  <ul>
+                    <li>Kullanıcılar tarafından oluşturulabilir veya</li>
+                    <li>Kamuya açık kaynaklardan derlenerek platform tarafından oluşturulmuş olabilir.</li>
+                  </ul>
+                  Platform tarafından oluşturulan profiller:
+                  <ul>
+                    <li>Resmi temsil niteliği taşımaz</li>
+                    <li>İlgili firmanın onayı olmadan oluşturulmuş olabilir</li>
+                  </ul>
+                  Firma yetkilileri:
+                  <ul>
+                    <li>Profillerini talep ederek sahiplenebilir</li>
+                    <li>Bilgileri güncelleyebilir</li>
+                    <li>Profilin kaldırılmasını talep edebilir</li>
+                  </ul>
+                </li>
+                <li><strong>Sorumluluk Reddi</strong><br/>Tedport:
+                  <ul>
+                    <li>Firma bilgilerinin doğruluğunu garanti etmez</li>
+                    <li>Kullanıcılar arasında gerçekleşen teklif, anlaşma ve işlemlerden sorumlu değildir</li>
+                    <li>Platform üzerindeki içeriklerin doğruluğu veya güncelliği konusunda sorumluluk kabul etmez</li>
+                  </ul>
+                </li>
+                <li><strong>Kullanıcı Yükümlülükleri</strong><br/>Kullanıcılar:
+                  <ul>
+                    <li>Doğru ve güncel bilgi sağlamakla yükümlüdür</li>
+                    <li>Platformu kötüye kullanmamayı kabul eder</li>
+                    <li>Yanıltıcı, sahte veya hukuka aykırı içerik paylaşmamayı kabul eder</li>
+                  </ul>
+                </li>
+                <li><strong>Fikri Mülkiyet</strong><br/>Platformda yer alan marka, logo ve içerikler ilgili hak sahiplerine aittir. Hak sahipleri, talepleri halinde içeriklerin kaldırılmasını isteyebilir.</li>
+                <li><strong>İçerik Kaldırma Talepleri</strong><br/>Firma veya hak sahipleri: info@tedport.com adresine e-posta göndererek
+                  <ul>
+                    <li>Profil güncelleme</li>
+                    <li>Profil kaldırma talebinde bulunabilir.</li>
+                  </ul>
+                  Talepler makul süre içerisinde değerlendirilir.
+                </li>
+                <li><strong>Hizmet Değişiklikleri</strong><br/>TedPort, platform özelliklerini değiştirme, durdurma veya sonlandırma hakkını saklı tutar.</li>
+                <li><strong>Yürürlük</strong><br/>Bu şartlar, kullanıcı platformu kullanmaya başladığı andan itibaren geçerlidir.</li>
+              </ol>
+            </div>
+            <button className="modal-close-btn" onClick={() => setShowTermsModal(false)}>Kapat</button>
+          </div>
+        </div>
+      )}
+      {showPrivacyModal && (
+        <div className="modal-overlay" onClick={() => setShowPrivacyModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Gizlilik Politikası</h2>
+            <div className="modal-scrollable">
+              <p>Bu politika, Tedport platformunda toplanan verilerin nasıl kullanıldığını açıklar.</p>
+              <ol>
+                <li><strong>Toplanan Veriler</strong><br/>Tedport aşağıdaki verileri toplayabilir:
+                  <ul>
+                    <li>Ad, soyad, e-posta gibi kullanıcı bilgileri</li>
+                    <li>Firma adı, iletişim bilgileri</li>
+                    <li>Platform kullanım verileri</li>
+                  </ul>
+                </li>
+                <li><strong>Veri Toplama Yöntemi</strong><br/>Veriler:
+                  <ul>
+                    <li>Kullanıcı tarafından sağlanabilir</li>
+                    <li>Kamuya açık kaynaklardan elde edilebilir</li>
+                  </ul>
+                </li>
+                <li><strong>Veri Kullanım Amaçları</strong><br/>Toplanan veriler:
+                  <ul>
+                    <li>Platform hizmetlerini sunmak</li>
+                    <li>Kullanıcı deneyimini geliştirmek</li>
+                    <li>İletişim sağlamak</li>
+                  </ul>
+                  amaçlarıyla kullanılır.
+                </li>
+                <li><strong>Veri Paylaşımı</strong><br/>Tedport:
+                  <ul>
+                    <li>Kullanıcı verilerini üçüncü kişilerle satmaz</li>
+                    <li>Yasal zorunluluklar dışında paylaşmaz</li>
+                  </ul>
+                </li>
+                <li><strong>Veri Güvenliği</strong><br/>Tedport, verilerin korunması için makul teknik ve idari önlemleri alır.</li>
+                <li><strong>Kullanıcı Hakları</strong><br/>Kullanıcılar:
+                  <ul>
+                    <li>Verilerine erişme</li>
+                    <li>Düzeltme talep etme</li>
+                    <li>Silinmesini isteme</li>
+                  </ul>
+                  haklarına sahiptir.<br/>
+                  Talepler için: info@tedport.com
+                </li>
+                <li><strong>Çerezler (Cookies)</strong><br/>Platform, kullanıcı deneyimini iyileştirmek için çerezler kullanabilir.</li>
+                <li><strong>Güncellemeler</strong><br/>Bu politika zaman zaman güncellenebilir.</li>
+              </ol>
+            </div>
+            <button className="modal-close-btn" onClick={() => setShowPrivacyModal(false)}>Kapat</button>
+          </div>
+        </div>
+      )}
       <footer className="page-footer">
         <p>© 2026 Tedport. Tüm hakları saklıdır.</p>
       </footer>

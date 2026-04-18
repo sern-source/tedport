@@ -1,3 +1,67 @@
+/* Enes Doğanay | 18 Nisan 2026: Modal popup stilleri (gpt ile yapıldı) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90vw;
+  max-height: 80vh;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  padding: 32px 24px 20px 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: modalFadeIn 0.2s;
+}
+
+.modal-content h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.3rem;
+  color: var(--primary);
+  text-align: center;
+}
+
+.modal-scrollable {
+  overflow-y: auto;
+  max-height: 48vh;
+  font-size: 0.98rem;
+  color: var(--text-gray);
+  padding-right: 4px;
+}
+
+.modal-close-btn {
+  margin: 0 auto 0 auto;
+  display: block;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-close-btn:hover {
+  background: var(--primary-dark, #1a237e);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 /* Enes Doğanay | 6 Nisan 2026: @import kaldırıldı (index.html'de <link> ile yüklü) */
 /* Enes Doğanay | 6 Nisan 2026: :root kaldırıldı (index.css'de merkezi) */
 
