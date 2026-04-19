@@ -1176,11 +1176,22 @@ const SupplierProfile = () => {
                                             <a href={googleMapsLink} target="_blank" rel="noopener noreferrer" className="contact-map-action">Haritada Aç</a>
                                         </div>
 
-                                        <a href={googleMapsLink} target="_blank" rel="noopener noreferrer" className="map-link">
-                                            <div className="map" style={{ backgroundImage: `url(${mapImageUrl})` }}>
-                                                <div className="map-label">{firma.il_ilce}</div>
-                                            </div>
-                                        </a>
+                                        {/* Enes Doğanay | 19 Nisan 2026: Konum alanına dinamik Google Maps iframe eklendi */}
+                                        <div className="map-iframe-wrapper" style={{ width: "100%", borderRadius: 8, overflow: "hidden", margin: "8px 0" }}>
+                                            <iframe
+                                                title="Firma Konumu"
+                                                width="100%"
+                                                height="200"
+                                                style={{ border: 0, minHeight: 180 }}
+                                                loading="lazy"
+                                                allowFullScreen
+                                                referrerPolicy="no-referrer-when-downgrade"
+                                                src={`https://maps.google.com/maps?q=${encodedAddress}&output=embed`}
+                                            />
+                                        </div>
+                                        <div style={{ marginTop: 4, fontWeight: 600, color: "#1a73e8", fontSize: 15 }}>
+                                            {adresText}
+                                        </div>
 
                                         {(firma.adres || firma.web_sitesi || firma.eposta) && (
                                             <div className="contact-info-stack">
