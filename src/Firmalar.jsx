@@ -19,7 +19,7 @@ import './Firmalar.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import { supabase } from './supabaseClient';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-dom';
 import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
 import { TURKEY_DISTRICTS } from './turkeyDistricts'; // Enes Doğanay | 14 Nisan 2026: İl/ilçe ayrımı için
 import { getManagedCompanyId } from './companyManagementApi';
@@ -810,8 +810,10 @@ function App() {
   const PAGE_SIZE = 10;
   const navigate = useNavigate();
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const urlSearchTerm = searchParams.get('search') || '';
+  const urlPage = Number(searchParams.get('page')) || null;
 
   // Enes Doğanay | 7 Nisan 2026: sessionStorage'dan önceki arama/filtre/sayfa durumunu oku (geri tuşunda korunsun)
   const savedState = (() => {
@@ -823,7 +825,8 @@ function App() {
 
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(savedState?.page || 1);
+  // Enes Doğanay | 28 Nisan 2026: Sayfa numarasını URL'den oku, yoksa sessionStorage'dan, o da yoksa 1
+  const [page, setPage] = useState(urlPage || savedState?.page || 1);
   const [totalCount, setTotalCount] = useState(0);
 
   /* Enes Doğanay | 5 Nisan 2026: Mobilde filtre paneli aç/kapat state */
@@ -1144,14 +1147,28 @@ function App() {
     setLoading(false);
   };
 
+  // Enes Doğanay | 28 Nisan 2026: Arama/filtre/sıralama değişirse ve sayfa 1 değilse, sadece page'i 1 yap (URL güncellemesi page effect'inde)
   useEffect(() => {
-    setPage(1);
+    if (page !== 1) {
+      setPage(1);
+    }
   }, [debouncedSearch, filters, sortMode]);
 
   /* Enes Doğanay | 5 Nisan 2026: Sayfa değiştiğinde scroll en üste gider */
+  // Enes Doğanay | 28 Nisan 2026: Sayfa değişince hem scroll, hem URL güncelle
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [page]);
+    setSearchParams(params => {
+      const newParams = new URLSearchParams(params);
+      newParams.set('page', page);
+      return newParams;
+    }, { replace: true });
+  }, [page, setSearchParams]);
+  // Enes Doğanay | 28 Nisan 2026: URL'deki page parametresi değişirse state'i güncelle (örn. geri tuşu)
+  useEffect(() => {
+    const urlPageNow = Number(searchParams.get('page')) || 1;
+    setPage(urlPageNow);
+  }, [searchParams]);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   const smartPages = getSmartPages(page, totalPages);
