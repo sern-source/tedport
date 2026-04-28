@@ -810,6 +810,7 @@ const SupplierProfile = () => {
                     <div className="container">
                         <div className="hero-flex">
                             {/* Enes Doğanay | 8 Nisan 2026: Sadece firma-logolari bucket'inden yüklenen logolar kullanılır, eski sahte avatarlar elenir */}
+                            {/* Enes Doğanay | 28 Nisan 2026: Logosu olmayan firmalarda baş harf yerine default logo gösteriliyor */}
                             {firma.logo_url?.includes('firma-logolari') ? (
                                 <img
                                     src={firma.logo_url}
@@ -817,11 +818,16 @@ const SupplierProfile = () => {
                                     className="supp-avatar2"
                                     style={{ objectFit: 'contain', background: '#fff', padding: '6px' }}
                                     onError={e => {
-                                        e.currentTarget.outerHTML = `<div class="supp-avatar2">${firma.firma_adi?.charAt(0) ?? ''}</div>`;
+                                        e.currentTarget.outerHTML = `<img class='supp-avatar2' src='/tedport_default_company_logo.png' alt='Default Logo' style='object-fit:contain;background:#fff;padding:6px;' />`;
                                     }}
                                 />
                             ) : (
-                                <div className="supp-avatar2">{firma.firma_adi?.charAt(0)}</div>
+                                <img
+                                    src="/tedport_default_company_logo.png"
+                                    alt="Default Logo"
+                                    className="supp-avatar2"
+                                    style={{ objectFit: 'contain', background: '#fff', padding: '6px' }}
+                                />
                             )}
 
                             <div className="info-content">

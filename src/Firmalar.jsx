@@ -515,6 +515,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
       {/* Enes Doğanay | 13 Nisan 2026: <a> ile sarmalandı — orta tuş yeni sekmede açar */}
       <a href={`/firmadetay/${data.id}`} className="card-images" onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${data.id}`); }} style={{ cursor: 'pointer' }}>
         <div className="main-image">
+          {/* Enes Doğanay | 28 Nisan 2026: Logosu olmayan firmalarda baş harf yerine default logo gösteriliyor */}
           {data.images ? (
             <img
               src={data.images}
@@ -522,13 +523,13 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
               style={{ width: '100%', height: '90%', objectFit: 'contain', borderRadius: '8px', background: '#fff' }}
               onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
             />
-          ) : null}
-          <div
-            className='supp-avatar2'
-            style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', height: '100%', display: data.images ? 'none' : 'flex' }}
-          >
-            {data.name?.charAt(0)}
-          </div>
+          ) : (
+            <img
+              src="/tedport_default_company_logo.png"
+              alt="Default Logo"
+              style={{ width: '100%', height: '90%', objectFit: 'contain', borderRadius: '8px', background: '#fff' }}
+            />
+          )}
         </div>
       </a>
 
@@ -825,8 +826,8 @@ function App() {
 
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
-  // Enes Doğanay | 28 Nisan 2026: Sayfa numarasını URL'den oku, yoksa sessionStorage'dan, o da yoksa 1
-  const [page, setPage] = useState(urlPage || savedState?.page || 1);
+  // Enes Doğanay | 28 Nisan 2026: Sayfa numarasını sadece URL'den oku, sessionStorage'dan asla alma
+  const [page, setPage] = useState(urlPage || 1);
   const [totalCount, setTotalCount] = useState(0);
 
   /* Enes Doğanay | 5 Nisan 2026: Mobilde filtre paneli aç/kapat state */
@@ -989,7 +990,6 @@ function App() {
       sessionStorage.setItem('tedport_firmalar_state', JSON.stringify({
         search: search,
         filters: filters,
-        page: page,
         viewMode: viewMode,
         sortMode: sortMode
       }));
