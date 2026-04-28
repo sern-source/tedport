@@ -1366,9 +1366,15 @@ function App() {
                       {supplier.images ? (
                         <img src={supplier.images} alt="" className="firmalar-list-avatar-img" onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }} />
                       ) : null}
-                      <span className="firmalar-list-avatar-placeholder" style={{ display: supplier.images ? 'none' : 'flex' }}>
-                        {supplier.name?.charAt(0)}
-                      </span>
+                      {/* Enes Doğanay | 28 Nisan 2026: Küçük liste görünümünde logosu olmayanlarda baş harf yerine default logo */}
+                      {!supplier.images && (
+                        <img
+                          src="/tedport_default_company_logo.png"
+                          alt="Default Logo"
+                          className="firmalar-list-avatar-img"
+                          style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 6, background: '#fff', border: '1px solid #e5e7eb' }}
+                        />
+                      )}
                     </a>
                     <a href={`/firmadetay/${supplier.id}`} className="firmalar-list-col firmalar-list-col--name" onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${supplier.id}`); }} style={{ color: 'inherit', textDecoration: 'none' }}>
                       {supplier.name}
