@@ -1991,6 +1991,13 @@
     line-height: 1.5;
 }
 
+.ihale-email-warning__content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
 .ihale-email-warning .material-symbols-outlined {
     font-size: 18px;
     color: #f97316;
@@ -2002,6 +2009,37 @@
     color: #2563eb;
     font-weight: 600;
     text-decoration: underline;
+}
+
+.ihale-email-invite-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 7px 14px;
+    background: #2563eb;
+    color: #fff !important;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.ihale-email-invite-btn:hover {
+    background: #1d4ed8;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+.ihale-email-invite-btn .material-symbols-outlined {
+    font-size: 16px;
+    color: #fff !important;
+    margin: 0;
+    flex-shrink: 0;
 }
 
 .ihale-email-add-btn {
@@ -3163,6 +3201,105 @@
     font-size: 0.88rem;
 }
 
+/* Enes Doğanay | 1 Mayıs 2026: Giriş yapmamış kullanıcı için ihale detay blur/gate */
+.tender-detail__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.tender-detail__content--locked .tender-detail__body,
+.tender-detail__content--locked .tender-detail__footer {
+    filter: blur(6px);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.tender-detail-auth-gate {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    background: rgba(248, 250, 252, 0.35);
+}
+
+.tender-detail-auth-gate__cta {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 28px 36px;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(15, 23, 42, 0.06);
+    max-width: 360px;
+    width: 88%;
+}
+
+.tender-detail-auth-gate__cta .material-symbols-outlined {
+    font-size: 40px;
+    color: #3b82f6;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.tender-detail-auth-gate__cta h3 {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 8px;
+}
+
+.tender-detail-auth-gate__cta p {
+    font-size: 0.87rem;
+    color: #64748b;
+    margin: 0 0 18px;
+    line-height: 1.5;
+}
+
+.tender-detail-auth-gate__btn {
+    display: inline-block;
+    padding: 10px 28px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    font-size: 0.93rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.1s;
+    font-family: 'Inter', sans-serif;
+}
+
+.tender-detail-auth-gate__btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.tender-detail-auth-gate__register {
+    display: block;
+    margin-top: 12px;
+    font-size: 0.83rem;
+    color: #94a3b8;
+}
+
+.tender-detail-auth-gate__register button {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.83rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.tender-detail-auth-gate__register button:hover {
+    text-decoration: underline;
+}
+
 @media (max-width: 640px) {
     .tender-detail-modal {
         width: 100vw;
@@ -4290,6 +4427,72 @@
 .teklif-success-card__btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+}
+
+/* Enes Doğanay | 1 Mayıs 2026: İhale yayınlama modalındaki paylaşım linki */
+.ihale-publish-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    background: #f0f7ff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    margin-bottom: 6px;
+}
+
+.ihale-publish-link-row__icon {
+    font-size: 18px;
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.ihale-publish-link-row__input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 0.78rem;
+    font-family: 'Inter', monospace;
+    color: #1e40af;
+    outline: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: text;
+}
+
+.ihale-publish-link-row__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    padding: 6px 12px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.ihale-publish-link-row__copy:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.ihale-publish-link-row__copy--done {
+    background: #059669 !important;
+    transform: none !important;
+}
+
+.ihale-publish-link-row__copy .material-symbols-outlined {
+    font-size: 15px;
 }
 
 /* Enes Doğanay | 13 Nisan 2026: Geri Çek onay modal */

@@ -40,3 +40,12 @@ export const formatTenderDate = (dateValue) => {
 export const formatTenderBudget = (budgetNote) => {
     return budgetNote?.trim() || 'Bütçe bilgisi paylaşılmadı';
 };
+
+// Enes Doğanay | 1 Mayıs 2026: Sisteme kayıtlı olmayan kullanıcıya Tedport davet e-postası oluşturur
+export const buildInviteMailto = (email) => {
+    const subject = encodeURIComponent('Tedport - İhale Bildirimleri Daveti');
+    const body = encodeURIComponent(
+        `Merhaba,\n\nSizi Tedport Tedarik Portalı'na davet etmek istiyorum.\n\nTedport'a ücretsiz üye olarak ihale bildirimlerini alabilir, teklif süreçlerinizi kolayca yönetebilirsiniz.\n\nKayıt olmak için:\nhttps://tedport.com/register\n\nİyi çalışmalar!`
+    );
+    return `mailto:${email}?subject=${subject}&body=${body}`;
+};

@@ -5,13 +5,14 @@ import './SharedHeader.css';
 import SharedHeader from './SharedHeader';
 import SEO from './SEO'; // Enes Doğanay | 16 Nisan 2026: SEO meta tag desteği
 import { supabase } from './supabaseClient';
-import { formatTenderDate, getTenderStatusMeta } from './tenderUtils';
+import { formatTenderDate, getTenderStatusMeta, buildInviteMailto } from './tenderUtils';
 // Enes Doğanay | 6 Nisan 2026: Kurumsal giriş için ihale CRUD API'si eklendi
 import { getManagedCompanyId } from './companyManagementApi';
 import { listMyTenders, createTender, updateTender, deleteTender } from './ihaleManagementApi';
 // Enes Doğanay | 10 Nisan 2026: Teslim yeri il/ilçe seçimi için
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
 import CitySelect from './CitySelect';
+import SimpleSelect from './SimpleSelect';
 // Enes Doğanay | 10 Nisan 2026: Auth context — teklif popup'ında kullanıcı bilgisi
 import { useAuth } from './AuthContext';
 
@@ -237,7 +238,8 @@ const IhalelerPage = () => {
     /* Enes Doğanay | 13 Nisan 2026: Teklif başarılı gönderildi mesajı */
     const [teklifSuccess, setTeklifSuccess] = useState(false);
     /* Enes Doğanay | 13 Nisan 2026: İhale yayınlama başarı modalı */
-    const [ihalePublishSuccess, setIhalePublishSuccess] = useState(false);
+    const [ihalePublishSuccess, setIhalePublishSuccess] = useState(null); // null veya yeni ihale id
+    const [publishedLinkCopied, setPublishedLinkCopied] = useState(false);
     /* Enes Doğanay | 13 Nisan 2026: Kullanıcının mevcut teklifleri — 1 ihale 1 teklif kısıtı */
     const [userOffers, setUserOffers] = useState({});
     /* Enes Doğanay | 13 Nisan 2026: Teklifi geri çekme state */
@@ -345,7 +347,11 @@ const IhalelerPage = () => {
     const openCreate = async () => {
         setEditingTender(null);
         const refNo = await generateReferansNo();
-        setForm({ ...EMPTY_FORM, referans_no: refNo, gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [] });
+        const todayStr = new Date().toISOString().split('T')[0];
+        const twoWeeksLater = new Date();
+        twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+        const twoWeeksStr = twoWeeksLater.toISOString().split('T')[0];
+        setForm({ ...EMPTY_FORM, referans_no: refNo, gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [], yayin_tarihi: todayStr, son_basvuru_tarihi: twoWeeksStr, teslim_suresi: '14' });
         setFormError('');
         setYeniGereksinimMadde('');
         setYeniGereksinimAciklama('');
@@ -534,6 +540,12 @@ const IhalelerPage = () => {
         setFormSaving(true);
         setFormError('');
         try {
+            // Inputta yazılı geçerli email varsa otomatik ekle (+ butonuna basmayı unutanlar için)
+            const pendingEmail = emailInput.trim().toLowerCase();
+            if (pendingEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pendingEmail) && emailStatus === 'valid' && !form.davet_emailleri.includes(pendingEmail)) {
+                setForm(p => ({ ...p, davet_emailleri: [...p.davet_emailleri, pendingEmail] }));
+                // form state async güncellenir; payload'ı aşağıda manuel ekleyeceğiz
+            }
             // Davetli ihale seçilmişse firma listesi zorunlu
             if (form.ihale_tipi === 'Davetli İhale' && form.davetli_firmalar.length === 0) {
                 setFormError('Davetli ihale için en az bir firma eklemeniz gerekiyor.');
@@ -579,6 +591,12 @@ const IhalelerPage = () => {
                 });
             }
 
+            // Inputta hâlâ yazılı geçerli email varsa listeye dahil et (state async olduğundan tekrar kontrol)
+            const finalPendingEmail = emailInput.trim().toLowerCase();
+            const finalInviteEmails = (finalPendingEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(finalPendingEmail) && emailStatus === 'valid' && !form.davet_emailleri.includes(finalPendingEmail))
+                ? [...form.davet_emailleri, finalPendingEmail]
+                : form.davet_emailleri;
+
             const payload = {
                 ...form,
                 durum: forceDurum || form.durum,
@@ -586,19 +604,20 @@ const IhalelerPage = () => {
                 il_ilce: [form.teslim_il, form.teslim_ilce].filter(Boolean).join(' / '),
                 // Dosya meta bilgilerini gönder
                 ek_dosyalar: uploadedFiles,
+                davet_emailleri: finalInviteEmails,
             };
 
             if (editingTender) {
                 await updateTender(editingTender.id, payload);
             } else {
-                await createTender(payload);
+                const created = await createTender(payload);
+                // Enes Doğanay | 1 Mayıs 2026: Yeni ihale yayınlandığında success modal + ihale linki
+                if ((forceDurum || form.durum) !== 'draft' && created?.id) {
+                    setPublishedLinkCopied(false);
+                    setIhalePublishSuccess(created.id);
+                }
             }
             setShowModal(false);
-            // Enes Doğanay | 13 Nisan 2026: Yeni ihale yayınlandığında success modal göster (taslak hariç)
-            if (!editingTender && (forceDurum || form.durum) !== 'draft') {
-                setIhalePublishSuccess(true);
-                setTimeout(() => setIhalePublishSuccess(false), 5000);
-            }
             // Enes Doğanay | 6 Nisan 2026: Hem kendi listemizi hem public listeyi yenile
             await fetchMyTenders();
             await fetchPublicTenders();
@@ -1401,32 +1420,36 @@ const IhalelerPage = () => {
                                 {stepperStep === 1 && (
                                     <div className="ihale-step-content">
                                         <div className="ihale-modal__grid">
-                                            <label className="ihale-field">
+                                            <div className="ihale-field">
                                                 <span>İhale Tipi *</span>
-                                                <select value={form.ihale_tipi} onChange={e => {
-                                                    const val = e.target.value;
-                                                    if (val === 'Davetli İhale' && !isVerifiedUser) return;
-                                                    {/* Enes Doğanay | 10 Nisan 2026: Açık İhaleye dönünce davetli firma verisini temizle */}
-                                                    setForm(p => ({
-                                                        ...p,
-                                                        ihale_tipi: val,
-                                                        ...(val !== 'Davetli İhale' ? { davetli_firmalar: [] } : {}),
-                                                    }));
-                                                }}>
-                                                    <option value="Açık İhale">Açık İhale</option>
-                                                    <option value="Davetli İhale" disabled={!isVerifiedUser}>
-                                                        Davetli İhale {!isVerifiedUser ? '(Onaylı hesap gerekli)' : ''}
-                                                    </option>
-                                                </select>
-                                            </label>
+                                                <SimpleSelect
+                                                    value={form.ihale_tipi}
+                                                    onChange={val => {
+                                                        if (val === 'Davetli İhale' && !isVerifiedUser) return;
+                                                        setForm(p => ({
+                                                            ...p,
+                                                            ihale_tipi: val,
+                                                            ...(val !== 'Davetli İhale' ? { davetli_firmalar: [] } : {}),
+                                                        }));
+                                                    }}
+                                                    options={[
+                                                        { value: 'Açık İhale', label: 'Açık İhale', icon: 'public' },
+                                                        { value: 'Davetli İhale', label: isVerifiedUser ? 'Davetli İhale' : 'Davetli İhale (Onaylı hesap gerekli)', icon: 'group', disabled: !isVerifiedUser },
+                                                    ]}
+                                                />
+                                            </div>
 
-                                            <label className="ihale-field">
+                                            <div className="ihale-field">
                                                 <span>KDV Durumu</span>
-                                                <select value={form.kdv_durumu} onChange={e => setForm(p => ({ ...p, kdv_durumu: e.target.value }))}>
-                                                    <option value="haric">KDV Hariç</option>
-                                                    <option value="dahil">KDV Dahil</option>
-                                                </select>
-                                            </label>
+                                                <SimpleSelect
+                                                    value={form.kdv_durumu}
+                                                    onChange={val => setForm(p => ({ ...p, kdv_durumu: val }))}
+                                                    options={[
+                                                        { value: 'haric', label: 'KDV Hariç', icon: 'receipt_long' },
+                                                        { value: 'dahil', label: 'KDV Dahil', icon: 'receipt' },
+                                                    ]}
+                                                />
+                                            </div>
 
                                             <label className="ihale-field">
                                                 <span>İhale Açılış Tarihi *</span>
@@ -1488,10 +1511,19 @@ const IhalelerPage = () => {
                                             {emailStatus === 'not_found' && emailInput.trim().length > 0 && (
                                                 <div className="ihale-email-warning">
                                                     <span className="material-symbols-outlined">info</span>
-                                                    <span>
-                                                        <strong>{emailInput.trim()}</strong> adresine sahip bir kullanıcı sistemimizde bulunamadı.
-                                                        İhale bildirimi alabilmesi için bu kişiyi <a href="/register" target="_blank" rel="noopener noreferrer">Tedport’a ücretsiz kayıt</a> olmaya davet edebilirsiniz.
-                                                    </span>
+                                                    <div className="ihale-email-warning__content">
+                                                        <span>
+                                                            <strong>{emailInput.trim()}</strong> adresine sahip bir kullanıcı sistemimizde bulunamadı.
+                                                            Aşağıdaki butona tıklayarak hazır bir davet e-postası gönderebilirsiniz.
+                                                        </span>
+                                                        <a
+                                                            className="ihale-email-invite-btn"
+                                                            href={buildInviteMailto(emailInput.trim())}
+                                                        >
+                                                            <span className="material-symbols-outlined">send</span>
+                                                            Davet E-postası Gönder
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             )}
                                             {form.davet_emailleri.length > 0 && (
@@ -2262,6 +2294,7 @@ const IhalelerPage = () => {
                                     </button>
                                 </div>
 
+                                <div className={`tender-detail__content${!userProfile ? ' tender-detail__content--locked' : ''}`}>
                                 <div className="tender-detail__body">
                                     {dt.aciklama && (
                                         <div className="tender-detail__section">
@@ -2380,6 +2413,18 @@ const IhalelerPage = () => {
                                             </button>
                                         );
                                     })()}
+                                </div>
+                                {!userProfile && (
+                                    <div className="tender-detail-auth-gate">
+                                        <div className="tender-detail-auth-gate__cta">
+                                            <span className="material-symbols-outlined">lock</span>
+                                            <h3>İhale detayını görmek için giriş yapın</h3>
+                                            <p>İhale detaylarını görüntülemek ve teklif verebilmek için hesabınıza giriş yapın.</p>
+                                            <button type="button" className="tender-detail-auth-gate__btn" onClick={() => navigate(`/login?redirect=${encodeURIComponent('/ihaleler?ihale=' + dt.id)}`)}>İhalelere Giriş Yap</button>
+                                            <span className="tender-detail-auth-gate__register">Hesabınız yok mu? <button type="button" onClick={() => navigate('/register')}>Kayıt Ol</button></span>
+                                        </div>
+                                    </div>
+                                )}
                                 </div>
                             </div>
                         </div>
@@ -2865,14 +2910,34 @@ const IhalelerPage = () => {
 
                 {/* Enes Doğanay | 13 Nisan 2026: İhale yayınlama başarı modalı */}
                 {ihalePublishSuccess && (
-                    <div className="teklif-success-overlay" onClick={() => setIhalePublishSuccess(false)}>
+                    <div className="teklif-success-overlay" onClick={() => setIhalePublishSuccess(null)}>
                         <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
                             <div className="teklif-success-card__icon">
                                 <span className="material-symbols-outlined">check_circle</span>
                             </div>
                             <h3>İhaleniz Yayınlandı!</h3>
                             <p>İhaleniz başarıyla yayınlanmıştır. Tedarikçiler artık ihalenizi görebilir ve teklif verebilir.</p>
-                            <button className="teklif-success-card__btn" onClick={() => setIhalePublishSuccess(false)}>
+                            <div className="ihale-publish-link-row">
+                                <span className="material-symbols-outlined ihale-publish-link-row__icon">link</span>
+                                <input
+                                    className="ihale-publish-link-row__input"
+                                    readOnly
+                                    value={`https://tedport.com/ihaleler?ihale=${ihalePublishSuccess}`}
+                                    onFocus={e => e.target.select()}
+                                />
+                                <button
+                                    className={`ihale-publish-link-row__copy${publishedLinkCopied ? ' ihale-publish-link-row__copy--done' : ''}`}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`https://tedport.com/ihaleler?ihale=${ihalePublishSuccess}`);
+                                        setPublishedLinkCopied(true);
+                                        setTimeout(() => setPublishedLinkCopied(false), 2000);
+                                    }}
+                                >
+                                    <span className="material-symbols-outlined">{publishedLinkCopied ? 'check' : 'content_copy'}</span>
+                                    {publishedLinkCopied ? 'Kopyalandı!' : 'Linki Kopyala'}
+                                </button>
+                            </div>
+                            <button className="teklif-success-card__btn" onClick={() => setIhalePublishSuccess(null)}>
                                 Tamam
                             </button>
                         </div>

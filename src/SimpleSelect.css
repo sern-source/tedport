@@ -1,0 +1,130 @@
+/* Enes Doğanay | 1 Mayıs 2026: SimpleSelect dropdown stilleri — CitySelect ile uyumlu */
+
+.simple-select {
+  position: relative;
+  width: 100%;
+}
+
+.simple-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  color: #111827;
+  background: #fafbfc;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  text-align: left;
+}
+
+.simple-select-trigger:hover {
+  border-color: #d1d5db;
+}
+
+.simple-select-trigger--open {
+  border-color: #137fec;
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
+  background: #ffffff;
+}
+
+.simple-select-icon {
+  font-size: 18px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.simple-select-placeholder {
+  flex: 1;
+  color: #9ca3af;
+}
+
+.simple-select-value {
+  flex: 1;
+  color: #111827;
+  font-weight: 500;
+}
+
+.simple-select-arrow {
+  font-size: 20px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Dropdown panel */
+.simple-select-dropdown {
+  background: #ffffff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+  animation: simpleSelectIn 0.15s ease;
+}
+
+@keyframes simpleSelectIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.simple-select-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.simple-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.1s;
+  user-select: none;
+}
+
+.simple-select-option:hover {
+  background: #f0f7ff;
+  color: #137fec;
+}
+
+.simple-select-option--active {
+  background: #eff6ff;
+  color: #137fec;
+  font-weight: 600;
+}
+
+.simple-select-option--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.simple-select-opt-icon {
+  font-size: 16px;
+  color: #9ca3af;
+}
+
+.simple-select-option:hover .simple-select-opt-icon,
+.simple-select-option--active .simple-select-opt-icon {
+  color: #137fec;
+}
+
+.simple-select-opt-label {
+  flex: 1;
+}
+
+.simple-select-opt-check {
+  font-size: 16px;
+  color: #137fec;
+  margin-left: auto;
+}

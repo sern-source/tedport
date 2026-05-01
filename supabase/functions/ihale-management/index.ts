@@ -74,6 +74,253 @@ const safeDate = (v?: string | null): string | null => {
 // Enes Doganay | 6 Nisan 2026: Bugunun tarihini YYYY-MM-DD formatinda doner
 const today = (): string => new Date().toISOString().split("T")[0];
 
+// Enes Doganay | 1 Mayis 2026: Davet emaillerini gonder — DB sorgusu yok, direkt Resend
+const sendInvitationEmails = async (
+    emails: string[],
+    tenderBaslik: string,
+    tenderId: string,
+    firmaAdi: string,
+): Promise<void> => {
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL");
+    if (!resendApiKey || !fromEmail) return;
+
+    const tenderUrl = `https://tedport.com/ihaleler?ihale=${tenderId}`;
+    const safe = (s: string) =>
+        String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
+            />/g,
+            "&gt;",
+        ).replace(/"/g, "&quot;");
+    const safeBaslik = safe(tenderBaslik);
+    const safeFirma = safe(firmaAdi);
+    const safeUrl = tenderUrl; // URL has no user input, no escaping needed for href
+
+    const html = `<!DOCTYPE html>
+<html lang="tr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+<style>
+  body, table, td, p, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+  table, td { mso-table-lspace:0pt; mso-table-rspace:0pt; }
+  img { border:0; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+  @media only screen and (max-width:620px) {
+    .email-wrap { width:100% !important; padding:20px 8px !important; }
+    .email-container { width:100% !important; }
+    .section-pad { padding-left:20px !important; padding-right:20px !important; }
+    .btn-td { text-align:center !important; }
+  }
+</style>
+</head>
+<body style="margin:0; padding:0; background-color:#f1f5f9;">
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f1f5f9">
+  <tr>
+    <td class="email-wrap" align="center" style="padding:40px 16px;">
+
+      <!-- ═══ CONTAINER ═══ -->
+      <table class="email-container" role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; width:100%;">
+
+        <!-- ── HEADER ── -->
+        <tr>
+          <td bgcolor="#1e3a8a" style="background-color:#1e3a8a; background-image:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 60%,#3b82f6 100%); border-radius:16px 16px 0 0; padding:32px 40px 28px 40px;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td valign="middle">
+                  <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:20px; font-weight:bold; color:#ffffff;">Tedport</p>
+                  <p style="margin:3px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#93c5fd; text-transform:uppercase; letter-spacing:1px;">Tedarik Portali</p>
+                </td>
+                <td align="right" valign="middle">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td bgcolor="#2d5be3" style="background-color:#2d5be3; border-radius:20px; padding:5px 14px;">
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:bold; color:#dbeafe;">IHALE DAVETI</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <!-- Heading -->
+            <p style="margin:24px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:26px; font-weight:bold; color:#ffffff; line-height:1.25;">Yeni bir ihaleye<br>davet edildiniz!</p>
+            <p style="margin:10px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#93c5fd; line-height:1.6;"><strong style="color:#ffffff;">${safeFirma}</strong> firmasi sizi Tedport uzerindeki bir ihaleye teklif vermeye davet etti.</p>
+          </td>
+        </tr>
+
+        <!-- ── WHITE BODY ── -->
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff; border-radius:0 0 16px 16px; padding:0 0 32px 0;">
+
+            <!-- Tender card -->
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td class="section-pad" style="padding:28px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:2px solid #bfdbfe; border-radius:12px;">
+                    <tr>
+                      <td bgcolor="#eff6ff" style="background-color:#eff6ff; border-radius:10px; padding:20px 22px;">
+                        <p style="margin:0 0 8px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; color:#2563eb; text-transform:uppercase; letter-spacing:1.5px;">IHALE BASLIGI</p>
+                        <p style="margin:0 0 14px 0; font-family:Arial,Helvetica,sans-serif; font-size:18px; font-weight:bold; color:#0f172a; line-height:1.35;">${safeBaslik}</p>
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td style="padding-right:8px;">
+                              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                  <td bgcolor="#dbeafe" style="background-color:#dbeafe; border-radius:20px; padding:4px 12px;">
+                                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:bold; color:#1d4ed8;">Aktif Ihale</p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td>
+                              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                  <td bgcolor="#dcfce7" style="background-color:#dcfce7; border-radius:20px; padding:4px 12px;">
+                                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:bold; color:#15803d;">Teklif Verilebilir</p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- Firma box -->
+              <tr>
+                <td class="section-pad" style="padding:14px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #e2e8f0; border-radius:10px;">
+                    <tr>
+                      <td bgcolor="#f8fafc" style="background-color:#f8fafc; border-radius:9px; padding:14px 18px;">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                          <tr>
+                            <td width="44" valign="middle">
+                              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                  <td width="40" height="40" bgcolor="#1d4ed8" style="background-color:#1d4ed8; border-radius:8px; text-align:center; vertical-align:middle;">
+                                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:18px; line-height:40px; text-align:center; color:#ffffff;">&#127970;</p>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td style="padding-left:12px;" valign="middle">
+                              <p style="margin:0 0 2px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#94a3b8; font-weight:bold; text-transform:uppercase; letter-spacing:1px;">Davet Eden Firma</p>
+                              <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:16px; font-weight:bold; color:#0f172a;">${safeFirma}</p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- CTA Button -->
+              <tr>
+                <td class="section-pad btn-td" align="center" style="padding:28px 32px 0 32px; text-align:center;">
+                  <!--[if mso]>
+                  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${safeUrl}" style="height:52px;v-text-anchor:middle;width:340px;" arcsize="17%" strokecolor="#1d4ed8" fillcolor="#1d4ed8">
+                    <w:anchorlock/>
+                    <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;">Ihaleyi Goruntule ve Teklif Ver</center>
+                  </v:roundrect>
+                  <![endif]-->
+                  <!--[if !mso]><!-->
+                  <a href="${safeUrl}" style="display:inline-block; background-color:#1d4ed8; color:#ffffff; text-decoration:none; font-family:Arial,Helvetica,sans-serif; font-size:15px; font-weight:bold; padding:15px 36px; border-radius:10px; mso-hide:all;">Ihaleyi Goruntule ve Teklif Ver</a>
+                  <!--<![endif]-->
+                  <p style="margin:12px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#94a3b8; text-align:center; line-height:1.7;">Ya da bu linki tarayiciniza kopyalayin:<br><a href="${safeUrl}" style="color:#2563eb; font-size:11px; word-break:break-all;">${safeUrl}</a></p>
+                </td>
+              </tr>
+
+              <!-- Steps -->
+              <tr>
+                <td class="section-pad" style="padding:24px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                      <td bgcolor="#f8fafc" style="background-color:#f8fafc; border-radius:10px; padding:18px 20px;">
+                        <p style="margin:0 0 12px 0; font-family:Arial,Helvetica,sans-serif; font-size:13px; font-weight:bold; color:#1e40af;">Nasil teklif veririm?</p>
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                          <tr>
+                            <td width="22" valign="top" style="padding:4px 0;"><p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#475569;">1.</p></td>
+                            <td style="padding:4px 0 4px 6px;"><p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#475569; line-height:1.5;">Yukaridaki butona tiklayarak ihaleyi goruntuleyin.</p></td>
+                          </tr>
+                          <tr>
+                            <td width="22" valign="top" style="padding:4px 0;"><p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#475569;">2.</p></td>
+                            <td style="padding:4px 0 4px 6px;"><p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#475569; line-height:1.5;">Hesabiniza giris yapin ya da kayit olun.</p></td>
+                          </tr>
+                          <tr>
+                            <td width="22" valign="top" style="padding:4px 0;"><p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#475569;">3.</p></td>
+                            <td style="padding:4px 0 4px 6px;"><p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#475569; line-height:1.5;">&quot;Teklif Ver&quot; butonuna tiklayarak teklifinizi olusturun.</p></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td class="section-pad" style="padding:24px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                      <td style="border-top:1px solid #e2e8f0; padding-top:20px;" colspan="2"></td>
+                    </tr>
+                    <tr>
+                      <td valign="top">
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#94a3b8; line-height:1.7;">Bu e-posta, <strong style="color:#64748b;">${safeFirma}</strong> firmasinin<br>Tedport uzerinden gonderdigi otomatik bir davet bildirimidir.<br>Sorulariniz icin <a href="mailto:info@tedport.com" style="color:#2563eb; text-decoration:none;">info@tedport.com</a></p>
+                      </td>
+                      <td align="right" valign="top" style="padding-left:16px; white-space:nowrap;">
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; font-weight:bold; color:#1e40af;">Tedport</p>
+                        <p style="margin:2px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#94a3b8;">tedport.com</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+      <!-- ═══ /CONTAINER ═══ -->
+
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
+
+    for (const rawEmail of emails) {
+        const email = String(rawEmail || "").trim().toLowerCase();
+        if (!email) continue;
+        const resp = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${resendApiKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                from: fromEmail,
+                to: [email],
+                subject: `${safeFirma} sizi ihaleye davet etti — Tedport`,
+                html,
+            }),
+        });
+        if (!resp.ok) {
+            console.error(
+                "Davet maili gonderilemedi:",
+                email,
+                await resp.text(),
+            );
+        } else {
+            console.log("Davet maili gonderildi:", email);
+        }
+    }
+};
+
 // Enes Doganay | 6 Nisan 2026: Durum degeri DB CHECK constraint ile uyumlu olmali
 const VALID_DURUM = ["draft", "canli", "kapali"] as const;
 const normalizeDurum = (v: unknown): string => {
@@ -184,6 +431,31 @@ Deno.serve(async (request) => {
                 .single();
 
             if (error) throw error;
+
+            // Enes Doganay | 1 Mayis 2026: Taslak degilse davet emaillerini gonder
+            const inviteEmails = Array.isArray(t.davet_emailleri)
+                ? t.davet_emailleri.filter(Boolean) as string[]
+                : [];
+            if (data.durum !== "draft" && inviteEmails.length > 0) {
+                const { data: firmaRow } = await supabaseAdmin
+                    .from("firmalar")
+                    .select("firma_adi")
+                    .eq("firmaID", firmaId)
+                    .maybeSingle();
+                const firmaAdi =
+                    (firmaRow as { firma_adi?: string } | null)?.firma_adi ??
+                        "Bilinmeyen Firma";
+                await sendInvitationEmails(
+                    inviteEmails,
+                    data.baslik,
+                    String(data.id),
+                    firmaAdi,
+                )
+                    .catch((err) =>
+                        console.error("sendInvitationEmails hata:", err)
+                    );
+            }
+
             return jsonResponse({ tender: data }, 201);
         }
 
@@ -248,7 +520,36 @@ Deno.serve(async (request) => {
                     error: "Ihale bulunamadi veya bu firmaya ait degil.",
                 }, 404);
             }
-            return jsonResponse({ tender: updated[0] });
+
+            // Enes Doganay | 1 Mayis 2026: Taslak -> canli gecisinde davet emaillerini gonder
+            const updatedTender = updated[0];
+            const updInviteEmails = Array.isArray(t.davet_emailleri)
+                ? t.davet_emailleri.filter(Boolean) as string[]
+                : [];
+            if (updatedTender.durum !== "draft" && updInviteEmails.length > 0) {
+                const { data: updFirmaRow } = await supabaseAdmin
+                    .from("firmalar")
+                    .select("firma_adi")
+                    .eq("firmaID", firmaId)
+                    .maybeSingle();
+                const updFirmaAdi =
+                    (updFirmaRow as { firma_adi?: string } | null)?.firma_adi ??
+                        "Bilinmeyen Firma";
+                await sendInvitationEmails(
+                    updInviteEmails,
+                    updatedTender.baslik,
+                    String(updatedTender.id),
+                    updFirmaAdi,
+                )
+                    .catch((err) =>
+                        console.error(
+                            "sendInvitationEmails (update) hata:",
+                            err,
+                        )
+                    );
+            }
+
+            return jsonResponse({ tender: updatedTender });
         }
 
         // ── Sil ────────────────────────────────────────────────────────────

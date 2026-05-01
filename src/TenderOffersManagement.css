@@ -1922,6 +1922,73 @@
 }
 
 /* ═══════════════════════════════════════════════════
+   Enes Doğanay | 1 Mayıs 2026: Paylaşılabilir İhale Linki
+   ═══════════════════════════════════════════════════ */
+.tom-share-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f0f7ff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    margin-bottom: 14px;
+}
+
+.tom-share-link-row__icon {
+    font-size: 18px;
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.tom-share-link-row__input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    font-family: 'Inter', monospace;
+    color: #1e40af;
+    outline: none;
+    cursor: text;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tom-share-link-row__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    padding: 6px 12px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.tom-share-link-row__copy:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.tom-share-link-row__copy--done {
+    background: #059669 !important;
+    transform: none !important;
+}
+
+.tom-share-link-row__copy .material-symbols-outlined {
+    font-size: 15px;
+}
+
+/* ═══════════════════════════════════════════════════
    Enes Doğanay | 13 Nisan 2026: İhale Aksiyon Butonları
    ═══════════════════════════════════════════════════ */
 .tom-tender-actions {

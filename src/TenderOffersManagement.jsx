@@ -4,7 +4,9 @@ import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { updateTender, deleteTender, createTender as createTenderApi } from './ihaleManagementApi';
+import { buildInviteMailto } from './tenderUtils';
 import CitySelect from './CitySelect';
+import SimpleSelect from './SimpleSelect';
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
 import './TenderOffersManagement.css';
 import './Ihaleler.css';
@@ -206,6 +208,7 @@ const TenderOffersManagement = ({ companyId }) => {
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [closingTenderId, setClosingTenderId] = useState(null);
     const [closeConfirmId, setCloseConfirmId] = useState(null);
+    const [copiedLink, setCopiedLink] = useState(false);
 
     /* Enes Doğanay | 15 Nisan 2026: Akıllı puanlama bilgilendirme popup */
     const [showScoringInfo, setShowScoringInfo] = useState(false);
@@ -250,6 +253,8 @@ const TenderOffersManagement = ({ companyId }) => {
     const createFileInputRef = useRef(null);
     const createFirmaResultsRef = useRef(null);
     const [createIsVerifiedUser, setCreateIsVerifiedUser] = useState(false);
+    const [createEmailStatus, setCreateEmailStatus] = useState(null); // null | 'checking' | 'valid' | 'not_found'
+    const createEmailCheckTimeout = useRef(null);
 
     /* Enes Doğanay | 13 Nisan 2026: Favoriler ve notlar localStorage ile kalıcı */
     const [shortlist, setShortlist] = useState(() => {
@@ -854,11 +859,16 @@ const TenderOffersManagement = ({ companyId }) => {
     /* Enes Doğanay | 15 Nisan 2026: Stepper modal açma */
     const openCreateModal = async () => {
         const refNo = await generateCreateRefNo();
-        setCreateForm({ ...CREATE_EMPTY_FORM, referans_no: refNo, gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [] });
+        const todayStr = new Date().toISOString().split('T')[0];
+        const twoWeeksLater = new Date();
+        twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+        const twoWeeksStr = twoWeeksLater.toISOString().split('T')[0];
+        setCreateForm({ ...CREATE_EMPTY_FORM, referans_no: refNo, gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [], yayin_tarihi: todayStr, son_basvuru_tarihi: twoWeeksStr, teslim_suresi: '14' });
         setCreateFormError('');
         setCreateYeniGereksinimMadde('');
         setCreateYeniGereksinimAciklama('');
         setCreateEmailInput('');
+        setCreateEmailStatus(null);
         setCreateFirmaSearchTerm('');
         setCreateFirmaSearchResults([]);
         setCreateStepperStep(0);
@@ -875,13 +885,35 @@ const TenderOffersManagement = ({ companyId }) => {
     };
     const createRemoveGereksinim = (id) => setCreateForm(p => ({ ...p, gereksinimler: p.gereksinimler.filter(g => g.id !== id) }));
 
+    // Enes Doğanay | 1 Mayıs 2026: E-posta DB kontrolü — sisteme kayıtlı mı?
+    const checkCreateEmailInDb = useCallback(async (email) => {
+        const trimmed = email.trim().toLowerCase();
+        if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) { setCreateEmailStatus(null); return; }
+        setCreateEmailStatus('checking');
+        try {
+            const { data, error } = await supabase.from('profiles').select('id').eq('email', trimmed).maybeSingle();
+            if (error) throw error;
+            setCreateEmailStatus(data ? 'valid' : 'not_found');
+        } catch { setCreateEmailStatus(null); }
+    }, []);
+
+    const handleCreateEmailInputChange = (e) => {
+        const val = e.target.value;
+        setCreateEmailInput(val);
+        setCreateEmailStatus(null);
+        if (createEmailCheckTimeout.current) clearTimeout(createEmailCheckTimeout.current);
+        createEmailCheckTimeout.current = setTimeout(() => checkCreateEmailInDb(val), 500);
+    };
+
     // Enes Doğanay | 15 Nisan 2026: E-posta tag input
     const createAddEmail = () => {
         const email = createEmailInput.trim().toLowerCase();
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+        if (createEmailStatus !== 'valid') return;
         if (createForm.davet_emailleri.includes(email)) return;
         setCreateForm(p => ({ ...p, davet_emailleri: [...p.davet_emailleri, email] }));
         setCreateEmailInput('');
+        setCreateEmailStatus(null);
     };
     const createRemoveEmail = (email) => setCreateForm(p => ({ ...p, davet_emailleri: p.davet_emailleri.filter(e => e !== email) }));
     const createHandleEmailKeyDown = (e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); createAddEmail(); } };
@@ -925,6 +957,12 @@ const TenderOffersManagement = ({ companyId }) => {
         setCreateFormSaving(true);
         setCreateFormError('');
         try {
+            // Inputta yazılı geçerli email varsa otomatik ekle (+ butonuna basmayı unutanlar için)
+            const pendingEmail = createEmailInput.trim().toLowerCase();
+            const finalInviteEmails = (pendingEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pendingEmail) && createEmailStatus === 'valid' && !createForm.davet_emailleri.includes(pendingEmail))
+                ? [...createForm.davet_emailleri, pendingEmail]
+                : createForm.davet_emailleri;
+
             if (createForm.ihale_tipi === 'Davetli İhale' && createForm.davetli_firmalar.length === 0) {
                 setCreateFormError('Davetli ihale için en az bir firma eklemeniz gerekiyor.');
                 setCreateFormSaving(false);
@@ -956,6 +994,7 @@ const TenderOffersManagement = ({ companyId }) => {
                 durum: forceDurum || createForm.durum,
                 il_ilce: [createForm.teslim_il, createForm.teslim_ilce].filter(Boolean).join(' / '),
                 ek_dosyalar: uploadedFiles,
+                davet_emailleri: finalInviteEmails,
             };
             await createTenderApi(payload);
             setShowCreateModal(false);
@@ -1207,6 +1246,31 @@ const TenderOffersManagement = ({ companyId }) => {
                                                 </div>
                                             );
                                         })()}
+                                        {/* Enes Doğanay | 1 Mayıs 2026: Paylaşılabilir ihale linki */}
+                                        {selectedTender.durum !== 'draft' && (
+                                            <div className="tom-share-link-row">
+                                                <span className="material-symbols-outlined tom-share-link-row__icon">link</span>
+                                                <input
+                                                    className="tom-share-link-row__input"
+                                                    readOnly
+                                                    value={`https://tedport.com/ihaleler?ihale=${selectedTender.id}`}
+                                                    onFocus={e => e.target.select()}
+                                                />
+                                                <button
+                                                    className={`tom-share-link-row__copy${copiedLink ? ' tom-share-link-row__copy--done' : ''}`}
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(`https://tedport.com/ihaleler?ihale=${selectedTender.id}`);
+                                                        setCopiedLink(true);
+                                                        setTimeout(() => setCopiedLink(false), 2000);
+                                                    }}
+                                                    title="Linki kopyala"
+                                                >
+                                                    <span className="material-symbols-outlined">{copiedLink ? 'check' : 'content_copy'}</span>
+                                                    {copiedLink ? 'Kopyalandı!' : 'Kopyala'}
+                                                </button>
+                                            </div>
+                                        )}
+
                                         {/* Enes Doğanay | 13 Nisan 2026: İhale yönetim aksiyonları — düzenle/kapat/sil */}
                                         {/* Enes Doğanay | 15 Nisan 2026: İhaleyi tekrarla butonu + silme uyarısı iyileştirildi + kapatma görünürlük sorusu */}
                                         <div className="tom-tender-actions">
@@ -2161,30 +2225,35 @@ const TenderOffersManagement = ({ companyId }) => {
                             {createStepperStep === 1 && (
                                 <div className="ihale-step-content">
                                     <div className="ihale-modal__grid">
-                                        <label className="ihale-field">
+                                        <div className="ihale-field">
                                             <span>İhale Tipi *</span>
-                                            <select value={createForm.ihale_tipi} onChange={e => {
-                                                const val = e.target.value;
-                                                if (val === 'Davetli İhale' && !createIsVerifiedUser) return;
-                                                setCreateForm(p => ({
-                                                    ...p,
-                                                    ihale_tipi: val,
-                                                    ...(val !== 'Davetli İhale' ? { davetli_firmalar: [] } : {}),
-                                                }));
-                                            }}>
-                                                <option value="Açık İhale">Açık İhale</option>
-                                                <option value="Davetli İhale" disabled={!createIsVerifiedUser}>
-                                                    Davetli İhale {!createIsVerifiedUser ? '(Onaylı hesap gerekli)' : ''}
-                                                </option>
-                                            </select>
-                                        </label>
-                                        <label className="ihale-field">
+                                            <SimpleSelect
+                                                value={createForm.ihale_tipi}
+                                                onChange={val => {
+                                                    if (val === 'Davetli İhale' && !createIsVerifiedUser) return;
+                                                    setCreateForm(p => ({
+                                                        ...p,
+                                                        ihale_tipi: val,
+                                                        ...(val !== 'Davetli İhale' ? { davetli_firmalar: [] } : {}),
+                                                    }));
+                                                }}
+                                                options={[
+                                                    { value: 'Açık İhale', label: 'Açık İhale', icon: 'public' },
+                                                    { value: 'Davetli İhale', label: createIsVerifiedUser ? 'Davetli İhale' : 'Davetli İhale (Onaylı hesap gerekli)', icon: 'group', disabled: !createIsVerifiedUser },
+                                                ]}
+                                            />
+                                        </div>
+                                        <div className="ihale-field">
                                             <span>KDV Durumu</span>
-                                            <select value={createForm.kdv_durumu} onChange={e => setCreateForm(p => ({ ...p, kdv_durumu: e.target.value }))}>
-                                                <option value="haric">KDV Hariç</option>
-                                                <option value="dahil">KDV Dahil</option>
-                                            </select>
-                                        </label>
+                                            <SimpleSelect
+                                                value={createForm.kdv_durumu}
+                                                onChange={val => setCreateForm(p => ({ ...p, kdv_durumu: val }))}
+                                                options={[
+                                                    { value: 'haric', label: 'KDV Hariç', icon: 'receipt_long' },
+                                                    { value: 'dahil', label: 'KDV Dahil', icon: 'receipt' },
+                                                ]}
+                                            />
+                                        </div>
                                         <label className="ihale-field">
                                             <span>İhale Açılış Tarihi *</span>
                                             <input type="date" value={createForm.yayin_tarihi} onChange={e => setCreateForm(p => ({ ...p, yayin_tarihi: e.target.value }))} />
@@ -2216,12 +2285,45 @@ const TenderOffersManagement = ({ companyId }) => {
                                             Davet Edilecek E-postalar
                                         </span>
                                         <p className="ihale-section__desc">İhale yayınlandığında bu adreslere bildirim gönderilecek.</p>
-                                        <div className="ihale-email-input-row">
-                                            <input type="email" placeholder="ornek@firma.com" value={createEmailInput} onChange={e => setCreateEmailInput(e.target.value)} onKeyDown={createHandleEmailKeyDown} />
-                                            <button type="button" className="ihale-email-add-btn" onClick={createAddEmail}>
+                                        <div className={`ihale-email-input-row${createEmailStatus === 'valid' ? ' ihale-email-input-row--valid' : createEmailStatus === 'not_found' ? ' ihale-email-input-row--error' : ''}`}>
+                                            <input
+                                                type="email"
+                                                placeholder="ornek@firma.com"
+                                                value={createEmailInput}
+                                                onChange={handleCreateEmailInputChange}
+                                                onKeyDown={createHandleEmailKeyDown}
+                                            />
+                                            {createEmailStatus === 'checking' && (
+                                                <span className="ihale-email-status-icon ihale-email-status-icon--checking material-symbols-outlined">autorenew</span>
+                                            )}
+                                            {createEmailStatus === 'valid' && (
+                                                <span className="ihale-email-status-icon ihale-email-status-icon--valid material-symbols-outlined">check_circle</span>
+                                            )}
+                                            {createEmailStatus === 'not_found' && (
+                                                <span className="ihale-email-status-icon ihale-email-status-icon--error material-symbols-outlined">cancel</span>
+                                            )}
+                                            <button type="button" className="ihale-email-add-btn" onClick={createAddEmail} disabled={createEmailStatus !== 'valid'}>
                                                 <span className="material-symbols-outlined">add</span>
                                             </button>
                                         </div>
+                                        {createEmailStatus === 'not_found' && createEmailInput.trim().length > 0 && (
+                                            <div className="ihale-email-warning">
+                                                <span className="material-symbols-outlined">info</span>
+                                                <div className="ihale-email-warning__content">
+                                                    <span>
+                                                        <strong>{createEmailInput.trim()}</strong> adresine sahip bir kullanıcı sistemimizde bulunamadı.
+                                                        Aşağıdaki butona tıklayarak hazır bir davet e-postası gönderebilirsiniz.
+                                                    </span>
+                                                    <a
+                                                        className="ihale-email-invite-btn"
+                                                        href={buildInviteMailto(createEmailInput.trim())}
+                                                    >
+                                                        <span className="material-symbols-outlined">send</span>
+                                                        Davet E-postası Gönder
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        )}
                                         {createForm.davet_emailleri.length > 0 && (
                                             <div className="ihale-email-tags">
                                                 {createForm.davet_emailleri.map(email => (
