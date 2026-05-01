@@ -663,30 +663,84 @@
 
 /* Sıralama dropdown */
 .tom-sort-wrap {
+    position: relative;
+}
+
+.tom-sort-trigger {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 0 12px;
+    padding: 0 10px;
     height: 38px;
     border-radius: 10px;
     border: 1px solid #e2e8f0;
     background: #fff;
-    transition: border-color 0.2s;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
 }
 
-.tom-sort-wrap:focus-within { border-color: #93c5fd; }
-.tom-sort-wrap .material-symbols-outlined { font-size: 18px; color: #94a3b8; }
+.tom-sort-trigger:hover { border-color: #93c5fd; }
+.tom-sort-trigger .material-symbols-outlined { font-size: 18px; color: #94a3b8; }
 
-.tom-sort-select {
+.tom-sort-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.tom-sort-chevron {
+    font-size: 17px;
+    color: #94a3b8;
+    transition: transform 0.2s;
+}
+
+.tom-sort-chevron.open { transform: rotate(180deg); }
+
+.tom-sort-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 175px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    z-index: 200;
+    overflow: hidden;
+    animation: tomSortMenuIn 0.15s ease;
+}
+
+@keyframes tomSortMenuIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tom-sort-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 14px;
     border: none;
-    outline: none;
     background: transparent;
     font-family: inherit;
     font-size: 0.82rem;
-    color: #0f172a;
-    cursor: pointer;
     font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-align: left;
 }
+
+.tom-sort-option .material-symbols-outlined { font-size: 17px; color: #94a3b8; }
+
+.tom-sort-option:hover { background: #f1f5f9; }
+
+.tom-sort-option.active { color: #2563eb; background: #eff6ff; }
+
+.tom-sort-option.active .material-symbols-outlined { color: #2563eb; }
 
 /* Enes Doğanay | 13 Nisan 2026: Teklif filtre chipleri */
 .tom-offers-filters {

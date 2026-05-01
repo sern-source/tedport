@@ -842,6 +842,14 @@ function App() {
   const [viewMode, setViewMode] = useState('grid');
   // Enes Doğanay | 14 Nisan 2026: Sıralama modu state'i
   const [sortMode, setSortMode] = useState(savedState?.sortMode || 'default');
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef(null);
+  useEffect(() => {
+    if (!sortDropdownOpen) return;
+    const handler = (e) => { if (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target)) setSortDropdownOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [sortDropdownOpen]);
   const [currentUserId, setCurrentUserId] = useState(null);
   // Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişim dropdown hangi satırda açık
   const [openContactId, setOpenContactId] = useState(null);
@@ -1290,18 +1298,33 @@ function App() {
                 )}
 
                 <div className="firmalar-toolbar-actions">
-                  <div className="firmalar-sort-wrap">
-                    <span className="material-symbols-outlined firmalar-sort-icon">sort</span>
-                    <select
-                      className="firmalar-sort-select"
-                      value={sortMode}
-                      onChange={(e) => setSortMode(e.target.value)}
+                  <div className="firmalar-sort-wrap" ref={sortDropdownRef}>
+                    <button
+                      type="button"
+                      className="firmalar-sort-trigger"
+                      onClick={() => setSortDropdownOpen(o => !o)}
                     >
-                      {/* Enes Doğanay | 14 Nisan 2026: Akıllı Sıralama + alfabetik seçenekler */}
-                      <option value="default">Akıllı Sıralama</option>
-                      <option value="a-z">A'dan Z'ye</option>
-                      <option value="z-a">Z'den A'ya</option>
-                    </select>
+                      <span className="material-symbols-outlined firmalar-sort-icon">sort</span>
+                      <span className="firmalar-sort-label">
+                        {sortMode === 'default' ? 'Akıllı Sıralama' : sortMode === 'a-z' ? "A'dan Z'ye" : "Z'den A'ya"}
+                      </span>
+                      <span className={`material-symbols-outlined firmalar-sort-chevron${sortDropdownOpen ? ' open' : ''}`}>expand_more</span>
+                    </button>
+                    {sortDropdownOpen && (
+                      <div className="firmalar-sort-menu">
+                        {[{ value: 'default', label: 'Akıllı Sıralama', icon: 'auto_awesome' }, { value: 'a-z', label: "A'dan Z'ye", icon: 'arrow_downward' }, { value: 'z-a', label: "Z'den A'ya", icon: 'arrow_upward' }].map(opt => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            className={`firmalar-sort-option${sortMode === opt.value ? ' active' : ''}`}
+                            onClick={() => { setSortMode(opt.value); setSortDropdownOpen(false); }}
+                          >
+                            <span className="material-symbols-outlined">{opt.icon}</span>
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <button
                     type="button"

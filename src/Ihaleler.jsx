@@ -167,6 +167,14 @@ const IhalelerPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortBy, setSortBy] = useState('deadline');
+    const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+    const sortDropdownRef = useRef(null);
+    useEffect(() => {
+        if (!sortDropdownOpen) return;
+        const handler = (e) => { if (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target)) setSortDropdownOpen(false); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [sortDropdownOpen]);
     const [selectedFirmaName, setSelectedFirmaName] = useState('');
     const [tableMissing, setTableMissing] = useState(false);
     const [page, setPage] = useState(1);
@@ -1871,13 +1879,37 @@ const IhalelerPage = () => {
                         ))}
                     </div>
 
-                    <div className="tenders-sort-box">
-                        <span className="material-symbols-outlined">swap_vert</span>
-                        <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
-                            <option value="deadline">Son Başvuru Tarihi</option>
-                            <option value="newest">Yeni Yayınlanan</option>
-                            <option value="title">Başlığa Göre</option>
-                        </select>
+                    <div className="tenders-sort-box" ref={sortDropdownRef}>
+                        <button
+                            type="button"
+                            className="tenders-sort-trigger"
+                            onClick={() => setSortDropdownOpen(o => !o)}
+                        >
+                            <span className="material-symbols-outlined">swap_vert</span>
+                            <span className="tenders-sort-label">
+                                {sortBy === 'deadline' ? 'Son Başvuru Tarihi' : sortBy === 'newest' ? 'Yeni Yayınlanan' : 'Başlığa Göre'}
+                            </span>
+                            <span className={`material-symbols-outlined tenders-sort-chevron${sortDropdownOpen ? ' open' : ''}`}>expand_more</span>
+                        </button>
+                        {sortDropdownOpen && (
+                            <div className="tenders-sort-menu">
+                                {[
+                                    { value: 'deadline', label: 'Son Başvuru Tarihi', icon: 'event' },
+                                    { value: 'newest',   label: 'Yeni Yayınlanan',     icon: 'fiber_new' },
+                                    { value: 'title',    label: 'Başlığa Göre',       icon: 'sort_by_alpha' }
+                                ].map(opt => (
+                                    <button
+                                        key={opt.value}
+                                        type="button"
+                                        className={`tenders-sort-option${sortBy === opt.value ? ' active' : ''}`}
+                                        onClick={() => { setSortBy(opt.value); setSortDropdownOpen(false); }}
+                                    >
+                                        <span className="material-symbols-outlined">{opt.icon}</span>
+                                        {opt.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     {totalPages > 1 && (
                         <div className="tenders-mini-pagination">

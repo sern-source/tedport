@@ -168,7 +168,7 @@ const About = () => {
 
                                 <div className="about-timeline-item left">
                                     <div className="about-timeline-content text-right">
-                                        <h3>Ocak 2026</h3>
+                                        <h3>Eylül 2025</h3>
                                         <h4>Fikrin Doğuşu</h4>
                                         <p>Tedport fikri, Türkiye’deki B2B tedarik süreçlerinin dijitalleştirilmesi ihtiyacından doğdu. 3 kişilik kurucu ekip olarak yolculuğumuza başladık.</p>
                                     </div>
@@ -180,20 +180,30 @@ const About = () => {
                                     <div className="about-timeline-empty"></div>
                                     <div className="about-timeline-dot outline"><div></div></div>
                                     <div className="about-timeline-content text-left">
-                                        <h3>Mart 2026</h3>
-                                        <h4>Platform Lansmanı</h4>
-                                        <p>Tedport.com yayına alındı. Firma kayıtları, arama, filtreleme ve teklif sistemi ile hizmete başlandı.</p>
+                                        <h3>Ocak 2026</h3>
+                                        <h4>Platform Geliştirme</h4>
+                                        <p>Yoğun geliştirme sürecine girildi. Teknik altyapı kuruldu, tasarım tamamlandı ve beta testleri başlatıldı.</p>
                                     </div>
                                 </div>
 
                                 <div className="about-timeline-item left">
                                     <div className="about-timeline-content text-right">
+                                        <h3>Mart 2026</h3>
+                                        <h4>Platform Lansmanı</h4>
+                                        <p>Tedport.com yayına alındı. Firma kayıtları, arama, filtreleme ve teklif sistemi ile hizmete başlandı.</p>
+                                    </div>
+                                    <div className="about-timeline-dot outline"><div></div></div>
+                                    <div className="about-timeline-empty"></div>
+                                </div>
+
+                                <div className="about-timeline-item right">
+                                    <div className="about-timeline-empty"></div>
+                                    <div className="about-timeline-dot outline"><div></div></div>
+                                    <div className="about-timeline-content text-left">
                                         <h3>Nisan 2026</h3>
                                         <h4>Büyüme Dönemi</h4>
                                         <p>İhale sistemi, kurumsal hesaplar ve gelişmiş filtreleme özellikleri eklendi. 81 il kapsamında hizmet verilmeye başlandı.</p>
                                     </div>
-                                    <div className="about-timeline-dot outline"><div></div></div>
-                                    <div className="about-timeline-empty"></div>
                                 </div>
 
                             </div>

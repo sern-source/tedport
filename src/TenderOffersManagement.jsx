@@ -169,6 +169,14 @@ const TenderOffersManagement = ({ companyId }) => {
     const [tenderFilter, setTenderFilter] = useState('all');
     const [offerFilter, setOfferFilter] = useState('all');
     const [offerSort, setOfferSort] = useState('score');
+    const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+    const sortDropdownRef = useRef(null);
+    useEffect(() => {
+        if (!sortDropdownOpen) return;
+        const handler = (e) => { if (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target)) setSortDropdownOpen(false); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [sortDropdownOpen]);
     const [compareIds, setCompareIds] = useState([]);
     /* Enes Doğanay | 15 Nisan 2026: Karşılaştırma özelliği onboarding ipucu */
     const [compareHintDismissed, setCompareHintDismissed] = useState(() =>
@@ -292,6 +300,16 @@ const TenderOffersManagement = ({ companyId }) => {
                         a[k].push(o);
                         return a;
                     }, {});
+                }
+
+                /* Süresi dolmuş aktif ihaleleri otomatik kapat */
+                const now = new Date();
+                const expiredIds = rows
+                    .filter(t => ['canli', 'active'].includes(String(t.durum).toLowerCase()) && t.son_basvuru_tarihi && new Date(t.son_basvuru_tarihi) < now)
+                    .map(t => t.id);
+                if (expiredIds.length > 0) {
+                    await supabase.from('firma_ihaleleri').update({ durum: 'kapali' }).in('id', expiredIds);
+                    rows = rows.map(t => expiredIds.includes(t.id) ? { ...t, durum: 'kapali' } : t);
                 }
 
                 setTenders(rows);
@@ -1273,15 +1291,39 @@ const TenderOffersManagement = ({ companyId }) => {
                                         >
                                             <span className="material-symbols-outlined">help</span>
                                         </button>
-                                        <div className="tom-sort-wrap">
-                                            <span className="material-symbols-outlined">sort</span>
-                                            <select value={offerSort} onChange={e => setOfferSort(e.target.value)} className="tom-sort-select">
-                                                <option value="score">Puana Göre</option>
-                                                <option value="price-asc">Fiyat ↑</option>
-                                                <option value="price-desc">Fiyat ↓</option>
-                                                <option value="delivery">Teslim Süresi</option>
-                                                <option value="date">Tarih (Yeni)</option>
-                                            </select>
+                                        <div className="tom-sort-wrap" ref={sortDropdownRef}>
+                                            <button
+                                                type="button"
+                                                className="tom-sort-trigger"
+                                                onClick={() => setSortDropdownOpen(o => !o)}
+                                            >
+                                                <span className="material-symbols-outlined">sort</span>
+                                                <span className="tom-sort-label">
+                                                    {offerSort === 'score' ? 'Puana Göre' : offerSort === 'price-asc' ? 'Fiyat ↑' : offerSort === 'price-desc' ? 'Fiyat ↓' : offerSort === 'delivery' ? 'Teslim Süresi' : 'Tarih (Yeni)'}
+                                                </span>
+                                                <span className={`material-symbols-outlined tom-sort-chevron${sortDropdownOpen ? ' open' : ''}`}>expand_more</span>
+                                            </button>
+                                            {sortDropdownOpen && (
+                                                <div className="tom-sort-menu">
+                                                    {[
+                                                        { value: 'score',      label: 'Puana Göre',    icon: 'workspace_premium' },
+                                                        { value: 'price-asc',  label: 'Fiyat ↑',        icon: 'arrow_upward' },
+                                                        { value: 'price-desc', label: 'Fiyat ↓',        icon: 'arrow_downward' },
+                                                        { value: 'delivery',   label: 'Teslim Süresi', icon: 'local_shipping' },
+                                                        { value: 'date',       label: 'Tarih (Yeni)',   icon: 'schedule' },
+                                                    ].map(opt => (
+                                                        <button
+                                                            key={opt.value}
+                                                            type="button"
+                                                            className={`tom-sort-option${offerSort === opt.value ? ' active' : ''}`}
+                                                            onClick={() => { setOfferSort(opt.value); setSortDropdownOpen(false); }}
+                                                        >
+                                                            <span className="material-symbols-outlined">{opt.icon}</span>
+                                                            {opt.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

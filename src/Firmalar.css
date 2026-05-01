@@ -1300,18 +1300,25 @@ summary {
 }
 
 .firmalar-sort-wrap {
+  position: relative;
+}
+
+.firmalar-sort-trigger {
   display: flex;
   align-items: center;
-  position: relative;
+  gap: 6px;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   background: #f8fafc;
-  padding: 0 10px 0 8px;
+  padding: 0 10px 0 10px;
   height: 40px;
-  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
 }
 
-.firmalar-sort-wrap:hover {
+.firmalar-sort-trigger:hover {
   border-color: #93c5fd;
   background: #eff6ff;
 }
@@ -1319,36 +1326,87 @@ summary {
 .firmalar-sort-icon {
   font-size: 18px;
   color: #64748b;
-  pointer-events: none;
-  margin-right: 4px;
+  flex-shrink: 0;
 }
 
-.firmalar-sort-select {
+.firmalar-sort-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.firmalar-sort-chevron {
+  font-size: 18px;
+  color: #94a3b8;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.firmalar-sort-chevron.open {
+  transform: rotate(180deg);
+}
+
+.firmalar-sort-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 170px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+  z-index: 200;
+  overflow: hidden;
+  animation: sortMenuIn 0.15s ease;
+}
+
+@keyframes sortMenuIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.firmalar-sort-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
   border: none;
   background: transparent;
+  font-family: inherit;
   font-size: 13px;
   font-weight: 500;
   color: #334155;
   cursor: pointer;
-  outline: none;
-  padding: 0 4px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  font-family: inherit;
+  transition: background 0.15s;
+  text-align: left;
 }
 
-.firmalar-sort-select option {
-  font-size: 13px;
+.firmalar-sort-option .material-symbols-outlined {
+  font-size: 17px;
+  color: #94a3b8;
+}
+
+.firmalar-sort-option:hover {
+  background: #f1f5f9;
+}
+
+.firmalar-sort-option.active {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.firmalar-sort-option.active .material-symbols-outlined {
+  color: #2563eb;
 }
 
 @media (max-width: 480px) {
-  .firmalar-sort-wrap {
+  .firmalar-sort-trigger {
     height: 36px;
     border-radius: 10px;
-    padding: 0 8px 0 6px;
+    padding: 0 8px;
   }
-  .firmalar-sort-select {
+  .firmalar-sort-label {
     font-size: 12px;
   }
   .firmalar-sort-icon {

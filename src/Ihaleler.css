@@ -221,27 +221,100 @@
 .tenders-search-clear .material-symbols-outlined { font-size: 16px; }
 
 .tenders-sort-box {
+    position: relative;
+}
+
+.tenders-sort-trigger {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     min-height: 48px;
-    padding: 0 14px;
+    padding: 0 12px;
     border-radius: 14px;
     background: #fff;
     border: 1px solid rgba(226, 232, 240, 0.9);
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
 }
 
-.tenders-sort-box .material-symbols-outlined { color: #94a3b8; font-size: 20px; }
+.tenders-sort-trigger:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
 
-.tenders-sort-box select {
-    border: none;
-    outline: none;
-    background: transparent;
+.tenders-sort-trigger .material-symbols-outlined { color: #94a3b8; font-size: 20px; }
+
+.tenders-sort-label {
     color: #0f172a;
     font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.tenders-sort-chevron {
+    font-size: 18px;
+    color: #94a3b8;
+    transition: transform 0.2s;
+}
+
+.tenders-sort-chevron.open {
+    transform: rotate(180deg);
+}
+
+.tenders-sort-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 190px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    z-index: 200;
+    overflow: hidden;
+    animation: tendersSortMenuIn 0.15s ease;
+}
+
+@keyframes tendersSortMenuIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tenders-sort-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
     font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #334155;
     cursor: pointer;
+    transition: background 0.15s;
+    text-align: left;
+}
+
+.tenders-sort-option .material-symbols-outlined {
+    font-size: 17px;
+    color: #94a3b8;
+}
+
+.tenders-sort-option:hover {
+    background: #f1f5f9;
+}
+
+.tenders-sort-option.active {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.tenders-sort-option.active .material-symbols-outlined {
+    color: #2563eb;
 }
 
 /* Mini pagination (toolbar) */
