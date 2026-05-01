@@ -73,6 +73,91 @@
 .tenders-mini-stat--closed .material-symbols-outlined { color: #cbd5e1; }
 .tenders-mini-stat--closed strong { color: #cbd5e1; }
 
+/* İlk ihale oluşturma banner'ı */
+.my-tenders-first-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    margin-top: 8px;
+}
+
+.my-tenders-first-banner__icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.my-tenders-first-banner__icon .material-symbols-outlined {
+    font-size: 24px;
+    color: #fff;
+}
+
+.my-tenders-first-banner__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.my-tenders-first-banner__body strong {
+    display: block;
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+}
+
+.my-tenders-first-banner__body p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.my-tenders-first-banner__btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+    white-space: nowrap;
+}
+
+.my-tenders-first-banner__btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.my-tenders-first-banner__btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+@media (max-width: 600px) {
+    .my-tenders-first-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .my-tenders-first-banner__btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* Enes Doğanay | 11 Nisan 2026: Sayfa kapsayıcısı */
 .tenders-page {
     min-height: 100vh;
@@ -1754,6 +1839,52 @@
     color: #64748b !important;
     cursor: default !important;
     border-color: #e2e8f0 !important;
+}
+
+/* Referans No kopyalama satırı */
+.ihale-refno-copy-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ihale-refno-copy-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+.ihale-refno-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    padding: 0 14px;
+    height: 38px;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.ihale-refno-copy-btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.ihale-refno-copy-btn:hover {
+    background: #e2e8f0;
+    color: #1e40af;
+    border-color: #cbd5e1;
+}
+
+.ihale-refno-copy-btn--done {
+    background: #dcfce7 !important;
+    color: #15803d !important;
+    border-color: #bbf7d0 !important;
 }
 
 /* Enes Doğanay | 10 Nisan 2026: Bölüm başlıkları (gereksinimler, e-posta, ek dosya, davetli firma) */

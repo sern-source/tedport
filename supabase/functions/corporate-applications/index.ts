@@ -96,117 +96,294 @@ const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
     const applicantName = `${String(application.applicant_first_name || "")} ${
         String(application.applicant_last_name || "")
     }`.trim();
+    const safe = (s: unknown) =>
+        String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
+            />/g,
+            "&gt;",
+        ).replace(/"/g, "&quot;");
+    const safeName = safe(applicantName || "Tedport kullanıcısı");
+    const safeCompany = safe(companyName);
+    const safeNote = reviewNote ? safe(reviewNote) : "";
+
+    const emailWrapper = (
+        headerBg: string,
+        headerGradient: string,
+        badgeBg: string,
+        badgeText: string,
+        badgeColor: string,
+        headingColor: string,
+        heading: string,
+        subheading: string,
+        bodyHtml: string,
+    ) => `<!DOCTYPE html>
+<html lang="tr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+<style>
+  body, table, td, p, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+  table, td { mso-table-lspace:0pt; mso-table-rspace:0pt; }
+  img { border:0; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+  @media only screen and (max-width:620px) {
+    .email-wrap { width:100% !important; padding:20px 8px !important; }
+    .email-container { width:100% !important; }
+    .section-pad { padding-left:20px !important; padding-right:20px !important; }
+    .btn-td { text-align:center !important; }
+  }
+</style>
+</head>
+<body style="margin:0; padding:0; background-color:#f1f5f9;">
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f1f5f9">
+  <tr>
+    <td class="email-wrap" align="center" style="padding:40px 16px;">
+      <table class="email-container" role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; width:100%;">
+        <!-- HEADER -->
+        <tr>
+          <td bgcolor="${headerBg}" style="background-color:${headerBg}; background-image:${headerGradient}; border-radius:16px 16px 0 0; padding:30px 40px 26px 40px;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td valign="middle">
+                  <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:20px; font-weight:bold; color:#ffffff;">Tedport</p>
+                  <p style="margin:3px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:${headingColor}; text-transform:uppercase; letter-spacing:1px;">Tedarik Portali</p>
+                </td>
+                <td align="right" valign="middle">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td bgcolor="${badgeBg}" style="background-color:${badgeBg}; border-radius:20px; padding:5px 14px;">
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:bold; color:${badgeColor};">${badgeText}</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:22px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:25px; font-weight:bold; color:#ffffff; line-height:1.3;">${heading}</p>
+            <p style="margin:10px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:${headingColor}; line-height:1.6;">${subheading}</p>
+          </td>
+        </tr>
+        <!-- WHITE BODY -->
+        <tr>
+          <td bgcolor="#ffffff" style="background-color:#ffffff; border-radius:0 0 16px 16px; padding:0 0 32px 0;">
+            ${bodyHtml}
+          </td>
+        </tr>
+        <!-- FOOTER -->
+        <tr>
+          <td align="center" style="padding:20px 0 0 0;">
+            <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#94a3b8;">Tedport Teknoloji A.S. &nbsp;|&nbsp; <a href="https://tedport.com" style="color:#94a3b8; text-decoration:none;">tedport.com</a></p>
+            <p style="margin:6px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#cbd5e1;">Sorulariniz icin <a href="mailto:info@tedport.com" style="color:#94a3b8;">info@tedport.com</a> adresine yazabilirsiniz.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
 
     if (decision === "approve") {
+        const body = `
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+              <!-- Greeting card -->
+              <tr>
+                <td class="section-pad" style="padding:28px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:2px solid #bbf7d0; border-radius:12px;">
+                    <tr>
+                      <td bgcolor="#f0fdf4" style="background-color:#f0fdf4; border-radius:10px; padding:20px 22px;">
+                        <p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; color:#15803d; text-transform:uppercase; letter-spacing:1.5px;">KURUMSAL HESAP HAZIR</p>
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:17px; font-weight:bold; color:#0f172a; line-height:1.4;">Merhaba ${safeName},</p>
+                        <p style="margin:10px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569; line-height:1.7;"><strong>${safeCompany}</strong> adina yaptiginiz kurumsal basvuru onaylandi. Hesabiniz olusturuldu ve giriş yapabilirsiniz.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <!-- Info box -->
+              <tr>
+                <td class="section-pad" style="padding:14px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #e2e8f0; border-radius:10px;">
+                    <tr>
+                      <td bgcolor="#f8fafc" style="background-color:#f8fafc; border-radius:9px; padding:14px 18px;">
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#334155; line-height:1.7;">Asagidaki butona tiklayarak yeni sifrenizi belirleyin. Sifrenizi olusturduktan sonra bu e-posta adresiyle kurumsal giriste kullanabilirsiniz.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              ${
+            safeNote
+                ? `
+              <tr>
+                <td class="section-pad" style="padding:14px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-left:4px solid #22c55e; border-radius:0 10px 10px 0;">
+                    <tr>
+                      <td bgcolor="#f0fdf4" style="background-color:#f0fdf4; padding:14px 18px;">
+                        <p style="margin:0 0 4px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; color:#15803d; text-transform:uppercase; letter-spacing:0.5px;">NOT</p>
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#1e293b; line-height:1.7;">${safeNote}</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>`
+                : ""
+        }
+              <!-- CTA -->
+              <tr>
+                <td class="section-pad btn-td" style="padding:28px 32px 0 32px;">
+                  <!--[if mso]>
+                  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${
+            actionLink || "#"
+        }" style="height:46px;v-text-anchor:middle;width:200px;" arcsize="50%" stroke="f" fillcolor="#15803d">
+                    <w:anchorlock/>
+                    <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;">Sifremi Belirle</center>
+                  </v:roundrect>
+                  <![endif]-->
+                  <!--[if !mso]><!-->
+                  <a href="${
+            actionLink || "#"
+        }" style="background-color:#15803d; border-radius:999px; color:#ffffff; display:inline-block; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:bold; line-height:46px; text-align:center; text-decoration:none; width:200px; -webkit-text-size-adjust:none;">Sifremi Belirle</a>
+                  <!--<![endif]-->
+                </td>
+              </tr>
+            </table>`;
         return {
             subject: `Tedport Kurumsal Başvurunuz Onaylandı | ${companyName}`,
-            html: `
-        <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
-          <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
-            <div style="padding: 22px 24px; background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%); color: #fff;">
-              <h1 style="margin: 0; font-size: 24px;">Kurumsal Başvurunuz Onaylandı</h1>
-              <p style="margin: 8px 0 0; opacity: 0.9;">${companyName} için Tedport kurumsal hesabınız hazırlandı.</p>
-            </div>
-            <div style="padding: 24px;">
-              <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${
-                applicantName || "Tedport kullanıcısı"
-            }, başvurunuz incelendi ve onaylandı. Bu e-posta adresi için kurumsal hesabınız oluşturuldu.</p>
-              <p style="margin: 0 0 20px; line-height: 1.7; color: #475569;">Aşağıdaki bağlantıya tıklayarak yeni şifrenizi belirleyin. Şifrenizi oluşturduktan sonra bu e-posta adresiyle kurumsal giriş yapabilirsiniz.</p>
-              <a href="${
-                actionLink || "#"
-            }" style="display: inline-block; padding: 14px 18px; border-radius: 999px; background: #1d4ed8; color: #fff; text-decoration: none; font-weight: 700;">Şifremi Belirle</a>
-              ${
-                reviewNote
-                    ? `<p style="margin: 20px 0 0; line-height: 1.7; color: #475569;"><strong>Not:</strong> ${reviewNote}</p>`
-                    : ""
-            }
-            </div>
-          </div>
-        </div>
-      `,
+            html: emailWrapper(
+                "#14532d",
+                "linear-gradient(135deg,#14532d 0%,#15803d 55%,#22c55e 100%)",
+                "#166534",
+                "BASVURU ONAYLANDI",
+                "#bbf7d0",
+                "#bbf7d0",
+                "Kurumsal başvurunuz<br>onaylandı!",
+                `<strong>${safeCompany}</strong> için Tedport kurumsal hesabınız hazırlandı.`,
+                body,
+            ),
         };
     }
 
     if (decision === "needs_info") {
+        const body = `
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td class="section-pad" style="padding:28px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:2px solid #fed7aa; border-radius:12px;">
+                    <tr>
+                      <td bgcolor="#fff7ed" style="background-color:#fff7ed; border-radius:10px; padding:20px 22px;">
+                        <p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; color:#c2410c; text-transform:uppercase; letter-spacing:1.5px;">EK BILGI GEREKLI</p>
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:17px; font-weight:bold; color:#0f172a; line-height:1.4;">Merhaba ${safeName},</p>
+                        <p style="margin:10px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569; line-height:1.7;"><strong>${safeCompany}</strong> adina yaptiginiz kurumsal basvuru incelenmis olup degerlendirmeyi tamamlayabilmemiz icin sizden ek bilgi almamiz gerekmektedir.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              ${
+            safeNote
+                ? `
+              <tr>
+                <td class="section-pad" style="padding:14px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-left:4px solid #d97706; border-radius:0 10px 10px 0;">
+                    <tr>
+                      <td bgcolor="#fffbeb" style="background-color:#fffbeb; padding:14px 18px;">
+                        <p style="margin:0 0 4px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">TALEP EDILEN BILGI / BELGE</p>
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#1e293b; line-height:1.7;">${safeNote}</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>`
+                : ""
+        }
+              <tr>
+                <td class="section-pad" style="padding:14px 32px 0 32px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #e2e8f0; border-radius:10px;">
+                    <tr>
+                      <td bgcolor="#f8fafc" style="background-color:#f8fafc; border-radius:9px; padding:14px 18px;">
+                        <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#334155; line-height:1.7;">Bu e-postaya dogrudan yanit vererek veya <a href="mailto:info@tedport.com" style="color:#d97706;">info@tedport.com</a> adresine yazarak bilgilerinizi iletebilirsiniz.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>`;
         return {
             subject:
                 `Başvurunuz İçin Ek Bilgi Gerekli | ${companyName} – Tedport`,
-            html: `
-        <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
-          <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
-            <div style="padding: 22px 24px; background: linear-gradient(135deg, #92400e 0%, #d97706 100%); color: #fff;">
-              <div style="font-size: 28px; margin-bottom: 8px;">📋</div>
-              <h1 style="margin: 0; font-size: 22px; font-weight: 700;">Başvurunuz İçin Ek Bilgi Gerekli</h1>
-              <p style="margin: 6px 0 0; opacity: 0.9; font-size: 14px;">${companyName}</p>
-            </div>
-            <div style="padding: 28px 24px;">
-              <p style="margin: 0 0 20px; line-height: 1.7; color: #334155;">
-                Merhaba <strong>${
-                applicantName || "Tedport kullanıcısı"
-            }</strong>,<br>
-                ${companyName} adına yaptığınız kurumsal başvuru incelenmiş olup değerlendirmeyi tamamlayabilmemiz için sizden ek bilgi almamız gerekmektedir.
-              </p>
-              ${
-                reviewNote
-                    ? `
-              <div style="background: #fffbeb; border-left: 4px solid #d97706; border-radius: 0 10px 10px 0; padding: 16px 18px; margin: 0 0 20px;">
-                <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e;">Talep Edilen Bilgi / Belge</p>
-                <p style="margin: 0; line-height: 1.7; color: #1e293b; font-size: 15px;">${reviewNote}</p>
-              </div>`
-                    : `
-              <div style="background: #fffbeb; border-left: 4px solid #d97706; border-radius: 0 10px 10px 0; padding: 16px 18px; margin: 0 0 20px;">
-                <p style="margin: 0; line-height: 1.7; color: #1e293b;">Lütfen bize yanıt vererek gerekli detayları paylaşın.</p>
-              </div>`
-            }
-              <p style="margin: 0; line-height: 1.7; color: #64748b; font-size: 13px;">
-                Bu e-postaya doğrudan yanıt vererek veya <a href="mailto:info@tedport.com" style="color: #d97706;">info@tedport.com</a> adresine yazarak bilgilerinizi iletebilirsiniz.
-              </p>
-            </div>
-            <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center;">
-              Tedport Teknoloji A.Ş. | <a href="https://tedport.com" style="color: #94a3b8;">tedport.com</a>
-            </div>
-          </div>
-        </div>
-      `,
+            html: emailWrapper(
+                "#92400e",
+                "linear-gradient(135deg,#78350f 0%,#b45309 55%,#d97706 100%)",
+                "#a16207",
+                "EK BILGI BEKLENIYOR",
+                "#fef3c7",
+                "#fde68a",
+                "Basvurunuz için ek<br>bilgi gerekiyor",
+                `<strong>${safeCompany}</strong> başvurusu değerlendirme aşamasında.`,
+                body,
+            ),
         };
     }
 
+    // reject
+    const body = `
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td class="section-pad" style="padding:28px 32px 0 32px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:2px solid #fecaca; border-radius:12px;">
+                <tr>
+                  <td bgcolor="#fff1f2" style="background-color:#fff1f2; border-radius:10px; padding:20px 22px;">
+                    <p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; color:#b91c1c; text-transform:uppercase; letter-spacing:1.5px;">BASVURU REDDEDILDI</p>
+                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:17px; font-weight:bold; color:#0f172a; line-height:1.4;">Merhaba ${safeName},</p>
+                    <p style="margin:10px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#475569; line-height:1.7;"><strong>${safeCompany}</strong> adina yaptiginiz kurumsal basvuru incelendi ve maalesef bu asamada onaylanamadi.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          ${
+        safeNote
+            ? `
+          <tr>
+            <td class="section-pad" style="padding:14px 32px 0 32px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-left:4px solid #b91c1c; border-radius:0 10px 10px 0;">
+                <tr>
+                  <td bgcolor="#fff1f2" style="background-color:#fff1f2; padding:14px 18px;">
+                    <p style="margin:0 0 4px 0; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:bold; color:#9f1239; text-transform:uppercase; letter-spacing:0.5px;">RED GEREKÇESI</p>
+                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#1e293b; line-height:1.7;">${safeNote}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>`
+            : ""
+    }
+          <tr>
+            <td class="section-pad" style="padding:14px 32px 0 32px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #e2e8f0; border-radius:10px;">
+                <tr>
+                  <td bgcolor="#f8fafc" style="background-color:#f8fafc; border-radius:9px; padding:14px 18px;">
+                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#334155; line-height:1.7;">Eksik bilgilerinizi tamamlayarak yeniden basvurabilirsiniz. Sorulariniz icin <a href="mailto:info@tedport.com" style="color:#b91c1c;">info@tedport.com</a> adresine yazabilirsiniz.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>`;
     return {
         subject: `Kurumsal Başvurunuz Reddedildi | ${companyName} – Tedport`,
-        html: `
-      <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
-        <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
-          <div style="padding: 22px 24px; background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%); color: #fff;">
-            <div style="font-size: 28px; margin-bottom: 8px;">❌</div>
-            <h1 style="margin: 0; font-size: 22px; font-weight: 700;">Kurumsal Başvurunuz Reddedildi</h1>
-            <p style="margin: 6px 0 0; opacity: 0.9; font-size: 14px;">${companyName}</p>
-          </div>
-          <div style="padding: 28px 24px;">
-            <p style="margin: 0 0 20px; line-height: 1.7; color: #334155;">
-              Merhaba <strong>${
-            applicantName || "Tedport kullanıcısı"
-        }</strong>,<br>
-              ${companyName} adına yaptığınız kurumsal başvuru incelendi ve maalesef bu aşamada onaylanamadı.
-            </p>
-            ${
-            reviewNote
-                ? `
-            <div style="background: #fff1f2; border-left: 4px solid #b91c1c; border-radius: 0 10px 10px 0; padding: 16px 18px; margin: 0 0 20px;">
-              <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9f1239;">Red Gerekçesi</p>
-              <p style="margin: 0; line-height: 1.7; color: #1e293b; font-size: 15px;">${reviewNote}</p>
-            </div>`
-                : ""
-        }
-            <p style="margin: 0; line-height: 1.7; color: #64748b; font-size: 13px;">
-              Eksik bilgilerinizi tamamlayarak yeniden başvurabilirsiniz. Sorularınız için <a href="mailto:info@tedport.com" style="color: #b91c1c;">info@tedport.com</a> adresine yazabilirsiniz.
-            </p>
-          </div>
-          <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center;">
-            Tedport Teknoloji A.Ş. | <a href="https://tedport.com" style="color: #94a3b8;">tedport.com</a>
-          </div>
-        </div>
-      </div>
-    `,
+        html: emailWrapper(
+            "#7f1d1d",
+            "linear-gradient(135deg,#7f1d1d 0%,#b91c1c 55%,#ef4444 100%)",
+            "#991b1b",
+            "BASVURU REDDEDILDI",
+            "#fecaca",
+            "#fecaca",
+            "Kurumsal başvurunuz<br>reddedildi",
+            `<strong>${safeCompany}</strong> başvurusu değerlendirme sonuçlandı.`,
+            body,
+        ),
     };
 };
 

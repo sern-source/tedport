@@ -230,6 +230,10 @@ const TenderOffersManagement = ({ companyId }) => {
     /* Enes Doğanay | 15 Nisan 2026: Statü değişikliği başarı modal */
     const [statusSuccessModal, setStatusSuccessModal] = useState(null);
 
+    /* Enes Doğanay | 1 Mayıs 2026: Yeni ihale yayınlama başarı modalı + link */
+    const [createPublishSuccess, setCreatePublishSuccess] = useState(null); // null veya yeni ihale id
+    const [createPublishedLinkCopied, setCreatePublishedLinkCopied] = useState(false);
+
     /* Enes Doğanay | 15 Nisan 2026: Yeni ihale oluşturma — Ihaleler sayfasındaki 4 adımlı stepper modal */
     const STEPPER_LABELS = [
         { key: 'temel', label: 'Temel Bilgiler', icon: 'edit_note' },
@@ -254,6 +258,7 @@ const TenderOffersManagement = ({ companyId }) => {
     const createFirmaResultsRef = useRef(null);
     const [createIsVerifiedUser, setCreateIsVerifiedUser] = useState(false);
     const [createEmailStatus, setCreateEmailStatus] = useState(null); // null | 'checking' | 'valid' | 'not_found'
+    const [createRefNoCopied, setCreateRefNoCopied] = useState(false);
     const createEmailCheckTimeout = useRef(null);
 
     /* Enes Doğanay | 13 Nisan 2026: Favoriler ve notlar localStorage ile kalıcı */
@@ -996,9 +1001,14 @@ const TenderOffersManagement = ({ companyId }) => {
                 ek_dosyalar: uploadedFiles,
                 davet_emailleri: finalInviteEmails,
             };
-            await createTenderApi(payload);
+            const created = await createTenderApi(payload);
             setShowCreateModal(false);
             await reloadTenders();
+            // Enes Doğanay | 1 Mayıs 2026: Taslak değilse başarı popup + link göster
+            if ((forceDurum || createForm.durum) !== 'draft' && created?.id) {
+                setCreatePublishedLinkCopied(false);
+                setCreatePublishSuccess(created.id);
+            }
         } catch (err) {
             setCreateFormError(err.message || 'Kaydedilemedi.');
         } finally {
@@ -2138,6 +2148,42 @@ const TenderOffersManagement = ({ companyId }) => {
                 </div>
             )}
 
+            {/* Enes Doğanay | 1 Mayıs 2026: Yeni ihale yayınlama başarı popup */}
+            {createPublishSuccess && (
+                <div className="teklif-success-overlay" onClick={() => setCreatePublishSuccess(null)}>
+                    <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+                        <div className="teklif-success-card__icon">
+                            <span className="material-symbols-outlined">check_circle</span>
+                        </div>
+                        <h3>İhaleniz Yayınlandı!</h3>
+                        <p>İhaleniz başarıyla yayınlanmıştır. Tedarikçiler artık ihalenizi görebilir ve teklif verebilir.</p>
+                        <div className="ihale-publish-link-row">
+                            <span className="material-symbols-outlined ihale-publish-link-row__icon">link</span>
+                            <input
+                                className="ihale-publish-link-row__input"
+                                readOnly
+                                value={`https://tedport.com/ihaleler?ihale=${createPublishSuccess}`}
+                                onFocus={e => e.target.select()}
+                            />
+                            <button
+                                className={`ihale-publish-link-row__copy${createPublishedLinkCopied ? ' ihale-publish-link-row__copy--done' : ''}`}
+                                onClick={() => {
+                                    navigator.clipboard.writeText(`https://tedport.com/ihaleler?ihale=${createPublishSuccess}`);
+                                    setCreatePublishedLinkCopied(true);
+                                    setTimeout(() => setCreatePublishedLinkCopied(false), 2000);
+                                }}
+                            >
+                                <span className="material-symbols-outlined">{createPublishedLinkCopied ? 'check' : 'content_copy'}</span>
+                                {createPublishedLinkCopied ? 'Kopyalandı!' : 'Linki Kopyala'}
+                            </button>
+                        </div>
+                        <button className="teklif-success-card__btn" onClick={() => setCreatePublishSuccess(null)}>
+                            Tamam
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Enes Doğanay | 16 Haziran 2025: Statü değişikliği başarı modal */}
             {statusSuccessModal && (
                 <div className="tom-contact-overlay" onClick={() => setStatusSuccessModal(null)}>
@@ -2268,7 +2314,23 @@ const TenderOffersManagement = ({ companyId }) => {
                                         </label>
                                         <label className="ihale-field">
                                             <span>Referans No</span>
-                                            <input type="text" value={createForm.referans_no} readOnly className="ihale-field--readonly" tabIndex={-1} />
+                                            <div className="ihale-refno-copy-row">
+                                                <input type="text" value={createForm.referans_no} readOnly className="ihale-field--readonly" tabIndex={-1} />
+                                                <button
+                                                    type="button"
+                                                    className={`ihale-refno-copy-btn${createRefNoCopied ? ' ihale-refno-copy-btn--done' : ''}`}
+                                                    onClick={() => {
+                                                        if (!createForm.referans_no) return;
+                                                        navigator.clipboard.writeText(createForm.referans_no);
+                                                        setCreateRefNoCopied(true);
+                                                        setTimeout(() => setCreateRefNoCopied(false), 2000);
+                                                    }}
+                                                    title="Referans numarasını kopyala"
+                                                >
+                                                    <span className="material-symbols-outlined">{createRefNoCopied ? 'check' : 'content_copy'}</span>
+                                                    {createRefNoCopied ? 'Kopyalandı' : 'Kopyala'}
+                                                </button>
+                                            </div>
                                         </label>
                                     </div>
 

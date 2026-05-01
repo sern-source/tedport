@@ -666,8 +666,6 @@
     flex-direction: column;
     gap: 6px;
     margin-top: 14px;
-    max-height: 520px;
-    overflow-y: auto;
 }
 
 .afd-result-card {
@@ -752,6 +750,78 @@
 
 .afd-no-results .material-symbols-outlined {
     font-size: 20px;
+}
+
+/* ── Pagination ───────────────────────────────────────── */
+.afd-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 0 4px;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 10px;
+}
+
+.afd-pagination-info {
+    font-size: .82rem;
+    color: #64748b;
+}
+
+.afd-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.afd-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 6px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #374151;
+    font-size: .85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+}
+
+.afd-page-btn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.afd-page-btn:not(:disabled):hover {
+    background: #f0f7ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+.afd-page-btn.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+    font-weight: 700;
+}
+
+.afd-page-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.afd-page-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    font-size: .85rem;
+    color: #94a3b8;
+    user-select: none;
 }
 
 /* ── Panel Wrapper ────────────────────────────────────── */

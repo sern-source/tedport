@@ -240,6 +240,7 @@ const IhalelerPage = () => {
     /* Enes Doğanay | 13 Nisan 2026: İhale yayınlama başarı modalı */
     const [ihalePublishSuccess, setIhalePublishSuccess] = useState(null); // null veya yeni ihale id
     const [publishedLinkCopied, setPublishedLinkCopied] = useState(false);
+    const [refNoCopied, setRefNoCopied] = useState(false);
     /* Enes Doğanay | 13 Nisan 2026: Kullanıcının mevcut teklifleri — 1 ihale 1 teklif kısıtı */
     const [userOffers, setUserOffers] = useState({});
     /* Enes Doğanay | 13 Nisan 2026: Teklifi geri çekme state */
@@ -1243,9 +1244,18 @@ const IhalelerPage = () => {
                         {myTendersLoading ? (
                             <p className="my-tenders-loading">Yükleniyor…</p>
                         ) : myTenders.length === 0 ? (
-                            <div className="my-tenders-empty">
-                                <span className="material-symbols-outlined">inbox</span>
-                                <p>Henüz ihale oluşturmadınız.</p>
+                            <div className="my-tenders-first-banner">
+                                <div className="my-tenders-first-banner__icon">
+                                    <span className="material-symbols-outlined">rocket_launch</span>
+                                </div>
+                                <div className="my-tenders-first-banner__body">
+                                    <strong>İlk ihalenizi oluşturun</strong>
+                                    <p>Tedarikçi firmalar tekliflerini görebilsin diye ihalenizi yayınlayın. 3 dakika sürer.</p>
+                                </div>
+                                <button type="button" className="my-tenders-first-banner__btn" onClick={openCreate}>
+                                    İhale Oluştur
+                                    <span className="material-symbols-outlined">arrow_forward</span>
+                                </button>
                             </div>
                         ) : (
                             <div className="my-tenders-list">
@@ -1468,7 +1478,23 @@ const IhalelerPage = () => {
 
                                             <label className="ihale-field">
                                                 <span>Referans No</span>
-                                                <input type="text" value={form.referans_no} readOnly className="ihale-field--readonly" tabIndex={-1} />
+                                                <div className="ihale-refno-copy-row">
+                                                    <input type="text" value={form.referans_no} readOnly className="ihale-field--readonly" tabIndex={-1} />
+                                                    <button
+                                                        type="button"
+                                                        className={`ihale-refno-copy-btn${refNoCopied ? ' ihale-refno-copy-btn--done' : ''}`}
+                                                        onClick={() => {
+                                                            if (!form.referans_no) return;
+                                                            navigator.clipboard.writeText(form.referans_no);
+                                                            setRefNoCopied(true);
+                                                            setTimeout(() => setRefNoCopied(false), 2000);
+                                                        }}
+                                                        title="Referans numarasını kopyala"
+                                                    >
+                                                        <span className="material-symbols-outlined">{refNoCopied ? 'check' : 'content_copy'}</span>
+                                                        {refNoCopied ? 'Kopyalandı' : 'Kopyala'}
+                                                    </button>
+                                                </div>
                                             </label>
                                         </div>
 
@@ -1948,6 +1974,14 @@ const IhalelerPage = () => {
                             <button
                                 className="tenders-mini-page-btn"
                                 disabled={page === 1}
+                                onClick={() => setPage(1)}
+                                title="İlk sayfa"
+                            >
+                                <span className="material-symbols-outlined">first_page</span>
+                            </button>
+                            <button
+                                className="tenders-mini-page-btn"
+                                disabled={page === 1}
                                 onClick={() => setPage(p => p - 1)}
                                 title="Önceki sayfa"
                             >
@@ -1963,6 +1997,14 @@ const IhalelerPage = () => {
                                 title="Sonraki sayfa"
                             >
                                 <span className="material-symbols-outlined">chevron_right</span>
+                            </button>
+                            <button
+                                className="tenders-mini-page-btn"
+                                disabled={page === totalPages}
+                                onClick={() => setPage(totalPages)}
+                                title="Son sayfa"
+                            >
+                                <span className="material-symbols-outlined">last_page</span>
                             </button>
                         </div>
                     )}
@@ -2235,6 +2277,14 @@ const IhalelerPage = () => {
                                 <button
                                     className="tenders-page-btn tenders-page-btn--nav"
                                     disabled={page === 1}
+                                    onClick={() => setPage(1)}
+                                    title="İlk sayfa"
+                                >
+                                    <span className="material-symbols-outlined">first_page</span>
+                                </button>
+                                <button
+                                    className="tenders-page-btn tenders-page-btn--nav"
+                                    disabled={page === 1}
                                     onClick={() => setPage(p => p - 1)}
                                 >
                                     <span className="material-symbols-outlined">chevron_left</span>
@@ -2258,6 +2308,14 @@ const IhalelerPage = () => {
                                     onClick={() => setPage(p => p + 1)}
                                 >
                                     <span className="material-symbols-outlined">chevron_right</span>
+                                </button>
+                                <button
+                                    className="tenders-page-btn tenders-page-btn--nav"
+                                    disabled={page === totalPages}
+                                    onClick={() => setPage(totalPages)}
+                                    title="Son sayfa"
+                                >
+                                    <span className="material-symbols-outlined">last_page</span>
                                 </button>
                             </div>
                         )}

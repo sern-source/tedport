@@ -49,6 +49,11 @@ const AdminFirmaDuzenle = () => {
     const [weakDeleting, setWeakDeleting] = useState(new Set());
     const [weakDeleteResult, setWeakDeleteResult] = useState(null);
 
+    /* Enes Doğanay | 1 Mayıs 2026: Pagination state */
+    const PAGE_SIZE = 50;
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+
     /* Enes Doğanay | 13 Nisan 2026: Seçili firma + mod state'leri */
     const [selectedFirma, setSelectedFirma] = useState(null);
     const [loadingCompany, setLoadingCompany] = useState(false);
@@ -74,6 +79,7 @@ const AdminFirmaDuzenle = () => {
     }, [navigate]);
 
     /* Enes Doğanay | 15 Nisan 2026: Debounced firma arama — boşken tüm firmalar, yazınca filtrele */
+    /* Enes Doğanay | 1 Mayıs 2026: Pagination desteği eklendi */
     useEffect(() => {
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         const q = searchTerm.trim();
@@ -81,22 +87,25 @@ const AdminFirmaDuzenle = () => {
 
         searchTimeoutRef.current = setTimeout(async () => {
             setSearching(true);
+            const from = (currentPage - 1) * PAGE_SIZE;
+            const to = from + PAGE_SIZE - 1;
             let query = supabase
                 .from('firmalar')
-                .select('firmaID, firma_adi, category_name, il_ilce, logo_url')
+                .select('firmaID, firma_adi, category_name, il_ilce, logo_url', { count: 'exact' })
                 .order('firma_adi', { ascending: sortAsc })
-                .limit(50);
+                .range(from, to);
             if (q.length > 0) {
                 query = query.ilike('firma_adi', `%${q}%`);
             }
-            const { data, error } = await query;
+            const { data, error, count } = await query;
             if (error) console.error('Firma arama hatası:', error);
             setSearchResults(data || []);
+            setTotalCount(count || 0);
             setSearching(false);
         }, delay);
 
         return () => { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); };
-    }, [searchTerm, sortAsc]);
+    }, [searchTerm, sortAsc, currentPage]);
 
     /* Enes Doğanay | 15 Nisan 2026: Benzer/duplike firma isimlerini bul ve grupla */
     const handleFindDuplicates = async () => {
@@ -568,7 +577,7 @@ const AdminFirmaDuzenle = () => {
                                     <input
                                         type="text"
                                         value={searchTerm}
-                                        onChange={e => setSearchTerm(e.target.value)}
+                                        onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                                         placeholder="Firma adı ile arayın..."
                                         autoFocus
                                     />
@@ -588,11 +597,11 @@ const AdminFirmaDuzenle = () => {
                             <div className="afd-sort-row">
                                 {!duplicateMode && !weakMode && searchResults.length > 0 && (
                                     <>
-                                        <button className={`afd-btn afd-btn--sort${sortAsc ? ' active' : ''}`} onClick={() => setSortAsc(true)}>
+                                        <button className={`afd-btn afd-btn--sort${sortAsc ? ' active' : ''}`} onClick={() => { setSortAsc(true); setCurrentPage(1); }}>
                                             <span className="material-symbols-outlined">arrow_downward</span>
                                             A → Z
                                         </button>
-                                        <button className={`afd-btn afd-btn--sort${!sortAsc ? ' active' : ''}`} onClick={() => setSortAsc(false)}>
+                                        <button className={`afd-btn afd-btn--sort${!sortAsc ? ' active' : ''}`} onClick={() => { setSortAsc(false); setCurrentPage(1); }}>
                                             <span className="material-symbols-outlined">arrow_upward</span>
                                             Z → A
                                         </button>
@@ -799,32 +808,95 @@ const AdminFirmaDuzenle = () => {
                             )}
 
                             {!duplicateMode && !weakMode && searchResults.length > 0 && (
-                                <div className="afd-results">
-                                    {searchResults.map(firma => (
-                                        <button
-                                            key={firma.firmaID}
-                                            className="afd-result-card"
-                                            onClick={() => handleSelectFirma(firma)}
-                                        >
-                                            <div className="afd-result-avatar">
-                                                {firma.logo_url?.includes('firma-logolari') ? (
-                                                    <img src={firma.logo_url} alt="" loading="lazy" />
-                                                ) : (
-                                                    <span>{(firma.firma_adi || 'F').charAt(0).toUpperCase()}</span>
+                                <>
+                                    <div className="afd-results">
+                                        {searchResults.map(firma => (
+                                            <button
+                                                key={firma.firmaID}
+                                                className="afd-result-card"
+                                                onClick={() => handleSelectFirma(firma)}
+                                            >
+                                                <div className="afd-result-avatar">
+                                                    {firma.logo_url?.includes('firma-logolari') ? (
+                                                        <img src={firma.logo_url} alt="" loading="lazy" />
+                                                    ) : (
+                                                        <span>{(firma.firma_adi || 'F').charAt(0).toUpperCase()}</span>
+                                                    )}
+                                                </div>
+                                                <div className="afd-result-info">
+                                                    <strong>{firma.firma_adi}</strong>
+                                                    <small>{firma.category_name || 'Kategori yok'} • {firma.il_ilce || 'Konum yok'}</small>
+                                                </div>
+                                                {firma.logo_url?.includes('firma-logolari') && (
+                                                    <span className="afd-result-logo-badge" title="Logosu var">
+                                                        <span className="material-symbols-outlined">image</span>
+                                                    </span>
                                                 )}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Pagination */}
+                                    {totalCount > PAGE_SIZE && (
+                                        <div className="afd-pagination">
+                                            <span className="afd-pagination-info">
+                                                {totalCount} firmadan {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, totalCount)} gösteriliyor
+                                            </span>
+                                            <div className="afd-pagination-controls">
+                                                <button
+                                                    className="afd-page-btn"
+                                                    onClick={() => setCurrentPage(1)}
+                                                    disabled={currentPage === 1}
+                                                    title="İlk sayfa"
+                                                >
+                                                    <span className="material-symbols-outlined">first_page</span>
+                                                </button>
+                                                <button
+                                                    className="afd-page-btn"
+                                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                                    disabled={currentPage === 1}
+                                                >
+                                                    <span className="material-symbols-outlined">chevron_left</span>
+                                                </button>
+                                                {(() => {
+                                                    const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+                                                    const pages = [];
+                                                    const start = Math.max(1, currentPage - 2);
+                                                    const end = Math.min(totalPages, currentPage + 2);
+                                                    if (start > 1) pages.push(<span key="s-ellipsis" className="afd-page-ellipsis">…</span>);
+                                                    for (let i = start; i <= end; i++) {
+                                                        pages.push(
+                                                            <button
+                                                                key={i}
+                                                                className={`afd-page-btn afd-page-btn--num${i === currentPage ? ' active' : ''}`}
+                                                                onClick={() => setCurrentPage(i)}
+                                                            >
+                                                                {i}
+                                                            </button>
+                                                        );
+                                                    }
+                                                    if (end < totalPages) pages.push(<span key="e-ellipsis" className="afd-page-ellipsis">…</span>);
+                                                    return pages;
+                                                })()}
+                                                <button
+                                                    className="afd-page-btn"
+                                                    onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalCount / PAGE_SIZE), p + 1))}
+                                                    disabled={currentPage >= Math.ceil(totalCount / PAGE_SIZE)}
+                                                >
+                                                    <span className="material-symbols-outlined">chevron_right</span>
+                                                </button>
+                                                <button
+                                                    className="afd-page-btn"
+                                                    onClick={() => setCurrentPage(Math.ceil(totalCount / PAGE_SIZE))}
+                                                    disabled={currentPage >= Math.ceil(totalCount / PAGE_SIZE)}
+                                                    title="Son sayfa"
+                                                >
+                                                    <span className="material-symbols-outlined">last_page</span>
+                                                </button>
                                             </div>
-                                            <div className="afd-result-info">
-                                                <strong>{firma.firma_adi}</strong>
-                                                <small>{firma.category_name || 'Kategori yok'} • {firma.il_ilce || 'Konum yok'}</small>
-                                            </div>
-                                            {firma.logo_url?.includes('firma-logolari') && (
-                                                <span className="afd-result-logo-badge" title="Logosu var">
-                                                    <span className="material-symbols-outlined">image</span>
-                                                </span>
-                                            )}
-                                        </button>
-                                    ))}
-                                </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
 
                             {!duplicateMode && !weakMode && !searching && searchTerm.trim().length >= 1 && searchResults.length === 0 && (

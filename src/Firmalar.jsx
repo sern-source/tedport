@@ -1278,6 +1278,14 @@ function App() {
                     <button
                       className="mini-page-btn"
                       disabled={page === 1}
+                      onClick={() => setPage(1)}
+                      title="İlk sayfa"
+                    >
+                      <span className="material-symbols-outlined">first_page</span>
+                    </button>
+                    <button
+                      className="mini-page-btn"
+                      disabled={page === 1}
                       onClick={() => setPage(p => p - 1)}
                       title="Önceki sayfa"
                     >
@@ -1293,6 +1301,14 @@ function App() {
                       title="Sonraki sayfa"
                     >
                       <span className="material-symbols-outlined">chevron_right</span>
+                    </button>
+                    <button
+                      className="mini-page-btn"
+                      disabled={page === totalPages}
+                      onClick={() => setPage(totalPages)}
+                      title="Son sayfa"
+                    >
+                      <span className="material-symbols-outlined">last_page</span>
                     </button>
                   </div>
                 )}
@@ -1494,6 +1510,14 @@ function App() {
                 <button
                   className="page-btn nav"
                   disabled={page === 1}
+                  onClick={() => setPage(1)}
+                  title="İlk sayfa"
+                >
+                  <span className="material-symbols-outlined">first_page</span>
+                </button>
+                <button
+                  className="page-btn nav"
+                  disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
                 >
                   <span className="material-symbols-outlined">chevron_left</span>
@@ -1520,6 +1544,14 @@ function App() {
                   onClick={() => setPage(p => p + 1)}
                 >
                   <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+                <button
+                  className="page-btn nav"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(totalPages)}
+                  title="Son sayfa"
+                >
+                  <span className="material-symbols-outlined">last_page</span>
                 </button>
               </div>
             )}

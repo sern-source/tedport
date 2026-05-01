@@ -1,6 +1,5 @@
 // Enes Doğanay | 13 Nisan 2026: useRef destructured import olarak eklendi
 import React, { useEffect, useRef, useState } from 'react';
-// Enes Doğanay | 18 Nisan 2026: Modal için eklenen state ve fonksiyonlar (gpt ile yapıldı)
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import './Register.css';
 import SharedHeader from './SharedHeader';
@@ -33,9 +32,7 @@ const initialCorporateForm = {
 };
 
 const RegistrationPage = () => {
-  // Enes Doğanay | 18 Nisan 2026: Hizmet Şartları ve Gizlilik Politikası modalı için state (gpt ile yapıldı)
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  /* Enes Doğanay | 18 Nisan 2026: Ticari elektronik ileti onay modalı */
   const [showMarketingModal, setShowMarketingModal] = useState(false);
   const [showMarketingTooltip, setShowMarketingTooltip] = useState(false);
   const navigate = useNavigate();
@@ -75,11 +72,21 @@ const RegistrationPage = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    setShowTermsModal(false);
-    setShowPrivacyModal(false);
     setShowMarketingModal(false);
     setShowMarketingTooltip(false);
   }, [registrationType]);
+
+  /* Enes Doğanay | 1 Mayıs 2026: Marketing modalı — ESC ile kapat + body scroll kilidi */
+  useEffect(() => {
+    if (!showMarketingModal) return;
+    const onKeyDown = (e) => { if (e.key === 'Escape') setShowMarketingModal(false); };
+    document.addEventListener('keydown', onKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [showMarketingModal]);
 
   /* Enes Doğanay | 17 Nisan 2026: Firma detaydan yönlendirmede URL parametrelerinden kurumsal formu doldur */
   useEffect(() => {
@@ -916,8 +923,8 @@ const RegistrationPage = () => {
                   <div className="checkbox-group">
                     <input type="checkbox" id="terms-corporate" checked={kvkkAccepted} onChange={(event) => setKvkkAccepted(event.target.checked)} />
                     <label htmlFor="terms-corporate" className="checkbox-label checkbox-required">
-                      <button type="button" className="text-link-inline" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı,{' '}
-                      <button type="button" className="text-link-inline" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı ve{' '}
+                      <a href="/hizmet-sartlari" target="_blank" rel="noopener noreferrer" className="text-link-inline">Hizmet Şartları</a>'nı,{' '}
+                      <a href="/gizlilik-politikasi" target="_blank" rel="noopener noreferrer" className="text-link-inline">Gizlilik Politikası</a>'nı ve{' '}
                       <a href="/kvkk" target="_blank" rel="noopener noreferrer" className="text-link-inline">KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum. <span className="required-star">*</span>
                     </label>
                   </div>
@@ -996,7 +1003,7 @@ const RegistrationPage = () => {
                 <span>veya</span>
               </div>
               <p className="oauth-consent-note">
-                Google veya LinkedIn ile devam ederek <button type="button" className="text-link-inline" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı ve <button type="button" className="text-link-inline" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı kabul etmiş olursunuz.
+                Google veya LinkedIn ile devam ederek <a href="/hizmet-sartlari" target="_blank" rel="noopener noreferrer" className="text-link-inline">Hizmet Şartları</a>'nı ve <a href="/gizlilik-politikasi" target="_blank" rel="noopener noreferrer" className="text-link-inline">Gizlilik Politikası</a>'nı kabul etmiş olursunuz.
               </p>
 
               <div className="photo-upload-container">
@@ -1071,8 +1078,8 @@ const RegistrationPage = () => {
               <div className="checkbox-group">
                 <input type="checkbox" id="terms-individual" checked={kvkkAccepted} onChange={(event) => setKvkkAccepted(event.target.checked)} />
                 <label htmlFor="terms-individual" className="checkbox-label checkbox-required">
-                  <button type="button" className="text-link-inline" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı,{' '}
-                  <button type="button" className="text-link-inline" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı ve{' '}
+                  <a href="/hizmet-sartlari" target="_blank" rel="noopener noreferrer" className="text-link-inline">Hizmet Şartları</a>'nı,{' '}
+                  <a href="/gizlilik-politikasi" target="_blank" rel="noopener noreferrer" className="text-link-inline">Gizlilik Politikası</a>'nı ve{' '}
                   <a href="/kvkk" target="_blank" rel="noopener noreferrer" className="text-link-inline">KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum. <span className="required-star">*</span>
                 </label>
               </div>
@@ -1123,69 +1130,6 @@ const RegistrationPage = () => {
         </div>
       </main>
 
-      {/* Hizmet Şartları Modal */}
-      {showTermsModal && (
-        <div className="reg-modal-overlay" onClick={() => setShowTermsModal(false)}>
-          <div className="reg-modal" onClick={e => e.stopPropagation()}>
-            <div className="reg-modal-header">
-              <div className="reg-modal-header-inner">
-                <span className="material-symbols-outlined reg-modal-icon">gavel</span>
-                <h2>Hizmet Şartları</h2>
-              </div>
-              <button type="button" className="reg-modal-close" onClick={() => setShowTermsModal(false)} aria-label="Kapat">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-            <div className="reg-modal-body">
-              <section className="reg-modal-section"><h3>1. Taraflar ve Konu</h3><p>İşbu Hizmet Şartları ("Sözleşme"), Tedport Teknoloji A.Ş. ("Tedport") ile platforma üye olan kullanıcı ("Kullanıcı") arasında akdedilmiştir.</p></section>
-              <section className="reg-modal-section"><h3>2. Hizmet Tanımı</h3><p>Tedport, tedarikçi ve alıcı firmaları bir araya getiren dijital bir platformdur. Tedport aracı konumundadır; sunulan ürün/hizmetlerin sahibi değil, taraflar arasındaki ticari ilişkilerin tarafı değildir.</p><div className="reg-modal-notice"><span className="material-symbols-outlined">info</span><span>Tedport, platformda gerçekleşen işlemlerin sonucu, kalite, teslimat veya ödeme süreçlerinden sorumlu değildir.</span></div></section>
-              <section className="reg-modal-section"><h3>3. Üyelik ve Hesap</h3><ul><li>Kullanıcı, kayıt sırasında doğru ve güncel bilgi vermekle yükümlüdür</li><li>Hesap güvenliği kullanıcıya aittir</li><li>Tedport, şüpheli veya hatalı hesapları askıya alma hakkını saklı tutar</li></ul></section>
-              <section className="reg-modal-section"><h3>4. Kullanım Kuralları</h3><p>Kullanıcı aşağıdaki eylemlerde bulunamaz:</p><ul><li>Yanıltıcı veya sahte bilgi paylaşmak</li><li>Başka kullanıcıları dolandırmaya yönelik faaliyetlerde bulunmak</li><li>Platformun teknik yapısını bozacak girişim</li><li>İzinsiz veri toplamak veya scraping yapmak</li></ul></section>
-              <section className="reg-modal-section"><h3>5. İçerik ve Sorumluluk</h3><ul><li>Platformda paylaşılan tüm içeriklerden kullanıcı sorumludur</li><li>Tedport içerikleri denetleme hakkına sahiptir ancak ön denetim yükümlülüğü yoktur</li></ul></section>
-              <section className="reg-modal-section"><h3>6. Ücretlendirme</h3><p>Tedport bazı hizmetleri ücretli sunabilir; ücretler platformda belirtilir. Tedport, fiyatları değiştirme hakkını saklı tutar.</p></section>
-              <section className="reg-modal-section"><h3>7. Fikri Mülkiyet</h3><p>Platformun tüm hakları Tedport'a aittir. Kullanıcı, platformu kopyalayamaz veya ticari amaçla kullanamaz.</p></section>
-              <section className="reg-modal-section"><h3>8. Hizmetin Askıya Alınması</h3><p>Tedport; hukuka aykırılık, güvenlik riski veya sistem kötüye kullanımı durumlarında hizmeti askıya alabilir.</p></section>
-              <section className="reg-modal-section"><h3>9. Sorumluluğun Sınırlandırılması</h3><p>Tedport; kullanıcılar arası anlaşmazlıklardan, ürün/hizmet kalitesinden sorumlu değildir.</p></section>
-              <section className="reg-modal-section"><h3>10. Mücbir Sebep</h3><p>Doğal afet, siber saldırı, altyapı sorunları gibi durumlarda Tedport sorumlu tutulamaz.</p></section>
-              <section className="reg-modal-section"><h3>11. Uygulanacak Hukuk</h3><p>İşbu Sözleşme Türk hukukuna tabidir. Uyuşmazlıklarda İstanbul Mahkemeleri yetkilidir.</p></section>
-              <section className="reg-modal-section"><h3>12. Yürürlük</h3><p>Kullanıcı, platforma üye olarak bu Sözleşme'yi kabul etmiş sayılır.</p></section>
-            </div>
-            <div className="reg-modal-footer">
-              <button type="button" className="reg-modal-accept-btn" onClick={() => setShowTermsModal(false)}>Anladım, Kapat</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Gizlilik Politikası Modal */}
-      {showPrivacyModal && (
-        <div className="reg-modal-overlay" onClick={() => setShowPrivacyModal(false)}>
-          <div className="reg-modal" onClick={e => e.stopPropagation()}>
-            <div className="reg-modal-header">
-              <div className="reg-modal-header-inner">
-                <span className="material-symbols-outlined reg-modal-icon">lock</span>
-                <h2>Gizlilik Politikası</h2>
-              </div>
-              <button type="button" className="reg-modal-close" onClick={() => setShowPrivacyModal(false)} aria-label="Kapat">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-            <div className="reg-modal-body">
-              <section className="reg-modal-section"><h3>1. Amaç</h3><p>Bu Gizlilik Politikası, Tedport'un kullanıcı verilerini nasıl topladığını, kullandığını ve koruduğunu açıklamaktadır.</p></section>
-              <section className="reg-modal-section"><h3>2. Toplanan Veriler</h3><ul><li>Kimlik bilgileri (ad, soyad)</li><li>İletişim bilgileri (e-posta, telefon)</li><li>şirket bilgileri</li><li>Kullanım verileri (log, IP)</li></ul></section>
-              <section className="reg-modal-section"><h3>3. Verilerin Kullanımı</h3><p>Hizmet sunumu, hesap yönetimi, güvenlik, analiz ve (rıza verilmişse) pazarlama amaçlarıyla kullanılır.</p></section>
-              <section className="reg-modal-section"><h3>4. Çerezler</h3><p>Tedport kullanıcı deneyimini geliştirmek için çerezler kullanır. Kullanıcılar tarayıcı ayarlarından çerezleri kontrol edebilir.</p></section>
-              <section className="reg-modal-section"><h3>5. Veri Paylaşımı</h3><ul><li>Teknik hizmet sağlayıcılar</li><li>Analitik servisler</li><li>Yetkili kamu kurumları</li></ul><div className="reg-modal-notice"><span className="material-symbols-outlined">shield</span><span>Verileriniz satılmaz veya kiralanmaz.</span></div></section>
-              <section className="reg-modal-section"><h3>6. Veri Güvenliği</h3><ul><li>SSL / HTTPS kullanılmaktadır</li><li>Erişim kontrolleri uygulanmaktadır</li></ul></section>
-              <section className="reg-modal-section"><h3>7. Saklama Süresi</h3><p>Veriler; hizmet süresi boyunca ve yasal zorunluluklar kapsamında saklanır, ardından silinir.</p></section>
-              <section className="reg-modal-section"><h3>8. Kullanıcı Hakları</h3><p>Verilerinize erişebilir, düzeltme talep edebilir veya silinmesini isteyebilirsiniz. Talepler: <a href="mailto:info@tedport.com" className="text-link">info@tedport.com</a></p></section>
-              <section className="reg-modal-section"><h3>9. Değişiklikler</h3><p>Tedport bu politikayı güncelleyebilir. Güncel versiyon platformda yayınlanır.</p></section>
-            </div>
-            <div className="reg-modal-footer">
-              <button type="button" className="reg-modal-accept-btn" onClick={() => setShowPrivacyModal(false)}>Anladım, Kapat</button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Ticari Elektronik İleti Modal */}
       {showMarketingModal && (
         <div className="reg-modal-overlay" onClick={() => setShowMarketingModal(false)}>
