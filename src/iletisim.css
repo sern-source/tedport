@@ -429,33 +429,6 @@
   text-decoration: underline;
 }
 
-/* Map Section */
-.contact-page-wrapper .contact-map-container {
-  height: 300px;
-  width: 100%;
-  border-radius: 1rem;
-  overflow: hidden;
-  border: 1px solid rgba(226, 232, 240, 0.6);
-  background-color: white;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.3s;
-}
-
-.contact-page-wrapper .contact-map-container:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
-@media (min-width: 640px) {
-  .contact-page-wrapper .contact-map-container {
-    height: 350px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .contact-page-wrapper .contact-map-container {
-    height: 400px;
-  }
-}
 
 /* Footer */
 .contact-page-wrapper .contact-footer {

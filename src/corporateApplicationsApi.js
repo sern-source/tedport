@@ -12,20 +12,18 @@ const mapFormToDatabasePayload = (formData) => ({
   website_url: String(formData.websiteUrl || '').trim() || null,
   corporate_email: String(formData.corporateEmail || '').trim().toLowerCase(),
   phone: String(formData.phone || '').trim(),
-  tax_office: String(formData.taxOffice || '').trim() || null,
-  tax_number: String(formData.taxNumber || '').trim() || null,
-// Enes Doğanay | 8 Nisan 2026: companyAddress yerine companyIl/companyIlce/companyOpenAddress birleştirilir
+// Enes Doğanay | 1 Mayıs 2026: vergi alanları kaldırıldı, yetkilendirme belgesi metadata'ya taşındı
   company_address: [
     formData.companyIl,
     formData.companyIlce,
     formData.companyOpenAddress
   ].map(v => String(v || '').trim()).filter(Boolean).join(', ') || null,
   verification_note: String(formData.verificationNote || '').trim() || null,
-  ...(formData.selectedFirmaId || formData.companyPhone || formData.taxDocumentUrl || formData.companyIl ? {
+  ...(formData.selectedFirmaId || formData.companyPhone || formData.authorizationDocUrl || formData.companyIl ? {
     metadata: {
       ...(formData.selectedFirmaId ? { requested_firma_id: formData.selectedFirmaId } : {}),
       ...(formData.companyPhone ? { company_phone: String(formData.companyPhone).trim() } : {}),
-      ...(formData.taxDocumentUrl ? { tax_document_url: formData.taxDocumentUrl } : {}),
+      ...(formData.authorizationDocUrl ? { authorization_doc_url: formData.authorizationDocUrl } : {}),
       ...(formData.companyIl ? { company_il: formData.companyIl, company_ilce: formData.companyIlce || '', company_open_address: formData.companyOpenAddress || '' } : {})
     }
   } : {})

@@ -166,6 +166,9 @@ const ProfilePage = () => {
   // Enes Doğanay | 11 Nisan 2026: Bekleyen e-posta değişikliği (onay maili bekleniyor)
   const [pendingEmail, setPendingEmail] = useState(null);
 
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [marketingConsentSaving, setMarketingConsentSaving] = useState(false);
+
   /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihleri state'i */
   const [notifPrefs, setNotifPrefs] = useState({
     teklif_talepleri: true,
@@ -214,7 +217,7 @@ const ProfilePage = () => {
         if (currentUser.new_email) setPendingEmail(currentUser.new_email);
 
         const [profileResult, cityResult, listsResult, favsResult, notificationsResult, remindersResult, quotesResult] = await Promise.all([
-          supabase.from("profiles").select("id, first_name, last_name, company_name, phone, location, avatar, email").eq("id", currentUser.id).single(),
+          supabase.from("profiles").select("id, first_name, last_name, company_name, phone, location, avatar, email, marketing_consent").eq("id", currentUser.id).single(),
           supabase.from("sehirler").select("sehir").order("sehir", { ascending: true }),
           supabase.from('kullanici_listeleri').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true }),
           supabase.from('kullanici_favorileri').select('*').eq('user_id', currentUser.id),
@@ -224,7 +227,10 @@ const ProfilePage = () => {
         ]);
 
         const { data: profileData } = profileResult;
-        if (profileData) setProfile(profileData);
+        if (profileData) {
+          setProfile(profileData);
+          setMarketingConsent(profileData.marketing_consent ?? false);
+        }
 
         const { data: cityData } = cityResult;
         if (cityData) setCities(cityData.map((c) => c.sehir));
@@ -757,6 +763,24 @@ const ProfilePage = () => {
     } catch (err) {
       console.error('[Bildirim Tercihleri] Beklenmeyen hata:', err);
       setNotifPrefs(prev => ({ ...prev, [key]: !newValue }));
+    }
+  };
+
+  const handleToggleMarketing = async () => {
+    const newValue = !marketingConsent;
+    setMarketingConsent(newValue);
+    setMarketingConsentSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ marketing_consent: newValue })
+        .eq('id', user.id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('[Pazarlama Onayı] Güncelleme hatası:', err);
+      setMarketingConsent(!newValue);
+    } finally {
+      setMarketingConsentSaving(false);
     }
   };
 
@@ -1898,6 +1922,25 @@ const ProfilePage = () => {
                           </button>
                         </div>
                       ))}
+
+                      {/* Pazarlama onayı — ayrı satır, profiles tablosundan */}
+                      <div className="notif-pref-row notif-pref-row--marketing">
+                        <div className="notif-pref-info">
+                          <span className="material-symbols-outlined notif-pref-icon">mark_email_read</span>
+                          <div>
+                            <strong>Pazarlama İletişimi</strong>
+                            <p>Kampanya, fırsat ve önerilerle ilgili e-posta al</p>
+                          </div>
+                        </div>
+                        <button
+                          className={`notif-pref-switch ${marketingConsent ? 'active' : ''} ${marketingConsentSaving ? 'saving' : ''}`}
+                          onClick={handleToggleMarketing}
+                          disabled={marketingConsentSaving}
+                          aria-label={`Pazarlama iletişimi ${marketingConsent ? 'açık' : 'kapalı'}`}
+                        >
+                          <span className="notif-pref-switch-knob" />
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

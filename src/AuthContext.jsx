@@ -113,6 +113,19 @@ export function AuthProvider({ children }) {
             clearAuthState();
             return;
           }
+
+          // Enes Doğanay | 1 Mayıs 2026: OAuth ile ilk kayıt — şartları kabul etmiş sayılır, consent_logs'a yaz
+          const provider = session.user.app_metadata?.provider || 'oauth';
+          await supabase.from('consent_logs').insert({
+            user_id: session.user.id,
+            kvkk_accepted: true,
+            marketing_accepted: false,
+            consent_text_version: '1.0',
+            signup_method: `oauth_${provider}`,
+            ip_address: null,
+            user_agent: navigator.userAgent
+          });
+
           profileResult.data = { first_name: autoFirstName, last_name: autoLastName };
         } else {
           try { await supabase.auth.signOut(); } catch {}

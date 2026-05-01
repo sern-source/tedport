@@ -130,21 +130,40 @@ const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
     if (decision === "needs_info") {
         return {
             subject:
-                `Tedport Kurumsal Başvurunuz İçin Ek Bilgi Gerekli | ${companyName}`,
+                `Başvurunuz İçin Ek Bilgi Gerekli | ${companyName} – Tedport`,
             html: `
         <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
           <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
-            <div style="padding: 22px 24px; background: linear-gradient(135deg, #d29a42 0%, #be7c20 100%); color: #fff;">
-              <h1 style="margin: 0; font-size: 24px;">Başvurunuz İçin Ek Bilgi Gerekli</h1>
+            <div style="padding: 22px 24px; background: linear-gradient(135deg, #92400e 0%, #d97706 100%); color: #fff;">
+              <div style="font-size: 28px; margin-bottom: 8px;">📋</div>
+              <h1 style="margin: 0; font-size: 22px; font-weight: 700;">Başvurunuz İçin Ek Bilgi Gerekli</h1>
+              <p style="margin: 6px 0 0; opacity: 0.9; font-size: 14px;">${companyName}</p>
             </div>
-            <div style="padding: 24px;">
-              <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${
+            <div style="padding: 28px 24px;">
+              <p style="margin: 0 0 20px; line-height: 1.7; color: #334155;">
+                Merhaba <strong>${
                 applicantName || "Tedport kullanıcısı"
-            }, ${companyName} adına yaptığınız kurumsal başvuru incelendi.</p>
-              <p style="margin: 0; line-height: 1.7; color: #475569;">İncelemeyi tamamlayabilmemiz için ek bilgi gerekiyor. ${
-                reviewNote ||
-                "Lütfen bize yanıt vererek gerekli detayları paylaşın."
-            }</p>
+            }</strong>,<br>
+                ${companyName} adına yaptığınız kurumsal başvuru incelenmiş olup değerlendirmeyi tamamlayabilmemiz için sizden ek bilgi almamız gerekmektedir.
+              </p>
+              ${
+                reviewNote
+                    ? `
+              <div style="background: #fffbeb; border-left: 4px solid #d97706; border-radius: 0 10px 10px 0; padding: 16px 18px; margin: 0 0 20px;">
+                <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e;">Talep Edilen Bilgi / Belge</p>
+                <p style="margin: 0; line-height: 1.7; color: #1e293b; font-size: 15px;">${reviewNote}</p>
+              </div>`
+                    : `
+              <div style="background: #fffbeb; border-left: 4px solid #d97706; border-radius: 0 10px 10px 0; padding: 16px 18px; margin: 0 0 20px;">
+                <p style="margin: 0; line-height: 1.7; color: #1e293b;">Lütfen bize yanıt vererek gerekli detayları paylaşın.</p>
+              </div>`
+            }
+              <p style="margin: 0; line-height: 1.7; color: #64748b; font-size: 13px;">
+                Bu e-postaya doğrudan yanıt vererek veya <a href="mailto:info@tedport.com" style="color: #d97706;">info@tedport.com</a> adresine yazarak bilgilerinizi iletebilirsiniz.
+              </p>
+            </div>
+            <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center;">
+              Tedport Teknoloji A.Ş. | <a href="https://tedport.com" style="color: #94a3b8;">tedport.com</a>
             </div>
           </div>
         </div>
@@ -153,21 +172,37 @@ const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
     }
 
     return {
-        subject: `Tedport Kurumsal Başvurunuz Sonuçlandı | ${companyName}`,
+        subject: `Kurumsal Başvurunuz Reddedildi | ${companyName} – Tedport`,
         html: `
       <div style="font-family: Arial, sans-serif; background: #f8fafc; padding: 32px; color: #0f172a;">
         <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden;">
           <div style="padding: 22px 24px; background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%); color: #fff;">
-            <h1 style="margin: 0; font-size: 24px;">Kurumsal Başvurunuz Şu An İçin Onaylanmadı</h1>
+            <div style="font-size: 28px; margin-bottom: 8px;">❌</div>
+            <h1 style="margin: 0; font-size: 22px; font-weight: 700;">Kurumsal Başvurunuz Reddedildi</h1>
+            <p style="margin: 6px 0 0; opacity: 0.9; font-size: 14px;">${companyName}</p>
           </div>
-          <div style="padding: 24px;">
-            <p style="margin: 0 0 16px; line-height: 1.7;">Merhaba ${
+          <div style="padding: 28px 24px;">
+            <p style="margin: 0 0 20px; line-height: 1.7; color: #334155;">
+              Merhaba <strong>${
             applicantName || "Tedport kullanıcısı"
-        }, ${companyName} adına yaptığınız kurumsal başvuru değerlendirildi.</p>
-            <p style="margin: 0; line-height: 1.7; color: #475569;">Bu aşamada başvurunuzu onaylayamadık. ${
-            reviewNote ||
-            "Dilerseniz eksik bilgilerle birlikte yeniden başvurabilirsiniz."
-        }</p>
+        }</strong>,<br>
+              ${companyName} adına yaptığınız kurumsal başvuru incelendi ve maalesef bu aşamada onaylanamadı.
+            </p>
+            ${
+            reviewNote
+                ? `
+            <div style="background: #fff1f2; border-left: 4px solid #b91c1c; border-radius: 0 10px 10px 0; padding: 16px 18px; margin: 0 0 20px;">
+              <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9f1239;">Red Gerekçesi</p>
+              <p style="margin: 0; line-height: 1.7; color: #1e293b; font-size: 15px;">${reviewNote}</p>
+            </div>`
+                : ""
+        }
+            <p style="margin: 0; line-height: 1.7; color: #64748b; font-size: 13px;">
+              Eksik bilgilerinizi tamamlayarak yeniden başvurabilirsiniz. Sorularınız için <a href="mailto:info@tedport.com" style="color: #b91c1c;">info@tedport.com</a> adresine yazabilirsiniz.
+            </p>
+          </div>
+          <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center;">
+            Tedport Teknoloji A.Ş. | <a href="https://tedport.com" style="color: #94a3b8;">tedport.com</a>
           </div>
         </div>
       </div>

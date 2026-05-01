@@ -204,38 +204,11 @@ const Contact = () => {
                                     <div className="contact-info-header">
                                         <h2>İletişim Bilgileri</h2>
                                         <p>
-                                            Genel merkezimiz İstanbul'un kalbinde yer almaktadır. Çalışma saatlerimiz içerisinde bizi ziyaret edebilir veya aşağıdaki iletişim kanallarından bize ulaşabilirsiniz.
+                                            Sorularınız veya önerileriniz için bize e-posta aracılığıyla ulaşabilirsiniz. En kısa sürede geri dönüş yapacağız.
                                         </p>
                                     </div>
 
                                     <div className="contact-info-cards">
-                                        {/* Address Card */}
-                                        <div className="contact-info-card">
-                                            <div className="contact-icon-box">
-                                                <span className="material-symbols-outlined">location_on</span>
-                                            </div>
-                                            <div className="contact-info-text">
-                                                <h3>Adres</h3>
-                                                <p>
-                                                    Levent Mah. Büyükdere Cad. No:123<br />
-                                                    Kanyon Ofis Bloğu Kat: 15<br />
-                                                    34394 Şişli / İstanbul
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Phone Card */}
-                                        <div className="contact-info-card">
-                                            <div className="contact-icon-box">
-                                                <span className="material-symbols-outlined">call</span>
-                                            </div>
-                                            <div className="contact-info-text">
-                                                <h3>Telefon</h3>
-                                                <p>Hafta içi 09:00 - 18:00</p>
-                                                <a href="tel:+902121234567">+90 (212) 123 45 67</a>
-                                            </div>
-                                        </div>
-
                                         {/* Email Card */}
                                         <div className="contact-info-card">
                                             <div className="contact-icon-box">
@@ -252,19 +225,7 @@ const Contact = () => {
                                 </div>
                             </div>
 
-                            {/* Map Section */}
-                            <div className="contact-map-container">
-                                <iframe
-                                    title="Office Location Map"
-                                    src="https://maps.google.com/maps?q=Kanyon%20Al%C4%B1%C5%9Fveri%C5%9F%20Merkezi,%20B%C3%BCy%C3%BCkdere%20Cd.%20No:185,%2034394%20%C5%9Ei%C5%9Fli/%C4%B0stanbul&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0 }}
-                                    allowFullScreen
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer-when-downgrade"
-                                ></iframe>
-                            </div>
+
                         </div>
                     </section>
                 </main>

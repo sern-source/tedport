@@ -133,6 +133,22 @@ const formatCurrency = (amount, currency) => {
     return `${symbol} ${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
+const TENDERS_PAGE_SIZE = 12;
+
+const getSmartPages = (current, total) => {
+    const delta = 2;
+    const pages = [];
+    let last = null;
+    for (let i = 1; i <= total; i++) {
+        if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+            if (last && i - last > 1) pages.push('...');
+            pages.push(i);
+            last = i;
+        }
+    }
+    return pages;
+};
+
 const IhalelerPage = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -153,6 +169,7 @@ const IhalelerPage = () => {
     const [sortBy, setSortBy] = useState('deadline');
     const [selectedFirmaName, setSelectedFirmaName] = useState('');
     const [tableMissing, setTableMissing] = useState(false);
+    const [page, setPage] = useState(1);
 
     // Enes Doğanay | 7 Nisan 2026: Görünüm tercihi localStorage'dan okunur ve kullanıcıya özgü kalır
     const [viewMode, setViewMode] = useState(() => {
@@ -325,6 +342,7 @@ const IhalelerPage = () => {
         setYeniGereksinimMadde('');
         setYeniGereksinimAciklama('');
         setEmailInput('');
+        setEmailStatus(null);
         setFirmaSearchTerm('');
         setFirmaSearchResults([]);
         setStepperStep(0);
@@ -364,6 +382,7 @@ const IhalelerPage = () => {
         setYeniGereksinimMadde('');
         setYeniGereksinimAciklama('');
         setEmailInput('');
+        setEmailStatus(null);
         setFirmaSearchTerm('');
         setFirmaSearchResults([]);
         setStepperStep(0);
@@ -414,12 +433,45 @@ const IhalelerPage = () => {
     const removeGereksinim = (id) => setForm(p => ({ ...p, gereksinimler: p.gereksinimler.filter(g => g.id !== id) }));
 
     // Enes Doğanay | 10 Nisan 2026: Çoklu e-posta tag input
+    const [emailStatus, setEmailStatus] = useState(null); // null | 'checking' | 'valid' | 'not_found'
+    const emailCheckTimeout = useRef(null);
+
+    const checkEmailInDb = useCallback(async (email) => {
+        const trimmed = email.trim().toLowerCase();
+        if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+            setEmailStatus(null);
+            return;
+        }
+        setEmailStatus('checking');
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('email', trimmed)
+                .maybeSingle();
+            if (error) throw error;
+            setEmailStatus(data ? 'valid' : 'not_found');
+        } catch {
+            setEmailStatus(null);
+        }
+    }, []);
+
+    const handleEmailInputChange = (e) => {
+        const val = e.target.value;
+        setEmailInput(val);
+        setEmailStatus(null);
+        if (emailCheckTimeout.current) clearTimeout(emailCheckTimeout.current);
+        emailCheckTimeout.current = setTimeout(() => checkEmailInDb(val), 500);
+    };
+
     const addEmail = () => {
         const email = emailInput.trim().toLowerCase();
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+        if (emailStatus !== 'valid') return;
         if (form.davet_emailleri.includes(email)) return;
         setForm(p => ({ ...p, davet_emailleri: [...p.davet_emailleri, email] }));
         setEmailInput('');
+        setEmailStatus(null);
     };
     const removeEmail = (email) => setForm(p => ({ ...p, davet_emailleri: p.davet_emailleri.filter(e => e !== email) }));
     const handleEmailKeyDown = (e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addEmail(); } };
@@ -760,6 +812,20 @@ const IhalelerPage = () => {
     const liveCount = tenders.filter((tender) => getTenderStatusMeta(tender).key === 'canli').length;
     const upcomingCount = tenders.filter((tender) => getTenderStatusMeta(tender).key === 'yaklasan').length;
     const closedCount = tenders.filter((tender) => getTenderStatusMeta(tender).key === 'kapali').length;
+
+    const totalPages = Math.ceil(filteredTenders.length / TENDERS_PAGE_SIZE);
+    const smartPages = getSmartPages(page, totalPages);
+    const paginatedTenders = filteredTenders.slice((page - 1) * TENDERS_PAGE_SIZE, page * TENDERS_PAGE_SIZE);
+
+    // Arama/filtre/sıralama değişince sayfayı 1'e sıfırla
+    React.useEffect(() => {
+        setPage(1);
+    }, [searchTerm, statusFilter, sortBy]);
+
+    // Sayfa değişince en üste scroll
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [page]);
 
     // Enes Doğanay | 7 Nisan 2026: Görünüm değiştirme ve localStorage'a kaydetme
     const toggleViewMode = () => {
@@ -1390,18 +1456,36 @@ const IhalelerPage = () => {
                                                 Davet Edilecek E-postalar
                                             </span>
                                             <p className="ihale-section__desc">İhale yayınlandığında bu adreslere bildirim gönderilecek.</p>
-                                            <div className="ihale-email-input-row">
+                                            <div className={`ihale-email-input-row${emailStatus === 'valid' ? ' ihale-email-input-row--valid' : emailStatus === 'not_found' ? ' ihale-email-input-row--error' : ''}`}>
                                                 <input
                                                     type="email"
                                                     placeholder="ornek@firma.com"
                                                     value={emailInput}
-                                                    onChange={e => setEmailInput(e.target.value)}
+                                                    onChange={handleEmailInputChange}
                                                     onKeyDown={handleEmailKeyDown}
                                                 />
-                                                <button type="button" className="ihale-email-add-btn" onClick={addEmail}>
+                                                {emailStatus === 'checking' && (
+                                                    <span className="ihale-email-status-icon ihale-email-status-icon--checking material-symbols-outlined">autorenew</span>
+                                                )}
+                                                {emailStatus === 'valid' && (
+                                                    <span className="ihale-email-status-icon ihale-email-status-icon--valid material-symbols-outlined">check_circle</span>
+                                                )}
+                                                {emailStatus === 'not_found' && (
+                                                    <span className="ihale-email-status-icon ihale-email-status-icon--error material-symbols-outlined">cancel</span>
+                                                )}
+                                                <button type="button" className="ihale-email-add-btn" onClick={addEmail} disabled={emailStatus !== 'valid'}>
                                                     <span className="material-symbols-outlined">add</span>
                                                 </button>
                                             </div>
+                                            {emailStatus === 'not_found' && emailInput.trim().length > 0 && (
+                                                <div className="ihale-email-warning">
+                                                    <span className="material-symbols-outlined">info</span>
+                                                    <span>
+                                                        <strong>{emailInput.trim()}</strong> adresine sahip bir kullanıcı sistemimizde bulunamadı.
+                                                        İhale bildirimi alabilmesi için bu kişiyi <a href="/register" target="_blank" rel="noopener noreferrer">Tedport’a ücretsiz kayıt</a> olmaya davet edebilirsiniz.
+                                                    </span>
+                                                </div>
+                                            )}
                                             {form.davet_emailleri.length > 0 && (
                                                 <div className="ihale-email-tags">
                                                     {form.davet_emailleri.map(email => (
@@ -1795,6 +1879,29 @@ const IhalelerPage = () => {
                             <option value="title">Başlığa Göre</option>
                         </select>
                     </div>
+                    {totalPages > 1 && (
+                        <div className="tenders-mini-pagination">
+                            <button
+                                className="tenders-mini-page-btn"
+                                disabled={page === 1}
+                                onClick={() => setPage(p => p - 1)}
+                                title="Önceki sayfa"
+                            >
+                                <span className="material-symbols-outlined">chevron_left</span>
+                            </button>
+                            <span className="tenders-mini-page-info">
+                                <span className="tenders-mini-page-current">{page}</span> / {totalPages}
+                            </span>
+                            <button
+                                className="tenders-mini-page-btn"
+                                disabled={page === totalPages}
+                                onClick={() => setPage(p => p + 1)}
+                                title="Sonraki sayfa"
+                            >
+                                <span className="material-symbols-outlined">chevron_right</span>
+                            </button>
+                        </div>
+                    )}
                 </section>
 
                 {tableMissing ? (
@@ -1824,7 +1931,7 @@ const IhalelerPage = () => {
                                     <span className="material-symbols-outlined">lock</span>
                                     <h3>İhaleleri görüntülemek için giriş yapın</h3>
                                     <p>İhale detaylarını görmek ve teklif vermek için hesabınıza giriş yapın.</p>
-                                    <button type="button" className="tenders-blur-login-btn" onClick={() => navigate('/login')}>Giriş Yap</button>
+                                    <button type="button" className="tenders-blur-login-btn" onClick={() => navigate('/login?redirect=/ihaleler')}>Giriş Yap</button>
                                     <span className="tenders-blur-register">Hesabınız yok mu? <button type="button" onClick={() => navigate('/register')}>Kayıt Ol</button></span>
                                 </div>
                             </div>
@@ -1849,7 +1956,7 @@ const IhalelerPage = () => {
                                     <span className="tenders-list-col tenders-list-col--durum">Durum</span>
                                     <span className="tenders-list-col tenders-list-col--actions">İşlem</span>
                                 </div>
-                                {filteredTenders.map((tender) => {
+                                {paginatedTenders.map((tender) => {
                                     const statusMeta = getTenderStatusMeta(tender);
                                     const isHighlighted = highlightTenderId === tender.id;
                                     // Enes Doğanay | 15 Nisan 2026: Kendi ihalesi farklı renk — list view
@@ -1909,7 +2016,7 @@ const IhalelerPage = () => {
                         ) : (
                             /* Enes Doğanay | 11 Nisan 2026: Modern card grid — yeni alanlar, countdown, Firmaya Git + İhaleye Katıl */
                             <section className="tenders-grid">
-                                {filteredTenders.map((tender) => {
+                                {paginatedTenders.map((tender) => {
                                     const statusMeta = getTenderStatusMeta(tender);
                                     /* Geri sayım hesapla */
                                     const deadline = tender.son_basvuru_tarihi ? new Date(tender.son_basvuru_tarihi) : null;
@@ -2058,6 +2165,37 @@ const IhalelerPage = () => {
                                     );
                                 })}
                             </section>
+                        )}
+                        {totalPages > 1 && (
+                            <div className="tenders-pagination">
+                                <button
+                                    className="tenders-page-btn tenders-page-btn--nav"
+                                    disabled={page === 1}
+                                    onClick={() => setPage(p => p - 1)}
+                                >
+                                    <span className="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                {smartPages.map((p, i) =>
+                                    p === '...' ? (
+                                        <span key={`dots-${i}`} className="tenders-page-btn tenders-page-btn--dots">...</span>
+                                    ) : (
+                                        <button
+                                            key={`page-${p}`}
+                                            className={`tenders-page-btn${page === p ? ' tenders-page-btn--active' : ''}`}
+                                            onClick={() => setPage(p)}
+                                        >
+                                            {p}
+                                        </button>
+                                    )
+                                )}
+                                <button
+                                    className="tenders-page-btn tenders-page-btn--nav"
+                                    disabled={page === totalPages}
+                                    onClick={() => setPage(p => p + 1)}
+                                >
+                                    <span className="material-symbols-outlined">chevron_right</span>
+                                </button>
+                            </div>
                         )}
                         </div>
                     </>

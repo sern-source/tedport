@@ -986,48 +986,63 @@ const SupplierProfile = () => {
                                         </button>
                                     </div>
 
-                                    {isTendersTableMissing ? (
-                                        <div className="tenders-empty-state-inline">
-                                            İhale tablosu Supabase üzerinde kurulduğunda bu alan otomatik olarak dinamik verilerle dolacak.
-                                        </div>
-                                    ) : tendersLoading ? (
-                                        <div className="tenders-list tenders-list-loading">
-                                            {[1, 2].map((item) => (
-                                                <div key={item} className="tender-item tender-item-skeleton" />
-                                            ))}
-                                        </div>
-                                    ) : tenders.length > 0 ? (
-                                        <div className="tenders-list">
-                                            {tenders.map((tender) => {
-                                                const tenderStatus = getTenderStatusMeta(tender);
-                                                return (
-                                                    <div key={tender.id} className="tender-item">
-                                                        <div className="tender-header">
-                                                            <div className="tender-info">
-                                                                <h3 className="tender-title">{tender.baslik}</h3>
-                                                                <p className="tender-desc">{tender.aciklama}</p>
+                                    <div className="firma-tenders-gate">
+                                        {!userProfile && (
+                                            <div className="tenders-blur-overlay">
+                                                <div className="tenders-blur-cta">
+                                                    <span className="material-symbols-outlined">lock</span>
+                                                    <h3>İhaleleri görüntülemek için giriş yapın</h3>
+                                                    <p>İhale detaylarını görmek için hesabınıza giriş yapın.</p>
+                                                    <button type="button" className="tenders-blur-login-btn" onClick={() => navigate(`/login?redirect=/firmadetay/${id}`)}>Giriş Yap</button>
+                                                    <span className="tenders-blur-register">Hesabınız yok mu? <button type="button" onClick={() => navigate('/register')}>Kayıt Ol</button></span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className={!userProfile ? 'tenders-blurred-content' : undefined}>
+                                            {isTendersTableMissing ? (
+                                                <div className="tenders-empty-state-inline">
+                                                    İhale tablosu Supabase üzerinde kurulduğunda bu alan otomatik olarak dinamik verilerle dolacak.
+                                                </div>
+                                            ) : tendersLoading ? (
+                                                <div className="tenders-list tenders-list-loading">
+                                                    {[1, 2].map((item) => (
+                                                        <div key={item} className="tender-item tender-item-skeleton" />
+                                                    ))}
+                                                </div>
+                                            ) : tenders.length > 0 ? (
+                                                <div className="tenders-list">
+                                                    {tenders.map((tender) => {
+                                                        const tenderStatus = getTenderStatusMeta(tender);
+                                                        return (
+                                                            <div key={tender.id} className="tender-item">
+                                                                <div className="tender-header">
+                                                                    <div className="tender-info">
+                                                                        <h3 className="tender-title">{tender.baslik}</h3>
+                                                                        <p className="tender-desc">{tender.aciklama}</p>
+                                                                    </div>
+                                                                    <div className={`tender-status tender-status-${tenderStatus.className}`}>
+                                                                        {tenderStatus.label}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="tender-meta-row">
+                                                                    <div className="tender-date">
+                                                                        <span className="material-symbols-outlined tender-date-icon">calendar_today</span>
+                                                                        {formatTenderDate(tender.son_basvuru_tarihi)}
+                                                                    </div>
+                                                                    {tender.kategori && <span className="tender-meta-chip">{tender.kategori}</span>}
+                                                                    {tender.ihale_tipi && <span className="tender-meta-chip">{tender.ihale_tipi}</span>}
+                                                                </div>
                                                             </div>
-                                                            <div className={`tender-status tender-status-${tenderStatus.className}`}>
-                                                                {tenderStatus.label}
-                                                            </div>
-                                                        </div>
-                                                        <div className="tender-meta-row">
-                                                            <div className="tender-date">
-                                                                <span className="material-symbols-outlined tender-date-icon">calendar_today</span>
-                                                                {formatTenderDate(tender.son_basvuru_tarihi)}
-                                                            </div>
-                                                            {tender.kategori && <span className="tender-meta-chip">{tender.kategori}</span>}
-                                                            {tender.ihale_tipi && <span className="tender-meta-chip">{tender.ihale_tipi}</span>}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
+                                                        );
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <div className="tenders-empty-state-inline">
+                                                    Bu firmaya ait yayınlanmış ihale kaydı bulunmuyor.
+                                                </div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <div className="tenders-empty-state-inline">
-                                            Bu firmaya ait yayınlanmış ihale kaydı bulunmuyor.
-                                        </div>
-                                    )}
+                                    </div>
                                 </section>
                             </div>
 
@@ -1135,7 +1150,7 @@ const SupplierProfile = () => {
                                             {/* Enes Doğanay | 6 Nisan 2026: Giriş yapmayan kullanıcı için favori kartında da not kartıyla aynı boş durum gösterilir */}
                                             <span className="material-symbols-outlined notes-lock-icon">lock</span>
                                             <p className="notes-login-text">Bu firmayı listelerinize eklemek için lütfen giriş yapın.</p>
-                                            <button onClick={() => navigate('/login')} className="notes-login-btn">Giriş Yap</button>
+                                            <button onClick={() => navigate(`/login?redirect=/firmadetay/${id}`)} className="notes-login-btn">Giriş Yap</button>
                                         </div>
                                     )}
                                 </div>
@@ -1172,7 +1187,7 @@ const SupplierProfile = () => {
                                     {!userProfile && (
                                         <div className="contact-gated-panel">
                                             <p className="contact-gated-text">Teklif istemek ve telefon bilgisini görmek için giriş yapın.</p>
-                                            <button onClick={() => navigate('/login')} className="notes-login-btn contact-login-btn">Giriş Yap</button>
+                                            <button onClick={() => navigate(`/login?redirect=/firmadetay/${id}`)} className="notes-login-btn contact-login-btn">Giriş Yap</button>
                                         </div>
                                     )}
                                     {/* Enes Doğanay | 6 Nisan 2026: Konum ve firma bilgileri tek bir panel altında toparlandı */}
@@ -1389,7 +1404,7 @@ const SupplierProfile = () => {
                                         <div className="notes-login-prompt">
                                             <span className="material-symbols-outlined notes-lock-icon">lock</span>
                                             <p className="notes-login-text">Bu tedarikçi için özel notlar almak istiyorsanız lütfen giriş yapın.</p>
-                                            <button onClick={() => navigate('/login')} className="notes-login-btn">Giriş Yap</button>
+                                            <button onClick={() => navigate(`/login?redirect=/firmadetay/${id}`)} className="notes-login-btn">Giriş Yap</button>
                                         </div>
                                     )}
                                 </div>

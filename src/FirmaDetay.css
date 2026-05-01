@@ -806,6 +806,87 @@ body {
   margin-top: 2.5rem;
 }
 
+.firma-tenders-gate {
+  position: relative;
+}
+
+.firma-tenders-gate .tenders-blurred-content {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.firma-tenders-gate .tenders-blur-overlay {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  margin-bottom: -60px;
+}
+
+.firma-tenders-gate .tenders-blur-cta {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  max-width: 420px;
+}
+
+.firma-tenders-gate .tenders-blur-cta .material-symbols-outlined {
+  font-size: 40px;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.firma-tenders-gate .tenders-blur-cta h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.firma-tenders-gate .tenders-blur-cta p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 16px;
+}
+
+.firma-tenders-gate .tenders-blur-login-btn {
+  display: inline-block;
+  padding: 10px 32px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.firma-tenders-gate .tenders-blur-login-btn:hover {
+  background: #2563eb;
+}
+
+.firma-tenders-gate .tenders-blur-register {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.firma-tenders-gate .tenders-blur-register button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
 .tenders-section-header {
   display: flex;
   align-items: center;

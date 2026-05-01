@@ -108,8 +108,7 @@ const AdminCorporateApplicationsPage = () => {
                 application.listed_company_name,
                 application.corporate_email,
                 application.applicant_first_name,
-                application.applicant_last_name,
-                application.tax_number
+                application.applicant_last_name
             ].some((value) => (value || '').toLocaleLowerCase('tr-TR').includes(normalizedQuery));
 
             return matchesStatus && matchesSearch;
@@ -225,7 +224,7 @@ const AdminCorporateApplicationsPage = () => {
                                 <span className="material-symbols-outlined">search</span>
                                 <input
                                     type="text"
-                                    placeholder="Firma, başvuru sahibi veya vergi numarası ara..."
+                                    placeholder="Firma, başvuru sahibi veya e-posta ara..."
                                     value={searchTerm}
                                     onChange={(event) => setSearchTerm(event.target.value)}
                                 />
@@ -307,7 +306,6 @@ const AdminCorporateApplicationsPage = () => {
                                                         </p>
                                                     )}
                                                     <p className="corporate-admin-card-note"><strong>Web sitesi:</strong> {application.website_url ? <a href={application.website_url} target="_blank" rel="noreferrer">{application.website_url}</a> : 'Belirtilmedi'}</p>
-                                                    <p className="corporate-admin-card-note"><strong>Vergi dairesi / no:</strong> {[application.tax_office, application.tax_number].filter(Boolean).join(' / ') || 'Belirtilmedi'}</p>
                                                     {/* Enes Doğanay | 8 Nisan 2026: İl/İlçe/Açık Adres metadata'dan yapılandırılmış gösterim */}
                                                     {application.metadata?.company_il ? (
                                                         <div className="corporate-admin-card-note corporate-admin-address-block">
@@ -322,17 +320,16 @@ const AdminCorporateApplicationsPage = () => {
                                                         <p className="corporate-admin-card-note"><strong>Adres:</strong> {application.company_address || 'Belirtilmedi'}</p>
                                                     )}
                                                     <p className="corporate-admin-card-note"><strong>Başvuru notu:</strong> {application.verification_note || 'Ek açıklama yok.'}</p>
-                                                    {/* Enes Doğanay | 8 Nisan 2026: Vergi levhası durumu admin panelinde her zaman gösterilir */}
-                                                    {application.metadata?.tax_document_url ? (
+                                                    {/* Enes Doğanay | 1 Mayıs 2026: Yetkilendirme Belgesi (eski: Vergi Levhası) */}
+                                                    {application.metadata?.authorization_doc_url ? (
                                                         <p className="corporate-admin-card-note corporate-admin-tax-doc">
-                                                            <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#16a34a' }}>description</span>
-                                                            <strong>Vergi Levhası:</strong>{' '}
+                                                            <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#16a34a' }}>verified_user</span>
+                                                            <strong>Yetkilendirme Belgesi:</strong>{' '}
                                                             <button
                                                                 type="button"
                                                                 className="corporate-admin-tax-link"
                                                                 onClick={async () => {
-                                                                    const filePath = application.metadata.tax_document_url;
-                                                                    // Enes Doğanay | 8 Nisan 2026: Private bucket — signed URL ile aç (1 saat geçerli)
+                                                                    const filePath = application.metadata.authorization_doc_url;
                                                                     const { data, error } = await supabase.storage.from('tax-documents').createSignedUrl(filePath, 3600);
                                                                     if (data?.signedUrl) {
                                                                         window.open(data.signedUrl, '_blank');
@@ -341,14 +338,14 @@ const AdminCorporateApplicationsPage = () => {
                                                                     }
                                                                 }}
                                                             >
-                                                                Dosyayı Görüntüle
+                                                                Belgeyi Görüntüle
                                                             </button>
-                                                            <span className="corporate-admin-tax-badge">Belge Yüklendi</span>
+                                                            <span className="corporate-admin-tax-badge" style={{ background: '#dcfce7', color: '#15803d' }}>Belge Yüklendi</span>
                                                         </p>
                                                     ) : (
                                                         <p className="corporate-admin-card-note">
-                                                            <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#94a3b8' }}>description</span>
-                                                            <strong>Vergi Levhası:</strong> <span style={{ color: '#94a3b8' }}>Yüklenmedi</span>
+                                                            <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#ef4444' }}>verified_user</span>
+                                                            <strong>Yetkilendirme Belgesi:</strong> <span style={{ color: '#ef4444', fontWeight: 600 }}>Yüklenmedi</span>
                                                         </p>
                                                     )}
                                                     {application.review_note && (

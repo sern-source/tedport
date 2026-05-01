@@ -28,16 +28,16 @@ const initialCorporateForm = {
   websiteUrl: '',
   corporateEmail: '',
   phone: '',
-  taxOffice: '',
-  taxNumber: '',
   verificationNote: '',
-  taxDocument: null
+  authorizationDoc: null
 };
 
 const RegistrationPage = () => {
   // Enes Doğanay | 18 Nisan 2026: Hizmet Şartları ve Gizlilik Politikası modalı için state (gpt ile yapıldı)
   const [showTermsModal, setShowTermsModal] = useState(false);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false); // gpt ile yapıldı
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showMarketingModal, setShowMarketingModal] = useState(false);
+  const [showMarketingTooltip, setShowMarketingTooltip] = useState(false);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [registrationType, setRegistrationType] = useState(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
@@ -52,7 +52,8 @@ const RegistrationPage = () => {
   /* Enes Doğanay | 11 Nisan 2026: Şifre tekrarı doğrulaması */
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [corporateForm, setCorporateForm] = useState(initialCorporateForm);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -73,10 +74,11 @@ const RegistrationPage = () => {
     setRegistrationType(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
   }, [searchParams]);
 
-  // Enes Doğanay | 18 Nisan 2026: Sekme değişince modal state'lerini sıfırla (gpt ile yapıldı)
   useEffect(() => {
     setShowTermsModal(false);
     setShowPrivacyModal(false);
+    setShowMarketingModal(false);
+    setShowMarketingTooltip(false);
   }, [registrationType]);
 
   /* Enes Doğanay | 17 Nisan 2026: Firma detaydan yönlendirmede URL parametrelerinden kurumsal formu doldur */
@@ -243,12 +245,32 @@ const RegistrationPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const logConsent = async (userId) => {
+    try {
+      let ip = null;
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        ip = data.ip;
+      } catch (_) {}
+      await supabase.from('consent_logs').insert([{
+        user_id: userId,
+        kvkk_accepted: kvkkAccepted,
+        marketing_accepted: marketingConsent,
+        consent_text_version: '1.0',
+        signup_method: 'individual',
+        ip_address: ip,
+        user_agent: navigator.userAgent,
+      }]);
+    } catch (_) {}
+  };
+
   // Enes Doğanay | 6 Nisan 2026: Bireysel kayit mevcut auth akisini korur
   const handleIndividualSubmit = async (event) => {
     event.preventDefault();
 
-    if (!termsAccepted) {
-      showMessage('error', 'Lütfen hizmet şartlarını ve gizlilik politikasını kabul edin.');
+    if (!kvkkAccepted) {
+      showMessage('error', 'Lütfen Hizmet şartları, Gizlilik Politikası ve KVKK Aydınlatma Metni\'ni okuduğunuzu onaylayın.');
       return;
     }
 
@@ -307,7 +329,8 @@ const RegistrationPage = () => {
               company_name: companyName,
               email: email,
               phone: phone,
-              avatar: avatarUrl
+              avatar: avatarUrl,
+              marketing_consent: marketingConsent
             }
           ]);
 
@@ -315,6 +338,7 @@ const RegistrationPage = () => {
           throw new Error(profileError.message);
         }
 
+        await logConsent(userId);
         navigate('/emailconfirmation', { state: { email, password } });
       }
     } catch (error) {
@@ -334,7 +358,7 @@ const RegistrationPage = () => {
     }
   };
 
-  // Enes Doğanay | 8 Nisan 2026: Kurumsal form zorunlu alan doğrulaması — sadece verificationNote ve taxDocument opsiyonel
+  // Enes Doğanay | 1 Mayıs 2026: vergi alanları kaldırıldı, authorizationDoc zorunlu hale getirildi
   const validateCorporateForm = () => {
     const errors = {};
     const requiredFields = [
@@ -348,21 +372,180 @@ const RegistrationPage = () => {
       { key: 'companyPhone', label: 'Şirket Telefon Numarası' },
       { key: 'companyIl', label: 'İl' },
       { key: 'companyIlce', label: 'İlçe' },
-      { key: 'companyOpenAddress', label: 'Açık Adres' },
-      { key: 'taxOffice', label: 'Vergi Dairesi' },
-      { key: 'taxNumber', label: 'Vergi Numarası' }
+      { key: 'companyOpenAddress', label: 'Açık Adres' }
     ];
     requiredFields.forEach(({ key, label }) => {
       if (!String(corporateForm[key] || '').trim()) {
         errors[key] = `${label} alanını doldurunuz.`;
       }
     });
+    if (!corporateForm.authorizationDoc) {
+      errors.authorizationDoc = 'Lütfen imzalanmış yetkilendirme belgesini yükleyin.';
+    }
     return errors;
   };
 
+  const downloadYetkilendirmePdf = () => {
+    const html = `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tedport \u2013 Yetkilendirme Belgesi</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #111; padding: 40px 50px; line-height: 1.65; }
+    .header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #1e3a5f; }
+    .logo { font-size: 22pt; font-weight: 900; letter-spacing: 3px; color: #1e3a5f; }
+    .doc-title { font-size: 12pt; font-weight: bold; margin-top: 8px; text-transform: uppercase; color: #1e3a5f; letter-spacing: 0.5px; }
+    .doc-date { font-size: 9pt; color: #888; margin-top: 6px; }
+    h2 { font-size: 10.5pt; font-weight: bold; color: #1e3a5f; margin: 20px 0 7px; text-transform: uppercase; border-bottom: 1px solid #c8d8ec; padding-bottom: 4px; }
+    p { margin-bottom: 7px; font-size: 10.5pt; }
+    ul { margin: 4px 0 8px 22px; }
+    ul li { margin-bottom: 4px; font-size: 10.5pt; }
+    .box { background: #f5f8fc; border: 1px solid #dce8f5; border-radius: 4px; padding: 12px 16px; margin: 8px 0; }
+    .party-name { font-weight: bold; font-size: 11pt; }
+    .between { text-align: center; font-size: 9pt; color: #888; margin: 6px 0; }
+    .field-row { display: flex; gap: 16px; margin-bottom: 10px; }
+    .field { flex: 1; }
+    .field-label { font-size: 9pt; color: #444; font-weight: bold; margin-bottom: 3px; }
+    .field-line { border-bottom: 1.5px solid #333; height: 24px; }
+    .notice { background: #fffbeb; border-left: 3px solid #f59e0b; padding: 10px 14px; font-size: 9.5pt; margin: 18px 0; color: #555; }
+    .sig-grid { display: flex; gap: 24px; margin-top: 28px; }
+    .sig-box { flex: 1; border: 1px solid #cdd; border-radius: 5px; padding: 14px 16px; }
+    .sig-box h3 { font-size: 10pt; font-weight: bold; color: #1e3a5f; margin-bottom: 12px; text-align: center; border-bottom: 1px solid #e0e0e0; padding-bottom: 6px; text-transform: uppercase; }
+    .sig-row { margin-bottom: 12px; }
+    .sig-label { font-size: 9pt; color: #555; }
+    .sig-line { border-bottom: 1px solid #333; height: 22px; margin-top: 2px; }
+    .stamp { height: 70px; border: 1px dashed #bbb; border-radius: 3px; margin-top: 8px; display: flex; align-items: center; justify-content: center; color: #bbb; font-size: 8.5pt; }
+    .footer { margin-top: 24px; text-align: center; font-size: 8pt; color: #aaa; border-top: 1px solid #eee; padding-top: 10px; }
+    .print-btn { display: block; margin: 0 auto 20px; padding: 9px 28px; background: #1e3a5f; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 10pt; }
+    @media print { .print-btn { display: none !important; } body { padding: 20px 30px; } }
+  </style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">Yazd\u0131r / PDF Olarak Kaydet</button>
+  <div class="header">
+    <div class="logo">TEDPORT</div>
+    <div class="doc-title">Firma Sayfas\u0131 Y\u00f6netim Yetkilendirme ve Taahhüt Belgesi</div>
+    <div class="doc-date">Belge Tarihi: _____ / _____ / _______</div>
+  </div>
+
+  <h2>1. Taraflar</h2>
+  <p>\u0130\u015fbu Yetkilendirme Belgesi ("Belge");</p>
+  <div class="box">
+    <p><span class="party-name">[F\u0130RMA \u00dcNVANI]</span></p>
+    <p>(MERS\u0130S No: [\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026])</p>
+    <p>("Firma")</p>
+  </div>
+  <div class="between">\u2014 ile \u2014</div>
+  <div class="box">
+    <p><span class="party-name">Tedport Teknoloji A.\u015e.</span></p>
+    <p>("Tedport")</p>
+  </div>
+  <p style="margin-top:8px">aras\u0131nda d\u00fczenlenmi\u015ftir.</p>
+
+  <h2>2. Ama\u00e7</h2>
+  <p>Bu Belge, Firma ad\u0131na Tedport platformunda olu\u015fturulan/olu\u015fturulacak firma sayfas\u0131n\u0131n y\u00f6netimi i\u00e7in yetkilendirilen ki\u015finin belirlenmesi ve yetki kapsam\u0131n\u0131n d\u00fczenlenmesi amac\u0131yla haz\u0131rlanm\u0131\u015ft\u0131r.</p>
+
+  <h2>3. Yetkilendirilen Ki\u015fi Bilgileri</h2>
+  <div class="field-row">
+    <div class="field"><div class="field-label">Ad Soyad</div><div class="field-line"></div></div>
+    <div class="field"><div class="field-label">T.C. Kimlik No</div><div class="field-line"></div></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><div class="field-label">Unvan / G\u00f6rev</div><div class="field-line"></div></div>
+    <div class="field"><div class="field-label">Telefon</div><div class="field-line"></div></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><div class="field-label">E-posta</div><div class="field-line"></div></div>
+    <div class="field" style="visibility:hidden"><div class="field-label">.</div><div class="field-line"></div></div>
+  </div>
+
+  <h2>4. Yetki Kapsam\u0131</h2>
+  <p>Firma, yukar\u0131da bilgileri yer alan ki\u015fiyi a\u015fa\u011f\u0131daki i\u015flemleri ger\u00e7ekle\u015ftirmek \u00fczere yetkilendirdi\u011fini kabul eder:</p>
+  <ul>
+    <li>Firma sayfas\u0131n\u0131 olu\u015fturmak ve d\u00fczenlemek</li>
+    <li>\u00dcr\u00fcn/hizmet bilgilerini eklemek ve g\u00fcncellemek</li>
+    <li>Platform \u00fczerinden teklif vermek ve ileti\u015fim kurmak</li>
+    <li>Kullan\u0131c\u0131 mesajlar\u0131n\u0131 yan\u0131tlamak</li>
+    <li>Firma ad\u0131na i\u00e7erik payla\u015fmak</li>
+  </ul>
+  <p>Bu yetki, Tedport platformu ile s\u0131n\u0131rl\u0131d\u0131r.</p>
+
+  <h2>5. Beyan ve Taahhütler</h2>
+  <p>Firma ve yetkili ki\u015fi a\u015fa\u011f\u0131dakilerini <strong>kabul ve taahhüt eder:</strong></p>
+  <ul>
+    <li>Verilen t\u00fcm bilgilerin do\u011fru ve g\u00fcncel oldu\u011funu,</li>
+    <li>Yetkilendirmenin firma i\u00e7i yetkiye dayand\u0131\u011f\u0131n\u0131,</li>
+    <li>Tedport'un bu yetkilendirmeyi ayr\u0131ca do\u011frulamakla y\u00fck\u00fcml\u00fc olmad\u0131\u011f\u0131n\u0131,</li>
+    <li>Yetkisiz kullan\u0131m veya yanl\u0131\u015f beyan durumunda t\u00fcm sorumlulu\u011fun kendilerine ait oldu\u011funu,</li>
+    <li>Platformda yap\u0131lan t\u00fcm i\u015flemlerin firma ad\u0131na yap\u0131lm\u0131\u015f say\u0131laca\u011f\u0131n\u0131.</li>
+  </ul>
+
+  <h2>6. Sorumluluk ve Tazminat</h2>
+  <p>Firma a\u015fa\u011f\u0131dakilerini kabul eder:</p>
+  <ul>
+    <li>Yetkili ki\u015finin yapt\u0131\u011f\u0131 t\u00fcm i\u015flemlerden do\u011frudan sorumlu oldu\u011funu,</li>
+    <li>Bu i\u015flemler nedeniyle Tedport'un u\u011frayabilece\u011fi her t\u00fcrl\u00fc zarar, talep ve masraf\u0131 tazmin edece\u011fini,</li>
+    <li>\u00dc\u00fcnc\u00fc ki\u015filerden gelebilecek taleplerde Tedport'u sorumlu tutmayaca\u011f\u0131n\u0131.</li>
+  </ul>
+
+  <h2>7. Yetkinin S\u00fcresi ve Sona Ermesi</h2>
+  <ul>
+    <li>Bu yetkilendirme, Firma taraf\u0131ndan yaz\u0131l\u0131 olarak geri al\u0131nana kadar ge\u00e7erlidir.</li>
+    <li>Yetkinin iptali, Tedport'a yaz\u0131l\u0131 bildirim yap\u0131lmas\u0131 ile h\u00fckm do\u011furur.</li>
+    <li>Bildirim yap\u0131lana kadar ger\u00e7ekle\u015ftirilen i\u015flemler ge\u00e7erli say\u0131l\u0131r.</li>
+  </ul>
+
+  <h2>8. Do\u011frulama ve Ek Belge Talebi</h2>
+  <p>Tedport, gerekli g\u00f6rd\u00fc\u011f\u00fc durumlarda imza sirk\u00fcl\u00e4ri, ticaret sicil gazetesi gibi ek belgeleri talep etme ve yetkilendirmeyi ask\u0131ya alma hakk\u0131n\u0131 sakl\u0131 tutar.</p>
+
+  <h2>9. Elektronik Kay\u0131tlar\u0131n Delil Niteli\u011fi</h2>
+  <p>Taraflar, Tedport sistemlerinde tutulan log kay\u0131tlar\u0131, i\u015flem ge\u00e7mi\u015fi ve mesajla\u015fmalar gibi kay\u0131tlar\u0131n Hukuk Muhakemeleri Kanunu \u00e7er\u00e7evesinde kesin delil niteli\u011fi ta\u015f\u0131d\u0131\u011f\u0131n\u0131 kabul eder.</p>
+
+  <h2>10. Ki\u015fisel Veriler</h2>
+  <p>Bu belge kapsam\u0131nda payla\u015f\u0131lan ki\u015fisel veriler, 6698 say\u0131l\u0131 Ki\u015fisel Verilerin Korunmas\u0131 Kanunu kapsam\u0131nda i\u015flenecektir. Detayl\u0131 bilgi i\u00e7in <strong>Tedport KVKK Ayd\u0131nlatma Metni</strong> incelenebilir.</p>
+
+  <h2>11. Uyu\u015fmazl\u0131k \u00c7\u00f6z\u00fcm\u00fc</h2>
+  <p>\u0130\u015fbu Belge'den do\u011fabilecek uyu\u015fmazl\u0131klarda <strong>\u0130stanbul (Merkez) Mahkemeleri ve \u0130cra Daireleri</strong> yetkilidir.</p>
+
+  <h2>12. Y\u00fcr\u00fcrl\u00fck</h2>
+  <p>\u0130\u015fbu Belge, taraflarca imzaland\u0131\u011f\u0131 tarihte y\u00fcr\u00fcrl\u00fc\u011fe girer.</p>
+
+  <div class="notice">
+    Bu belgeyi eksiksiz doldurunuz, firma yetkilisi taraf\u0131ndan imzalatınız ve ka\u015fe vuruldu\u011fundan emin olunuz. Ard\u0131ndan taranm\u0131\u015f veya foto\u011fraflanm\u0131\u015f PDF olarak sisteme y\u00fckleyiniz.
+  </div>
+
+  <div class="sig-grid">
+    <div class="sig-box">
+      <h3>Firma Yetkilisi</h3>
+      <div class="sig-row"><div class="sig-label">Ad Soyad</div><div class="sig-line"></div></div>
+      <div class="sig-row"><div class="sig-label">Unvan</div><div class="sig-line"></div></div>
+      <div class="sig-row"><div class="sig-label">Tarih</div><div class="sig-line"></div></div>
+      <div class="stamp">\u0130mza / Ka\u015fe Alan\u0131</div>
+    </div>
+    <div class="sig-box">
+      <h3>Yetkilendirilen Ki\u015fi</h3>
+      <div class="sig-row"><div class="sig-label">Ad Soyad</div><div class="sig-line"></div></div>
+      <div class="sig-row"><div class="sig-label">Tarih</div><div class="sig-line"></div></div>
+      <div class="sig-row"><div class="sig-label">\u0130mza</div><div class="sig-line"></div></div>
+      <div style="height:70px"></div>
+    </div>
+  </div>
+
+  <div class="footer">Tedport Teknoloji A.\u015e. | info@tedport.com | www.tedport.com</div>
+</body>
+</html>`;
+    const w = window.open('', '_blank', 'width=900,height=820');
+    if (w) {
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(() => w.print(), 600);
+    }
+  };
+
   // Enes Doğanay | 6 Nisan 2026: Kurumsal sekme kullanici olusturmak yerine admin incelemesine giden basvuru olusturur
-  // Enes Doğanay | 8 Nisan 2026: Vergi levhası dosyası varsa Storage'a yükle, URL'yi metadata'ya ekle
-  // Enes Doğanay | 8 Nisan 2026: form yerine div kullanıldığı için event parametresi kaldırıldı — Chrome adres popup engeli
   const handleCorporateSubmit = async () => {
 
     // Enes Doğanay | 8 Nisan 2026: Zorunlu alan doğrulaması
@@ -373,8 +556,8 @@ const RegistrationPage = () => {
       return;
     }
 
-    if (!termsAccepted) {
-      showMessage('error', 'Lütfen hizmet şartlarını ve gizlilik politikasını kabul edin.');
+    if (!kvkkAccepted) {
+      showMessage('error', 'Lütfen Hizmet şartları, Gizlilik Politikası ve KVKK Aydınlatma Metni\'ni okuduğunuzu onaylayın.');
       return;
     }
 
@@ -390,28 +573,25 @@ const RegistrationPage = () => {
         return;
       }
 
-      // Enes Doğanay | 8 Nisan 2026: Vergi levhası private 'tax-documents' bucket'ına yüklenir
-      let taxDocumentUrl = null;
-      if (corporateForm.taxDocument) {
-        const file = corporateForm.taxDocument;
-        const fileExt = file.name.split('.').pop();
-        const fileName = `vergi-levhasi-${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('tax-documents')
-          .upload(fileName, file);
-        if (uploadError) {
-          console.error('Vergi levhası yükleme hatası:', uploadError);
-        } else {
-          // Private bucket — sadece dosya yolunu sakla, admin signed URL ile açar
-          taxDocumentUrl = fileName;
-        }
+      // Enes Doğanay | 1 Mayıs 2026: Yetkilendirme belgesi zorunlu — tax-documents bucket'ına yükle
+      let authorizationDocUrl = null;
+      const file = corporateForm.authorizationDoc;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `yetkilendirme-belgesi-${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('tax-documents')
+        .upload(fileName, file);
+      if (uploadError) {
+        throw new Error('Yetkilendirme belgesi yüklenemedi: ' + uploadError.message);
       }
+      authorizationDocUrl = fileName;
 
-      const submissionData = { ...corporateForm, taxDocumentUrl };
+      const submissionData = { ...corporateForm, authorizationDocUrl };
       const result = await submitCorporateApplication(submissionData);
       setCorporateSubmittedApplication(result.application || null);
       setCorporateForm(initialCorporateForm);
-      setTermsAccepted(false);
+      setKvkkAccepted(false);
+      setMarketingConsent(false);
       showMessage('success', 'Kurumsal başvurunuz başarıyla alındı! Ekibimiz başvurunuzu en kısa sürede inceleyecek ve sonucu e-posta ile size bildirecektir.');
     } catch (error) {
       showMessage('error', error.message || 'Kurumsal başvuru oluşturulamadı.');
@@ -676,18 +856,7 @@ const RegistrationPage = () => {
                     </div>
                   </fieldset>
 
-                  <div className="form-row">
-                    <div className="input-group">
-                      <label>Vergi Dairesi</label>
-                      <input className={`form-input${corporateErrors.taxOffice ? ' form-input--error' : ''}`} type="text" placeholder="Vergi dairesini girin" value={corporateForm.taxOffice} onChange={(event) => handleCorporateInputChange('taxOffice', event.target.value)} name="crp_to_x" autoComplete="one-time-code" />
-                      {corporateErrors.taxOffice && <span className="field-error-text">{corporateErrors.taxOffice}</span>}
-                    </div>
-                    <div className="input-group">
-                      <label>Vergi Numarası</label>
-                      <input className={`form-input${corporateErrors.taxNumber ? ' form-input--error' : ''}`} type="text" placeholder="Vergi numarasını girin" value={corporateForm.taxNumber} onChange={(event) => handleCorporateInputChange('taxNumber', event.target.value)} name="crp_tn_x" autoComplete="one-time-code" />
-                      {corporateErrors.taxNumber && <span className="field-error-text">{corporateErrors.taxNumber}</span>}
-                    </div>
-                  </div>
+                  {/* Enes Doğanay | 1 Mayıs 2026: Vergi Dairesi/Numarası kaldırıldı */}
 
                   {/* Enes Doğanay | 8 Nisan 2026: Doğrulama Notu opsiyonel yapıldı */}
                   <div className="input-group">
@@ -695,39 +864,46 @@ const RegistrationPage = () => {
                     <textarea className="form-textarea" placeholder="Şirket sahipliği, ticaret sicili, mevcut firma kaydıyla bağınız veya incelemeyi hızlandıracak notları yazın" value={corporateForm.verificationNote} onChange={(event) => handleCorporateInputChange('verificationNote', event.target.value)} />
                   </div>
 
-                  {/* Enes Doğanay | 8 Nisan 2026: Vergi levhası yükleme (opsiyonel) + teşvik notu */}
-                  <div className="input-group">
-                    <label>Vergi Levhası <span className="field-optional">(Opsiyonel)</span></label>
-                    <div className="tax-doc-upload">
-                      <label className="tax-doc-upload-area" htmlFor="taxDocInput">
-                        <span className="material-symbols-outlined tax-doc-upload-icon">
-                          {corporateForm.taxDocument ? 'task' : 'upload_file'}
+                  {/* Yetkilendirme Belgesi — indir, imzala, yükle */}
+                  <div className="auth-doc-section">
+                    <div className="auth-doc-header">
+                      <span className="material-symbols-outlined auth-doc-icon">verified_user</span>
+                      <div>
+                        <strong className="auth-doc-title">Yetkilendirme Belgesi <span className="required-star">*</span></strong>
+                        <p className="auth-doc-desc">Aşağıdaki belgeyi indirin, eksiksiz doldurun, firma yetkilisi tarafından imzalayıp kaşe vurduktan sonra PDF veya görsel olarak yükleyin.</p>
+                      </div>
+                    </div>
+                    <button type="button" className="auth-doc-download-btn" onClick={downloadYetkilendirmePdf}>
+                      <span className="material-symbols-outlined">download</span>
+                      Yetkilendirme Belgesini İndir
+                    </button>
+                    <div className={`auth-doc-upload${corporateErrors.authorizationDoc ? ' auth-doc-upload--error' : ''}`}>
+                      <label className="auth-doc-upload-area" htmlFor="authDocInput">
+                        <span className="material-symbols-outlined auth-doc-upload-icon">
+                          {corporateForm.authorizationDoc ? 'task' : 'upload_file'}
                         </span>
-                        <span className="tax-doc-upload-text">
-                          {corporateForm.taxDocument ? corporateForm.taxDocument.name : 'Vergi levhasını yüklemek için tıklayın'}
+                        <span className="auth-doc-upload-text">
+                          {corporateForm.authorizationDoc ? corporateForm.authorizationDoc.name : 'İmzalanmış belgeyi yüklemek için tıklayın (PDF, JPG, PNG)'}
                         </span>
                         <input
-                          id="taxDocInput"
+                          id="authDocInput"
                           type="file"
                           accept=".pdf,.jpg,.jpeg,.png"
                           className="sr-only"
                           onChange={(event) => {
                             if (event.target.files && event.target.files[0]) {
-                              handleCorporateInputChange('taxDocument', event.target.files[0]);
+                              handleCorporateInputChange('authorizationDoc', event.target.files[0]);
                             }
                           }}
                         />
                       </label>
-                      {corporateForm.taxDocument && (
-                        <button type="button" className="tax-doc-remove" onClick={() => handleCorporateInputChange('taxDocument', null)}>
+                      {corporateForm.authorizationDoc && (
+                        <button type="button" className="auth-doc-remove" onClick={() => handleCorporateInputChange('authorizationDoc', null)}>
                           <span className="material-symbols-outlined">close</span>
                         </button>
                       )}
                     </div>
-                    <div className="tax-doc-boost-note">
-                      <span className="material-symbols-outlined tax-doc-boost-icon">trending_up</span>
-                      <span>Vergi levhası eklemek başvurunuzun <strong>onaylanma ihtimalini önemli ölçüde artırır</strong> ve inceleme sürecini hızlandırır.</span>
-                    </div>
+                    {corporateErrors.authorizationDoc && <span className="field-error-text">{corporateErrors.authorizationDoc}</span>}
                   </div>
 
 
@@ -736,125 +912,47 @@ const RegistrationPage = () => {
                     <p>Onay geldiğinde hesabınız bizim tarafımızdan oluşturulur. Size gönderilecek şifre belirleme bağlantısıyla hesabınızı aktif edip kurumsal giriş yaparsınız.</p>
                   </div>
 
-                  {/* Enes Doğanay | 18 Nisan 2026: Kurumsal kayıt için Hizmet Şartları ve Gizlilik Politikası onayı tekrar eklendi (gpt ile yapıldı) */}
+                  {/* KVKK onayı */}
                   <div className="checkbox-group">
-                    <input type="checkbox" id="terms-corporate" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
-                    <label htmlFor="terms-corporate" className="checkbox-label">
-                      <button type="button" className="text-link-btn" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı ve{' '}
-                      <button type="button" className="text-link-btn" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı okudum ve kabul ediyorum.
+                    <input type="checkbox" id="terms-corporate" checked={kvkkAccepted} onChange={(event) => setKvkkAccepted(event.target.checked)} />
+                    <label htmlFor="terms-corporate" className="checkbox-label checkbox-required">
+                      <button type="button" className="text-link-inline" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı,{' '}
+                      <button type="button" className="text-link-inline" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı ve{' '}
+                      <a href="/kvkk" target="_blank" rel="noopener noreferrer" className="text-link-inline">KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum. <span className="required-star">*</span>
                     </label>
                   </div>
 
-
-      {/* Enes Doğanay | 18 Nisan 2026: Modal bileşenleri her iki sekmede de çalışsın diye return'un en sonuna taşındı (gpt ile yapıldı) */}
-      {showTermsModal && (
-        <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2>Hizmet Şartları</h2>
-            <div className="modal-scrollable">
-              <p>Bu platformu (“Tedport”) kullanarak aşağıdaki şartları kabul etmiş sayılırsınız.</p>
-              <ol>
-                <li><strong>Platformun Amacı</strong><br/>Tedport; firmalar, tedarikçiler ve kullanıcılar arasında teklif alma, ihale oluşturma ve iş bağlantıları kurulmasını sağlayan bir aracılık platformudur. Tedport, taraflar arasında gerçekleşen işlemlerin doğrudan tarafı değildir.</li>
-                <li><strong>Firma Profilleri</strong><br/>Platformda yer alan firma profilleri:
-                  <ul>
-                    <li>Kullanıcılar tarafından oluşturulabilir veya</li>
-                    <li>Kamuya açık kaynaklardan derlenerek platform tarafından oluşturulmuş olabilir.</li>
-                  </ul>
-                  Platform tarafından oluşturulan profiller:
-                  <ul>
-                    <li>Resmi temsil niteliği taşımaz</li>
-                    <li>İlgili firmanın onayı olmadan oluşturulmuş olabilir</li>
-                  </ul>
-                  Firma yetkilileri:
-                  <ul>
-                    <li>Profillerini talep ederek sahiplenebilir</li>
-                    <li>Bilgileri güncelleyebilir</li>
-                    <li>Profilin kaldırılmasını talep edebilir</li>
-                  </ul>
-                </li>
-                <li><strong>Sorumluluk Reddi</strong><br/>Tedport:
-                  <ul>
-                    <li>Firma bilgilerinin doğruluğunu garanti etmez</li>
-                    <li>Kullanıcılar arasında gerçekleşen teklif, anlaşma ve işlemlerden sorumlu değildir</li>
-                    <li>Platform üzerindeki içeriklerin doğruluğu veya güncelliği konusunda sorumluluk kabul etmez</li>
-                  </ul>
-                </li>
-                <li><strong>Kullanıcı Yükümlülükleri</strong><br/>Kullanıcılar:
-                  <ul>
-                    <li>Doğru ve güncel bilgi sağlamakla yükümlüdür</li>
-                    <li>Platformu kötüye kullanmamayı kabul eder</li>
-                    <li>Yanıltıcı, sahte veya hukuka aykırı içerik paylaşmamayı kabul eder</li>
-                  </ul>
-                </li>
-                <li><strong>Fikri Mülkiyet</strong><br/>Platformda yer alan marka, logo ve içerikler ilgili hak sahiplerine aittir. Hak sahipleri, talepleri halinde içeriklerin kaldırılmasını isteyebilir.</li>
-                <li><strong>İçerik Kaldırma Talepleri</strong><br/>Firma veya hak sahipleri: info@tedport.com adresine e-posta göndererek
-                  <ul>
-                    <li>Profil güncelleme</li>
-                    <li>Profil kaldırma talebinde bulunabilir.</li>
-                  </ul>
-                  Talepler makul süre içerisinde değerlendirilir.
-                </li>
-                <li><strong>Hizmet Değişiklikleri</strong><br/>TedPort, platform özelliklerini değiştirme, durdurma veya sonlandırma hakkını saklı tutar.</li>
-                <li><strong>Yürürlük</strong><br/>Bu şartlar, kullanıcı platformu kullanmaya başladığı andan itibaren geçerlidir.</li>
-              </ol>
-            </div>
-            <button className="modal-close-btn" onClick={() => setShowTermsModal(false)}>Kapat</button>
-          </div>
-        </div>
-      )}
-      {showPrivacyModal && (
-        <div className="modal-overlay" onClick={() => setShowPrivacyModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2>Gizlilik Politikası</h2>
-            <div className="modal-scrollable">
-              <p>Bu politika, Tedport platformunda toplanan verilerin nasıl kullanıldığını açıklar.</p>
-              <ol>
-                <li><strong>Toplanan Veriler</strong><br/>Tedport aşağıdaki verileri toplayabilir:
-                  <ul>
-                    <li>Ad, soyad, e-posta gibi kullanıcı bilgileri</li>
-                    <li>Firma adı, iletişim bilgileri</li>
-                    <li>Platform kullanım verileri</li>
-                  </ul>
-                </li>
-                <li><strong>Veri Toplama Yöntemi</strong><br/>Veriler:
-                  <ul>
-                    <li>Kullanıcı tarafından sağlanabilir</li>
-                    <li>Kamuya açık kaynaklardan elde edilebilir</li>
-                  </ul>
-                </li>
-                <li><strong>Veri Kullanım Amaçları</strong><br/>Toplanan veriler:
-                  <ul>
-                    <li>Platform hizmetlerini sunmak</li>
-                    <li>Kullanıcı deneyimini geliştirmek</li>
-                    <li>İletişim sağlamak</li>
-                  </ul>
-                  amaçlarıyla kullanılır.
-                </li>
-                <li><strong>Veri Paylaşımı</strong><br/>Tedport:
-                  <ul>
-                    <li>Kullanıcı verilerini üçüncü kişilerle satmaz</li>
-                    <li>Yasal zorunluluklar dışında paylaşmaz</li>
-                  </ul>
-                </li>
-                <li><strong>Veri Güvenliği</strong><br/>Tedport, verilerin korunması için makul teknik ve idari önlemleri alır.</li>
-                <li><strong>Kullanıcı Hakları</strong><br/>Kullanıcılar:
-                  <ul>
-                    <li>Verilerine erişme</li>
-                    <li>Düzeltme talep etme</li>
-                    <li>Silinmesini isteme</li>
-                  </ul>
-                  haklarına sahiptir.<br/>
-                  Talepler için: info@tedport.com
-                </li>
-                <li><strong>Çerezler (Cookies)</strong><br/>Platform, kullanıcı deneyimini iyileştirmek için çerezler kullanabilir.</li>
-                <li><strong>Güncellemeler</strong><br/>Bu politika zaman zaman güncellenebilir.</li>
-              </ol>
-            </div>
-            <button className="modal-close-btn" onClick={() => setShowPrivacyModal(false)}>Kapat</button>
-          </div>
-        </div>
-      )}
-
+                  {/* Pazarlama iletişimi — opsiyonel */}
+                  <div className="checkbox-group">
+                    <input type="checkbox" id="marketing-corporate" checked={marketingConsent} onChange={(event) => setMarketingConsent(event.target.checked)} />
+                    <div className="checkbox-label-row">
+                      <label htmlFor="marketing-corporate" className="checkbox-label">
+                        Yeni tedarik fırsatları, kampanyalar ve bana özel önerilerden haberdar olmak istiyorum.
+                      </label>
+                      <div className="marketing-info-wrap">
+                        <button
+                          type="button"
+                          className="marketing-info-btn"
+                          aria-label="Detaylı bilgi"
+                          onClick={() => setShowMarketingTooltip(t => !t)}
+                        >
+                          <span className="material-symbols-outlined">info</span>
+                        </button>
+                        {showMarketingTooltip && (
+                          <div className="marketing-tooltip">
+                            <p className="marketing-tooltip-note">Bu onay tamamen isteğe bağlıdır. Pazarlama amaçlı e-posta/SMS almak için 6563 sayılı Kanun kapsamında açık rızanızı talep ediyoruz.</p>
+                            <button
+                              type="button"
+                              className="marketing-tooltip-detail-btn"
+                              onClick={() => { setShowMarketingTooltip(false); setShowMarketingModal(true); }}
+                            >
+                              Detaylı Metni Gör
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                   <button type="button" className="register-btn-primary register-btn-submit" disabled={loading} onClick={handleCorporateSubmit}>
                     {loading ? 'Başvurunuz Gönderiliyor...' : 'Kurumsal Başvuru Gönder'}
                   </button>
@@ -897,6 +995,9 @@ const RegistrationPage = () => {
               <div className="register-divider">
                 <span>veya</span>
               </div>
+              <p className="oauth-consent-note">
+                Google veya LinkedIn ile devam ederek <button type="button" className="text-link-inline" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı ve <button type="button" className="text-link-inline" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı kabul etmiş olursunuz.
+              </p>
 
               <div className="photo-upload-container">
                 <label className="photo-upload-box">
@@ -966,16 +1067,48 @@ const RegistrationPage = () => {
               </div>
 
 
-              {/* Enes Doğanay | 18 Nisan 2026: Hizmet Şartları ve Gizlilik Politikası onayı bireysel kayıt için tekrar eklendi (gpt ile yapıldı) */}
-              {/* Enes Doğanay | 18 Nisan 2026: Bireysel kayıt için Hizmet Şartları ve Gizlilik Politikası onayı tekrar eklendi (gpt ile yapıldı) */}
+              {/* KVKK onayı */}
               <div className="checkbox-group">
-                <input type="checkbox" id="terms-individual" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} />
-                <label htmlFor="terms-individual" className="checkbox-label">
-                  <button type="button" className="text-link-btn" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı ve{' '}
-                  <button type="button" className="text-link-btn" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı okudum ve kabul ediyorum.
+                <input type="checkbox" id="terms-individual" checked={kvkkAccepted} onChange={(event) => setKvkkAccepted(event.target.checked)} />
+                <label htmlFor="terms-individual" className="checkbox-label checkbox-required">
+                  <button type="button" className="text-link-inline" onClick={() => setShowTermsModal(true)}>Hizmet Şartları</button>'nı,{' '}
+                  <button type="button" className="text-link-inline" onClick={() => setShowPrivacyModal(true)}>Gizlilik Politikası</button>'nı ve{' '}
+                  <a href="/kvkk" target="_blank" rel="noopener noreferrer" className="text-link-inline">KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum. <span className="required-star">*</span>
                 </label>
               </div>
-              {/* Modal bileşenleri zaten yukarıda mevcut, tekrar eklenmedi */}
+
+              {/* Pazarlama iletişimi — opsiyonel */}
+              <div className="checkbox-group">
+                <input type="checkbox" id="marketing-individual" checked={marketingConsent} onChange={(event) => setMarketingConsent(event.target.checked)} />
+                <div className="checkbox-label-row">
+                  <label htmlFor="marketing-individual" className="checkbox-label">
+                    Yeni tedarik fırsatları, kampanyalar ve bana özel önerilerden haberdar olmak istiyorum.
+                  </label>
+                  <div className="marketing-info-wrap">
+                    <button
+                      type="button"
+                      className="marketing-info-btn"
+                      aria-label="Detaylı bilgi"
+                      onClick={() => setShowMarketingTooltip(t => !t)}
+                    >
+                      <span className="material-symbols-outlined">info</span>
+                    </button>
+                    {showMarketingTooltip && (
+                      <div className="marketing-tooltip">
+                        <p className="marketing-tooltip-note">Bu onay tamamen isteğe bağlıdır. Pazarlama amaçlı e-posta/SMS almak için 6563 sayılı Kanun kapsamında açık rızanızı talep ediyoruz.</p>
+                        <button
+                          type="button"
+                          className="marketing-tooltip-detail-btn"
+                          onClick={() => { setShowMarketingTooltip(false); setShowMarketingModal(true); }}
+                        >
+                          Detaylı Metni Gör
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <button type="submit" className="register-btn-primary register-btn-submit" disabled={loading}>
                 {loading ? 'Kayıt Yapılıyor...' : 'Hesap Oluştur'}
               </button>
@@ -990,111 +1123,98 @@ const RegistrationPage = () => {
         </div>
       </main>
 
-      {/* Enes Doğanay | 18 Nisan 2026: Modal bileşenleri page-container'ın içinde, footer'dan hemen önce (gpt ile yapıldı) */}
+      {/* Hizmet Şartları Modal */}
       {showTermsModal && (
-        <div className="modal-overlay" onClick={() => setShowTermsModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2>Hizmet Şartları</h2>
-            <div className="modal-scrollable">
-              <p>Bu platformu (“Tedport”) kullanarak aşağıdaki şartları kabul etmiş sayılırsınız.</p>
-              <ol>
-                <li><strong>Platformun Amacı</strong><br/>Tedport; firmalar, tedarikçiler ve kullanıcılar arasında teklif alma, ihale oluşturma ve iş bağlantıları kurulmasını sağlayan bir aracılık platformudur. Tedport, taraflar arasında gerçekleşen işlemlerin doğrudan tarafı değildir.</li>
-                <li><strong>Firma Profilleri</strong><br/>Platformda yer alan firma profilleri:
-                  <ul>
-                    <li>Kullanıcılar tarafından oluşturulabilir veya</li>
-                    <li>Kamuya açık kaynaklardan derlenerek platform tarafından oluşturulmuş olabilir.</li>
-                  </ul>
-                  Platform tarafından oluşturulan profiller:
-                  <ul>
-                    <li>Resmi temsil niteliği taşımaz</li>
-                    <li>İlgili firmanın onayı olmadan oluşturulmuş olabilir</li>
-                  </ul>
-                  Firma yetkilileri:
-                  <ul>
-                    <li>Profillerini talep ederek sahiplenebilir</li>
-                    <li>Bilgileri güncelleyebilir</li>
-                    <li>Profilin kaldırılmasını talep edebilir</li>
-                  </ul>
-                </li>
-                <li><strong>Sorumluluk Reddi</strong><br/>Tedport:
-                  <ul>
-                    <li>Firma bilgilerinin doğruluğunu garanti etmez</li>
-                    <li>Kullanıcılar arasında gerçekleşen teklif, anlaşma ve işlemlerden sorumlu değildir</li>
-                    <li>Platform üzerindeki içeriklerin doğruluğu veya güncelliği konusunda sorumluluk kabul etmez</li>
-                  </ul>
-                </li>
-                <li><strong>Kullanıcı Yükümlülükleri</strong><br/>Kullanıcılar:
-                  <ul>
-                    <li>Doğru ve güncel bilgi sağlamakla yükümlüdür</li>
-                    <li>Platformu kötüye kullanmamayı kabul eder</li>
-                    <li>Yanıltıcı, sahte veya hukuka aykırı içerik paylaşmamayı kabul eder</li>
-                  </ul>
-                </li>
-                <li><strong>Fikri Mülkiyet</strong><br/>Platformda yer alan marka, logo ve içerikler ilgili hak sahiplerine aittir. Hak sahipleri, talepleri halinde içeriklerin kaldırılmasını isteyebilir.</li>
-                <li><strong>İçerik Kaldırma Talepleri</strong><br/>Firma veya hak sahipleri: info@tedport.com adresine e-posta göndererek
-                  <ul>
-                    <li>Profil güncelleme</li>
-                    <li>Profil kaldırma talebinde bulunabilir.</li>
-                  </ul>
-                  Talepler makul süre içerisinde değerlendirilir.
-                </li>
-                <li><strong>Hizmet Değişiklikleri</strong><br/>TedPort, platform özelliklerini değiştirme, durdurma veya sonlandırma hakkını saklı tutar.</li>
-                <li><strong>Yürürlük</strong><br/>Bu şartlar, kullanıcı platformu kullanmaya başladığı andan itibaren geçerlidir.</li>
-              </ol>
+        <div className="reg-modal-overlay" onClick={() => setShowTermsModal(false)}>
+          <div className="reg-modal" onClick={e => e.stopPropagation()}>
+            <div className="reg-modal-header">
+              <div className="reg-modal-header-inner">
+                <span className="material-symbols-outlined reg-modal-icon">gavel</span>
+                <h2>Hizmet Şartları</h2>
+              </div>
+              <button type="button" className="reg-modal-close" onClick={() => setShowTermsModal(false)} aria-label="Kapat">
+                <span className="material-symbols-outlined">close</span>
+              </button>
             </div>
-            <button className="modal-close-btn" onClick={() => setShowTermsModal(false)}>Kapat</button>
+            <div className="reg-modal-body">
+              <section className="reg-modal-section"><h3>1. Taraflar ve Konu</h3><p>İşbu Hizmet Şartları ("Sözleşme"), Tedport Teknoloji A.Ş. ("Tedport") ile platforma üye olan kullanıcı ("Kullanıcı") arasında akdedilmiştir.</p></section>
+              <section className="reg-modal-section"><h3>2. Hizmet Tanımı</h3><p>Tedport, tedarikçi ve alıcı firmaları bir araya getiren dijital bir platformdur. Tedport aracı konumundadır; sunulan ürün/hizmetlerin sahibi değil, taraflar arasındaki ticari ilişkilerin tarafı değildir.</p><div className="reg-modal-notice"><span className="material-symbols-outlined">info</span><span>Tedport, platformda gerçekleşen işlemlerin sonucu, kalite, teslimat veya ödeme süreçlerinden sorumlu değildir.</span></div></section>
+              <section className="reg-modal-section"><h3>3. Üyelik ve Hesap</h3><ul><li>Kullanıcı, kayıt sırasında doğru ve güncel bilgi vermekle yükümlüdür</li><li>Hesap güvenliği kullanıcıya aittir</li><li>Tedport, şüpheli veya hatalı hesapları askıya alma hakkını saklı tutar</li></ul></section>
+              <section className="reg-modal-section"><h3>4. Kullanım Kuralları</h3><p>Kullanıcı aşağıdaki eylemlerde bulunamaz:</p><ul><li>Yanıltıcı veya sahte bilgi paylaşmak</li><li>Başka kullanıcıları dolandırmaya yönelik faaliyetlerde bulunmak</li><li>Platformun teknik yapısını bozacak girişim</li><li>İzinsiz veri toplamak veya scraping yapmak</li></ul></section>
+              <section className="reg-modal-section"><h3>5. İçerik ve Sorumluluk</h3><ul><li>Platformda paylaşılan tüm içeriklerden kullanıcı sorumludur</li><li>Tedport içerikleri denetleme hakkına sahiptir ancak ön denetim yükümlülüğü yoktur</li></ul></section>
+              <section className="reg-modal-section"><h3>6. Ücretlendirme</h3><p>Tedport bazı hizmetleri ücretli sunabilir; ücretler platformda belirtilir. Tedport, fiyatları değiştirme hakkını saklı tutar.</p></section>
+              <section className="reg-modal-section"><h3>7. Fikri Mülkiyet</h3><p>Platformun tüm hakları Tedport'a aittir. Kullanıcı, platformu kopyalayamaz veya ticari amaçla kullanamaz.</p></section>
+              <section className="reg-modal-section"><h3>8. Hizmetin Askıya Alınması</h3><p>Tedport; hukuka aykırılık, güvenlik riski veya sistem kötüye kullanımı durumlarında hizmeti askıya alabilir.</p></section>
+              <section className="reg-modal-section"><h3>9. Sorumluluğun Sınırlandırılması</h3><p>Tedport; kullanıcılar arası anlaşmazlıklardan, ürün/hizmet kalitesinden sorumlu değildir.</p></section>
+              <section className="reg-modal-section"><h3>10. Mücbir Sebep</h3><p>Doğal afet, siber saldırı, altyapı sorunları gibi durumlarda Tedport sorumlu tutulamaz.</p></section>
+              <section className="reg-modal-section"><h3>11. Uygulanacak Hukuk</h3><p>İşbu Sözleşme Türk hukukuna tabidir. Uyuşmazlıklarda İstanbul Mahkemeleri yetkilidir.</p></section>
+              <section className="reg-modal-section"><h3>12. Yürürlük</h3><p>Kullanıcı, platforma üye olarak bu Sözleşme'yi kabul etmiş sayılır.</p></section>
+            </div>
+            <div className="reg-modal-footer">
+              <button type="button" className="reg-modal-accept-btn" onClick={() => setShowTermsModal(false)}>Anladım, Kapat</button>
+            </div>
           </div>
         </div>
       )}
+      {/* Gizlilik Politikası Modal */}
       {showPrivacyModal && (
-        <div className="modal-overlay" onClick={() => setShowPrivacyModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h2>Gizlilik Politikası</h2>
-            <div className="modal-scrollable">
-              <p>Bu politika, Tedport platformunda toplanan verilerin nasıl kullanıldığını açıklar.</p>
-              <ol>
-                <li><strong>Toplanan Veriler</strong><br/>Tedport aşağıdaki verileri toplayabilir:
-                  <ul>
-                    <li>Ad, soyad, e-posta gibi kullanıcı bilgileri</li>
-                    <li>Firma adı, iletişim bilgileri</li>
-                    <li>Platform kullanım verileri</li>
-                  </ul>
-                </li>
-                <li><strong>Veri Toplama Yöntemi</strong><br/>Veriler:
-                  <ul>
-                    <li>Kullanıcı tarafından sağlanabilir</li>
-                    <li>Kamuya açık kaynaklardan elde edilebilir</li>
-                  </ul>
-                </li>
-                <li><strong>Veri Kullanım Amaçları</strong><br/>Toplanan veriler:
-                  <ul>
-                    <li>Platform hizmetlerini sunmak</li>
-                    <li>Kullanıcı deneyimini geliştirmek</li>
-                    <li>İletişim sağlamak</li>
-                  </ul>
-                  amaçlarıyla kullanılır.
-                </li>
-                <li><strong>Veri Paylaşımı</strong><br/>Tedport:
-                  <ul>
-                    <li>Kullanıcı verilerini üçüncü kişilerle satmaz</li>
-                    <li>Yasal zorunluluklar dışında paylaşmaz</li>
-                  </ul>
-                </li>
-                <li><strong>Veri Güvenliği</strong><br/>Tedport, verilerin korunması için makul teknik ve idari önlemleri alır.</li>
-                <li><strong>Kullanıcı Hakları</strong><br/>Kullanıcılar:
-                  <ul>
-                    <li>Verilerine erişme</li>
-                    <li>Düzeltme talep etme</li>
-                    <li>Silinmesini isteme</li>
-                  </ul>
-                  haklarına sahiptir.<br/>
-                  Talepler için: info@tedport.com
-                </li>
-                <li><strong>Çerezler (Cookies)</strong><br/>Platform, kullanıcı deneyimini iyileştirmek için çerezler kullanabilir.</li>
-                <li><strong>Güncellemeler</strong><br/>Bu politika zaman zaman güncellenebilir.</li>
-              </ol>
+        <div className="reg-modal-overlay" onClick={() => setShowPrivacyModal(false)}>
+          <div className="reg-modal" onClick={e => e.stopPropagation()}>
+            <div className="reg-modal-header">
+              <div className="reg-modal-header-inner">
+                <span className="material-symbols-outlined reg-modal-icon">lock</span>
+                <h2>Gizlilik Politikası</h2>
+              </div>
+              <button type="button" className="reg-modal-close" onClick={() => setShowPrivacyModal(false)} aria-label="Kapat">
+                <span className="material-symbols-outlined">close</span>
+              </button>
             </div>
-            <button className="modal-close-btn" onClick={() => setShowPrivacyModal(false)}>Kapat</button>
+            <div className="reg-modal-body">
+              <section className="reg-modal-section"><h3>1. Amaç</h3><p>Bu Gizlilik Politikası, Tedport'un kullanıcı verilerini nasıl topladığını, kullandığını ve koruduğunu açıklamaktadır.</p></section>
+              <section className="reg-modal-section"><h3>2. Toplanan Veriler</h3><ul><li>Kimlik bilgileri (ad, soyad)</li><li>İletişim bilgileri (e-posta, telefon)</li><li>şirket bilgileri</li><li>Kullanım verileri (log, IP)</li></ul></section>
+              <section className="reg-modal-section"><h3>3. Verilerin Kullanımı</h3><p>Hizmet sunumu, hesap yönetimi, güvenlik, analiz ve (rıza verilmişse) pazarlama amaçlarıyla kullanılır.</p></section>
+              <section className="reg-modal-section"><h3>4. Çerezler</h3><p>Tedport kullanıcı deneyimini geliştirmek için çerezler kullanır. Kullanıcılar tarayıcı ayarlarından çerezleri kontrol edebilir.</p></section>
+              <section className="reg-modal-section"><h3>5. Veri Paylaşımı</h3><ul><li>Teknik hizmet sağlayıcılar</li><li>Analitik servisler</li><li>Yetkili kamu kurumları</li></ul><div className="reg-modal-notice"><span className="material-symbols-outlined">shield</span><span>Verileriniz satılmaz veya kiralanmaz.</span></div></section>
+              <section className="reg-modal-section"><h3>6. Veri Güvenliği</h3><ul><li>SSL / HTTPS kullanılmaktadır</li><li>Erişim kontrolleri uygulanmaktadır</li></ul></section>
+              <section className="reg-modal-section"><h3>7. Saklama Süresi</h3><p>Veriler; hizmet süresi boyunca ve yasal zorunluluklar kapsamında saklanır, ardından silinir.</p></section>
+              <section className="reg-modal-section"><h3>8. Kullanıcı Hakları</h3><p>Verilerinize erişebilir, düzeltme talep edebilir veya silinmesini isteyebilirsiniz. Talepler: <a href="mailto:info@tedport.com" className="text-link">info@tedport.com</a></p></section>
+              <section className="reg-modal-section"><h3>9. Değişiklikler</h3><p>Tedport bu politikayı güncelleyebilir. Güncel versiyon platformda yayınlanır.</p></section>
+            </div>
+            <div className="reg-modal-footer">
+              <button type="button" className="reg-modal-accept-btn" onClick={() => setShowPrivacyModal(false)}>Anladım, Kapat</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Ticari Elektronik İleti Modal */}
+      {showMarketingModal && (
+        <div className="reg-modal-overlay" onClick={() => setShowMarketingModal(false)}>
+          <div className="reg-modal" onClick={e => e.stopPropagation()}>
+            <div className="reg-modal-header">
+              <div className="reg-modal-header-inner">
+                <span className="material-symbols-outlined reg-modal-icon reg-modal-icon--orange">mark_email_read</span>
+                <h2>Ticari Elektronik İleti Onay Metni</h2>
+              </div>
+              <button type="button" className="reg-modal-close" onClick={() => setShowMarketingModal(false)} aria-label="Kapat">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="reg-modal-body">
+              <div className="reg-modal-law-badge"><span className="material-symbols-outlined">balance</span><span>6563 sayılı Ticari İletişim ve Ticari Elektronik İletiler Hakkında Kanun kapsamında hazırlanmıştır.</span></div>
+              <section className="reg-modal-section">
+                <h3>Açık Rıza Beyanı</h3>
+                <p>Tarafıma, Tedport Teknoloji A.Ş. tarafından sunulan ürün ve hizmetlere ilişkin kampanya, tanıtım, fırsat ve bilgilendirme içeriklerinin e-posta ve/veya SMS yoluyla gönderilmesini kabul ediyorum.</p>
+                <p>Bu kapsamında kişisel verilerimin iletişim faaliyetlerinin yürütülmesi amacıyla işlenmesine izin veriyorum.</p>
+              </section>
+              <div className="reg-modal-notice reg-modal-notice--green"><span className="material-symbols-outlined">check_circle</span><span>Bu onay tamamen isteğe bağlıdır. Dilediğiniz zaman <strong>Profil → Bildirim Tercihleri → Pazarlama İletişimi</strong> toggle'ından anında geri alabilirsiniz.</span></div>
+            </div>
+            <div className="reg-modal-footer reg-modal-footer--split">
+              <button type="button" className="reg-modal-decline-btn" onClick={() => setShowMarketingModal(false)}>Hayır, Teşekkürler</button>
+              <button type="button" className="reg-modal-accept-btn" onClick={() => { setMarketingConsent(true); setShowMarketingModal(false); }}>
+                <span className="material-symbols-outlined">check</span>
+                Evet, Kabul Ediyorum
+              </button>
+            </div>
           </div>
         </div>
       )}

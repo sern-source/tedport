@@ -54,10 +54,6 @@ const SharedFooter = () => {
                         <h4>İletişim</h4>
                         <ul>
                             <li>
-                                <span className="material-symbols-outlined sf-contact-icon">location_on</span>
-                                <span>Şişli, İstanbul</span>
-                            </li>
-                            <li>
                                 <span className="material-symbols-outlined sf-contact-icon">mail</span>
                                 <a href="mailto:info@tedport.com">info@tedport.com</a>
                             </li>
@@ -68,6 +64,11 @@ const SharedFooter = () => {
                 {/* Bottom */}
                 <div className="sf-bottom">
                     <p>© {currentYear} Tedport. Tüm hakları saklıdır.</p>
+                    <div className="sf-legal-links">
+                        <Link to="/hizmet-sartlari">Hizmet Şartları</Link>
+                        <Link to="/gizlilik-politikasi">Gizlilik Politikası</Link>
+                        <Link to="/kvkk">KVKK Aydınlatma Metni</Link>
+                    </div>
                 </div>
             </div>
         </footer>

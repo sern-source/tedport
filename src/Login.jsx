@@ -25,6 +25,7 @@ const LoginPage = () => {
 
   // Enes Doğanay | 13 Nisan 2026: Ortak yönlendirme mantığı — login ve session kontrolü için tek fonksiyon
   const redirectAfterAuth = async (userId) => {
+    const redirectTo = searchParams.get('redirect');
     const { data: companyData } = await supabase
       .from('kurumsal_firma_yoneticileri')
       .select('firma_id')
@@ -36,12 +37,10 @@ const LoginPage = () => {
       if (!localStorage.getItem(visitedKey)) {
         localStorage.setItem(visitedKey, '1');
         navigate('/firma-profil?tab=panel');
-      } else {
-        navigate('/');
+        return;
       }
-    } else {
-      navigate('/');
     }
+    navigate(redirectTo || '/');
   };
 
   useEffect(() => {
