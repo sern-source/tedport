@@ -54,7 +54,7 @@ const PageLoader = () => (
     <div style={loaderStyle}>
         <div style={innerStyle}>
             <img
-                src="/tedport-logo_no-background.png"
+                src={isDark() ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'}
                 alt="Tedport"
                 style={logoStyle}
             />

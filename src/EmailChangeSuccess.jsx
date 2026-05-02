@@ -1,5 +1,6 @@
 {/* Enes Doğanay | 10 Nisan 2026: E-posta değişikliği onay başarı sayfası — SPA state'ten bağımsız */}
 import React from 'react';
+import { useTheme } from './useTheme';
 import './SharedHeader.css';
 import './EmailConfirmation.css';
 
@@ -7,6 +8,8 @@ const EmailChangeSuccess = () => {
   // Enes Doğanay | 10 Nisan 2026: URL query'den yeni e-postayı al (main.jsx tarafından ekleniyor)
   const params = new URLSearchParams(window.location.search);
   const newEmail = params.get('email');
+  // Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo
+  const { theme } = useTheme();
 
   return (
     <div className="ec-wrapper">
@@ -14,8 +17,8 @@ const EmailChangeSuccess = () => {
       <header className="shared-header">
         <div className="shared-header-inner">
           <a href="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
-            {/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG, light/dark her ikisinde de çalışır */}
-            <img className="shared-logo-image" src="/tedport-logo_no-background.png" alt="Tedport Logo" loading="lazy" />
+            {/* Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo */}
+            <img className="shared-logo-image" src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'} alt="Tedport Logo" loading="lazy" />
           </a>
           <div className="shared-nav">
             <div className="shared-nav-links">

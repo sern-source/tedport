@@ -2,12 +2,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+// Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo
+import { useTheme } from './useTheme';
 import './SharedFooter.css';
 
 const SharedFooter = () => {
     const currentYear = new Date().getFullYear();
     // Enes Doğanay | 2 Mayıs 2026: Giriş yapmış kullanıcıya Kayıt/Giriş linkleri gösterilmez
     const { userProfile } = useAuth();
+    // Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo
+    const { theme } = useTheme();
 
     return (
         <footer className="sf-footer">
@@ -16,8 +20,8 @@ const SharedFooter = () => {
                     {/* Brand */}
                     <div className="sf-brand">
                         <Link to="/" className="sf-logo-link">
-                            {/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG, light/dark her ikisinde de çalışır */}
-                            <img src="/tedport-logo_no-background.png" alt="Tedport Logo" className="sf-logo" loading="lazy" />
+                            {/* Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo */}
+                            <img src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'} alt="Tedport Logo" className="sf-logo" loading="lazy" />
                         </Link>
                         <p className="sf-brand-desc">
                             Türkiye'nin güvenilir B2B tedarik platformu. Firmalar arası ticareti dijitalleştiriyoruz.

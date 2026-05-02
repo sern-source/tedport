@@ -116,8 +116,8 @@ const SharedHeader = ({
                     </button>
 
                     <Link to="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
-                        {/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG, light/dark her ikisinde de çalışır */}
-                        <img className="shared-logo-image" src="/tedport-logo_no-background.png" alt="Tedport Logo" />
+                        {/* Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo kullan */}
+                        <img className="shared-logo-image" src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'} alt="Tedport Logo" />
                     </Link>
                 </div>
 
@@ -218,19 +218,6 @@ const SharedHeader = ({
 
                 {/* Enes Doğanay | 14 Nisan 2026: Sağ grup — nav + kullanıcı sabit konumda */}
                 <div className="shared-header-right">
-                    {/* Enes Doğanay | 2 Mayıs 2026: Faz 2 — dark mode toggle butonu */}
-                    <button
-                        type="button"
-                        className="shared-theme-toggle"
-                        onClick={toggleTheme}
-                        aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Karanlık temaya geç'}
-                        title={theme === 'dark' ? 'Açık tema' : 'Karanlık tema'}
-                    >
-                        <span className="material-symbols-outlined">
-                            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-                        </span>
-                    </button>
-
                     {/* Mobile Hamburger */}
                     <button
                         className="shared-hamburger"
@@ -587,6 +574,18 @@ const SharedHeader = ({
                         )}
                     </div>
                 </div>
+                    {/* Enes Doğanay | 3 Mayıs 2026: Dark mode toggle en sağa taşındı */}
+                    <button
+                        type="button"
+                        className="shared-theme-toggle"
+                        onClick={toggleTheme}
+                        aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Karanlık temaya geç'}
+                        title={theme === 'dark' ? 'Açık tema' : 'Karanlık tema'}
+                    >
+                        <span className="material-symbols-outlined">
+                            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </button>
                 </div>
             </div>
 
