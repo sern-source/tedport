@@ -448,6 +448,124 @@
   }
 }
 
+/* Enes Doğanay | 2 Mayıs 2026: AdminMesajSikayetleri için ek sınıflar */
+.acm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+.acm-field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+}
+.acm-field-row .acm-field {
+  flex: 1;
+  min-width: 140px;
+  margin-top: 0;
+}
+.acm-field-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+.acm-field-value {
+  font-size: 0.88rem;
+  color: #334155;
+}
+.acm-field-value--block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+.acm-report-msg-preview {
+  background: #fff7f7;
+  border-color: #fecaca;
+  color: #374151;
+  font-style: italic;
+}
+.acm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.acm-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1.5px solid #e2e8f0;
+  cursor: pointer;
+  background: #f8fafc;
+  color: #475569;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.acm-action-btn .material-symbols-outlined { font-size: 16px; }
+.acm-action-btn:hover:not(:disabled) { background: #f1f5f9; border-color: #cbd5e1; }
+.acm-action-btn--read { border-color: #fde68a; background: #fffbeb; color: #92400e; }
+.acm-action-btn--read:hover:not(:disabled) { background: #fef3c7; }
+.acm-action-btn--archive { border-color: #bbf7d0; background: #f0fdf4; color: #166534; }
+.acm-action-btn--archive:hover:not(:disabled) { background: #dcfce7; }
+.acm-action-btn--delete { border-color: #fecaca; background: #fff7f7; color: #dc2626; }
+.acm-action-btn--delete:hover:not(:disabled) { background: #fee2e2; }
+.acm-action-btn:disabled { opacity: 0.5; cursor: default; }
+.acm-admin-note-input {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  background: #f8fafc;
+}
+.acm-admin-note-input:focus { border-color: #6366f1; background: #fff; }
+.acm-save-note-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin-top: 4px;
+  width: fit-content;
+}
+.acm-save-note-btn .material-symbols-outlined { font-size: 15px; }
+.acm-save-note-btn:hover:not(:disabled) { background: linear-gradient(135deg, #4f46e5, #4338ca); }
+.ams-kaynak-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+
 @media (max-width: 480px) {
   .acm-stats {
     grid-template-columns: repeat(2, 1fr);

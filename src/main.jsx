@@ -9,6 +9,12 @@ import { AuthProvider } from './AuthContext';
 import ToastWrapper from './ToastWrapper';
 import { supabase, supabaseUrl } from './supabaseClient';
 
+// Enes Doğanay | 2 Mayıs 2026: Component unmount sırasında iptal edilen Supabase fetch'leri
+// AbortError fırlatır — bunlar expected, console'u kirletmesin
+window.addEventListener('unhandledrejection', (e) => {
+  if (e.reason?.name === 'AbortError') e.preventDefault();
+});
+
 // Enes Doğanay | 10 Nisan 2026: E-posta değişiklik onayı — SPA yüklenmeden önce hash'i yakala ve işle
 // Bu sayede AuthContext, Realtime, vs. hiç kirlenmiyor
 const hash = window.location.hash || '';

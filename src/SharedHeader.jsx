@@ -453,6 +453,24 @@ const SharedHeader = ({
                                                 </span>
                                             </button>
                                         )}
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Admin dropdown — Mesaj Şikayetleri butonu */}
+                                        {isCurrentUserAdmin && (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/admin/mesaj-sikayetleri');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    flag
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Mesaj Şikayetleri
+                                                </span>
+                                            </button>
+                                        )}
 
                                         {!managedCompanyId && (
                                             <>
@@ -656,6 +674,13 @@ const SharedHeader = ({
                                 <Link to="/admin/etiket-onay" onClick={() => setIsMobileMenuOpen(false)}>
                                     <span className="material-symbols-outlined shared-mobile-menu-icon">verified</span>
                                     Onay Merkezi
+                                </Link>
+                            )}
+                            {/* Enes Doğanay | 2 Mayıs 2026: Mobil menü — Mesaj Şikayetleri linki */}
+                            {isCurrentUserAdmin && (
+                                <Link to="/admin/mesaj-sikayetleri" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span className="material-symbols-outlined shared-mobile-menu-icon">flag</span>
+                                    Mesaj Şikayetleri
                                 </Link>
                             )}
                             <button

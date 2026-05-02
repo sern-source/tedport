@@ -200,6 +200,8 @@ const TenderOffersManagement = ({ companyId }) => {
     /* Enes Doğanay | 13 Nisan 2026: İletişim popup state */
     const [contactPopup, setContactPopup] = useState(null);
     const [contactLoading, setContactLoading] = useState(false);
+    // Enes Doğanay | 2 Mayıs 2026: Kopyalama geri bildirimi
+    const [copiedField, setCopiedField] = useState(null);
 
     /* Enes Doğanay | 13 Nisan 2026: İhale düzenle/sil/kapat state */
     const [editModal, setEditModal] = useState(false);
@@ -276,6 +278,181 @@ const TenderOffersManagement = ({ companyId }) => {
 
     useEffect(() => { localStorage.setItem('tedport_shortlist_offer_ids', JSON.stringify(shortlist)); }, [shortlist]);
     useEffect(() => { localStorage.setItem('tedport_offer_notes', JSON.stringify(notes)); }, [notes]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma state — teklif_mesajlari'ndan bağımsız yeni tablo */
+    const [activeTenderChat, setActiveTenderChat] = useState(null); // { offer, tenderTitle }
+    const [tenderChatMessages, setTenderChatMessages] = useState([]);
+    const [tenderChatLoading, setTenderChatLoading] = useState(false);
+    const [tenderChatInput, setTenderChatInput] = useState('');
+    const [tenderChatSending, setTenderChatSending] = useState(false);
+    const tenderChatChannelRef = useRef(null);
+    const tenderChatEndRef = useRef(null);
+    /* Enes Doğanay | 2 Mayıs 2026: Okunmamış ihale teklif mesajı olan offer id seti */
+    const [unreadTenderChatIds, setUnreadTenderChatIds] = useState(() => new Set());
+    // Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet state'leri
+    const [reportModal, setReportModal] = useState(null); // { mesajId, mesajIcerik }
+    const [reportSending, setReportSending] = useState(false);
+    const [reportNeden, setReportNeden] = useState('spam');
+    const [reportAciklama, setReportAciklama] = useState('');
+    const [reportSuccess, setReportSuccess] = useState(false);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Chat container'ını en alta kaydır */
+    const scrollTenderChatToBottom = useCallback((smooth = true) => {
+        setTimeout(() => {
+            const container = tenderChatEndRef.current?.parentElement;
+            if (container) container.scrollTo({ top: container.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
+        }, 80);
+    }, []);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Teklif chat'ini aç — mesajları çek + realtime subscribe */
+    // Enes Doğanay | 2 Mayıs 2026: tenderDurum eklendi — kapalı ihale tespiti için
+    const openTenderChat = useCallback(async (offer, tenderTitle, tenderDurum) => {
+        // Önceki kanalı temizle
+        if (tenderChatChannelRef.current) {
+            supabase.removeChannel(tenderChatChannelRef.current);
+            tenderChatChannelRef.current = null;
+        }
+        setActiveTenderChat({ offer, tenderTitle, tenderDurum });
+        setTenderChatLoading(true);
+        setTenderChatInput('');
+        setTenderChatMessages([]);
+
+        try {
+            const { data } = await supabase
+                .from('ihale_teklif_mesajlari')
+                .select('*')
+                .eq('teklif_id', offer.id)
+                .order('created_at', { ascending: true });
+            setTenderChatMessages(data || []);
+            scrollTenderChatToBottom(false);
+
+            // Firma olarak okunmamışları okundu işaretle
+            const unread = (data || []).filter(m => m.sender_role === 'bidder' && !m.okundu_firma);
+            if (unread.length > 0) {
+                supabase.from('ihale_teklif_mesajlari')
+                    .update({ okundu_firma: true })
+                    .in('id', unread.map(m => m.id))
+                    .then(() => {});
+                setUnreadTenderChatIds(prev => { const s = new Set(prev); s.delete(offer.id); return s; });
+            }
+        } catch (err) {
+            if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
+        } finally {
+            setTenderChatLoading(false);
+        }
+
+        // Realtime subscribe
+        const channel = supabase
+            .channel(`tender-chat-company-${offer.id}`)
+            .on('broadcast', { event: 'new-tender-message' }, ({ payload }) => {
+                setTenderChatMessages(prev => {
+                    if (prev.some(m => m.id === payload.id)) return prev;
+                    return [...prev, payload];
+                });
+                scrollTenderChatToBottom();
+                // Gelen mesaj bidder'dan ise otomatik okundu yap
+                if (payload.sender_role === 'bidder') {
+                    supabase.from('ihale_teklif_mesajlari').update({ okundu_firma: true }).eq('id', payload.id).then(() => {});
+                }
+            })
+            .subscribe();
+        tenderChatChannelRef.current = channel;
+    }, [scrollTenderChatToBottom]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Teklif chat'ini kapat */
+    const closeTenderChat = useCallback(() => {
+        if (tenderChatChannelRef.current) {
+            supabase.removeChannel(tenderChatChannelRef.current);
+            tenderChatChannelRef.current = null;
+        }
+        setActiveTenderChat(null);
+        setTenderChatMessages([]);
+        setTenderChatInput('');
+    }, []);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet gönder */
+    const submitReport = useCallback(async () => {
+        if (!reportModal || reportSending) return;
+        setReportSending(true);
+        const { data: authData } = await supabase.auth.getUser();
+        const reporterId = authData?.user?.id;
+        if (!reporterId) { setReportSending(false); return; }
+        const { error } = await supabase.from('mesaj_sikayetleri').insert([{
+            reporter_id: reporterId,
+            mesaj_id: String(reportModal.mesajId),
+            kaynak: 'ihale_teklifi',
+            mesaj_icerik: reportModal.mesajIcerik,
+            neden: reportNeden,
+            aciklama: reportAciklama.trim() || null,
+        }]);
+        setReportSending(false);
+        setReportModal(null);
+        setReportNeden('spam');
+        setReportAciklama('');
+        if (!error) {
+            setReportSuccess(true);
+            setTimeout(() => setReportSuccess(false), 3500);
+        }
+    }, [reportModal, reportSending, reportNeden, reportAciklama]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Firma olarak mesaj gönder */
+    const sendTenderChatMessage = useCallback(async () => {
+        if (!tenderChatInput.trim() || !activeTenderChat) return;
+        // Kapalı ihalede mesaj gönderilemesin
+        if (activeTenderChat.tenderDurum === 'kapali') return;
+        setTenderChatSending(true);
+        const { data: authData } = await supabase.auth.getUser();
+        const senderId = authData?.user?.id;
+        if (!senderId) { setTenderChatSending(false); return; }
+
+        const { data, error } = await supabase
+            .from('ihale_teklif_mesajlari')
+            .insert([{
+                teklif_id: activeTenderChat.offer.id,
+                sender_id: senderId,
+                sender_role: 'company',
+                mesaj: tenderChatInput.trim(),
+                okundu_firma: true,
+            }])
+            .select()
+            .single();
+
+        if (!error && data) {
+            setTenderChatMessages(prev => [...prev, data]);
+            setTenderChatInput('');
+            if (tenderChatChannelRef.current) {
+                await tenderChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data });
+            }
+            scrollTenderChatToBottom();
+            // Teklif veren kullanıcıya bildirim gönder
+            try {
+                if (activeTenderChat.offer.user_id) {
+                    await supabase.from('bildirimler').insert([{
+                        user_id: activeTenderChat.offer.user_id,
+                        type: 'tender_offer_message',
+                        title: 'İhale teklifine yeni mesaj',
+                        message: `"${activeTenderChat.tenderTitle || 'İhale'}" teklifinize firma yanıt verdi.`,
+                        is_read: false,
+                        metadata: {
+                            ihale_id: activeTenderChat.offer.ihale_id,
+                            teklif_id: activeTenderChat.offer.id,
+                            ihale_baslik: activeTenderChat.tenderTitle,
+                        },
+                    }]);
+                }
+            } catch { /* bildirim başarısız olsa bile mesaj gitti */ }
+        }
+        setTenderChatSending(false);
+    }, [tenderChatInput, activeTenderChat, scrollTenderChatToBottom]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Bileşen unmount → kanalı temizle */
+    useEffect(() => {
+        return () => {
+            if (tenderChatChannelRef.current) {
+                supabase.removeChannel(tenderChatChannelRef.current);
+            }
+        };
+    }, []);
 
     /* ─── Veri Çekme ─── */
     useEffect(() => {
@@ -412,6 +589,20 @@ const TenderOffersManagement = ({ companyId }) => {
         newParams.delete('ihale');
         newParams.delete('teklif_user');
         setSearchParams(newParams, { replace: true });
+    }, [loading, tenders, offersByTender]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Bildirimden yönlendirme — sessionStorage tom_open_teklif_chat ile chat aç */
+    useEffect(() => {
+        if (loading || tenders.length === 0) return;
+        const chatTeklifId = sessionStorage.getItem('tom_open_teklif_chat');
+        if (!chatTeklifId) return;
+        sessionStorage.removeItem('tom_open_teklif_chat');
+        const allOffers = Object.values(offersByTender).flat();
+        const targetOffer = allOffers.find(o => String(o.id) === chatTeklifId);
+        if (targetOffer) {
+            const tender = tenders.find(t => String(t.id) === String(targetOffer.ihale_id));
+            openTenderChat(targetOffer, tender?.baslik, tender?.durum);
+        }
     }, [loading, tenders, offersByTender]);
 
     /* Enes Doğanay | 13 Nisan 2026: Highlight edilen teklif kartına scroll */
@@ -595,22 +786,33 @@ const TenderOffersManagement = ({ companyId }) => {
         if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
     };
 
-    /* Enes Doğanay | 13 Nisan 2026: İletişime geç — teklif verenin profil + firma bilgilerini getir */
+    /* Enes Doğanay | 2 Mayıs 2026: Profili Görüntüle — teklif verenin profil + firma bilgilerini getir */
     const openContact = async (offer) => {
         setContactLoading(true);
+        const name = offer.gonderen_ad_soyad || '';
+        const initials = name
+            ? name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2)
+            : '?';
         const info = {
-            name: offer.gonderen_ad_soyad,
+            name,
+            initials,
             email: offer.gonderen_email,
             firma: offer.gonderen_firma_adi || null,
             phone: null,
             firmaPhone: null,
             firmaEmail: null,
+            avatar: null,
+            companyName: null,
+            location: null,
         };
 
-        /* Profil tablosundan telefon */
+        /* Enes Doğanay | 2 Mayıs 2026: Profil tablosundan avatar + telefon + şirket + konum */
         if (offer.user_id) {
-            const { data: prof } = await supabase.from('profiles').select('phone').eq('id', offer.user_id).maybeSingle();
+            const { data: prof } = await supabase.from('profiles').select('phone, avatar, company_name, location').eq('id', offer.user_id).maybeSingle();
             if (prof?.phone) info.phone = prof.phone;
+            if (prof?.avatar) info.avatar = prof.avatar;
+            if (prof?.company_name) info.companyName = prof.company_name;
+            if (prof?.location) info.location = prof.location;
         }
 
         /* Firma tablosundan telefon ve e-posta */
@@ -1555,9 +1757,9 @@ const TenderOffersManagement = ({ companyId }) => {
                                                             <button
                                                                 className="tom-icon-btn tom-icon-btn--contact"
                                                                 onClick={() => openContact(offer)}
-                                                                title="İletişime Geç"
+                                                                title="Profili Görüntüle"
                                                             >
-                                                                <span className="material-symbols-outlined">contact_phone</span>
+                                                                <span className="material-symbols-outlined">person_search</span>
                                                             </button>
                                                             <label className={`tom-compare-check${!compareHintDismissed && compareIds.length === 0 ? ' tom-compare-check--hint' : ''}`} title="Karşılaştır">
                                                                 <input type="checkbox" checked={isCompare} onChange={() => toggleCompare(offer.id)} />
@@ -1675,6 +1877,16 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                         {offer.ek_dosya_adi || 'Ek Dosya'}
                                                                     </button>
                                                                 )}
+                                                                {/* Enes Doğanay | 2 Mayıs 2026: Teklif mesajlaşma butonu */}
+                                                                <button
+                                                                    className={`tom-btn tom-btn--chat${unreadTenderChatIds.has(offer.id) ? ' tom-btn--chat-unread' : ''}`}
+                                                                    onClick={(e) => { e.stopPropagation(); openTenderChat(offer, selectedTender?.baslik, selectedTender?.durum); }}
+                                                                    title="Teklif veren kişiyle mesaj gönder"
+                                                                >
+                                                                    <span className="material-symbols-outlined">forum</span>
+                                                                    Mesaj Gönder
+                                                                    {unreadTenderChatIds.has(offer.id) && <span className="tom-chat-unread-dot" />}
+                                                                </button>
                                                                 {/* Enes Doğanay | 15 Nisan 2026: Kabul edilen teklif → iletişime geç + statü değiştir */}
                                                                 {String(offer.durum || '').toLowerCase() === 'kabul' && (
                                                                     <div className="tom-offer-card__footer-right">
@@ -1957,43 +2169,253 @@ const TenderOffersManagement = ({ companyId }) => {
                 </div>
             )}
 
-            {/* Enes Doğanay | 13 Nisan 2026: İletişime Geç popup overlay */}
+            {/* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma modal — teklif_mesajlari'ndan bağımsız */}
+            {activeTenderChat && (
+                <div className="tom-tender-chat-overlay" onClick={closeTenderChat}>
+                    <div className="tom-tender-chat-modal" onClick={e => e.stopPropagation()}>
+                        <div className="tom-tender-chat-header">
+                            <div className="tom-tender-chat-header__info">
+                                <span className="material-symbols-outlined">chat</span>
+                                <div>
+                                    <strong>{activeTenderChat.offer.gonderen_ad_soyad || 'Teklif Veren'}</strong>
+                                    {activeTenderChat.offer.gonderen_email && <span>{activeTenderChat.offer.gonderen_email}</span>}
+                                </div>
+                            </div>
+                            <div className="tom-tender-chat-header__right">
+                                {/* Enes Doğanay | 2 Mayıs 2026: Chat header’nda profil butonu */}
+                                <button
+                                    className="tom-tender-chat-profile-btn"
+                                    onClick={() => openContact(activeTenderChat.offer)}
+                                    title="Profili Görüntüle"
+                                >
+                                    <span className="material-symbols-outlined">account_circle</span>
+                                </button>
+                                <span className="tom-tender-chat-ihale-tag">
+                                    <span className="material-symbols-outlined">gavel</span>
+                                    {activeTenderChat.tenderTitle || 'İhale'}
+                                </span>
+                                <button className="tom-tender-chat-close" onClick={closeTenderChat}>
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="tom-tender-chat-messages">
+                            {tenderChatLoading ? (
+                                <div className="tom-tender-chat-empty">
+                                    <div className="tom-tender-chat-spinner" />
+                                    <p>Mesajlar yükleniyor...</p>
+                                </div>
+                            ) : tenderChatMessages.length === 0 ? (
+                                <div className="tom-tender-chat-empty">
+                                    <span className="material-symbols-outlined">chat_bubble_outline</span>
+                                    <p>Henüz mesaj yok. Teklif hakkında soru sormak için mesaj gönderin.</p>
+                                </div>
+                            ) : (
+                                tenderChatMessages.map((m) => (
+                                    <div key={m.id} className={`tom-tender-chat-bubble ${m.sender_role === 'company' ? 'mine' : 'theirs'}`}>
+                                        <div className="tom-tender-chat-bubble__header">
+                                            <strong>{m.sender_role === 'company' ? 'Siz (Firma)' : (activeTenderChat.offer.gonderen_ad_soyad || 'Teklif Veren')}</strong>
+                                            <span>{new Date(m.created_at).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                        <p>{m.mesaj}</p>
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Şikayet butonu — sadece karşı tarafın mesajlarında */}
+                                        {m.sender_role !== 'company' && (
+                                            <button className="msg-report-btn" title="Mesajı Şikayet et" onClick={() => { setReportModal({ mesajId: m.id, mesajIcerik: m.mesaj }); setReportNeden('spam'); setReportAciklama(''); }}>
+                                                <span className="material-symbols-outlined">flag</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                            <div ref={tenderChatEndRef} />
+                        </div>
+
+                        {/* Enes Doğanay | 2 Mayıs 2026: Kapalı ihalede mesaj giriş alanı yerine bilgi banner'ı */}
+                        {activeTenderChat.tenderDurum === 'kapali' ? (
+                            <div className="tom-chat-closed-banner">
+                                <span className="material-symbols-outlined">lock</span>
+                                Bu ihale kapatıldı. Artık mesaj gönderilemez.
+                            </div>
+                        ) : (
+                        <div className="tom-tender-chat-input">
+                            <input
+                                type="text"
+                                placeholder="Mesajınızı yazın..."
+                                value={tenderChatInput}
+                                onChange={e => setTenderChatInput(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTenderChatMessage(); } }}
+                                disabled={tenderChatSending}
+                                maxLength={2000}
+                            />
+                            <button onClick={sendTenderChatMessage} disabled={tenderChatSending || !tenderChatInput.trim()}>
+                                <span className="material-symbols-outlined">{tenderChatSending ? 'progress_activity' : 'send'}</span>
+                            </button>
+                        </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 2 Mayıs 2026: Şikayet başarı toast */}
+            {reportSuccess && (
+                <div className="msg-report-toast">
+                    <span className="material-symbols-outlined">check_circle</span>
+                    Şikayetiniz alındı. İncelenecektir.
+                </div>
+            )}
+
+            {/* Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet modal */}
+            {reportModal && (
+                <div className="msg-report-overlay" onClick={() => !reportSending && setReportModal(null)}>
+                    <div className="msg-report-modal" onClick={e => e.stopPropagation()}>
+                        <div className="msg-report-modal__header">
+                            <span className="material-symbols-outlined">flag</span>
+                            <h3>Mesajı Şikayet Et</h3>
+                            <button className="msg-report-close" onClick={() => setReportModal(null)} disabled={reportSending}>
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="msg-report-modal__body">
+                            <div className="msg-report-preview">{reportModal.mesajIcerik}</div>
+                            <p className="msg-report-label">Şikayet nedeni</p>
+                            <div className="msg-report-reasons">
+                                {[{value:'spam',label:'Spam / İstenmeyen Mesaj'},{value:'hakaret',label:'Hakaret / İltihap'},{value:'tehdit',label:'Tehdit / Taciz'},{value:'yaniltici',label:'Yanıltıcı / Sahte Teklif'},{value:'diger',label:'Diğer'}].map(r => (
+                                    <label key={r.value} className={`msg-report-reason${reportNeden === r.value ? ' selected' : ''}`}>
+                                        <input type="radio" name="report-neden" value={r.value} checked={reportNeden === r.value} onChange={() => setReportNeden(r.value)} />
+                                        {r.label}
+                                    </label>
+                                ))}
+                            </div>
+                            <p className="msg-report-label">Ek açıklama <span>(isteğe bağlı)</span></p>
+                            <textarea className="msg-report-textarea" value={reportAciklama} onChange={e => setReportAciklama(e.target.value)} placeholder="Şikayet detayı..." maxLength={500} rows={3} />
+                        </div>
+                        <div className="msg-report-modal__footer">
+                            <button className="msg-report-cancel" onClick={() => setReportModal(null)} disabled={reportSending}>İptal</button>
+                            <button className="msg-report-submit" onClick={submitReport} disabled={reportSending}>
+                                {reportSending ? <span className="material-symbols-outlined">progress_activity</span> : 'Şikayet Gönder'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 2 Mayıs 2026: Profil popup — yeniden tasarlandı */}
             {contactPopup && (
-                <div className="tom-contact-overlay" onClick={() => setContactPopup(null)}>
+                <div className="tom-contact-overlay" onClick={() => { setContactPopup(null); setCopiedField(null); }}>
                     <div className="tom-contact-card" onClick={e => e.stopPropagation()}>
-                        <button className="tom-contact-card__close" onClick={() => setContactPopup(null)}>
+                        {/* Gradient banner */}
+                        <div className="tom-contact-card__banner" />
+                        <button className="tom-contact-card__close" onClick={() => { setContactPopup(null); setCopiedField(null); }}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
-                        <div className="tom-contact-card__avatar">
-                            <span className="material-symbols-outlined">person</span>
-                        </div>
-                        <h3>{contactPopup.name || 'İsimsiz'}</h3>
-                        {contactPopup.firma && <p className="tom-contact-card__firma">{contactPopup.firma}</p>}
 
+                        {/* Avatar — banner’ı üstüne biner */}
+                        <div className="tom-contact-card__avatar">
+                            {contactPopup.avatar
+                                ? <img src={contactPopup.avatar} alt="" className="tom-contact-card__avatar-img" />
+                                : <span className="tom-contact-card__initials">{contactPopup.initials || '?'}</span>
+                            }
+                        </div>
+
+                        {/* Kimlik bilgileri */}
+                        <div className="tom-contact-card__identity">
+                            <h3>{contactPopup.name || 'İsimsiz'}</h3>
+                            {(contactPopup.companyName || contactPopup.firma)
+                                ? <p className="tom-contact-card__firma">
+                                    <span className="material-symbols-outlined">business</span>
+                                    {contactPopup.companyName || contactPopup.firma}
+                                  </p>
+                                : <p className="tom-contact-card__firma">Bireysel Tedarikçi</p>
+                            }
+                            <span className="tom-contact-card__badge">
+                                <span className="material-symbols-outlined">verified</span>
+                                Kayıtlı Üye
+                            </span>
+                        </div>
+
+                        {/* İletişim satırları */}
                         <div className="tom-contact-card__rows">
                             {contactPopup.email && (
-                                <a href={`mailto:${contactPopup.email}`} className="tom-contact-row">
+                                <div className="tom-contact-row tom-contact-row--email">
                                     <span className="material-symbols-outlined">mail</span>
-                                    <div><small>E-posta</small><span>{contactPopup.email}</span></div>
-                                </a>
+                                    <div className="tom-contact-row__body">
+                                        <small>E-posta</small>
+                                        <span>{contactPopup.email}</span>
+                                    </div>
+                                    <div className="tom-contact-row__actions">
+                                        <a href={`mailto:${contactPopup.email}`} className="tom-contact-icon-btn" title="Mail gönder">
+                                            <span className="material-symbols-outlined">send</span>
+                                        </a>
+                                        <button
+                                            className="tom-contact-icon-btn"
+                                            title="Kopyala"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(contactPopup.email);
+                                                setCopiedField('email');
+                                                setTimeout(() => setCopiedField(null), 2000);
+                                            }}
+                                        >
+                                            <span className="material-symbols-outlined">
+                                                {copiedField === 'email' ? 'check' : 'content_copy'}
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             )}
                             {contactPopup.phone && (
                                 <a href={`tel:${contactPopup.phone}`} className="tom-contact-row">
                                     <span className="material-symbols-outlined">phone</span>
-                                    <div><small>Telefon</small><span>{contactPopup.phone}</span></div>
+                                    <div className="tom-contact-row__body">
+                                        <small>Telefon</small>
+                                        <span>{contactPopup.phone}</span>
+                                    </div>
                                 </a>
                             )}
                             {contactPopup.firmaPhone && contactPopup.firmaPhone !== contactPopup.phone && (
                                 <a href={`tel:${contactPopup.firmaPhone}`} className="tom-contact-row">
                                     <span className="material-symbols-outlined">business</span>
-                                    <div><small>Firma Telefon</small><span>{contactPopup.firmaPhone}</span></div>
+                                    <div className="tom-contact-row__body">
+                                        <small>Firma Telefon</small>
+                                        <span>{contactPopup.firmaPhone}</span>
+                                    </div>
                                 </a>
                             )}
                             {contactPopup.firmaEmail && contactPopup.firmaEmail !== contactPopup.email && (
-                                <a href={`mailto:${contactPopup.firmaEmail}`} className="tom-contact-row">
+                                <div className="tom-contact-row tom-contact-row--email">
                                     <span className="material-symbols-outlined">domain</span>
-                                    <div><small>Firma E-posta</small><span>{contactPopup.firmaEmail}</span></div>
-                                </a>
+                                    <div className="tom-contact-row__body">
+                                        <small>Firma E-posta</small>
+                                        <span>{contactPopup.firmaEmail}</span>
+                                    </div>
+                                    <div className="tom-contact-row__actions">
+                                        <a href={`mailto:${contactPopup.firmaEmail}`} className="tom-contact-icon-btn" title="Mail gönder">
+                                            <span className="material-symbols-outlined">send</span>
+                                        </a>
+                                        <button
+                                            className="tom-contact-icon-btn"
+                                            title="Kopyala"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(contactPopup.firmaEmail);
+                                                setCopiedField('firmaEmail');
+                                                setTimeout(() => setCopiedField(null), 2000);
+                                            }}
+                                        >
+                                            <span className="material-symbols-outlined">
+                                                {copiedField === 'firmaEmail' ? 'check' : 'content_copy'}
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                            {contactPopup.location && (
+                                <div className="tom-contact-row">
+                                    <span className="material-symbols-outlined">location_on</span>
+                                    <div className="tom-contact-row__body">
+                                        <small>Konum</small>
+                                        <span>{contactPopup.location}</span>
+                                    </div>
+                                </div>
                             )}
                         </div>
 

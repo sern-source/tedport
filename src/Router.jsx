@@ -33,6 +33,8 @@ const GizlilikPolitikasi = lazy(() => import('./GizlilikPolitikasi'));
 const SSS = lazy(() => import('./SSS'));
 // Enes Doğanay | 2 Mayıs 2026: Admin Onay Merkezi — etiket ve logo onaylama sayfası
 const AdminEtiketOnay = lazy(() => import('./AdminEtiketOnay'));
+// Enes Doğanay | 2 Mayıs 2026: Admin Mesaj Şikayetleri sayfası
+const AdminMesajSikayetleri = lazy(() => import('./AdminMesajSikayetleri'));
 
 export default function Router() {
   return (
@@ -63,6 +65,8 @@ export default function Router() {
         <Route path="/admin/chatbot-egitimi" element={<AdminChatbotTraining />} />
         {/* Enes Doğanay | 2 Mayıs 2026: Onay Merkezi route */}
         <Route path="/admin/etiket-onay" element={<AdminEtiketOnay />} />
+        {/* Enes Doğanay | 2 Mayıs 2026: Mesaj Şikayetleri route */}
+        <Route path="/admin/mesaj-sikayetleri" element={<AdminMesajSikayetleri />} />
         {/* Enes Doğanay | 7 Nisan 2026: Kurumsal firma profil sayfası — panel + teklifler + bildirimler */}
         <Route path="/firma-profil" element={<FirmaProfil />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />

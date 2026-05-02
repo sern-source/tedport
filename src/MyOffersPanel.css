@@ -702,6 +702,242 @@
     border-color: #cbd5e1;
 }
 
+/* Enes Doğanay | 2 Mayıs 2026: Mesajlaş butonu */
+.mop-btn--chat {
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1.5px solid #6366f1;
+    position: relative;
+}
+.mop-btn--chat:hover {
+    background: #e0e7ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.18);
+}
+.mop-btn--chat-unread { background: #e0e7ff; border-color: #4f46e5; }
+.mop-chat-unread-dot {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 1.5px solid #fff;
+}
+
+/* ── İhale Teklif Chat Overlay (Bidder) ────────────────────────── */
+/* Enes Doğanay | 2 Mayıs 2026: teklif_mesajlari'ndan bağımsız, ihale teklif mesajlaşma */
+.mop-chat-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.mop-chat-modal {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 24px 64px rgba(15,23,42,0.22);
+    width: 100%;
+    max-width: 540px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 90vh;
+}
+.mop-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+}
+.mop-chat-header__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+.mop-chat-header__info .material-symbols-outlined {
+    font-size: 28px;
+    color: #4f46e5;
+    background: #eef2ff;
+    border-radius: 10px;
+    padding: 6px;
+    flex-shrink: 0;
+}
+.mop-chat-header__info > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.mop-chat-header__info strong {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mop-chat-ihale-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #4f46e5;
+    background: #eef2ff;
+    border-radius: 6px;
+    padding: 3px 8px;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mop-chat-ihale-tag .material-symbols-outlined { font-size: 13px; }
+.mop-chat-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+}
+.mop-chat-close:hover { color: #dc2626; background: #fef2f2; }
+.mop-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8fafc;
+    min-height: 200px;
+    max-height: 360px;
+}
+.mop-chat-messages::-webkit-scrollbar { width: 5px; }
+.mop-chat-messages::-webkit-scrollbar-track { background: transparent; }
+.mop-chat-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+.mop-chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 32px 16px;
+    color: #94a3b8;
+    text-align: center;
+    margin: auto;
+}
+.mop-chat-empty .material-symbols-outlined { font-size: 36px; }
+.mop-chat-empty p { font-size: 0.85rem; margin: 0; max-width: 260px; }
+.mop-chat-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #4f46e5;
+    border-radius: 50%;
+    animation: mop-spin 0.7s linear infinite;
+}
+@keyframes mop-spin { to { transform: rotate(360deg); } }
+.mop-chat-bubble {
+    max-width: 78%;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+.mop-chat-bubble p { margin: 0; }
+.mop-chat-bubble__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+.mop-chat-bubble__header strong { font-size: 0.78rem; font-weight: 700; }
+.mop-chat-bubble__header span { font-size: 0.72rem; color: #94a3b8; }
+.mop-chat-bubble.mine {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: #fff;
+    border-bottom-right-radius: 3px;
+}
+.mop-chat-bubble.mine .mop-chat-bubble__header strong { color: #e0e7ff; }
+.mop-chat-bubble.mine .mop-chat-bubble__header span { color: rgba(255,255,255,0.6); }
+.mop-chat-bubble.theirs {
+    align-self: flex-start;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+    border-bottom-left-radius: 3px;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+}
+.mop-chat-bubble.theirs .mop-chat-bubble__header strong { color: #4f46e5; }
+/* Enes Doğanay | 2 Mayıs 2026: Kapalı ihale mesajlaşma engeli banner'ı */
+.mop-chat-closed-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border-top: 1px solid #fca5a5;
+    background: #fff7f7;
+    color: #b91c1c;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.mop-chat-closed-banner .material-symbols-outlined {
+    font-size: 18px;
+}
+.mop-chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 14px 16px;
+    border-top: 1px solid #f1f5f9;
+    background: #fff;
+}
+.mop-chat-input input {
+    flex: 1;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.mop-chat-input input:focus { border-color: #6366f1; }
+.mop-chat-input button {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    flex-shrink: 0;
+}
+.mop-chat-input button:hover:not(:disabled) { opacity: 0.88; transform: scale(1.05); }
+.mop-chat-input button:disabled { opacity: 0.5; cursor: default; }
+.mop-chat-input button .material-symbols-outlined { font-size: 20px; }
+
 /* Enes Doğanay | 15 Nisan 2026: Teklifi Sil butonu + onay modal */
 .mop-btn--danger {
     background: #fff;
@@ -714,6 +950,134 @@
     border-color: #f87171;
     transform: translateY(-1px);
 }
+
+/* Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet butonu + modal */
+.msg-report-btn {
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    align-self: flex-end;
+}
+.msg-report-btn .material-symbols-outlined { font-size: 15px; }
+.msg-report-btn:hover { color: #ef4444; background: #fee2e2; opacity: 1 !important; }
+.mop-chat-bubble:hover .msg-report-btn { opacity: 1; }
+.mop-chat-bubble.mine .msg-report-btn { display: none; }
+.msg-report-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 16px;
+}
+.msg-report-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 440px;
+    overflow: hidden;
+}
+.msg-report-modal__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.msg-report-modal__header .material-symbols-outlined { color: #ef4444; font-size: 22px; }
+.msg-report-modal__header h3 { flex: 1; font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0; }
+.msg-report-close { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 6px; color: #94a3b8; display: flex; }
+.msg-report-close:hover { background: #f1f5f9; color: #475569; }
+.msg-report-modal__body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.msg-report-preview {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #475569;
+    max-height: 80px;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+.msg-report-label { margin: 0; font-size: 0.82rem; font-weight: 600; color: #374151; }
+.msg-report-label span { font-weight: 400; color: #9ca3af; }
+.msg-report-reasons { display: flex; flex-direction: column; gap: 6px; }
+.msg-report-reason {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #374151;
+    transition: border-color 0.15s, background 0.15s;
+}
+.msg-report-reason.selected { border-color: #ef4444; background: #fff7f7; color: #b91c1c; }
+.msg-report-reason input { accent-color: #ef4444; }
+.msg-report-textarea {
+    width: 100%;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+.msg-report-textarea:focus { border-color: #ef4444; }
+.msg-report-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px 18px;
+    border-top: 1px solid #f1f5f9;
+}
+.msg-report-cancel {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+}
+.msg-report-cancel:hover:not(:disabled) { background: #e2e8f0; }
+.msg-report-submit {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.3);
+}
+.msg-report-submit:hover:not(:disabled) { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.msg-report-submit:disabled { opacity: 0.6; cursor: default; }
+.msg-report-submit .material-symbols-outlined { font-size: 16px; animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 .mop-delete-overlay {
     position: fixed;
@@ -875,4 +1239,30 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+/* Enes Doganay | 2 Mayis 2026: Sikayet basari toasty */
+.msg-report-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #16a34a;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  z-index: 99999;
+  animation: toast-in 0.25s ease;
+  white-space: nowrap;
+}
+.msg-report-toast .material-symbols-outlined { font-size: 20px; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }

@@ -1298,15 +1298,16 @@
 
 .cmp-btn--closed:hover { background: #f3f4f6; }
 
-/* Enes Doğanay | 7 Nisan 2026: Teklif Yönetimi — gelen/giden tab switcher + chat */
+/* Enes Doğanay | 2 Mayıs 2026: Teklif Yönetimi — modern pill-tab switcher */
 
 .cmp-quotes-tabs {
     display: flex;
-    gap: 0;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 14px;
+    gap: 6px;
+    background: #f1f5f9;
+    border-radius: 14px;
+    padding: 5px;
+    margin-bottom: 16px;
+    border: none;
 }
 
 .cmp-quotes-tab {
@@ -1314,31 +1315,34 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 10px 14px;
+    gap: 7px;
+    padding: 9px 14px;
     font: inherit;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     border: none;
-    background: #f9fafb;
-    color: #6b7280;
-    transition: all 0.2s;
+    background: transparent;
+    color: #64748b;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    letter-spacing: 0.01em;
 }
 
 .cmp-quotes-tab .material-symbols-outlined { font-size: 18px; }
 
-.cmp-quotes-tab:first-child { border-right: 1.5px solid #e5e7eb; }
+.cmp-quotes-tab:first-child { border-right: none; }
 
 .cmp-quotes-tab.active {
-    background: linear-gradient(135deg, #eff6ff, #e0ecff);
+    background: #ffffff;
     color: #1d4ed8;
-    box-shadow: inset 0 -2px 0 #1d4ed8;
+    box-shadow: 0 2px 8px rgba(15,23,42,0.1), 0 1px 2px rgba(15,23,42,0.06);
+    font-weight: 700;
 }
 
 .cmp-quotes-tab:hover:not(.active) {
-    background: #f1f5f9;
-    color: #475569;
+    background: rgba(255,255,255,0.6);
+    color: #334155;
 }
 
 /* Enes Doğanay | 9 Nisan 2026: Silme butonu isim/tarihin sağında */
@@ -1427,7 +1431,29 @@
     font-size: 0.82rem;
     color: #1d4ed8;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
 }
+
+/* Enes Doğanay | 2 Mayıs 2026: Gönderen adı tıklanabilir profil butonu */
+.quote-chat-sender-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    color: #1d4ed8;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+    transition: color 0.15s;
+    font-family: inherit;
+    line-height: inherit;
+}
+.quote-chat-sender-btn:hover { color: #1e40af; }
 
 .quote-chat-meta {
     display: flex;

@@ -49,32 +49,37 @@ const SupplierConnect = () => {
         const safe = sanitizeSearch(trimmed);
         if (safe.length < 2) { setHeroSuggestions([]); setHeroNoResults(false); return; }
 
-        const { data } = await supabase
-            .from('firmalar')
-            .select('firmaID, firma_adi, il_ilce, logo_url')
-            .or(expandSearchTerms(safe).flatMap(term => [
-                `firma_adi.ilike."%${term}%"`,
-                `ana_sektor.ilike."%${term}%"`,
-                `urun_kategorileri.ilike."%${term}%"`,
-                `arama_etiketleri.ilike."%${term}%"`,
-            ]).join(','))
-            .order('best', { ascending: false })
-            .limit(6);
+        // Enes Doğanay | 2 Mayıs 2026: try-catch — AbortError/network hatası öneri kutusunu patlatmasın
+        try {
+            const { data } = await supabase
+                .from('firmalar')
+                .select('firmaID, firma_adi, il_ilce, logo_url')
+                .or(expandSearchTerms(safe).flatMap(term => [
+                    `firma_adi.ilike."%${term}%"`,
+                    `ana_sektor.ilike."%${term}%"`,
+                    `urun_kategorileri.ilike."%${term}%"`,
+                    `arama_etiketleri.ilike."%${term}%"`,
+                ]).join(','))
+                .order('best', { ascending: false })
+                .limit(6);
 
-        if (data && data.length > 0) {
-            setHeroSuggestions(data.map(f => ({
-                id: f.firmaID,
-                name: f.firma_adi,
-                location: f.il_ilce || '',
-                logo: f.logo_url?.includes('firma-logolari') ? f.logo_url : null
-            })));
-            setHeroNoResults(false);
-            setHeroDidYouMean(null);
-        } else {
-            setHeroSuggestions([]);
-            setHeroNoResults(true);
-            // Enes Doğanay | 2 Mayıs 2026: 0 sonuç → yazım önerisi hesapla
-            setHeroDidYouMean(suggestCorrection(trimmed));
+            if (data && data.length > 0) {
+                setHeroSuggestions(data.map(f => ({
+                    id: f.firmaID,
+                    name: f.firma_adi,
+                    location: f.il_ilce || '',
+                    logo: f.logo_url?.includes('firma-logolari') ? f.logo_url : null
+                })));
+                setHeroNoResults(false);
+                setHeroDidYouMean(null);
+            } else {
+                setHeroSuggestions([]);
+                setHeroNoResults(true);
+                // Enes Doğanay | 2 Mayıs 2026: 0 sonuç → yazım önerisi hesapla
+                setHeroDidYouMean(suggestCorrection(trimmed));
+            }
+        } catch (err) {
+            if (err?.name !== 'AbortError') console.error('Hero öneri hatası:', err);
         }
     }, []);
 
@@ -111,26 +116,31 @@ const SupplierConnect = () => {
     /* Enes Doğanay | 14 Nisan 2026: Akıllı Sıralama — Firmalar sayfasıyla aynı önceliklendirme mantığı */
     useEffect(() => {
         const fetchRandomSuppliers = async () => {
-            const { data } = await supabase
-                .from('firmalar')
-                .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri, onayli_hesap, best, has_logo')
-                .order('has_logo', { ascending: false, nullsFirst: false })
-                .order('onayli_hesap', { ascending: false, nullsFirst: false })
-                .order('best', { ascending: false })
-                .order('firmaID', { ascending: true })
-                .limit(8);
+            // Enes Doğanay | 2 Mayıs 2026: try-catch — AbortError/network hatası sayfayı boş bırakmasın
+            try {
+                const { data } = await supabase
+                    .from('firmalar')
+                    .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri, onayli_hesap, best, has_logo')
+                    .order('has_logo', { ascending: false, nullsFirst: false })
+                    .order('onayli_hesap', { ascending: false, nullsFirst: false })
+                    .order('best', { ascending: false })
+                    .order('firmaID', { ascending: true })
+                    .limit(8);
 
-            const pool = (data || []).map(f => ({
-                ...f,
-                _isVerified: f.onayli_hesap === true
-            }));
+                const pool = (data || []).map(f => ({
+                    ...f,
+                    _isVerified: f.onayli_hesap === true
+                }));
 
-            // İlk 8'den rastgele 4 seç (Fisher-Yates)
-            for (let i = pool.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [pool[i], pool[j]] = [pool[j], pool[i]];
+                // İlk 8'den rastgele 4 seç (Fisher-Yates)
+                for (let i = pool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+                setTopSuppliers(pool.slice(0, 4));
+            } catch (err) {
+                if (err?.name !== 'AbortError') console.error('Ana sayfa tedarikçi yükleme hatası:', err);
             }
-            setTopSuppliers(pool.slice(0, 4));
         };
 
         fetchRandomSuppliers();

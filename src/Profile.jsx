@@ -152,6 +152,12 @@ const ProfilePage = () => {
   const [quoteChatInput, setQuoteChatInput] = useState('');
   const [quoteChatSending, setQuoteChatSending] = useState(false);
   const quoteChatEndRef = useRef(null);
+  // Enes Doğanay | 2 Mayıs 2026: Mesaj Şikayet state
+  const [reportModal, setReportModal] = useState(null); // { mesajId, mesajIcerik }
+  const [reportSending, setReportSending] = useState(false);
+  const [reportNeden, setReportNeden] = useState('spam');
+  const [reportAciklama, setReportAciklama] = useState('');
+  const [reportSuccess, setReportSuccess] = useState(false);
   /* Enes Doğanay | 9 Nisan 2026: Sadece mesaj container'ını aşağı kaydır, sayfayı değil */
   const scrollChatToBottom = useCallback((smooth = true) => {
     setTimeout(() => {
@@ -170,6 +176,7 @@ const ProfilePage = () => {
   const [marketingConsentSaving, setMarketingConsentSaving] = useState(false);
 
   /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihleri state'i */
+  /* Enes Doğanay | 2 Mayıs 2026: ihale_teklif_mesajlari tercihi eklendi */
   const [notifPrefs, setNotifPrefs] = useState({
     teklif_talepleri: true,
     teklif_yanitlari: true,
@@ -177,6 +184,7 @@ const ProfilePage = () => {
     hatirlatmalar: true,
     ihale_teklifleri: true,
     ihale_durum_degisiklikleri: true,
+    ihale_teklif_mesajlari: true,
     anlik_bildirimler: true
   });
   const [notifPrefsLoading, setNotifPrefsLoading] = useState(false);
@@ -720,6 +728,7 @@ const ProfilePage = () => {
         hatirlatmalar: data.hatirlatmalar ?? true,
         ihale_teklifleri: data.ihale_teklifleri ?? true,
         ihale_durum_degisiklikleri: data.ihale_durum_degisiklikleri ?? true,
+        ihale_teklif_mesajlari: data.ihale_teklif_mesajlari ?? true,
         anlik_bildirimler: data.anlik_bildirimler ?? true
       });
     }
@@ -740,6 +749,8 @@ const ProfilePage = () => {
         hatirlatmalar: updatedPrefs.hatirlatmalar,
         ihale_teklifleri: updatedPrefs.ihale_teklifleri,
         ihale_durum_degisiklikleri: updatedPrefs.ihale_durum_degisiklikleri,
+        // Enes Doğanay | 2 Mayıs 2026: ihale_teklif_mesajlari tercihi eklendi
+        ihale_teklif_mesajlari: updatedPrefs.ihale_teklif_mesajlari,
         anlik_bildirimler: updatedPrefs.anlik_bildirimler,
         updated_at: new Date().toISOString()
       };
@@ -807,6 +818,31 @@ const ProfilePage = () => {
     setQuoteChatLoading(false);
     /* Enes Doğanay | 9 Nisan 2026: Chat açıldığında mesaj container'ını en alta kaydır (sayfa kaymaz) */
     scrollChatToBottom(false);
+  };
+
+  // Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet gönder
+  const submitReport = async () => {
+    if (!reportModal || reportSending) return;
+    setReportSending(true);
+    const { data: authData } = await supabase.auth.getUser();
+    const reporterId = authData?.user?.id;
+    if (!reporterId) { setReportSending(false); return; }
+    const { error } = await supabase.from('mesaj_sikayetleri').insert([{
+      reporter_id: reporterId,
+      mesaj_id: String(reportModal.mesajId),
+      kaynak: 'teklif_talebi',
+      mesaj_icerik: reportModal.mesajIcerik,
+      neden: reportNeden,
+      aciklama: reportAciklama.trim() || null,
+    }]);
+    setReportSending(false);
+    setReportModal(null);
+    setReportNeden('spam');
+    setReportAciklama('');
+    if (!error) {
+      setReportSuccess(true);
+      setTimeout(() => setReportSuccess(false), 3500);
+    }
   };
 
   // Enes Doğanay | 7 Nisan 2026: Teklif chatine mesaj gönder (kullanıcı tarafı)
@@ -1161,6 +1197,7 @@ const ProfilePage = () => {
   else displayedFavorites.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
 
   /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihine göre filtreleme — kapalı tipteki bildirimler listede ve sayaçta görünmez */
+  // Enes Doğanay | 2 Mayıs 2026: tender_offer_message tercihi eklendi
   const notifTypeToPrefKey = {
     quote_received: 'teklif_talepleri',
     quote_reply: 'teklif_yanitlari',
@@ -1172,7 +1209,8 @@ const ProfilePage = () => {
     tender_offer_status: 'ihale_durum_degisiklikleri',
     tender_updated: 'ihale_durum_degisiklikleri',
     tender_closed: 'ihale_durum_degisiklikleri',
-    tender_cancelled: 'ihale_durum_degisiklikleri'
+    tender_cancelled: 'ihale_durum_degisiklikleri',
+    tender_offer_message: 'ihale_teklif_mesajlari'
   };
   const filteredNotifications = notifications.filter(n => {
     const prefKey = notifTypeToPrefKey[n.type];
@@ -1693,7 +1731,15 @@ const ProfilePage = () => {
                         <div className="quote-chat-header-top">
                           <div>
                             <h2>{activeQuote.konu}</h2>
-                            <p className="quote-chat-firma">{activeQuote._firma_adi}</p>
+                            {/* Enes Doğanay | 2 Mayıs 2026: Firma adına tıklayınca firma detay sayfasına git */}
+                            {activeQuote.firma_id
+                              ? <a className="quote-chat-firma quote-chat-firma--link" href={`/firmadetay/${activeQuote.firma_id}`} onClick={e => { e.preventDefault(); navigate(`/firmadetay/${activeQuote.firma_id}`); }}>
+                                  <span className="material-symbols-outlined">storefront</span>
+                                  {activeQuote._firma_adi}
+                                  <span className="material-symbols-outlined quote-chat-firma__arrow">open_in_new</span>
+                                </a>
+                              : <p className="quote-chat-firma">{activeQuote._firma_adi}</p>
+                            }
                           </div>
                           <span className={`my-quote-status my-quote-status--${displayDurum}`}>{st}</span>
                         </div>
@@ -1740,6 +1786,12 @@ const ProfilePage = () => {
                                 <span>{new Date(m.created_at).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                               </div>
                               <p>{m.mesaj}</p>
+                              {/* Enes Doğanay | 2 Mayıs 2026: Şikayet butonu — karşı taraf mesajı */}
+                              {m.sender_role !== 'user' && (
+                                <button className="msg-report-btn" title="Mesajı Şikayet et" onClick={() => { setReportModal({ mesajId: m.id, mesajIcerik: m.mesaj }); setReportNeden('spam'); setReportAciklama(''); }}>
+                                  <span className="material-symbols-outlined">flag</span>
+                                </button>
+                              )}
                             </div>
                           ))
                         )}
@@ -1903,6 +1955,8 @@ const ProfilePage = () => {
                         { key: 'teklif_mesajlari', icon: 'chat', label: 'Teklif Mesajları', desc: 'Teklif sohbetlerinde yeni mesaj geldiğinde bildirim al' },
                         { key: 'hatirlatmalar', icon: 'alarm', label: 'Hatırlatmalar', desc: 'Zamanlanmış hatırlatmalarınız geldiğinde bildirim al' },
                         { key: 'ihale_durum_degisiklikleri', icon: 'swap_horiz', label: 'İhale Durum Değişiklikleri', desc: 'İhale tekliflerinizin durumu değiştiğinde bildirim al' },
+                        // Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajları tercihi eklendi
+                        { key: 'ihale_teklif_mesajlari', icon: 'forum', label: 'İhale Teklif Mesajları', desc: 'İhale teklifleriniz üzerinden gelen mesajlarda bildirim al' },
                         { key: 'anlik_bildirimler', icon: 'notifications_active', label: 'Anlık Bildirimler (Pop-up)', desc: 'Ekranda anlık bildirim pop-up\'ları gösterilsin' }
                       ].map(item => (
                         <div key={item.key} className="notif-pref-row">
@@ -1984,6 +2038,13 @@ const ProfilePage = () => {
                                 // Enes Doğanay | 13 Nisan 2026: İhale durumu değişiklik bildirimleri
                                 if (!notification.is_read) handleMarkNotificationRead(notification.id);
                                 if (notification.metadata?.ihale_id) navigate(`/ihaleler?ihale=${notification.metadata.ihale_id}`);
+                              } else if (notification.type === 'tender_offer_message') {
+                                // Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajı bildirimi — teklif chatini aç
+                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                if (notification.metadata?.teklif_id) {
+                                  sessionStorage.setItem('mop_open_teklif_chat', String(notification.metadata.teklif_id));
+                                }
+                                navigate('/profile?tab=my-offers');
                               } else if (notification.metadata?.teklif_id) {
                                 navigateToQuoteChat(notification);
                               } else if (notification.firma_id) {
@@ -1996,7 +2057,7 @@ const ProfilePage = () => {
                             <div className="notification-feed-top">
                               <div>
                                 {/* Enes Doğanay | 14 Haziran 2025: İhale teklif bildirim tipleri eklendi */}
-                              <span className="notification-feed-type">{notification.type === 'reminder' ? '⏰ Hatırlatma' : notification.type === 'quote_received' ? '📩 Yeni Teklif' : notification.type === 'quote_reply' ? '💬 Yanıt Geldi' : notification.type === 'quote_message' ? '✉️ Yeni Mesaj' : notification.type === 'tender_new_offer' ? '📋 Yeni İhale Teklifi' : notification.type === 'tender_offer_updated' ? '✏️ Teklif Güncellendi' : notification.type === 'tender_offer_status' ? '📊 Teklif Durumu' : notification.type === 'tender_updated' ? '📝 İhale Güncellendi' : notification.type === 'tender_closed' ? '🔒 İhale Kapandı' : notification.type === 'tender_cancelled' ? '❌ İhale İptal' : notification.type === 'tender_offer_withdrawn' ? '↩️ Teklif Geri Çekildi' : '🔔 Bildirim'}</span>
+                              <span className="notification-feed-type">{notification.type === 'reminder' ? '⏰ Hatırlatma' : notification.type === 'quote_received' ? '📩 Yeni Teklif' : notification.type === 'quote_reply' ? '💬 Yanıt Geldi' : notification.type === 'quote_message' ? '✉️ Yeni Mesaj' : notification.type === 'tender_new_offer' ? '📋 Yeni İhale Teklifi' : notification.type === 'tender_offer_updated' ? '✏️ Teklif Güncellendi' : notification.type === 'tender_offer_status' ? '📊 Teklif Durumu' : notification.type === 'tender_updated' ? '📝 İhale Güncellendi' : notification.type === 'tender_closed' ? '🔒 İhale Kapandı' : notification.type === 'tender_cancelled' ? '❌ İhale İptal' : notification.type === 'tender_offer_withdrawn' ? '↩️ Teklif Geri Çekildi' : notification.type === 'tender_offer_message' ? '💬 İhale Teklif Mesajı' : '🔔 Bildirim'}</span>
                                 <h4>{notification.title}</h4>
                               </div>
                               <span className="notification-feed-time">{formatRelativeNotificationTime(notification.created_at)}</span>
@@ -2120,6 +2181,49 @@ const ProfilePage = () => {
           </main>
         </div>
       </div>
+
+      {/* Enes Doğanay | 2 Mayıs 2026: Şikayet başarı toast */}
+      {reportSuccess && (
+        <div className="msg-report-toast">
+          <span className="material-symbols-outlined">check_circle</span>
+          Şikayetiniz alındı. İncelenecektir.
+        </div>
+      )}
+
+      {/* Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet modal */}
+      {reportModal && (
+        <div className="msg-report-overlay" onClick={() => !reportSending && setReportModal(null)}>
+          <div className="msg-report-modal" onClick={e => e.stopPropagation()}>
+            <div className="msg-report-modal__header">
+              <span className="material-symbols-outlined">flag</span>
+              <h3>Mesajı Şikayet Et</h3>
+              <button className="msg-report-close" onClick={() => setReportModal(null)} disabled={reportSending}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="msg-report-modal__body">
+              <div className="msg-report-preview">{reportModal.mesajIcerik}</div>
+              <p className="msg-report-label">Şikayet nedeni</p>
+              <div className="msg-report-reasons">
+                {[{value:'spam',label:'Spam / İstenmeyen Mesaj'},{value:'hakaret',label:'Hakaret / İltihap'},{value:'tehdit',label:'Tehdit / Taciz'},{value:'yaniltici',label:'Yanıltıcı / Sahte Teklif'},{value:'diger',label:'Diğer'}].map(r => (
+                  <label key={r.value} className={`msg-report-reason${reportNeden === r.value ? ' selected' : ''}`}>
+                    <input type="radio" name="report-neden" value={r.value} checked={reportNeden === r.value} onChange={() => setReportNeden(r.value)} />
+                    {r.label}
+                  </label>
+                ))}
+              </div>
+              <p className="msg-report-label">Ek açıklama <span>(isteğe bağlı)</span></p>
+              <textarea className="msg-report-textarea" value={reportAciklama} onChange={e => setReportAciklama(e.target.value)} placeholder="Şikayet detayı..." maxLength={500} rows={3} />
+            </div>
+            <div className="msg-report-modal__footer">
+              <button className="msg-report-cancel" onClick={() => setReportModal(null)} disabled={reportSending}>İptal</button>
+              <button className="msg-report-submit" onClick={submitReport} disabled={reportSending}>
+                {reportSending ? <span className="material-symbols-outlined">progress_activity</span> : 'Şikayet Gönder'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Enes Doğanay | 6 Nisan 2026: Custom onay modal */}
       {confirmDelete && (

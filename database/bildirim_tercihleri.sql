@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS bildirim_tercihleri (
   hatirlatmalar boolean DEFAULT true,
   ihale_teklifleri boolean DEFAULT true,
   ihale_durum_degisiklikleri boolean DEFAULT true,
+  -- Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajı bildirimi tercihi
+  ihale_teklif_mesajlari boolean DEFAULT true,
   anlik_bildirimler boolean DEFAULT true,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
@@ -30,3 +32,7 @@ CREATE POLICY "users_insert_own_prefs"
 CREATE POLICY "users_update_own_prefs"
   ON bildirim_tercihleri FOR UPDATE
   USING (auth.uid() = user_id);
+
+-- Enes Doğanay | 2 Mayıs 2026: Mevcut tabloya ihale_teklif_mesajlari kolonu ekle
+ALTER TABLE bildirim_tercihleri
+  ADD COLUMN IF NOT EXISTS ihale_teklif_mesajlari boolean DEFAULT true;

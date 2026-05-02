@@ -1,5 +1,5 @@
 /* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler — kullanıcının katıldığı ihaleleri ve tekliflerini gösterir */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { useAuth } from './AuthContext'; /* Enes Doğanay | 15 Nisan 2026: Teklif popup için kullanıcı bilgisi */
@@ -140,6 +140,180 @@ const MyOffersPanel = () => {
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [deleting, setDeleting] = useState(false);
 
+    /* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma — bidder tarafı */
+    const [activeMopChat, setActiveMopChat] = useState(null); // { offer, tenderTitle, firmaAdi }
+    const [mopChatMessages, setMopChatMessages] = useState([]);
+    const [mopChatLoading, setMopChatLoading] = useState(false);
+    const [mopChatInput, setMopChatInput] = useState('');
+    const [mopChatSending, setMopChatSending] = useState(false);
+    const mopChatChannelRef = useRef(null);
+    const mopChatEndRef = useRef(null);
+    const [unreadMopChatIds, setUnreadMopChatIds] = useState(() => new Set());
+    // Enes Doğanay | 2 Mayıs 2026: Mesaj Şikayet state
+    const [reportModal, setReportModal] = useState(null); // { mesajId, mesajIcerik }
+    const [reportSending, setReportSending] = useState(false);
+    const [reportNeden, setReportNeden] = useState('spam');
+    const [reportAciklama, setReportAciklama] = useState('');
+    const [reportSuccess, setReportSuccess] = useState(false);
+
+    const scrollMopChatToBottom = useCallback((smooth = true) => {
+        setTimeout(() => {
+            const container = mopChatEndRef.current?.parentElement;
+            if (container) container.scrollTo({ top: container.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
+        }, 80);
+    }, []);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Bidder chat'i aç */
+    const openMopChat = useCallback(async (offer, tenderTitle, firmaAdi, anonim) => {
+        if (mopChatChannelRef.current) {
+            supabase.removeChannel(mopChatChannelRef.current);
+            mopChatChannelRef.current = null;
+        }
+        setActiveMopChat({ offer, tenderTitle, firmaAdi, anonim });
+        setMopChatLoading(true);
+        setMopChatInput('');
+        setMopChatMessages([]);
+
+        try {
+            const { data } = await supabase
+                .from('ihale_teklif_mesajlari')
+                .select('*')
+                .eq('teklif_id', offer.id)
+                .order('created_at', { ascending: true });
+            setMopChatMessages(data || []);
+            scrollMopChatToBottom(false);
+
+            // Bidder olarak okunmamışları okundu yap
+            const unread = (data || []).filter(m => m.sender_role === 'company' && !m.okundu_bidder);
+            if (unread.length > 0) {
+                supabase.from('ihale_teklif_mesajlari')
+                    .update({ okundu_bidder: true })
+                    .in('id', unread.map(m => m.id))
+                    .then(() => {});
+                setUnreadMopChatIds(prev => { const s = new Set(prev); s.delete(offer.id); return s; });
+            }
+        } catch (err) {
+            if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
+        } finally {
+            setMopChatLoading(false);
+        }
+
+        const channel = supabase
+            .channel(`tender-chat-bidder-${offer.id}`)
+            .on('broadcast', { event: 'new-tender-message' }, ({ payload }) => {
+                setMopChatMessages(prev => {
+                    if (prev.some(m => m.id === payload.id)) return prev;
+                    return [...prev, payload];
+                });
+                scrollMopChatToBottom();
+                if (payload.sender_role === 'company') {
+                    supabase.from('ihale_teklif_mesajlari').update({ okundu_bidder: true }).eq('id', payload.id).then(() => {});
+                }
+            })
+            .subscribe();
+        mopChatChannelRef.current = channel;
+    }, [scrollMopChatToBottom]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Bidder chat'i kapat */
+    const closeMopChat = useCallback(() => {
+        if (mopChatChannelRef.current) {
+            supabase.removeChannel(mopChatChannelRef.current);
+            mopChatChannelRef.current = null;
+        }
+        setActiveMopChat(null);
+        setMopChatMessages([]);
+        setMopChatInput('');
+    }, []);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet gönder */
+    const submitReport = async () => {
+        if (!reportModal || reportSending) return;
+        setReportSending(true);
+        const { data: authData } = await supabase.auth.getUser();
+        const reporterId = authData?.user?.id;
+        if (!reporterId) { setReportSending(false); return; }
+        const { error } = await supabase.from('mesaj_sikayetleri').insert([{
+            reporter_id: reporterId,
+            mesaj_id: String(reportModal.mesajId),
+            kaynak: 'ihale_teklifi',
+            mesaj_icerik: reportModal.mesajIcerik,
+            neden: reportNeden,
+            aciklama: reportAciklama.trim() || null,
+        }]);
+        setReportSending(false);
+        setReportModal(null);
+        setReportNeden('spam');
+        setReportAciklama('');
+        if (!error) {
+            setReportSuccess(true);
+            setTimeout(() => setReportSuccess(false), 3500);
+        }
+    };
+
+    /* Enes Doğanay | 2 Mayıs 2026: Bidder olarak mesaj gönder */
+    const sendMopChatMessage = useCallback(async () => {
+        if (!mopChatInput.trim() || !activeMopChat) return;
+        // Kapalı ihalede mesaj gönderilemesin
+        const _mopTender = tenderMap[String(activeMopChat.offer.ihale_id)];
+        if (getTenderStatus(_mopTender?.durum).tone === 'closed') return;
+        setMopChatSending(true);
+        const { data: authData } = await supabase.auth.getUser();
+        const senderId = authData?.user?.id;
+        if (!senderId) { setMopChatSending(false); return; }
+
+        const { data, error } = await supabase
+            .from('ihale_teklif_mesajlari')
+            .insert([{
+                teklif_id: activeMopChat.offer.id,
+                sender_id: senderId,
+                sender_role: 'bidder',
+                mesaj: mopChatInput.trim(),
+                okundu_bidder: true,
+            }])
+            .select()
+            .single();
+
+        if (!error && data) {
+            setMopChatMessages(prev => [...prev, data]);
+            setMopChatInput('');
+            if (mopChatChannelRef.current) {
+                await mopChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data });
+            }
+            scrollMopChatToBottom();
+            // Firma yöneticilerine bildirim gönder
+            try {
+                const tender = tenderMap[String(activeMopChat.offer.ihale_id)];
+                if (tender?.firma_id) {
+                    const { data: managers } = await supabase.from('kurumsal_firma_yoneticileri').select('user_id').eq('firma_id', String(tender.firma_id));
+                    if (managers?.length) {
+                        const userName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || senderId;
+                        const notifRows = managers.map(m => ({
+                            user_id: m.user_id,
+                            type: 'tender_offer_message',
+                            title: 'İhale teklifinden mesaj',
+                            message: `"${activeMopChat.tenderTitle || 'İhale'}" teklifine ${userName} mesaj gönderdi.`,
+                            is_read: false,
+                            metadata: {
+                                ihale_id: activeMopChat.offer.ihale_id,
+                                teklif_id: activeMopChat.offer.id,
+                                ihale_baslik: activeMopChat.tenderTitle,
+                            },
+                        }));
+                        supabase.from('bildirimler').insert(notifRows).then(() => {});
+                    }
+                }
+            } catch { /* bildirim başarısız olsa bile mesaj gitti */ }
+        }
+        setMopChatSending(false);
+    }, [mopChatInput, activeMopChat, tenderMap, userProfile, scrollMopChatToBottom]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Unmount → kanalı temizle */
+    useEffect(() => {
+        return () => {
+            if (mopChatChannelRef.current) supabase.removeChannel(mopChatChannelRef.current);
+        };
+    }, []);
+
     /* Enes Doğanay | 15 Nisan 2026: Teklif güncelle popup state'leri — Ihaleler.jsx'ten taşındı */
     const [editPopupTender, setEditPopupTender] = useState(null); // ihale bilgisi
     const [editPopupOffer, setEditPopupOffer] = useState(null); // mevcut teklif
@@ -221,6 +395,20 @@ const MyOffersPanel = () => {
             setTimeout(() => highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
         }
     }, [highlightId]);
+
+    /* Enes Doğanay | 2 Mayıs 2026: Bildirimden yönlendirme — sessionStorage mop_open_teklif_chat ile chat aç */
+    useEffect(() => {
+        if (loading || offers.length === 0) return;
+        const chatTeklifId = sessionStorage.getItem('mop_open_teklif_chat');
+        if (!chatTeklifId) return;
+        sessionStorage.removeItem('mop_open_teklif_chat');
+        const targetOffer = offers.find(o => String(o.id) === chatTeklifId);
+        if (targetOffer) {
+            const tender = tenderMap[String(targetOffer.ihale_id)] || {};
+            const firmaAdi = tender.anonim ? 'Anonim Firma' : (firmaMap[String(tender.firma_id)] || 'Firma');
+            openMopChat(targetOffer, tender.baslik, firmaAdi, tender.anonim);
+        }
+    }, [loading, offers]);
 
     /* Enes Doğanay | 13 Nisan 2026: Filtreleme ve arama */
     const filtered = useMemo(() => {
@@ -756,6 +944,17 @@ const MyOffersPanel = () => {
                                                 <span className="material-symbols-outlined">gavel</span>
                                                 İhaleye Git
                                             </button>
+                                            {/* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma — taslak değilse göster */}
+                                            {offer.durum !== 'taslak' && (
+                                                <button
+                                                    className={`mop-btn mop-btn--chat${unreadMopChatIds.has(offer.id) ? ' mop-btn--chat-unread' : ''}`}
+                                                    onClick={() => openMopChat(offer, tender.baslik, firmaAdi, tender.anonim)}
+                                                >
+                                                    <span className="material-symbols-outlined">forum</span>
+                                                    Mesaj Gönder
+                                                    {unreadMopChatIds.has(offer.id) && <span className="mop-chat-unread-dot" />}
+                                                </button>
+                                            )}
                                             {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma iletişim butonu gizlenir */}
                                             {tender.firma_id && !tender.anonim && (
                                                 <button className="mop-btn mop-btn--contact" onClick={() => openFirmaContact(tender.firma_id, firmaAdi)}>
@@ -783,6 +982,126 @@ const MyOffersPanel = () => {
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma modal — bidder tarafı */}
+            {activeMopChat && (
+                <div className="mop-chat-overlay" onClick={closeMopChat}>
+                    <div className="mop-chat-modal" onClick={e => e.stopPropagation()}>
+                        <div className="mop-chat-header">
+                            <div className="mop-chat-header__info">
+                                <span className="material-symbols-outlined">chat</span>
+                                <div>
+                                    <strong>{activeMopChat.anonim ? 'Anonim Firma' : (activeMopChat.firmaAdi || 'Firma')}</strong>
+                                    <span className="mop-chat-ihale-tag">
+                                        <span className="material-symbols-outlined">gavel</span>
+                                        {activeMopChat.tenderTitle || 'İhale'}
+                                    </span>
+                                </div>
+                            </div>
+                            <button className="mop-chat-close" onClick={closeMopChat}>
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <div className="mop-chat-messages">
+                            {mopChatLoading ? (
+                                <div className="mop-chat-empty">
+                                    <div className="mop-chat-spinner" />
+                                    <p>Mesajlar yükleniyor...</p>
+                                </div>
+                            ) : mopChatMessages.length === 0 ? (
+                                <div className="mop-chat-empty">
+                                    <span className="material-symbols-outlined">chat_bubble_outline</span>
+                                    <p>Henüz mesaj yok. Teklif hakkında firmaya soru sorabilirsiniz.</p>
+                                </div>
+                            ) : (
+                                mopChatMessages.map((m) => (
+                                    <div key={m.id} className={`mop-chat-bubble ${m.sender_role === 'bidder' ? 'mine' : 'theirs'}`}>
+                                        <div className="mop-chat-bubble__header">
+                                            <strong>{m.sender_role === 'bidder' ? 'Siz' : (activeMopChat.anonim ? 'Anonim Firma' : (activeMopChat.firmaAdi || 'Firma'))}</strong>
+                                            <span>{new Date(m.created_at).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                        <p>{m.mesaj}</p>
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Şikayet butonu — sadece karşı tarafın mesajlarında */}
+                                        {m.sender_role !== 'bidder' && (
+                                            <button className="msg-report-btn" title="Mesajı Şikayet et" onClick={() => { setReportModal({ mesajId: m.id, mesajIcerik: m.mesaj }); setReportNeden('spam'); setReportAciklama(''); }}>
+                                                <span className="material-symbols-outlined">flag</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                            <div ref={mopChatEndRef} />
+                        </div>
+
+                        {/* Enes Doğanay | 2 Mayıs 2026: Kapalı ihalede mesaj giriş alanı yerine bilgi banner'ı */}
+                        {getTenderStatus(tenderMap[String(activeMopChat.offer.ihale_id)]?.durum).tone === 'closed' ? (
+                            <div className="mop-chat-closed-banner">
+                                <span className="material-symbols-outlined">lock</span>
+                                Bu ihale kapatıldı. Artık mesaj gönderilemez.
+                            </div>
+                        ) : (
+                        <div className="mop-chat-input">
+                            <input
+                                type="text"
+                                placeholder="Mesajınızı yazın..."
+                                value={mopChatInput}
+                                onChange={e => setMopChatInput(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMopChatMessage(); } }}
+                                disabled={mopChatSending}
+                                maxLength={2000}
+                            />
+                            <button onClick={sendMopChatMessage} disabled={mopChatSending || !mopChatInput.trim()}>
+                                <span className="material-symbols-outlined">{mopChatSending ? 'progress_activity' : 'send'}</span>
+                            </button>
+                        </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 2 Mayıs 2026: Şikayet başarı toasty */}
+            {reportSuccess && (
+                <div className="msg-report-toast">
+                    <span className="material-symbols-outlined">check_circle</span>
+                    Şikayetiniz alındı. İncelenecektir.
+                </div>
+            )}
+
+            {/* Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet modal */}
+            {reportModal && (
+                <div className="msg-report-overlay" onClick={() => !reportSending && setReportModal(null)}>
+                    <div className="msg-report-modal" onClick={e => e.stopPropagation()}>
+                        <div className="msg-report-modal__header">
+                            <span className="material-symbols-outlined">flag</span>
+                            <h3>Mesajı Şikayet Et</h3>
+                            <button className="msg-report-close" onClick={() => setReportModal(null)} disabled={reportSending}>
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="msg-report-modal__body">
+                            <div className="msg-report-preview">{reportModal.mesajIcerik}</div>
+                            <p className="msg-report-label">Şikayet nedeni</p>
+                            <div className="msg-report-reasons">
+                                {[{value:'spam',label:'Spam / İstenmeyen Mesaj'},{value:'hakaret',label:'Hakaret / İltihap'},{value:'tehdit',label:'Tehdit / Taciz'},{value:'yaniltici',label:'Yanıltıcı / Sahte Teklif'},{value:'diger',label:'Diğer'}].map(r => (
+                                    <label key={r.value} className={`msg-report-reason${reportNeden === r.value ? ' selected' : ''}`}>
+                                        <input type="radio" name="report-neden" value={r.value} checked={reportNeden === r.value} onChange={() => setReportNeden(r.value)} />
+                                        {r.label}
+                                    </label>
+                                ))}
+                            </div>
+                            <p className="msg-report-label">Ek açıklama <span>(isteğe bağlı)</span></p>
+                            <textarea className="msg-report-textarea" value={reportAciklama} onChange={e => setReportAciklama(e.target.value)} placeholder="Şikayet detayı..." maxLength={500} rows={3} />
+                        </div>
+                        <div className="msg-report-modal__footer">
+                            <button className="msg-report-cancel" onClick={() => setReportModal(null)} disabled={reportSending}>İptal</button>
+                            <button className="msg-report-submit" onClick={submitReport} disabled={reportSending}>
+                                {reportSending ? <span className="material-symbols-outlined">progress_activity</span> : 'Şikayet Gönder'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

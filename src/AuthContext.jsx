@@ -23,7 +23,9 @@ const NOTIF_TYPE_TO_PREF_KEY = {
   tender_offer_status: 'ihale_durum_degisiklikleri',
   tender_updated: 'ihale_durum_degisiklikleri',
   tender_closed: 'ihale_durum_degisiklikleri',
-  tender_cancelled: 'ihale_durum_degisiklikleri'
+  tender_cancelled: 'ihale_durum_degisiklikleri',
+  /* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma bildirimi — teklif_mesajlari'ndan bağımsız */
+  tender_offer_message: 'ihale_teklifleri'
 };
 
 export function AuthProvider({ children }) {
@@ -66,9 +68,13 @@ export function AuthProvider({ children }) {
     // Enes Doğanay | 10 Nisan 2026: Logout sırasında session tekrar yüklenmesin
     if (isLoggingOutRef.current) return;
     try {
-      // Enes Doğanay | 10 Nisan 2026: getSession localStorage/memory'den okur — hızlı, network yok
-      // Şifre değişikliğinde refresh token revoke olur → getSession otomatik null döner
-      const { data: { session } } = await supabase.auth.getSession();
+      // Enes Doğanay | 2 Mayıs 2026: getSession'a 5sn timeout — Supabase paused/yavaş olursa
+      // network refresh isteği asılı kalır; timeout fırlatırsa catch→finally devreye girer, authChecked=true olur
+      const sessionPromise = supabase.auth.getSession();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('getSession timeout')), 5000)
+      );
+      const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
 
       if (!session?.user) {
         clearAuthState();
@@ -179,8 +185,14 @@ export function AuthProvider({ children }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    // Enes Doğanay | 2 Mayıs 2026: Güvenlik timeout — Supabase paused/yavaş olursa loadUserData asılı kalabilir;
+    // 8sn içinde bitmezse authChecked=true zorla (butonlar kaybolmasın)
+    const authFallbackTimer = setTimeout(() => {
+      setAuthChecked(prev => { if (!prev) console.warn('[Auth] loadUserData timeout — authChecked zorla true'); return true; });
+    }, 8000);
+
     // Enes Doğanay | 16 Nisan 2026: Unhandled promise rejection önlenir — loadUserData kendi içinde catch eder ama güvenlik için
-    loadUserData().catch(() => {});
+    loadUserData().catch(() => {}).finally(() => clearTimeout(authFallbackTimer));
 
     // Enes Doğanay | 10 Nisan 2026: Event tipine göre akıllı handling — SIGNED_OUT'ta loadUserData çağırma
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -202,7 +214,10 @@ export function AuthProvider({ children }) {
       setTimeout(() => loadUserData().catch(() => {}), 100);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(authFallbackTimer);
+    };
   }, []);
 
   const logout = async () => {
