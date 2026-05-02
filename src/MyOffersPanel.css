@@ -303,6 +303,18 @@
     text-decoration: underline;
 }
 
+/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma adı gri/italic */
+.mop-card__firma--anonim {
+    color: #94a3b8;
+    cursor: default;
+    font-style: italic;
+}
+
+.mop-card__firma--anonim:hover {
+    color: #94a3b8;
+    text-decoration: none;
+}
+
 .mop-card__firma .material-symbols-outlined {
     font-size: 14px;
 }

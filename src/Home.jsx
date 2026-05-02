@@ -3,9 +3,13 @@ import './Home.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
 import SharedFooter from './SharedFooter';
+import SEO from './SEO';
+/* Enes Doğanay | 2 Mayıs 2026: Yazım hatası önerisi için suggestCorrection eklendi */
+import { expandSearchTerms, suggestCorrection } from './synonyms';
 import { supabase } from './supabaseClient';
 /* Enes Doğanay | 6 Nisan 2026: Kullanılmayan NavLink import kaldırıldı */
 import { useNavigate } from 'react-router-dom';
+import { useSearchHistory } from './useSearchHistory';
 
 /**
  * SupplierConnect Component - Home Page / Landing Page
@@ -23,10 +27,14 @@ const SupplierConnect = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [topSuppliers, setTopSuppliers] = useState([]);
     const navigate = useNavigate();
+    const { history: searchHistory, addToHistory, removeFromHistory, clearHistory } = useSearchHistory();
+    const [heroHistoryVisible, setHeroHistoryVisible] = useState(false);
 
     // Enes Doğanay | 9 Nisan 2026: Hero arama çubuğunda canlı firma önerileri
     const [heroSuggestions, setHeroSuggestions] = useState([]);
     const [heroNoResults, setHeroNoResults] = useState(false);
+    /* Enes Doğanay | 2 Mayıs 2026: 0 sonuçta yazım önerisi — "Bunu mu demek istediniz?" */
+    const [heroDidYouMean, setHeroDidYouMean] = useState(null);
     const heroSearchRef = useRef(null);
 
     const sanitizeSearch = (input) => input.replace(/[\\"%#_]/g, '').trim();
@@ -44,7 +52,12 @@ const SupplierConnect = () => {
         const { data } = await supabase
             .from('firmalar')
             .select('firmaID, firma_adi, il_ilce, logo_url')
-            .or(`firma_adi.ilike."%${safe}%",ana_sektor.ilike."%${safe}%",urun_kategorileri.ilike."%${safe}%"`)
+            .or(expandSearchTerms(safe).flatMap(term => [
+                `firma_adi.ilike."%${term}%"`,
+                `ana_sektor.ilike."%${term}%"`,
+                `urun_kategorileri.ilike."%${term}%"`,
+                `arama_etiketleri.ilike."%${term}%"`,
+            ]).join(','))
             .order('best', { ascending: false })
             .limit(6);
 
@@ -56,9 +69,12 @@ const SupplierConnect = () => {
                 logo: f.logo_url?.includes('firma-logolari') ? f.logo_url : null
             })));
             setHeroNoResults(false);
+            setHeroDidYouMean(null);
         } else {
             setHeroSuggestions([]);
             setHeroNoResults(true);
+            // Enes Doğanay | 2 Mayıs 2026: 0 sonuç → yazım önerisi hesapla
+            setHeroDidYouMean(suggestCorrection(trimmed));
         }
     }, []);
 
@@ -74,6 +90,7 @@ const SupplierConnect = () => {
             if (heroSearchRef.current && !heroSearchRef.current.contains(e.target)) {
                 setHeroSuggestions([]);
                 setHeroNoResults(false);
+                setHeroHistoryVisible(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -81,11 +98,14 @@ const SupplierConnect = () => {
     }, []);
 
     const handleSearch = () => {
-        if (searchTerm.trim()) {
-            navigate(`/firmalar?search=${encodeURIComponent(searchTerm.trim())}`);
+        const trimmed = searchTerm.trim();
+        if (trimmed) {
+            addToHistory(trimmed);
+            navigate(`/firmalar?search=${encodeURIComponent(trimmed)}`);
         } else {
             navigate(`/firmalar`);
         }
+        setHeroHistoryVisible(false);
     };
 
     /* Enes Doğanay | 14 Nisan 2026: Akıllı Sıralama — Firmalar sayfasıyla aynı önceliklendirme mantığı */
@@ -118,6 +138,11 @@ const SupplierConnect = () => {
 
     return (
         <div className="supplier-connect-wrapper">
+            <SEO
+                title="Türkiye'nin B2B Tedarik Platformu"
+                description="Tedport ile doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun. İhale açın, teklif verin, firmaları keşfedin. Ücretsiz üyelik."
+                path="/"
+            />
             <SharedHeader />
 
             <main>
@@ -140,7 +165,11 @@ const SupplierConnect = () => {
                                             placeholder="Ürün veya firma ara..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            onKeyDown={(e) => { if (e.key === 'Enter') { setHeroSuggestions([]); setHeroNoResults(false); handleSearch(); } }}
+                                            onFocus={() => setHeroHistoryVisible(true)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') { setHeroSuggestions([]); setHeroNoResults(false); setHeroHistoryVisible(false); handleSearch(); }
+                                                if (e.key === 'Escape') { setHeroHistoryVisible(false); setHeroSuggestions([]); setHeroNoResults(false); }
+                                            }}
                                         />
                                         {/* Enes Doğanay | 9 Nisan 2026: Arama kutusunu tek tıkla temizleyen X butonu */}
                                         {searchTerm && searchTerm.length > 0 && (
@@ -152,7 +181,7 @@ const SupplierConnect = () => {
                                         )}
                                     </div>
 
-                                    <button className="sc-search-btn" onClick={() => { setHeroSuggestions([]); setHeroNoResults(false); handleSearch(); }}>Ara</button>
+                                    <button className="sc-search-btn" onClick={() => { setHeroSuggestions([]); setHeroNoResults(false); setHeroHistoryVisible(false); handleSearch(); }}>Ara</button>
                                 </div>
 
                                 {/* Enes Doğanay | 9 Nisan 2026: Canlı firma önerileri dropdown */}
@@ -190,6 +219,49 @@ const SupplierConnect = () => {
                                             <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#94a3b8' }}>search_off</span>
                                             <span>Sonuç bulunamadı</span>
                                         </div>
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Yazım önerisi dropdown'da göster */}
+                                        {heroDidYouMean && (
+                                            <div
+                                                className="sc-hero-suggestion-did-you-mean"
+                                                onClick={() => {
+                                                    setSearchTerm(heroDidYouMean);
+                                                    setHeroDidYouMean(null);
+                                                    setHeroNoResults(false);
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>spellcheck</span>
+                                                Bunu mu demek istediniz? <strong>{heroDidYouMean}</strong>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Arama Geçmişi */}
+                                {heroHistoryVisible && heroSuggestions.length === 0 && !heroNoResults && searchTerm.trim().length < 2 && searchHistory.length > 0 && (
+                                    <div className="sc-hero-suggestions sc-hero-history">
+                                        <div className="sc-history-header">
+                                            <span>Son Aramalar</span>
+                                            <button className="sc-history-clear" onClick={clearHistory} type="button">Temizle</button>
+                                        </div>
+                                        {searchHistory.map((term) => (
+                                            <div key={term} className="sc-history-item">
+                                                <div
+                                                    className="sc-history-item-main"
+                                                    onClick={() => { setSearchTerm(term); setHeroHistoryVisible(false); navigate(`/firmalar?search=${encodeURIComponent(term)}`); }}
+                                                >
+                                                    <span className="material-symbols-outlined sc-history-icon">history</span>
+                                                    <span>{term}</span>
+                                                </div>
+                                                <button
+                                                    className="sc-history-remove"
+                                                    type="button"
+                                                    onClick={(e) => { e.stopPropagation(); removeFromHistory(term); }}
+                                                    aria-label="Geçmişten kaldır"
+                                                >
+                                                    <span className="material-symbols-outlined">close</span>
+                                                </button>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
 

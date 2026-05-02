@@ -45,9 +45,10 @@ export const getManagedCompany = async () => {
             return { company: null, firmaId: null, mode: 'database' };
         }
 
+        // Enes Doğanay | 2 Mayıs 2026: pending_logo_url, arama_etiketleri, pending_logo_red_notu alanları eklendi — Onay Merkezi entegrasyonu
         const { data, error: selectError } = await supabase
             .from('firmalar')
-            .select('firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best')
+            .select('firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best, pending_logo_url, arama_etiketleri, pending_logo_red_notu')
             .eq('firmaID', firmaId)
             .single();
 

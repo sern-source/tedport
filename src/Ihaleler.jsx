@@ -100,6 +100,8 @@ const EMPTY_FORM = {
     davet_emailleri: [],     // string[]
     davetli_firmalar: [],    // [{firma_id, firma_adi, onayli}]
     ek_dosyalar: [],         // File[]
+    // Enes Doğanay | 2 Mayıs 2026: Anonim ihale — firma adı gizlenir
+    anonim: false,
 };
 
 // Enes Doğanay | 10 Nisan 2026: Stepper adım tanımları
@@ -160,6 +162,8 @@ const IhalelerPage = () => {
     const teklifParam = searchParams.get('teklif') || '';
     /* Enes Doğanay | 15 Nisan 2026: İhale yönetim sayfasından yeni ihale oluşturma */
     const yeniIhaleParam = searchParams.get('yeniIhale') || '';
+    // Enes Doğanay | 2 Mayıs 2026: İhale Yönetimi sayfasından düzenle butonu — URL param ile 4-adımlı formu aç
+    const duzenleParam = searchParams.get('duzenle') || '';
     // Enes Doğanay | 10 Nisan 2026: Auth context — teklif popup'ında kullanıcı bilgisi için
     const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
 
@@ -168,6 +172,7 @@ const IhalelerPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortBy, setSortBy] = useState('deadline');
+    // Enes Doğanay | 1 Mayıs 2026: Sıralama dropdown state + dışarı tıklama ile kapanma
     const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
     const sortDropdownRef = useRef(null);
     useEffect(() => {
@@ -239,6 +244,7 @@ const IhalelerPage = () => {
     const [teklifSuccess, setTeklifSuccess] = useState(false);
     /* Enes Doğanay | 13 Nisan 2026: İhale yayınlama başarı modalı */
     const [ihalePublishSuccess, setIhalePublishSuccess] = useState(null); // null veya yeni ihale id
+    /* Enes Doğanay | 1 Mayıs 2026: Yayınlama modalindaki link kopyalama + referans no kopyalama state'leri */
     const [publishedLinkCopied, setPublishedLinkCopied] = useState(false);
     const [refNoCopied, setRefNoCopied] = useState(false);
     /* Enes Doğanay | 13 Nisan 2026: Kullanıcının mevcut teklifleri — 1 ihale 1 teklif kısıtı */
@@ -392,6 +398,7 @@ const IhalelerPage = () => {
             davet_emailleri: tender.davet_emailleri || [],
             davetli_firmalar: tender.davetli_firmalar || [],
             ek_dosyalar: tender.ek_dosyalar || [],  // Enes Doğanay | 10 Nisan 2026: Kaydedilmiş dosyaları yükle
+            anonim: tender.anonim === true,
         });
         setFormError('');
         setYeniGereksinimMadde('');
@@ -431,6 +438,7 @@ const IhalelerPage = () => {
             davet_emailleri: tender.davet_emailleri || [],
             davetli_firmalar: tender.davetli_firmalar || [],
             ek_dosyalar: [],
+            anonim: false,
         });
         setFormError('');
         setStepperStep(0);
@@ -771,6 +779,17 @@ const IhalelerPage = () => {
         params.delete('yeniIhale');
         setSearchParams(params, { replace: true });
     }, [yeniIhaleParam, managedFirmaId]);
+
+    // Enes Doğanay | 2 Mayıs 2026: duzenle URL param — myTenders yüklendikten sonra ilgili ihaleyi düzenle modalında aç
+    useEffect(() => {
+        if (!duzenleParam || myTenders.length === 0) return;
+        const target = myTenders.find(t => String(t.id) === String(duzenleParam));
+        if (!target) return;
+        openEdit(target);
+        const params = new URLSearchParams(searchParams);
+        params.delete('duzenle');
+        setSearchParams(params, { replace: true });
+    }, [duzenleParam, myTenders]);
 
     useEffect(() => {
         if (highlightTenderId && highlightTenderRef.current) {
@@ -1244,6 +1263,7 @@ const IhalelerPage = () => {
                         {myTendersLoading ? (
                             <p className="my-tenders-loading">Yükleniyor…</p>
                         ) : myTenders.length === 0 ? (
+                            /* Enes Doğanay | 1 Mayıs 2026: Hiç ihalesi olmayan firmaya onboarding bannerı */
                             <div className="my-tenders-first-banner">
                                 <div className="my-tenders-first-banner__icon">
                                     <span className="material-symbols-outlined">rocket_launch</span>
@@ -1423,6 +1443,25 @@ const IhalelerPage = () => {
                                                 />
                                             </div>
                                         </div>
+
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihale toggle — firma adı herkesten gizlenir */}
+                                        <div className="ihale-anonim-row">
+                                            <div className="ihale-anonim-row__info">
+                                                <span className="material-symbols-outlined">visibility_off</span>
+                                                <div>
+                                                    <strong>Anonim İhale</strong>
+                                                    <p>Aktif edilirse firma adınız ihale kartlarında ve detay sayfasında gizlenir. Teklif verenler firmanızı göremez.</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className={`ihale-anonim-toggle${form.anonim ? ' ihale-anonim-toggle--on' : ''}`}
+                                                onClick={() => setForm(p => ({ ...p, anonim: !p.anonim }))}
+                                                aria-pressed={form.anonim}
+                                            >
+                                                <span className="ihale-anonim-toggle__knob" />
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
 
@@ -1478,6 +1517,7 @@ const IhalelerPage = () => {
 
                                             <label className="ihale-field">
                                                 <span>Referans No</span>
+                                                {/* Enes Doğanay | 1 Mayıs 2026: Referans no panoya kopyalama butonu */}
                                                 <div className="ihale-refno-copy-row">
                                                     <input type="text" value={form.referans_no} readOnly className="ihale-field--readonly" tabIndex={-1} />
                                                     <button
@@ -1534,6 +1574,7 @@ const IhalelerPage = () => {
                                                     <span className="material-symbols-outlined">add</span>
                                                 </button>
                                             </div>
+                                            {/* Enes Doğanay | 1 Mayıs 2026: Sistemde kayıtlı olmayan e-posta için davet maili gönderme linki */}
                                             {emailStatus === 'not_found' && emailInput.trim().length > 0 && (
                                                 <div className="ihale-email-warning">
                                                     <span className="material-symbols-outlined">info</span>
@@ -1724,6 +1765,13 @@ const IhalelerPage = () => {
                                                 <h4>{form.baslik || 'Başlık belirtilmedi'}</h4>
                                                 <span className={`tender-card-status tender-card-status-canli`}>{form.ihale_tipi}</span>
                                             </div>
+                                            {/* Enes Doğanay | 2 Mayıs 2026: Önizlemede anonim durumu göster */}
+                                            {form.anonim && (
+                                                <div className="ihale-preview__anonim-badge">
+                                                    <span className="material-symbols-outlined">visibility_off</span>
+                                                    Firma adınız gizlenecek (Anonim İhale)
+                                                </div>
+                                            )}
 
                                             {form.aciklama && <p className="ihale-preview__desc">{form.aciklama}</p>}
 
@@ -2069,7 +2117,18 @@ const IhalelerPage = () => {
                                     const isOwnTender = authManagedCompanyId && String(tender.firma_id) === String(authManagedCompanyId);
                                     return (
                                         <div key={tender.id} ref={isHighlighted ? highlightTenderRef : null} className={`tenders-list-row${isHighlighted ? ' tenders-list-row--highlight' : ''}${isOwnTender ? ' tenders-list-row--own' : ''}`} onClick={() => setDetailTender(tender)}>
-                                            <span className="tenders-list-col tenders-list-col--firma" onClick={(e) => { e.stopPropagation(); navigate(`/firmadetay/${tender.firma_id}`); }}>{tender.firma_adi}</span>
+                                            <span className="tenders-list-col tenders-list-col--firma" onClick={(e) => {
+                                                if (tender.anonim) return;
+                                                e.stopPropagation();
+                                                navigate(`/firmadetay/${tender.firma_id}`);
+                                            }}>
+                                                {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma adı gizlenir */}
+                                                {tender.anonim ? (
+                                                    <span className="tenders-list-anonim">
+                                                        <span className="material-symbols-outlined">visibility_off</span>Anonim
+                                                    </span>
+                                                ) : tender.firma_adi}
+                                            </span>
                                             <span className="tenders-list-col tenders-list-col--baslik">{tender.baslik}</span>
                                             <span className="tenders-list-col tenders-list-col--konum">{[tender.teslim_il, tender.teslim_ilce].filter(Boolean).join(' / ') || '—'}</span>
                                             <span className="tenders-list-col tenders-list-col--tarih">{formatTenderDate(tender.yayin_tarihi)}</span>
@@ -2146,10 +2205,18 @@ const IhalelerPage = () => {
                                         <article key={tender.id} ref={highlightTenderId === tender.id ? highlightTenderRef : null} className={`tender-card tender-card--${statusMeta.className}${highlightTenderId === tender.id ? ' tender-card--highlight' : ''}${isOwnTender ? ' tender-card--own' : ''}`}>
                                             {/* Üst şerit: Firma + Durum */}
                                             <div className="tender-card__header">
-                                                <button type="button" className="tender-card__company" onClick={() => navigate(`/firmadetay/${tender.firma_id}`)}>
-                                                    <span className="material-symbols-outlined">apartment</span>
-                                                    {tender.firma_adi}
-                                                </button>
+                                                {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma adı ve profil linki gizlenir */}
+                                                {tender.anonim ? (
+                                                    <span className="tender-card__company tender-card__company--anonim">
+                                                        <span className="material-symbols-outlined">visibility_off</span>
+                                                        Anonim Firma
+                                                    </span>
+                                                ) : (
+                                                    <button type="button" className="tender-card__company" onClick={() => navigate(`/firmadetay/${tender.firma_id}`)}>
+                                                        <span className="material-symbols-outlined">apartment</span>
+                                                        {tender.firma_adi}
+                                                    </button>
+                                                )}
                                                 <span className={`tender-card-status tender-card-status-${statusMeta.className}`}>{statusMeta.label}</span>
                                             </div>
 
@@ -2216,8 +2283,9 @@ const IhalelerPage = () => {
                                                 </div>
                                             )}
 
-                                            {/* Referans */}
-                                            {tender.referans_no && (
+                                            {/* Referans — anonim ihalede gizle (firma adı prefix'ten anlaşılabilir) */}
+                                            {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede referans no gizlenir */}
+                                            {tender.referans_no && !tender.anonim && (
                                                 <div className="tender-card__ref">
                                                     <span className="material-symbols-outlined">tag</span>
                                                     {tender.referans_no}
@@ -2342,10 +2410,18 @@ const IhalelerPage = () => {
                                     <div>
                                         <span className={`tender-card-status tender-card-status-${statusMeta.className}`}>{statusMeta.label}</span>
                                         <h2>{dt.baslik}</h2>
-                                        <button type="button" className="tender-detail__company-link" onClick={() => { setDetailTender(null); navigate(`/firmadetay/${dt.firma_id}`); }}>
-                                            <span className="material-symbols-outlined">apartment</span>
-                                            {dt.firma_adi}
-                                        </button>
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma adı ve profil linki gizlenir */}
+                                        {dt.anonim ? (
+                                            <span className="tender-detail__company-link tender-detail__company-link--anonim">
+                                                <span className="material-symbols-outlined">visibility_off</span>
+                                                Anonim Firma
+                                            </span>
+                                        ) : (
+                                            <button type="button" className="tender-detail__company-link" onClick={() => { setDetailTender(null); navigate(`/firmadetay/${dt.firma_id}`); }}>
+                                                <span className="material-symbols-outlined">apartment</span>
+                                                {dt.firma_adi}
+                                            </button>
+                                        )}
                                     </div>
                                     <button type="button" className="tender-detail__close" onClick={() => setDetailTender(null)}>
                                         <span className="material-symbols-outlined">close</span>
@@ -2390,7 +2466,8 @@ const IhalelerPage = () => {
                                                 <div><strong>Teslim Yeri</strong><span>{teslimYeri}</span></div>
                                             </div>
                                         )}
-                                        {dt.referans_no && (
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede detay modalında referans no gizlenir */}
+                                        {dt.referans_no && !dt.anonim && (
                                             <div className="tender-detail__grid-item">
                                                 <span className="material-symbols-outlined">tag</span>
                                                 <div><strong>Referans No</strong><span>{dt.referans_no}</span></div>
@@ -2472,6 +2549,7 @@ const IhalelerPage = () => {
                                         );
                                     })()}
                                 </div>
+                                {/* Enes Doğanay | 1 Mayıs 2026: Giriş yapmamış kullanıcıya ihale detayı kilitli göster — giriş/kayıt yönlendirmesi */}
                                 {!userProfile && (
                                     <div className="tender-detail-auth-gate">
                                         <div className="tender-detail-auth-gate__cta">
@@ -2510,11 +2588,14 @@ const IhalelerPage = () => {
                                         <div>
                                             <h2>{isUpdateMode ? (isDraftMode ? 'Taslağı Görüntüle' : 'Teklifi Güncelle') : 'Teklif Ver'}</h2>
                                             <p className="teklif-popup__tender-name">{tt.baslik}</p>
-                                            <p className="teklif-popup__tender-firma">
-                                                <span className="material-symbols-outlined">apartment</span>
-                                                {tt.firma_adi}
-                                                {tt.referans_no && <span className="teklif-popup__ref"> • {tt.referans_no}</span>}
-                                            </p>
+                                            {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma adı ve referans no gizlenir */}
+                                            {!tt.anonim && (
+                                                <p className="teklif-popup__tender-firma">
+                                                    <span className="material-symbols-outlined">apartment</span>
+                                                    {tt.firma_adi}
+                                                    {tt.referans_no && <span className="teklif-popup__ref"> • {tt.referans_no}</span>}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                     <button type="button" className="teklif-popup__close" onClick={() => !teklifSaving && setTeklifTender(null)}>
@@ -2597,26 +2678,23 @@ const IhalelerPage = () => {
                                                                 />
                                                             </div>
                                                             <div className="teklif-kalem-col teklif-kalem-col--currency">
-                                                                <select
-                                                                    value={MAIN_CURRENCIES.some(c => c.code === kalemCurrency) ? kalemCurrency : '_other'}
-                                                                    onChange={(e) => {
-                                                                        if (e.target.value === '_other') {
+                                                                {/* Enes Doğanay | 2 Mayıs 2026: Kalem para birimi — modern SimpleSelect */}
+                                                                <SimpleSelect
+                                                                    value={kalemCurrency}
+                                                                    onChange={(val) => {
+                                                                        if (val === '_other') {
                                                                             setCurrencyModalIdx(idx);
                                                                             setCurrencySearch('');
                                                                         } else {
-                                                                            updateKalem(idx, 'para_birimi', e.target.value);
+                                                                            updateKalem(idx, 'para_birimi', val);
                                                                         }
                                                                     }}
-                                                                    className="teklif-kalem-currency-select"
-                                                                >
-                                                                    {MAIN_CURRENCIES.map(c => (
-                                                                        <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
-                                                                    ))}
-                                                                    <option value="_other">Diğer…</option>
-                                                                </select>
-                                                                {!MAIN_CURRENCIES.some(c => c.code === kalemCurrency) && kalemCurrency !== 'TRY' && (
-                                                                    <span className="teklif-kalem-currency-badge">{getCurrencySymbol(kalemCurrency)} {kalemCurrency}</span>
-                                                                )}
+                                                                    options={[
+                                                                        ...MAIN_CURRENCIES.map(c => ({ value: c.code, label: `${c.symbol} ${c.code}` })),
+                                                                        ...(MAIN_CURRENCIES.some(c => c.code === kalemCurrency) ? [] : [{ value: kalemCurrency, label: `${getCurrencySymbol(kalemCurrency)} ${kalemCurrency}` }]),
+                                                                        { value: '_other', label: 'Diğer...' },
+                                                                    ]}
+                                                                />
                                                             </div>
                                                             <span className="teklif-kalem-col teklif-kalem-col--toplam teklif-kalem-col--amount">
                                                                 {formatCurrency(kalemTotal, kalemCurrency)}
@@ -2649,26 +2727,25 @@ const IhalelerPage = () => {
                                                         onChange={(e) => setTeklifForm(p => ({ ...p, genel_toplam: e.target.value }))}
                                                         className="teklif-popup__amount-input"
                                                     />
-                                                    <select
-                                                        value={MAIN_CURRENCIES.some(c => c.code === teklifForm.para_birimi) ? teklifForm.para_birimi : '_other'}
-                                                        onChange={(e) => {
-                                                            if (e.target.value === '_other') {
-                                                                setCurrencyModalIdx('single');
-                                                                setCurrencySearch('');
-                                                            } else {
-                                                                setTeklifForm(p => ({ ...p, para_birimi: e.target.value }));
-                                                            }
-                                                        }}
-                                                        className="teklif-popup__currency-select"
-                                                    >
-                                                        {MAIN_CURRENCIES.map(c => (
-                                                            <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
-                                                        ))}
-                                                        <option value="_other">Diğer…</option>
-                                                    </select>
-                                                    {!MAIN_CURRENCIES.some(c => c.code === teklifForm.para_birimi) && teklifForm.para_birimi !== 'TRY' && (
-                                                        <span className="teklif-kalem-currency-badge">{getCurrencySymbol(teklifForm.para_birimi)} {teklifForm.para_birimi}</span>
-                                                    )}
+                                                    {/* Enes Doğanay | 2 Mayıs 2026: Tek tutar para birimi — modern SimpleSelect */}
+                                                    <div className="teklif-popup__currency-simple">
+                                                        <SimpleSelect
+                                                            value={teklifForm.para_birimi || 'TRY'}
+                                                            onChange={(val) => {
+                                                                if (val === '_other') {
+                                                                    setCurrencyModalIdx('single');
+                                                                    setCurrencySearch('');
+                                                                } else {
+                                                                    setTeklifForm(p => ({ ...p, para_birimi: val }));
+                                                                }
+                                                            }}
+                                                            options={[
+                                                                ...MAIN_CURRENCIES.map(c => ({ value: c.code, label: `${c.symbol} ${c.code}` })),
+                                                                ...(MAIN_CURRENCIES.some(c => c.code === teklifForm.para_birimi) ? [] : [{ value: teklifForm.para_birimi, label: `${getCurrencySymbol(teklifForm.para_birimi)} ${teklifForm.para_birimi}` }]),
+                                                                { value: '_other', label: 'Diğer...' },
+                                                            ]}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}

@@ -945,6 +945,7 @@ const AdminFirmaDuzenle = () => {
                                 onSave={handleAdminSave}
                                 isNew={isNewMode}
                                 onDelete={!isNewMode ? handleAdminDelete : undefined}
+                                isAdmin={true}
                             />
                         </div>
                     )}

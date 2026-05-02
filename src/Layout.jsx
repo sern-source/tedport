@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import Chatbot from './Chatbot';
 
 export default function Layout() {
     const location = useLocation();
@@ -46,6 +47,7 @@ export default function Layout() {
     return (
         <div className="app-container">
             <Outlet />
+            <Chatbot />
         </div>
     );
 }

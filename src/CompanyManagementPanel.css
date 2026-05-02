@@ -773,6 +773,73 @@
     font-size: 18px;
 }
 
+/* Logo pending badge */
+.cmp-logo-pending-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+}
+.cmp-logo-pending-badge .material-symbols-outlined { font-size: 15px; }
+.cmp-logo-pending-hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+/* Enes Doğanay | 2 Mayıs 2026: Logo red bildirimi — admin logo reddedince firma panelinde gösterilir */
+.cmp-logo-red-badge {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 5px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+.cmp-logo-red-badge .material-symbols-outlined { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+/* Arama etiketleri bölümü */
+.cmp-tag-approved {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #166534;
+    margin-bottom: 14px;
+}
+.cmp-tag-approved .material-symbols-outlined { font-size: 17px; color: #16a34a; flex-shrink: 0; margin-top: 1px; }
+.cmp-tag-approved strong { margin-right: 4px; }
+
+.cmp-tag-pending {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #92400e;
+    margin-bottom: 14px;
+}
+.cmp-tag-pending .material-symbols-outlined { font-size: 17px; color: #d97706; flex-shrink: 0; margin-top: 1px; }
+.cmp-tag-pending strong { margin-right: 4px; }
+
+.cmp-tag-form { display: flex; flex-direction: column; gap: 12px; }
+
 /* Enes Doğanay | 7 Nisan 2026: Teklif Talepleri paneli stilleri */
 
 .cmp-quotes-card {

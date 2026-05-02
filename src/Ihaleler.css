@@ -305,6 +305,7 @@
 .tenders-search-clear:hover { background: #e2e8f0; }
 .tenders-search-clear .material-symbols-outlined { font-size: 16px; }
 
+/* Enes Doğanay | 1 Mayıs 2026: Custom sort dropdown — dışarı tıklayınca kapanan */
 .tenders-sort-box {
     position: relative;
 }
@@ -3763,34 +3764,17 @@
 }
 
 /* Enes Doğanay | 14 Nisan 2026: Kalem satırındaki para birimi seçici */
-.teklif-kalem-currency-select {
-    width: 100%;
+/* Enes Doğanay | 2 Mayıs 2026: Kalem para birimi — compact SimpleSelect override */
+.teklif-kalem-col--currency .simple-select-trigger {
     padding: 6px 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
     font-size: 0.78rem;
-    font-family: inherit;
-    color: #0f172a;
+    border-radius: 8px;
+    gap: 4px;
+    border: 1px solid #e2e8f0;
     background: #fff;
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.2s;
 }
-
-.teklif-kalem-currency-select:focus {
-    border-color: #93c5fd;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.teklif-kalem-currency-badge {
-    display: inline-block;
-    margin-top: 3px;
-    padding: 2px 6px;
-    border-radius: 6px;
-    background: #eff6ff;
-    color: #1e40af;
-    font-size: 0.7rem;
-    font-weight: 700;
+.teklif-kalem-col--currency .simple-select-arrow {
+    font-size: 16px;
 }
 
 /* Enes Doğanay | 14 Nisan 2026: Footer gruplu tutar */
@@ -4118,16 +4102,17 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.teklif-popup__currency-select {
-    padding: 10px 14px;
-    border: 1px solid #e2e8f0;
+/* Enes Doğanay | 2 Mayıs 2026: Tek tutar para birimi — SimpleSelect wrapper */
+.teklif-popup__currency-simple {
+    width: 140px;
+    flex-shrink: 0;
+}
+.teklif-popup__currency-simple .simple-select-trigger {
     border-radius: 12px;
+    padding: 10px 10px;
     font-size: 0.88rem;
-    font-family: inherit;
-    color: #0f172a;
+    border: 1px solid #e2e8f0;
     background: #fff;
-    cursor: pointer;
-    outline: none;
 }
 
 /* Inline satır */
@@ -4710,4 +4695,130 @@
 
 .teklif-success-card__icon--draft {
     background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Anonim ihale — firma adı gizleme stilleri */
+.tender-card__company--anonim {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px 4px 6px;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-style: italic;
+    cursor: default;
+}
+.tender-card__company--anonim .material-symbols-outlined {
+    font-size: 16px;
+    color: #94a3b8;
+}
+
+.tenders-list-anonim {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 0.82rem;
+}
+.tenders-list-anonim .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.tender-detail__company-link--anonim {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-style: italic;
+    cursor: default;
+}
+.tender-detail__company-link--anonim .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Toggle — form içi anonim satır */
+.ihale-anonim-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 8px;
+}
+.ihale-anonim-row__info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+}
+.ihale-anonim-row__info > .material-symbols-outlined {
+    font-size: 22px;
+    color: #64748b;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.ihale-anonim-row__info strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+.ihale-anonim-row__info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.ihale-anonim-toggle {
+    flex-shrink: 0;
+    width: 46px;
+    height: 26px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    border: none;
+    cursor: pointer;
+    padding: 3px;
+    transition: background 0.2s;
+    position: relative;
+}
+.ihale-anonim-toggle--on {
+    background: #2563eb;
+}
+.ihale-anonim-toggle__knob {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    transition: transform 0.2s;
+}
+.ihale-anonim-toggle--on .ihale-anonim-toggle__knob {
+    transform: translateX(20px);
+}
+
+/* Önizleme anonim badge */
+.ihale-preview__anonim-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fef9c3;
+    border: 1px solid #fde047;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #854d0e;
+}
+.ihale-preview__anonim-badge .material-symbols-outlined {
+    font-size: 16px;
+    color: #ca8a04;
 }

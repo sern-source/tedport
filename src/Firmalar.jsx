@@ -23,6 +23,8 @@ import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-do
 import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
 import { TURKEY_DISTRICTS } from './turkeyDistricts'; // Enes Doğanay | 14 Nisan 2026: İl/ilçe ayrımı için
 import { getManagedCompanyId } from './companyManagementApi';
+import { useSearchHistory } from './useSearchHistory';
+import { expandSearchTerms, suggestCorrection } from './synonyms';
 
 
 /* ================= SIDEBAR ================= */
@@ -811,6 +813,8 @@ function App() {
   const PAGE_SIZE = 10;
   const navigate = useNavigate();
 
+  const { history: searchHistory, addToHistory, removeFromHistory, clearHistory } = useSearchHistory();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const urlSearchTerm = searchParams.get('search') || '';
@@ -829,6 +833,7 @@ function App() {
   // Enes Doğanay | 28 Nisan 2026: Sayfa numarasını sadece URL'den oku, sessionStorage'dan asla alma
   const [page, setPage] = useState(urlPage || 1);
   const [totalCount, setTotalCount] = useState(0);
+  const [didYouMean, setDidYouMean] = useState(null); // Enes Doğanay | 2 Mayıs 2026: "Bunu mu demek istediniz?" önerisi — 0 sonuçta gösterilir
 
   /* Enes Doğanay | 5 Nisan 2026: Mobilde filtre paneli aç/kapat state */
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -842,6 +847,7 @@ function App() {
   const [viewMode, setViewMode] = useState('grid');
   // Enes Doğanay | 14 Nisan 2026: Sıralama modu state'i
   const [sortMode, setSortMode] = useState(savedState?.sortMode || 'default');
+  // Enes Doğanay | 1 Mayıs 2026: Sıralama dropdown — dışarı tıklayınca kapanan custom select
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const sortDropdownRef = useRef(null);
   useEffect(() => {
@@ -1024,6 +1030,13 @@ function App() {
     return () => clearTimeout(timer);
   }, [search]);
 
+  // Arama geçmişine kaydet (en az 3 karakter, 1.5s yerleştikten sonra)
+  useEffect(() => {
+    if (debouncedSearch.trim().length < 3) return;
+    const timer = setTimeout(() => { addToHistory(debouncedSearch.trim()); }, 1200);
+    return () => clearTimeout(timer);
+  }, [debouncedSearch, addToHistory]);
+
   useEffect(() => {
     fetchSuppliers();
   }, [page, debouncedSearch, filters, sortMode]);
@@ -1045,9 +1058,15 @@ function App() {
     if (trimmedSearch.length >= 2) {
       const safeSearch = sanitizeSearch(trimmedSearch);
       if (safeSearch.length >= 2) {
-        query = query.or(
-          `firma_adi.ilike."%${safeSearch}%",description.ilike."%${safeSearch}%",ana_sektor.ilike."%${safeSearch}%",urun_kategorileri.ilike."%${safeSearch}%"`
-        );
+        const expandedTerms = expandSearchTerms(safeSearch);
+        const orParts = expandedTerms.flatMap(term => [
+          `firma_adi.ilike."%${term}%"`,
+          `description.ilike."%${term}%"`,
+          `ana_sektor.ilike."%${term}%"`,
+          `urun_kategorileri.ilike."%${term}%"`,
+          `arama_etiketleri.ilike."%${term}%"`,
+        ]);
+        query = query.or(orParts.join(','));
       }
     }
 
@@ -1147,9 +1166,16 @@ function App() {
 
       setSuppliers(mappedSuppliers);
       setTotalCount(count);
+      // 0 sonuç + aktif arama varsa yazım önerisi hesapla
+      if (mappedSuppliers.length === 0 && debouncedSearch?.trim().length >= 2) {
+        setDidYouMean(suggestCorrection(debouncedSearch.trim()));
+      } else {
+        setDidYouMean(null);
+      }
     } else if (error) {
       setSuppliers([]);
       setTotalCount(0);
+      setDidYouMean(null);
     }
 
     setLoading(false);
@@ -1203,6 +1229,10 @@ function App() {
         search={search}
         setSearch={setSearch}
         showSearchBar={true}
+        searchHistory={searchHistory}
+        onHistorySelect={(term) => { setSearch(term); setDebouncedSearch(term); }}
+        onHistoryRemove={removeFromHistory}
+        onHistoryClear={clearHistory}
         navItems={[
           { label: 'Anasayfa', href: '/' },
           { label: 'İhaleler', href: '/ihaleler' },
@@ -1376,6 +1406,15 @@ function App() {
               <div className="empty-results">
                 <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#cbd5e1' }}>search_off</span>
                 <p>Arama veya filtre kriterlerinize uygun firma bulunamadı.</p>
+                {didYouMean && (
+                  <div
+                    className="did-you-mean"
+                    onClick={() => { setSearch(didYouMean); setDidYouMean(null); }}
+                  >
+                    <span className="material-symbols-outlined">spellcheck</span>
+                    Bunu mu demek istediniz? <strong>{didYouMean}</strong>
+                  </div>
+                )}
                 <button
                   className="btn-primary"
                   style={{ marginTop: '8px', padding: '8px 20px' }}
@@ -1416,11 +1455,11 @@ function App() {
                       )}
                     </a>
                     <a href={`/firmadetay/${supplier.id}`} className="firmalar-list-col firmalar-list-col--name" onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${supplier.id}`); }} style={{ color: 'inherit', textDecoration: 'none' }}>
-                      {supplier.name}
+                      <span className="firmalar-list-name-text">{supplier.name}</span>
                       {/* Enes Doğanay | 11 Nisan 2026: Liste görünümünde de 'Onaylı Firma' yazısı eklendi */}
-                      {supplier.isVerified && <span className="verified-badge-inline" style={{ marginLeft: '4px', verticalAlign: 'middle' }}><span className="material-symbols-outlined verified-icon" style={{ fontSize: '16px' }}>verified</span> <span className="verified-text">Onaylı Firma</span></span>}
+                      {supplier.isVerified && <span className="verified-badge-inline"><span className="material-symbols-outlined verified-icon" style={{ fontSize: '14px' }}>verified</span> <span className="verified-text">Onaylı Firma</span></span>}
                       {/* Enes Doğanay | 17 Nisan 2026: Liste görünümünde otomatik profil etiketi */}
-                      {!supplier.isVerified && <span className="platform-badge-inline" style={{ marginLeft: '4px', verticalAlign: 'middle' }}><span className="material-symbols-outlined platform-badge-icon" style={{ fontSize: '14px' }}>public</span> <span className="platform-badge-text">Otomatik Profil</span></span>}
+                      {!supplier.isVerified && <span className="platform-badge-inline"><span className="material-symbols-outlined platform-badge-icon" style={{ fontSize: '13px' }}>public</span> <span className="platform-badge-text">Otomatik Profil</span></span>}
                     </a>
                     <span className="firmalar-list-col firmalar-list-col--sector" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{(supplier.tags || []).slice(0, 2).join(', ') || '—'}</span>
                     <span className="firmalar-list-col firmalar-list-col--location" onClick={() => navigate(`/firmadetay/${supplier.id}`)} style={{ cursor: 'pointer' }}>{supplier.location || '—'}</span>
@@ -1505,6 +1544,7 @@ function App() {
               </>
             )}
 
+            {/* Enes Doğanay | 1 Mayıs 2026: Alt pagination — İlk/Son sayfa butonları eklendi */}
             {totalPages > 1 && (
               <div className="pagination">
                 <button

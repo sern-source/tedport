@@ -168,6 +168,7 @@ const About = () => {
 
                                 <div className="about-timeline-item left">
                                     <div className="about-timeline-content text-right">
+                                        {/* Enes Doğanay | 1 Mayıs 2026: Eylül 2025 ve Ocak 2026 timeline maddeleri eklendi */}
                                         <h3>Eylül 2025</h3>
                                         <h4>Fikrin Doğuşu</h4>
                                         <p>Tedport fikri, Türkiye’deki B2B tedarik süreçlerinin dijitalleştirilmesi ihtiyacından doğdu. 3 kişilik kurucu ekip olarak yolculuğumuza başladık.</p>

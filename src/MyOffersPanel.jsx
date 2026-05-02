@@ -172,7 +172,8 @@ const MyOffersPanel = () => {
                 const ihaleIds = [...new Set(myOffers.map(o => o.ihale_id))];
                 const { data: tenders } = await supabase
                     .from('firma_ihaleleri')
-                    .select('id, baslik, aciklama, referans_no, firma_id, durum, son_basvuru_tarihi, teslim_il, teslim_ilce, ihale_tipi, kategori')
+                    // Enes Doğanay | 2 Mayıs 2026: anonim alanı eklendi — firma/ref no gizleme için
+                    .select('id, baslik, aciklama, referans_no, firma_id, durum, son_basvuru_tarihi, teslim_il, teslim_ilce, ihale_tipi, kategori, anonim')
                     .in('id', ihaleIds);
 
                 const tMap = {};
@@ -569,11 +570,19 @@ const MyOffersPanel = () => {
                                     <div className="mop-card__tender">
                                         <h3>{tender.baslik || 'İhale bulunamadı'}</h3>
                                         <div className="mop-card__meta">
-                                            <span className="mop-card__firma" onClick={e => { e.stopPropagation(); if (tender.firma_id) navigate(`/firmadetay/${tender.firma_id}`); }}>
-                                                <span className="material-symbols-outlined">apartment</span>
-                                                {firmaAdi}
-                                            </span>
-                                            {tender.referans_no && (
+                                            {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma adı ve referans no gizlenir */}
+                                            {tender.anonim ? (
+                                                <span className="mop-card__firma mop-card__firma--anonim">
+                                                    <span className="material-symbols-outlined">apartment</span>
+                                                    Anonim Firma
+                                                </span>
+                                            ) : (
+                                                <span className="mop-card__firma" onClick={e => { e.stopPropagation(); if (tender.firma_id) navigate(`/firmadetay/${tender.firma_id}`); }}>
+                                                    <span className="material-symbols-outlined">apartment</span>
+                                                    {firmaAdi}
+                                                </span>
+                                            )}
+                                            {tender.referans_no && !tender.anonim && (
                                                 <span className="mop-card__ref">
                                                     <span className="material-symbols-outlined">tag</span>
                                                     {tender.referans_no}
@@ -747,15 +756,16 @@ const MyOffersPanel = () => {
                                                 <span className="material-symbols-outlined">gavel</span>
                                                 İhaleye Git
                                             </button>
-                                            {tender.firma_id && (
+                                            {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma iletişim butonu gizlenir */}
+                                            {tender.firma_id && !tender.anonim && (
                                                 <button className="mop-btn mop-btn--contact" onClick={() => openFirmaContact(tender.firma_id, firmaAdi)}>
                                                     <span className="material-symbols-outlined">contact_phone</span>
                                                     Firma ile İletişime Geç
                                                 </button>
                                             )}
-                                            {/* Enes Doğanay | 15 Nisan 2026: Güncelle butonu — popup bu sayfa içinde açılır */}
+                                            {/* Enes Doğanay | 2 Mayıs 2026: Güncelle butonu — Ihaleler sayfasına yönlendir, teklif popup orada açılır */}
                                             {tenderSt.tone === 'active' && st.tone !== 'accepted' && (
-                                                <button className={`mop-btn ${st.tone === 'draft' ? 'mop-btn--draft' : 'mop-btn--primary'}`} onClick={() => openEditPopup(offer, tender, firmaAdi)}>
+                                                <button className={`mop-btn ${st.tone === 'draft' ? 'mop-btn--draft' : 'mop-btn--primary'}`} onClick={() => navigate(`/ihaleler?ihale=${tender.id}&teklif=1`)}>
                                                     <span className="material-symbols-outlined">edit</span>
                                                     {st.tone === 'draft' ? 'Taslağı Güncelle' : 'Teklifi Güncelle'}
                                                 </button>

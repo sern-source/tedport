@@ -44,6 +44,7 @@ const SharedFooter = () => {
                         <h4>Kurumsal</h4>
                         <ul>
                             <li><Link to="/hakkimizda">Hakkımızda</Link></li>
+                            <li><Link to="/sss">Sıkça Sorulan Sorular</Link></li>
                             <li><Link to="/iletisim">İletişim</Link></li>
                             <li><a href="https://www.linkedin.com/company/tedport/about/" target="_blank" rel="noopener noreferrer">Kariyer</a></li>
                         </ul>

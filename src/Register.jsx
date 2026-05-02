@@ -670,7 +670,7 @@ const RegistrationPage = () => {
                     <span className="material-symbols-outlined">verified</span>
                   </div>
                   <h2>Başvurunuz İncelemeye Alındı</h2>
-                  <p>{corporateSubmittedApplication.company_name} için bıraktığınız kurumsal kayıt talebi admin paneline düştü. En geç 1 hafta içinde başvurunuzun sonucunu e-posta ile paylaşacağız.</p>
+                  <p>{corporateSubmittedApplication.company_name} için bıraktığınız kurumsal kayıt talebi admin paneline düştü. En geç 24 saat içinde başvurunuzun sonucunu e-posta ile paylaşacağız.</p>
                   <div className="corporate-success-steps">
                     <div className="corporate-success-step">
                       <strong>1.</strong>

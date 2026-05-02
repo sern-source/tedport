@@ -1,0 +1,432 @@
+/* ══════════════════════════════════════════════════════
+   SSS.css — Sıkça Sorulan Sorular Sayfası
+   ══════════════════════════════════════════════════════ */
+
+.sss-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ── Hero ──────────────────────────────────────────── */
+.sss-hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+  padding: 56px 20px 52px;
+  text-align: center;
+  color: white;
+}
+
+.sss-hero-inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.sss-hero-icon {
+  font-size: 48px;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.sss-hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+
+.sss-hero > .sss-hero-inner > p {
+  font-size: 1.05rem;
+  opacity: 0.82;
+  margin-bottom: 28px;
+}
+
+.sss-hero-meta {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  opacity: 0.65;
+  letter-spacing: 0.03em;
+}
+
+/* Search */
+.sss-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.sss-search-wrap .material-symbols-outlined {
+  color: #94a3b8;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.sss-search-wrap input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #1e293b;
+  background: transparent;
+  font-family: inherit;
+}
+
+.sss-search-wrap input::placeholder { color: #94a3b8; }
+
+.sss-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.sss-search-clear:hover { color: #475569; }
+.sss-search-clear .material-symbols-outlined { font-size: 18px; }
+
+/* ── Kategori Pills ─────────────────────────────────── */
+.sss-cats-wrap {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+}
+
+.sss-cats {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.sss-cats::-webkit-scrollbar { display: none; }
+
+.sss-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.sss-cat-pill .material-symbols-outlined { font-size: 16px; }
+
+.sss-cat-pill:hover {
+  border-color: #3b82f6;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.sss-cat-pill.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+.sss-pill-count {
+  font-size: 11px;
+  font-weight: 700;
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 2px;
+}
+.sss-cat-pill.active .sss-pill-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+/* ── İçerik Alanı ───────────────────────────────────── */
+.sss-content {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+}
+
+/* ── Grup ───────────────────────────────────────────── */
+.sss-group {
+  margin-bottom: 44px;
+}
+
+.sss-group-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.sss-group-title .material-symbols-outlined {
+  font-size: 20px;
+  color: #3b82f6;
+}
+
+.sss-group-count {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* ── Accordion ──────────────────────────────────────── */
+.sss-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  background: white;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.sss-item:hover {
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.07);
+}
+
+.sss-item.open {
+  border-color: #93c5fd;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+}
+
+.sss-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: left;
+  line-height: 1.45;
+  transition: background 0.15s;
+}
+
+.sss-question:hover { background: #f8fafc; }
+
+.sss-item.open .sss-question {
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.sss-chevron {
+  font-size: 22px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s;
+}
+
+.sss-item.open .sss-chevron {
+  transform: rotate(180deg);
+  color: #3b82f6;
+}
+
+/* Yanıt — CSS grid trick ile smooth animate */
+.sss-answer-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sss-item.open .sss-answer-wrap {
+  grid-template-rows: 1fr;
+}
+
+.sss-answer {
+  overflow: hidden;
+  padding: 0 20px;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: #475569;
+  border-top: 0 solid #eff6ff;
+  transition: padding 0.25s, border-top-width 0.25s;
+}
+
+.sss-item.open .sss-answer {
+  padding: 14px 20px 18px;
+  border-top-width: 1px;
+}
+
+/* Links inside answers */
+.sss-answer a,
+.sss-answer .cb-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+.sss-answer a:hover,
+.sss-answer .cb-link:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+.sss-answer strong { color: #1e293b; }
+
+/* ── Skeleton Loading ───────────────────────────────── */
+.sss-skeletons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sss-skeleton-item {
+  height: 54px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: sss-shimmer 1.5s infinite;
+}
+
+@keyframes sss-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Boş Durum ──────────────────────────────────────── */
+.sss-empty {
+  text-align: center;
+  padding: 72px 20px;
+}
+
+.sss-empty .material-symbols-outlined {
+  font-size: 52px;
+  color: #cbd5e1;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.sss-empty p {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.sss-empty-reset {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.sss-empty-reset:hover { background: #1d4ed8; }
+
+/* ── CTA ────────────────────────────────────────────── */
+.sss-cta {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  text-align: center;
+  padding: 64px 20px;
+  color: white;
+}
+
+.sss-cta-inner {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.sss-cta-icon {
+  font-size: 48px;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 14px;
+}
+
+.sss-cta h2 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  margin: 0 0 10px;
+  line-height: 1.3;
+}
+
+.sss-cta p {
+  opacity: 0.8;
+  margin-bottom: 28px;
+  font-size: 1rem;
+}
+
+.sss-cta-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sss-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 0.925rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  border: 2px solid transparent;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.sss-cta-btn .material-symbols-outlined { font-size: 18px; }
+.sss-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.sss-cta-btn--primary {
+  background: white;
+  color: #2563eb;
+}
+.sss-cta-btn--secondary {
+  background: transparent;
+  color: white;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.sss-cta-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  .sss-hero { padding: 40px 16px 36px; }
+  .sss-hero h1 { font-size: 1.5rem; }
+  .sss-hero-icon { font-size: 36px; }
+  .sss-content { padding: 28px 16px 48px; }
+  .sss-question { font-size: 0.875rem; padding: 14px 16px; }
+  .sss-item.open .sss-answer { padding: 12px 16px 16px; }
+  .sss-group-title { font-size: 0.95rem; }
+  .sss-cta h2 { font-size: 1.25rem; }
+  .sss-cta-btns { flex-direction: column; align-items: stretch; }
+  .sss-cta-btn { justify-content: center; }
+}

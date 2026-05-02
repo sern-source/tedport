@@ -1,7 +1,7 @@
 /* Enes Doğanay | 13 Nisan 2026: İhalelerim & Gelen Teklifler — tamamen yeniden tasarlandı */
 /* Enes Doğanay | 13 Nisan 2026: İhale düzenle/sil/kapat + bildirim entegrasyonu */
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { updateTender, deleteTender, createTender as createTenderApi } from './ihaleManagementApi';
 import { buildInviteMailto } from './tenderUtils';
@@ -161,6 +161,8 @@ const ScoreRing = ({ score, size = 52 }) => {
 const TenderOffersManagement = ({ companyId }) => {
     /* ─── State ─── */
     const [searchParams, setSearchParams] = useSearchParams();
+    // Enes Doğanay | 2 Mayıs 2026: İhaleler sayfasındaki 4-adımlı forma yönlendirmek için
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [tenders, setTenders] = useState([]);
@@ -171,6 +173,7 @@ const TenderOffersManagement = ({ companyId }) => {
     const [tenderFilter, setTenderFilter] = useState('all');
     const [offerFilter, setOfferFilter] = useState('all');
     const [offerSort, setOfferSort] = useState('score');
+    // Enes Doğanay | 1 Mayıs 2026: Sıralama dropdown state + dışarı tıklama ile kapanma
     const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
     const sortDropdownRef = useRef(null);
     useEffect(() => {
@@ -1289,7 +1292,8 @@ const TenderOffersManagement = ({ companyId }) => {
                                                 const isClosed = tenderTone === 'closed' || tenderTone === 'cancelled';
                                                 return (
                                                     <>
-                                                        <button className="tom-btn tom-btn--edit" onClick={() => openEditModal(selectedTender)} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
+                                                        {/* Enes Doğanay | 2 Mayıs 2026: İhaleler sayfasındaki 4-adımlı form — URL param ile aç */}
+                                                        <button className="tom-btn tom-btn--edit" onClick={() => navigate(`/ihaleler?duzenle=${selectedTender.id}`)} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
                                                             <span className="material-symbols-outlined">edit</span>
                                                             Düzenle
                                                         </button>

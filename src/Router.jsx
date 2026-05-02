@@ -21,6 +21,7 @@ const AdminCorporateApplications = lazy(() => import('./AdminCorporateApplicatio
 const AdminFirmaDuzenle = lazy(() => import('./AdminFirmaDuzenle'));
 /* Enes Doğanay | 14 Nisan 2026: Admin iletişim mesajları yönetim sayfası */
 const AdminContactMessages = lazy(() => import('./AdminContactMessages'));
+const AdminChatbotTraining = lazy(() => import('./AdminChatbotTraining'));
 const FirmaProfil = lazy(() => import('./FirmaProfil'));
 /* Enes Doğanay | 10 Nisan 2026: E-posta değişikliği onay başarı sayfası */
 const EmailChangeSuccess = lazy(() => import('./EmailChangeSuccess'));
@@ -29,6 +30,9 @@ const NotFound = lazy(() => import('./NotFound'));
 const Kvkk = lazy(() => import('./Kvkk'));
 const HizmetSartlari = lazy(() => import('./HizmetSartlari'));
 const GizlilikPolitikasi = lazy(() => import('./GizlilikPolitikasi'));
+const SSS = lazy(() => import('./SSS'));
+// Enes Doğanay | 2 Mayıs 2026: Admin Onay Merkezi — etiket ve logo onaylama sayfası
+const AdminEtiketOnay = lazy(() => import('./AdminEtiketOnay'));
 
 export default function Router() {
   return (
@@ -55,12 +59,17 @@ export default function Router() {
         <Route path="/admin/firma-duzenle" element={<AdminFirmaDuzenle />} />
         {/* Enes Doğanay | 14 Nisan 2026: Admin iletişim mesajları sayfası */}
         <Route path="/admin/iletisim-mesajlari" element={<AdminContactMessages />} />
+        {/* Chatbot eğitim yönetim sayfası */}
+        <Route path="/admin/chatbot-egitimi" element={<AdminChatbotTraining />} />
+        {/* Enes Doğanay | 2 Mayıs 2026: Onay Merkezi route */}
+        <Route path="/admin/etiket-onay" element={<AdminEtiketOnay />} />
         {/* Enes Doğanay | 7 Nisan 2026: Kurumsal firma profil sayfası — panel + teklifler + bildirimler */}
         <Route path="/firma-profil" element={<FirmaProfil />} />
         <Route path="/firmadetay/:id" element={<FirmaDetay />} />
         <Route path="/kvkk" element={<Kvkk />} />
         <Route path="/hizmet-sartlari" element={<HizmetSartlari />} />
         <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
+        <Route path="/sss" element={<SSS />} />
         {/* Enes Doğanay | 16 Nisan 2026: Tanımsız rotalar için 404 */}
         <Route path="*" element={<NotFound />} />
       </Route>

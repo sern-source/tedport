@@ -300,6 +300,72 @@
     color: #94a3b8;
 }
 
+/* ── Arama Geçmişi ── */
+.shared-search-history {
+    padding-top: 4px;
+}
+
+.shared-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+}
+
+.shared-history-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #3b82f6;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 0;
+}
+.shared-history-clear:hover { text-decoration: underline; }
+
+.shared-history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px 0 0;
+    cursor: pointer;
+}
+.shared-history-item:hover { background: #f8fafc; }
+
+.shared-history-item-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    padding: 9px 14px;
+    font-size: 14px;
+    color: #334155;
+}
+
+.shared-history-icon {
+    font-size: 18px;
+    color: #94a3b8;
+}
+
+.shared-history-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+.shared-history-remove:hover { color: #64748b; background: #f1f5f9; }
+.shared-history-remove .material-symbols-outlined { font-size: 16px; }
+
 @media (min-width: 640px) {
     .shared-search-icon {
         font-size: 20px;

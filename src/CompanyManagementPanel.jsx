@@ -67,7 +67,8 @@ const ALL_CITIES = [
 
 // ── bileşen ───────────────────────────────────────────────────────────────
 /* Enes Doğanay | 13 Nisan 2026: onSave prop — admin modu, isNew — yeni firma ekleme, onDelete — firma silme */
-const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDelete }) => {
+/* Enes Doğanay | 2 Mayıs 2026: isAdmin prop — admin panelinden gelince etiket talep değil direkt DB güncelleme */
+const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDelete, isAdmin }) => {
     const parsedLoc = useMemo(() => parseLocation(company?.il_ilce), [company?.il_ilce]);
 
     const [fields, setFields] = useState({
@@ -87,6 +88,16 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
     // Enes Doğanay | 6 Nisan 2026: Logo dosyası localden yükleme state'leri
     const [logoUploading, setLogoUploading] = useState(false);
     const [logoPreview, setLogoPreview] = useState('');
+    // Logo onay sistemi — pending_logo_url bekliyor mu?
+    const [pendingLogoUrl, setPendingLogoUrl] = useState('');
+    /* Enes Doğanay | 2 Mayıs 2026: Logo red notu — admin reddedince firma paneliyle gösterilir, yeni yüklemede temizlenir */
+    const [logoRedNotu, setLogoRedNotu] = useState('');
+    // Arama etiketleri talebi
+    const [approvedTags, setApprovedTags] = useState('');
+    const [tagInput, setTagInput] = useState('');
+    const [tagSending, setTagSending] = useState(false);
+    const [tagFeedback, setTagFeedback] = useState({ type: '', msg: '' });
+    const [pendingTagRequest, setPendingTagRequest] = useState(null);
     /* Enes Doğanay | 13 Nisan 2026: Firma silme onay modalı + siliniyor state'i */
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -109,8 +120,23 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
             description: company.description || ''
         });
         setLogoPreview(company.logo_url || '');
+        setPendingLogoUrl(company.pending_logo_url || '');
+        setLogoRedNotu(company.pending_logo_red_notu || '');
+        setApprovedTags(company.arama_etiketleri || '');
         const parsedCat = parseCatalog(company.urun_kategorileri);
         setCatalog(parsedCat);
+
+        // Bekleyen etiket talebini çek
+        if (company.firmaID) {
+            supabase
+                .from('etiket_talepleri')
+                .select('id, etiketler, durum, created_at')
+                .eq('firma_id', company.firmaID)
+                .eq('durum', 'bekliyor')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .then(({ data }) => setPendingTagRequest(data?.[0] || null));
+        }
         /* Enes Doğanay | 13 Nisan 2026: Orijinal snapshot'ları kaydet */
         originalFieldsRef.current = JSON.stringify({
             firma_adi: company.firma_adi || '',
@@ -145,7 +171,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
         district: (TURKEY_DISTRICTS[city] || []).includes(p.district) ? p.district : ''
     }));
 
-    // Enes Doğanay | 6 Nisan 2026: Logo dosyası seçilince Supabase Storage'a yüklenir ve logo_url güncellenir
+    // Logo onay sistemi — yüklenen logo direkt canlıya gitmez, pending_logo_url'e kaydedilir
     const handleLogoUpload = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -167,7 +193,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
 
         try {
             const ext = file.name.split('.').pop();
-            const filePath = `logos/${company.firmaID || 'temp'}_${Date.now()}.${ext}`;
+            const filePath = `logos/pending_${company.firmaID || 'temp'}_${Date.now()}.${ext}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('firma-logolari')
@@ -182,9 +208,17 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
             const publicUrl = publicUrlData?.publicUrl;
             if (!publicUrl) throw new Error('Public URL alınamadı.');
 
-            set('logo_url', publicUrl);
-            setLogoPreview(publicUrl);
-            setFeedback({ type: 'ok', msg: 'Logo yüklendi! Kaydetmeyi unutmayın.' });
+            // Direkt logo_url yerine pending_logo_url'e kaydet — admin onayına gönder
+            if (company.firmaID) {
+                const { error: dbErr } = await supabase
+                    .from('firmalar')
+                    .update({ pending_logo_url: publicUrl, pending_logo_red_notu: null })
+                    .eq('firmaID', company.firmaID);
+                if (dbErr) throw dbErr;
+            }
+            setPendingLogoUrl(publicUrl);
+            setLogoRedNotu('');
+            setFeedback({ type: 'ok', msg: 'Logo yüklendi. Admin onayından sonra yayına girecektir.' });
         } catch (err) {
             console.error('Logo yükleme hatası:', err);
             setFeedback({ type: 'err', msg: err.message || 'Logo yüklenemedi.' });
@@ -227,7 +261,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                 web_sitesi: fields.web_sitesi,
                 telefon: fields.telefon,
                 eposta: fields.eposta,
-                logo_url: fields.logo_url,
+                // logo_url kasıtlı olarak buraya dahil edilmedi — logo değişikliği admin onayıyla gerçekleşir
                 latitude: fields.latitude === '' ? null : Number(fields.latitude),
                 longitude: fields.longitude === '' ? null : Number(fields.longitude),
                 adres: fields.adres,
@@ -247,6 +281,45 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
             setFeedback({ type: 'err', msg: err.message || 'Kaydedilemedi, lütfen tekrar deneyin.' });
         } finally {
             setSaving(false);
+        }
+    };
+
+    /* Enes Doğanay | 2 Mayıs 2026: handleTagSubmit — admin ise direkt firmalar tablosuna yazar, değilse talep oluşturur */
+    const handleTagSubmit = async () => {
+        const tags = tagInput.trim();
+        if (!tags) return;
+        if (!company?.firmaID) return;
+        setTagSending(true);
+        setTagFeedback({ type: '', msg: '' });
+        try {
+            if (isAdmin) {
+                // Admin: doğrudan arama_etiketleri güncelle
+                const { error } = await supabase
+                    .from('firmalar')
+                    .update({ arama_etiketleri: tags })
+                    .eq('firmaID', company.firmaID);
+                if (error) throw error;
+                setTagInput('');
+                setApprovedTags(tags);
+                setTagFeedback({ type: 'ok', msg: 'Etiketler kaydedildi.' });
+            } else {
+                const { data: { user } } = await supabase.auth.getUser();
+                const { error } = await supabase.from('etiket_talepleri').insert({
+                    firma_id: company.firmaID,
+                    firma_adi: company.firma_adi,
+                    talep_eden_user: user?.id,
+                    etiketler: tags,
+                    durum: 'bekliyor',
+                });
+                if (error) throw error;
+                setTagInput('');
+                setPendingTagRequest({ etiketler: tags, durum: 'bekliyor', created_at: new Date().toISOString() });
+                setTagFeedback({ type: 'ok', msg: 'Etiket talebiniz alındı. Admin onayından sonra aktif olacaktır.' });
+            }
+        } catch (err) {
+            setTagFeedback({ type: 'err', msg: err.message || 'Kaydedilemedi.' });
+        } finally {
+            setTagSending(false);
         }
     };
 
@@ -295,7 +368,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                         </label>
                     </div>
 
-                    {/* Enes Doğanay | 6 Nisan 2026: Logo artık localden dosya seçilerek yükleniyor */}
+                    {/* Logo — onay sistemi: yüklenen logo pending_logo_url'e gider, admin onaylar */}
                     <div className="cmp-logo-upload">
                         <div className="cmp-logo-upload__preview">
                             {logoPreview ? (
@@ -309,6 +382,18 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                         <div className="cmp-logo-upload__info">
                             <strong>Firma Logosu</strong>
                             <p>PNG, JPG, WebP veya SVG — maks. 2 MB.</p>
+                            {pendingLogoUrl && (
+                                <div className="cmp-logo-pending-badge">
+                                    <span className="material-symbols-outlined">schedule</span>
+                                    Yeni logo admin onayı bekliyor
+                                </div>
+                            )}
+                            {!pendingLogoUrl && logoRedNotu && (
+                                <div className="cmp-logo-red-badge">
+                                    <span className="material-symbols-outlined">cancel</span>
+                                    Logo reddedildi: {logoRedNotu}
+                                </div>
+                            )}
                             <label className="cmp-btn cmp-btn--ghost cmp-btn--sm cmp-logo-upload__btn">
                                 <span className="material-symbols-outlined">upload</span>
                                 {logoUploading ? 'Yükleniyor…' : 'Fotoğraf Seç'}
@@ -316,10 +401,13 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                                     type="file"
                                     accept="image/png,image/jpeg,image/webp,image/svg+xml"
                                     onChange={handleLogoUpload}
-                                    disabled={logoUploading}
+                                    disabled={logoUploading || !!pendingLogoUrl}
                                     hidden
                                 />
                             </label>
+                            {pendingLogoUrl && (
+                                <p className="cmp-logo-pending-hint">Bekleyen onay varken yeni logo yüklenemez.</p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -490,6 +578,64 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                     <div className="cmp-feedback cmp-feedback--err">
                         <span className="material-symbols-outlined">error</span>
                         {feedback.msg}
+                    </div>
+                )}
+
+                {/* Arama Etiketleri Talebi */}
+                {!isNew && (
+                    <div className="cmp-card">
+                        <div className="cmp-card__head">
+                            <span className="material-symbols-outlined">label</span>
+                            <div>
+                                <h3>Arama Etiketleri</h3>
+                                <p>Firmayı bulmayı kolaylaştıracak anahtar kelimeler. Admin onayından sonra aramada aktif olur.</p>
+                            </div>
+                        </div>
+                        {approvedTags && (
+                            <div className="cmp-tag-approved">
+                                <span className="material-symbols-outlined">check_circle</span>
+                                <strong>Aktif etiketler:</strong>
+                                <span>{approvedTags}</span>
+                            </div>
+                        )}
+                        {/* Enes Doğanay | 2 Mayıs 2026: Admin modunda bekleyen talep bloğu gösterilmez, direkt form gösterilir */}
+                        {!isAdmin && pendingTagRequest ? (
+                            <div className="cmp-tag-pending">
+                                <span className="material-symbols-outlined">schedule</span>
+                                <div>
+                                    <strong>Bekleyen talep:</strong>
+                                    <span>{pendingTagRequest.etiketler}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="cmp-tag-form">
+                                <label className="cmp-field">
+                                    <span>{isAdmin ? 'Etiketler (virgülle ayırın)' : 'Yeni etiket talebi (virgülle ayırın)'}</span>
+                                    <input
+                                        type="text"
+                                        value={tagInput}
+                                        onChange={e => setTagInput(e.target.value)}
+                                        placeholder="Örn: CNC işleme, talaşlı imalat, freze, alüminyum döküm"
+                                        disabled={tagSending}
+                                    />
+                                </label>
+                                {tagFeedback.msg && (
+                                    <div className={`cmp-feedback cmp-feedback--${tagFeedback.type === 'ok' ? 'ok' : 'err'}`}>
+                                        <span className="material-symbols-outlined">{tagFeedback.type === 'ok' ? 'check_circle' : 'error'}</span>
+                                        {tagFeedback.msg}
+                                    </div>
+                                )}
+                                <button
+                                    type="button"
+                                    className="cmp-btn cmp-btn--ghost cmp-btn--sm"
+                                    onClick={handleTagSubmit}
+                                    disabled={tagSending || !tagInput.trim()}
+                                >
+                                    <span className="material-symbols-outlined">{tagSending ? 'progress_activity' : (isAdmin ? 'save' : 'send')}</span>
+                                    {tagSending ? (isAdmin ? 'Kaydediliyor…' : 'Gönderiliyor…') : (isAdmin ? 'Kaydet' : 'Talep Gönder')}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
 

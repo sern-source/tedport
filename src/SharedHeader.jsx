@@ -38,7 +38,11 @@ const SharedHeader = ({
     suggestions = [],
     onSuggestionClick = null,
     onSearchSubmit = null,
-    noResults = false
+    noResults = false,
+    searchHistory = [],
+    onHistorySelect = null,
+    onHistoryRemove = null,
+    onHistoryClear = null,
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -46,6 +50,7 @@ const SharedHeader = ({
     const { authChecked, userProfile, isCurrentUserAdmin, managedCompanyId, managedCompanyName, unreadNotifCount, pendingQuoteCount, logout } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [searchFocused, setSearchFocused] = useState(false);
     const dropdownRef = useRef(null);
     // Enes Doğanay | 5 Nisan 2026: Search bar dışına tıklayınca öneri dropdown'ını kapatmak için ref
     const searchBarRef = useRef(null);
@@ -62,6 +67,7 @@ const SharedHeader = ({
             // Enes Doğanay | 5 Nisan 2026: Search öneri dropdown'ı dış tıklamada kapat
             if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
                 if (onSuggestionClickRef.current) onSuggestionClickRef.current(null);
+                setSearchFocused(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -125,10 +131,13 @@ const SharedHeader = ({
                             placeholder="Firma, ürün ya da kategori ara..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            onFocus={() => setSearchFocused(true)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && onSearchSubmit) {
                                     onSearchSubmit(search);
+                                    setSearchFocused(false);
                                 }
+                                if (e.key === 'Escape') setSearchFocused(false);
                             }}
                         />
 
@@ -168,6 +177,39 @@ const SharedHeader = ({
                                     <span className="material-symbols-outlined shared-suggestion-no-result-icon">search_off</span>
                                     <span>Sonuç bulunamadı</span>
                                 </div>
+                            </div>
+                        )}
+
+                        {/* Arama Geçmişi — suggestions/noResults yokken ve input boşken */}
+                        {searchFocused && suggestions.length === 0 && !noResults && (!search || search.length < 2) && searchHistory.length > 0 && (
+                            <div className="shared-search-suggestions shared-search-history">
+                                <div className="shared-history-header">
+                                    <span>Son Aramalar</span>
+                                    {onHistoryClear && (
+                                        <button className="shared-history-clear" onClick={onHistoryClear} type="button">Temizle</button>
+                                    )}
+                                </div>
+                                {searchHistory.map((term) => (
+                                    <div key={term} className="shared-history-item">
+                                        <div
+                                            className="shared-history-item-main"
+                                            onClick={() => { if (onHistorySelect) { onHistorySelect(term); setSearchFocused(false); } }}
+                                        >
+                                            <span className="material-symbols-outlined shared-history-icon">history</span>
+                                            <span>{term}</span>
+                                        </div>
+                                        {onHistoryRemove && (
+                                            <button
+                                                className="shared-history-remove"
+                                                type="button"
+                                                onClick={(e) => { e.stopPropagation(); onHistoryRemove(term); }}
+                                                aria-label="Geçmişten kaldır"
+                                            >
+                                                <span className="material-symbols-outlined">close</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
@@ -376,6 +418,41 @@ const SharedHeader = ({
                                                 </span>
                                             </button>
                                         )}
+                                        {isCurrentUserAdmin && (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/admin/chatbot-egitimi');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    smart_toy
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Chatbot Eğitimi
+                                                </span>
+                                            </button>
+                                        )}
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Admin dropdown — Onay Merkezi butonu */}
+                                        {isCurrentUserAdmin && (
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/admin/etiket-onay');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    verified
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Onay Merkezi
+                                                </span>
+                                            </button>
+                                        )}
 
                                         {!managedCompanyId && (
                                             <>
@@ -566,6 +643,19 @@ const SharedHeader = ({
                                 <Link to="/admin/iletisim-mesajlari" onClick={() => setIsMobileMenuOpen(false)}>
                                     <span className="material-symbols-outlined shared-mobile-menu-icon">contact_mail</span>
                                     İletişim Mesajları
+                                </Link>
+                            )}
+                            {isCurrentUserAdmin && (
+                                <Link to="/admin/chatbot-egitimi" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span className="material-symbols-outlined shared-mobile-menu-icon">smart_toy</span>
+                                    Chatbot Eğitimi
+                                </Link>
+                            )}
+                            {/* Enes Doğanay | 2 Mayıs 2026: Mobil menü — Onay Merkezi linki */}
+                            {isCurrentUserAdmin && (
+                                <Link to="/admin/etiket-onay" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <span className="material-symbols-outlined shared-mobile-menu-icon">verified</span>
+                                    Onay Merkezi
                                 </Link>
                             )}
                             <button
