@@ -1291,3 +1291,302 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Enes Doğanay | 2 Mayıs 2026: Faz 9 — Register dark mode */
+[data-theme="dark"] .reg-modal {
+  background: #1e293b;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .reg-modal-header {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .reg-modal-header-inner h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .reg-modal-close {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .reg-modal-close:hover {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .reg-modal-section {
+  border-bottom-color: #1e293b;
+}
+
+[data-theme="dark"] .reg-modal-section h3 {
+  color: #64748b;
+}
+
+[data-theme="dark"] .reg-modal-section p,
+[data-theme="dark"] .reg-modal-section ul {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .reg-modal-notice {
+  background: rgba(29, 78, 216, 0.15);
+  border-color: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .reg-modal-notice--green {
+  background: rgba(21, 128, 61, 0.15);
+  border-color: #14532d;
+  color: #4ade80;
+}
+
+[data-theme="dark"] .reg-modal-law-badge {
+  background: rgba(120, 88, 0, 0.2);
+  border-color: #78350f;
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .reg-modal-footer {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .reg-modal-decline-btn {
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .reg-modal-decline-btn:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .reg-modal-small-note {
+  color: #475569;
+}
+
+[data-theme="dark"] .registration-card {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .tabs {
+  background-color: #0f172a;
+}
+
+[data-theme="dark"] .tab-btn.active {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .form-input {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-input:focus {
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.2);
+}
+
+[data-theme="dark"] .form-input::placeholder {
+  color: #475569;
+}
+
+[data-theme="dark"] .form-input:-webkit-autofill,
+[data-theme="dark"] .form-input:-webkit-autofill:hover,
+[data-theme="dark"] .form-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .form-textarea {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-textarea:focus {
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.18);
+}
+
+[data-theme="dark"] .photo-upload-box {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .photo-upload-box:hover {
+  background-color: #1e3a5f;
+}
+
+[data-theme="dark"] .firma-autocomplete-dropdown {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .firma-autocomplete-item:hover {
+  background: #334155;
+}
+
+[data-theme="dark"] .firma-autocomplete-name {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .firma-autocomplete-location {
+  color: #64748b;
+}
+
+[data-theme="dark"] .firma-autocomplete-managed-badge {
+  background: rgba(29, 78, 216, 0.2);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .register-notification--success {
+  background-color: rgba(6, 95, 70, 0.2);
+  color: #4ade80;
+  border-color: #14532d;
+}
+
+[data-theme="dark"] .register-notification--error {
+  background-color: rgba(127, 29, 29, 0.2);
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .corporate-process-box {
+  background: #1a2d45;
+  border-color: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .auth-doc-section {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .auth-doc-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .auth-doc-desc {
+  color: #64748b;
+}
+
+[data-theme="dark"] .auth-doc-upload-area {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .auth-doc-upload-area:hover {
+  border-color: #3b9eff;
+  background: #1a2d45;
+}
+
+[data-theme="dark"] .auth-doc-upload--error .auth-doc-upload-area {
+  border-color: #ef4444;
+  background: rgba(127, 29, 29, 0.15);
+}
+
+[data-theme="dark"] .auth-doc-upload-text {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .auth-doc-remove {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .auth-doc-remove:hover {
+  background: rgba(127, 29, 29, 0.2);
+}
+
+[data-theme="dark"] .corporate-address-block {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .corporate-address-block legend {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .corporate-address-block .form-select:disabled {
+  background-color: #1e293b;
+}
+
+[data-theme="dark"] .corporate-success-state {
+  background: linear-gradient(180deg, #1e293b 0%, #162033 100%);
+  border-color: #1e3a5f;
+}
+
+[data-theme="dark"] .corporate-success-state h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .corporate-success-state p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .corporate-success-step {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .corporate-success-step span {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .register-google-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .register-google-btn:hover {
+  background: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .register-linkedin-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .register-linkedin-btn:hover {
+  background: #1a2d45;
+  box-shadow: 0 2px 8px rgba(10, 102, 194, 0.2);
+}
+
+[data-theme="dark"] .register-divider {
+  color: #475569;
+}
+
+[data-theme="dark"] .register-divider::before,
+[data-theme="dark"] .register-divider::after {
+  background: #334155;
+}
+
+[data-theme="dark"] .marketing-info-btn {
+  background: rgba(67, 56, 202, 0.25);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .marketing-info-btn:hover {
+  background: rgba(67, 56, 202, 0.4);
+}
+
+[data-theme="dark"] .register-btn-secondary-soft {
+  background: rgba(29, 78, 216, 0.15);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .register-btn-secondary-soft:hover {
+  background: rgba(29, 78, 216, 0.25);
+}

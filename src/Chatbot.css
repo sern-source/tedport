@@ -58,7 +58,7 @@
   z-index: 9998;
   width: 360px;
   max-height: 540px;
-  background: #fff;
+  background: var(--bg-white);
   border-radius: 20px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
   display: flex;
@@ -165,7 +165,7 @@
   background: transparent;
 }
 .cb-messages::-webkit-scrollbar-thumb {
-  background: #e5e7eb;
+  background: var(--border);
   border-radius: 4px;
 }
 
@@ -190,8 +190,8 @@
 }
 
 .cb-bubble--bot {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: var(--bg-light);
+  color: var(--text-dark);
   border-bottom-left-radius: 4px;
 }
 
@@ -226,7 +226,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #9ca3af;
+  background: var(--text-light);
   display: inline-block;
   animation: cb-bounce 1.2s infinite ease-in-out;
 }
@@ -249,7 +249,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -278,29 +278,29 @@
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
 .cb-input {
   flex: 1;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 12px;
   padding: 9px 13px;
   font-size: 13.5px;
-  color: #1f2937;
+  color: var(--text-dark);
   outline: none;
   transition: border-color 0.15s;
-  background: #f9fafb;
+  background: var(--bg-light);
 }
 
 .cb-input:focus {
-  border-color: #1a56db;
-  background: #fff;
+  border-color: var(--primary);
+  background: var(--bg-white);
 }
 
 .cb-input::placeholder {
-  color: #9ca3af;
+  color: var(--text-light);
 }
 
 .cb-send {
@@ -340,4 +340,31 @@
     right: 16px;
     bottom: 20px;
   }
+}
+
+/* ── Dark Mode ─────────────────────────────────────────────────── */
+/* Enes Doğanay | 2 Mayıs 2026: Faz 4 — chatbot dark mode override'ları */
+
+[data-theme="dark"] .cb-badge {
+  border-color: var(--bg-light);
+}
+
+[data-theme="dark"] .cb-bubble--bot .cb-link {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .cb-bubble--bot .cb-link:hover {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .cb-quick-btn {
+  background: #1e2d4a;
+  color: #60a5fa;
+  border-color: #1e40af;
+}
+
+[data-theme="dark"] .cb-quick-btn:hover {
+  background: #1a56db;
+  color: #fff;
+  border-color: #1a56db;
 }

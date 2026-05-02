@@ -13,6 +13,7 @@ import { listMyTenders, createTender, updateTender, deleteTender } from './ihale
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
 import CitySelect from './CitySelect';
 import SimpleSelect from './SimpleSelect';
+import DatePicker from './DatePicker'; // Enes Doğanay | 2 Mayıs 2026: Özel takvim
 // Enes Doğanay | 10 Nisan 2026: Auth context — teklif popup'ında kullanıcı bilgisi
 import { useAuth } from './AuthContext';
 
@@ -412,6 +413,7 @@ const IhalelerPage = () => {
     };
 
     // Enes Doğanay | 10 Nisan 2026: İhaleyi klonla (tekrarla) — yeni referans no ile aynı verileri kopyalar
+    // Enes Doğanay | 2 Mayıs 2026: Tarihler — açılış bugün, kapanış orijinal süre kadar sonra
     const handleClone = async (tender) => {
         const refNo = await generateReferansNo();
         setEditingTender(null);
@@ -422,13 +424,28 @@ const IhalelerPage = () => {
             teslimIl = parts[0] || '';
             teslimIlce = parts[1] || '';
         }
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
+        const toYMD = (d) => d.toISOString().split('T')[0];
+        const yayinTarihi = toYMD(todayDate);
+        let sonBasvuruTarihi = '';
+        if (tender.yayin_tarihi && tender.son_basvuru_tarihi) {
+            const orig_start = new Date(tender.yayin_tarihi);
+            const orig_end   = new Date(tender.son_basvuru_tarihi);
+            const diffDays   = Math.round((orig_end - orig_start) / (1000 * 60 * 60 * 24));
+            if (diffDays > 0) {
+                const endDate = new Date(todayDate);
+                endDate.setDate(endDate.getDate() + diffDays);
+                sonBasvuruTarihi = toYMD(endDate);
+            }
+        }
         setForm({
             baslik: tender.baslik || '',
             aciklama: tender.aciklama || '',
             ihale_tipi: tender.ihale_tipi || 'Açık İhale',
             kdv_durumu: tender.kdv_durumu || 'haric',
-            yayin_tarihi: '',
-            son_basvuru_tarihi: '',
+            yayin_tarihi: yayinTarihi,
+            son_basvuru_tarihi: sonBasvuruTarihi,
             teslim_suresi: tender.teslim_suresi || '',
             durum: 'draft',
             referans_no: refNo,
@@ -1502,12 +1519,12 @@ const IhalelerPage = () => {
 
                                             <label className="ihale-field">
                                                 <span>İhale Açılış Tarihi *</span>
-                                                <input type="date" value={form.yayin_tarihi} onChange={e => setForm(p => ({ ...p, yayin_tarihi: e.target.value }))} />
+                                                <DatePicker value={form.yayin_tarihi} onChange={val => setForm(p => ({ ...p, yayin_tarihi: val }))} />
                                             </label>
 
                                             <label className="ihale-field">
                                                 <span>İhale Kapanış Tarihi *</span>
-                                                <input type="date" value={form.son_basvuru_tarihi} onChange={e => setForm(p => ({ ...p, son_basvuru_tarihi: e.target.value }))} />
+                                                <DatePicker value={form.son_basvuru_tarihi} onChange={val => setForm(p => ({ ...p, son_basvuru_tarihi: val }))} min={form.yayin_tarihi || undefined} />
                                             </label>
 
                                             <label className="ihale-field">

@@ -180,7 +180,7 @@ const FirmaProfil = () => {
                 const firmaIds = favsRes.data.map(f => f.firma_id);
                 const reminderMap = new Map((remindersRes.data || []).map(r => [String(r.note_id), r]));
                 const [firmsData, notesData] = await Promise.all([
-                    supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
+                    supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce, logo_url').in('firmaID', firmaIds),
                     supabase.from('kisisel_notlar').select('*').eq('user_id', userSession.user.id).in('firma_id', firmaIds)
                 ]);
                 setFavorites(favsRes.data.map(fav => {
@@ -192,6 +192,7 @@ const FirmaProfil = () => {
                         id: fav.id, firma_id: fav.firma_id, liste_id: fav.liste_id, created_at: fav.created_at,
                         name: firm.firma_adi || 'Bilinmeyen Firma', category: firm.category_name || 'Kategori Yok',
                         location: firm.il_ilce || 'Konum Yok', note: parsedNote.body,
+                        logo_url: firm.logo_url?.includes('firma-logolari') ? firm.logo_url : null,
                         notes: allNotes.map(n => {
                             const p = parseNotePayload(n.not_metni);
                             return { id: n.id, title: p.title, body: p.body, created_at: n.created_at, updated_at: n.updated_at, reminder: reminderMap.get(String(n.id)) || null };
@@ -1610,8 +1611,12 @@ const FirmaProfil = () => {
                                                     </div>
                                                 )}
 
-                                                <div className="fav-avatar" style={{ background: fav.color }}>
-                                                    {fav.name.substring(0, 2).toUpperCase()}
+                                                {/* Enes Doğanay | 2 Mayıs 2026: logo varsa gerçek logo, yoksa default logo */}
+                                                <div className="fav-avatar" style={fav.logo_url ? { background: '#ffffff' } : { background: fav.color }}>
+                                                    {fav.logo_url ? (
+                                                        <img src={fav.logo_url} alt={fav.name} className="fav-avatar-logo" onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }} />
+                                                    ) : null}
+                                                    <img src="/tedport_default_company_logo.png" alt="Logo" className="fav-avatar-logo" style={{ display: fav.logo_url ? 'none' : 'block' }} />
                                                 </div>
 
                                                 <div className="fav-body">

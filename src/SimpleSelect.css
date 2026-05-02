@@ -128,3 +128,73 @@
   color: #137fec;
   margin-left: auto;
 }
+
+/* ════════════════════════════════════════════════════ */
+/* Enes Doğanay | 2 Mayıs 2026: SimpleSelect dark mode */
+/* ════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .simple-select-trigger {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .simple-select-trigger:hover {
+  border-color: #475569;
+}
+
+[data-theme="dark"] .simple-select-trigger--open {
+  background: #1e293b;
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.15);
+}
+
+[data-theme="dark"] .simple-select-icon {
+  color: #64748b;
+}
+
+[data-theme="dark"] .simple-select-placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .simple-select-value {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .simple-select-arrow {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .simple-select-dropdown {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .simple-select-option {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .simple-select-option:hover {
+  background: #1e3a5f;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .simple-select-option--active {
+  background: #1e3a5f;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .simple-select-opt-icon {
+  color: #64748b;
+}
+
+[data-theme="dark"] .simple-select-option:hover .simple-select-opt-icon,
+[data-theme="dark"] .simple-select-option--active .simple-select-opt-icon {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .simple-select-opt-check {
+  color: #60a5fa;
+}

@@ -9,6 +9,8 @@ import { supabase } from './supabaseClient';
 import { submitCorporateApplication } from './corporateApplicationsApi';
 // Enes Doğanay | 8 Nisan 2026: İl/İlçe dropdown'ları için Türkiye veri seti
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
+// Enes Doğanay | 2 Mayıs 2026: Modern dropdown bileşenleri — native select yerine
+import CitySelect from './CitySelect';
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal form ilk degerleri tek nesnede toplanir
 // Enes Doğanay | 8 Nisan 2026: selectedFirmaId eklendi — mevcut firma seçimi için
@@ -825,34 +827,27 @@ const RegistrationPage = () => {
                     <div className="form-row">
                       <div className="input-group">
                         <label>İl</label>
-                        <select
-                          className={`form-input form-select${corporateErrors.companyIl ? ' form-input--error' : ''}`}
+                        {/* Enes Doğanay | 2 Mayıs 2026: Native select → CitySelect */}
+                        <CitySelect
                           value={corporateForm.companyIl}
-                          onChange={(event) => {
-                            handleCorporateInputChange('companyIl', event.target.value);
+                          onChange={(val) => {
+                            handleCorporateInputChange('companyIl', val);
                             handleCorporateInputChange('companyIlce', '');
                           }}
-                        >
-                          <option value="">İl seçin</option>
-                          {Object.keys(TURKEY_DISTRICTS).sort((a, b) => a.localeCompare(b, 'tr')).map((il) => (
-                            <option key={il} value={il}>{il}</option>
-                          ))}
-                        </select>
+                          placeholder="İl seçin"
+                        />
                         {corporateErrors.companyIl && <span className="field-error-text">{corporateErrors.companyIl}</span>}
                       </div>
                       <div className="input-group">
                         <label>İlçe</label>
-                        <select
-                          className={`form-input form-select${corporateErrors.companyIlce ? ' form-input--error' : ''}`}
+                        {/* Enes Doğanay | 2 Mayıs 2026: Native select → CitySelect options prop ile */}
+                        <CitySelect
                           value={corporateForm.companyIlce}
-                          onChange={(event) => handleCorporateInputChange('companyIlce', event.target.value)}
-                          disabled={!corporateForm.companyIl}
-                        >
-                          <option value="">İlçe seçin</option>
-                          {(TURKEY_DISTRICTS[corporateForm.companyIl] || []).map((ilce) => (
-                            <option key={ilce} value={ilce}>{ilce}</option>
-                          ))}
-                        </select>
+                          onChange={(val) => handleCorporateInputChange('companyIlce', val)}
+                          options={TURKEY_DISTRICTS[corporateForm.companyIl] || []}
+                          placeholder={corporateForm.companyIl ? 'İlçe seçin' : 'Önce il seçin'}
+                          icon="map"
+                        />
                         {corporateErrors.companyIlce && <span className="field-error-text">{corporateErrors.companyIlce}</span>}
                       </div>
                     </div>

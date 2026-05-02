@@ -178,3 +178,98 @@
   font-size: 0.85rem;
   color: #9ca3af;
 }
+
+/* ════════════════════════════════════════ */
+/* Enes Doğanay | 2 Mayıs 2026: CitySelect dark mode override */
+/* ════════════════════════════════════════ */
+
+[data-theme="dark"] .city-select-trigger {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .city-select-trigger:hover {
+  border-color: #475569;
+}
+
+[data-theme="dark"] .city-select-trigger--open {
+  background: #1e293b;
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.15);
+}
+
+[data-theme="dark"] .city-select-placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .city-select-value {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .city-select-arrow {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .city-select-clear:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .city-select-dropdown {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .city-select-search-wrap {
+  background: #0f172a;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .city-select-search-wrap .material-symbols-outlined {
+  color: #64748b;
+}
+
+[data-theme="dark"] .city-select-search {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .city-select-search::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .city-select-list::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+[data-theme="dark"] .city-select-list::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+[data-theme="dark"] .city-select-option {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .city-select-option:hover {
+  background: #1e3a5f;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .city-select-option--active {
+  background: #1e3a5f;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .city-select-option-icon {
+  color: #64748b;
+}
+
+[data-theme="dark"] .city-select-option:hover .city-select-option-icon,
+[data-theme="dark"] .city-select-option--active .city-select-option-icon {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .city-select-empty {
+  color: #64748b;
+}

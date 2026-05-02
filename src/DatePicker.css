@@ -1,0 +1,656 @@
+/* Enes Doğanay | 2 Mayıs 2026: Özel takvim bileşeni stilleri */
+
+/* ═══════════════════════════════════ */
+/*  Trigger                           */
+/* ═══════════════════════════════════ */
+.dp {
+    position: relative;
+    width: 100%;
+}
+
+.dp-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--bg-white);
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: left;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.dp-trigger:hover {
+    border-color: #93c5fd;
+}
+
+.dp-trigger--open {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dp-icon {
+    font-size: 18px;
+    color: #94a3b8;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.dp-trigger--open .dp-icon {
+    color: #3b82f6;
+}
+
+.dp-placeholder {
+    flex: 1;
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.dp-value {
+    flex: 1;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.dp-clear {
+    font-size: 16px;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 2px;
+    line-height: 1;
+    transition: color 0.15s, background 0.15s;
+    user-select: none;
+}
+
+.dp-clear:hover {
+    color: var(--text-dark);
+    background: var(--bg-light);
+}
+
+/* ═══════════════════════════════════ */
+/*  Panel                             */
+/* ═══════════════════════════════════ */
+.dp-panel {
+    background: var(--bg-white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.13), 0 4px 12px rgba(15, 23, 42, 0.07);
+    overflow: hidden;
+    animation: dpIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dpIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header */
+.dp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-light);
+}
+
+.dp-month {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    user-select: none;
+    letter-spacing: -0.01em;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Başlık tıklanabilir buton */
+.dp-month--btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.dp-month--btn:hover {
+    background: var(--border);
+}
+
+.dp-month-chevron {
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.dp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    padding: 0;
+}
+
+.dp-nav:hover {
+    background: var(--border);
+    color: var(--text-dark);
+}
+
+.dp-nav .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Yıl seçim grid'i */
+.dp-year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 10px 10px 4px;
+}
+
+.dp-year-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 4px;
+    border: none;
+    background: none;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    font-weight: 500;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+}
+
+.dp-year-btn:hover {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.dp-year-btn--today {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.dp-year-btn--selected {
+    background: #2563eb !important;
+    color: #fff !important;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Grid */
+.dp-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding: 8px 10px 4px;
+}
+
+.dp-weekday {
+    text-align: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    padding: 4px 0 6px;
+    letter-spacing: 0.04em;
+}
+
+.dp-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    padding: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.dp-day:hover:not(:disabled) {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.dp-day--other {
+    color: var(--text-light);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.dp-day--today {
+    color: #2563eb;
+    font-weight: 700;
+    position: relative;
+}
+
+.dp-day--today::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #2563eb;
+}
+
+.dp-day--selected {
+    background: #2563eb !important;
+    color: #fff !important;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.dp-day--selected::after { display: none; }
+
+.dp-day--disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Footer */
+.dp-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+}
+
+.dp-footer-clear,
+.dp-footer-today {
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 7px;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.dp-footer-clear {
+    color: var(--text-muted);
+}
+
+.dp-footer-clear:hover {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.dp-footer-today {
+    color: #2563eb;
+}
+
+.dp-footer-today:hover {
+    background: #eff6ff;
+}
+
+/* ═══════════════════════════════════ */
+/*  Amber variant (FirmaDetay)        */
+/* ═══════════════════════════════════ */
+.dp--amber .dp-trigger {
+    border-color: #e7d7bc;
+    background: #fff;
+    color: #5a4528;
+    border-radius: 12px;
+    height: 42px;
+    border-width: 1px;
+}
+
+.dp--amber .dp-trigger:hover {
+    border-color: #ddb469;
+}
+
+.dp--amber .dp-trigger--open {
+    border-color: #ddb469;
+    box-shadow: 0 0 0 4px rgba(221, 180, 105, 0.12);
+}
+
+.dp--amber .dp-icon {
+    color: #a07840;
+}
+
+.dp--amber .dp-trigger--open .dp-icon {
+    color: #c4832a;
+}
+
+.dp--amber .dp-panel {
+    border-color: #e7d7bc;
+    box-shadow: 0 12px 40px rgba(90, 60, 20, 0.18), 0 4px 12px rgba(90, 60, 20, 0.1);
+}
+
+.dp--amber .dp-header {
+    background: #fdf8f0;
+    border-bottom-color: #e7d7bc;
+}
+
+.dp--amber .dp-nav:hover {
+    background: #f5e9d4;
+    color: #7a5528;
+}
+
+.dp--amber .dp-weekday {
+    color: #c8a97a;
+}
+
+.dp--amber .dp-day:hover:not(:disabled) {
+    background: #fdf3e0;
+    color: #c4832a;
+}
+
+.dp--amber .dp-day--today {
+    color: #c4832a;
+}
+
+.dp--amber .dp-day--today::after {
+    background: #c4832a;
+}
+
+.dp--amber .dp-day--selected {
+    background: #d97706 !important;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+}
+
+.dp--amber .dp-footer {
+    border-top-color: #e7d7bc;
+}
+
+.dp--amber .dp-footer-clear:hover {
+    background: #fdf3e0;
+    color: #7a5528;
+}
+
+.dp--amber .dp-footer-today {
+    color: #c4832a;
+}
+
+.dp--amber .dp-footer-today:hover {
+    background: #fdf3e0;
+}
+
+/* ═══════════════════════════════════ */
+/*  Dark mode — blue (default)        */
+/* ═══════════════════════════════════ */
+[data-theme="dark"] .dp-trigger {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .dp-trigger:hover {
+    border-color: #475569;
+}
+
+[data-theme="dark"] .dp-trigger--open {
+    border-color: #3b9eff;
+    box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.15);
+}
+
+[data-theme="dark"] .dp-icon {
+    color: #64748b;
+}
+
+[data-theme="dark"] .dp-trigger--open .dp-icon {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .dp-placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .dp-clear:hover {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .dp-panel {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .dp-header {
+    background: #0f172a;
+    border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .dp-month {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .dp-nav {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .dp-nav:hover {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .dp-month--btn:hover {
+    background: #334155;
+}
+
+[data-theme="dark"] .dp-month-chevron {
+    color: #64748b;
+}
+
+[data-theme="dark"] .dp-year-btn {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .dp-year-btn:hover {
+    background: #1e3a5f;
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .dp-year-btn--today {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .dp-year-btn--selected {
+    background: #2563eb !important;
+    color: #fff !important;
+}
+
+[data-theme="dark"] .dp-weekday {
+    color: #475569;
+}
+
+[data-theme="dark"] .dp-day {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .dp-day:hover:not(:disabled) {
+    background: #1e3a5f;
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .dp-day--other {
+    color: #334155;
+}
+
+[data-theme="dark"] .dp-day--today {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .dp-day--today::after {
+    background: #60a5fa;
+}
+
+[data-theme="dark"] .dp-footer {
+    border-top-color: #334155;
+}
+
+[data-theme="dark"] .dp-footer-clear {
+    color: #64748b;
+}
+
+[data-theme="dark"] .dp-footer-clear:hover {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .dp-footer-today {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .dp-footer-today:hover {
+    background: #1e3a5f;
+}
+
+/* ═══════════════════════════════════════ */
+/*  Dark mode — amber variant override    */
+/* ═══════════════════════════════════════ */
+[data-theme="dark"] .dp--amber .dp-trigger {
+    background: rgba(14, 10, 4, 0.7);
+    border-color: rgba(160, 115, 45, 0.4);
+    color: #dfc8a0;
+}
+
+[data-theme="dark"] .dp--amber .dp-trigger:hover {
+    border-color: rgba(196, 131, 42, 0.6);
+}
+
+[data-theme="dark"] .dp--amber .dp-trigger--open {
+    border-color: #c4832a;
+    box-shadow: 0 0 0 3px rgba(196, 131, 42, 0.12);
+}
+
+[data-theme="dark"] .dp--amber .dp-icon {
+    color: #8a7050;
+}
+
+[data-theme="dark"] .dp--amber .dp-trigger--open .dp-icon {
+    color: #c4832a;
+}
+
+[data-theme="dark"] .dp--amber .dp-panel {
+    background: #1c1408;
+    border-color: rgba(160, 115, 45, 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+}
+
+[data-theme="dark"] .dp--amber .dp-header {
+    background: rgba(14, 10, 4, 0.8);
+    border-bottom-color: rgba(160, 115, 45, 0.25);
+}
+
+[data-theme="dark"] .dp--amber .dp-month {
+    color: #dfc8a0;
+}
+
+[data-theme="dark"] .dp--amber .dp-nav {
+    color: #8a7050;
+}
+
+[data-theme="dark"] .dp--amber .dp-nav:hover {
+    background: rgba(160, 115, 45, 0.2);
+    color: #dfc8a0;
+}
+
+[data-theme="dark"] .dp--amber .dp-month--btn:hover {
+    background: rgba(160, 115, 45, 0.15);
+}
+
+[data-theme="dark"] .dp--amber .dp-year-btn {
+    color: #c8a97a;
+}
+
+[data-theme="dark"] .dp--amber .dp-year-btn:hover {
+    background: rgba(196, 131, 42, 0.15);
+    color: #f5d49a;
+}
+
+[data-theme="dark"] .dp--amber .dp-year-btn--today {
+    color: #e8a84a;
+}
+
+[data-theme="dark"] .dp--amber .dp-year-btn--selected {
+    background: #c4832a !important;
+    box-shadow: 0 2px 8px rgba(196, 131, 42, 0.4);
+}
+
+[data-theme="dark"] .dp--amber .dp-weekday {
+    color: #5c4a2e;
+}
+
+[data-theme="dark"] .dp--amber .dp-day {
+    color: #c8a97a;
+}
+
+[data-theme="dark"] .dp--amber .dp-day:hover:not(:disabled) {
+    background: rgba(196, 131, 42, 0.15);
+    color: #f5d49a;
+}
+
+[data-theme="dark"] .dp--amber .dp-day--other {
+    color: #3d2d15;
+}
+
+[data-theme="dark"] .dp--amber .dp-day--today {
+    color: #e8a84a;
+}
+
+[data-theme="dark"] .dp--amber .dp-day--today::after {
+    background: #e8a84a;
+}
+
+[data-theme="dark"] .dp--amber .dp-day--selected {
+    background: #c4832a !important;
+    box-shadow: 0 2px 8px rgba(196, 131, 42, 0.4);
+}
+
+[data-theme="dark"] .dp--amber .dp-footer {
+    border-top-color: rgba(160, 115, 45, 0.25);
+}
+
+[data-theme="dark"] .dp--amber .dp-footer-clear {
+    color: #6b5030;
+}
+
+[data-theme="dark"] .dp--amber .dp-footer-clear:hover {
+    background: rgba(160, 115, 45, 0.15);
+    color: #dfc8a0;
+}
+
+[data-theme="dark"] .dp--amber .dp-footer-today {
+    color: #e8a84a;
+}
+
+[data-theme="dark"] .dp--amber .dp-footer-today:hover {
+    background: rgba(196, 131, 42, 0.15);
+}

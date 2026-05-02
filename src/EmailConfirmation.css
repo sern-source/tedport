@@ -233,3 +233,23 @@
   font-size: 0.75rem;
   margin: 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: EmailConfirmation.css dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .ec-secondary-section {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .ec-subtitle {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .ec-status-success {
+  color: #86efac;
+}
+
+[data-theme="dark"] .ec-status-error {
+  color: #fca5a5;
+}

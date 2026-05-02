@@ -212,13 +212,13 @@ body {
 .claim-profile-text strong {
   display: block;
   font-size: 0.95rem;
-  color: #1e293b;
+  color: var(--text-dark);
   margin-bottom: 4px;
 }
 
 .claim-profile-text p {
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
 }
@@ -279,8 +279,8 @@ body {
 }
 
 .stat-item {
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
   padding: 6px 12px;
   border-radius: var(--radius-lg);
   font-size: 0.875rem;
@@ -330,7 +330,7 @@ body {
 }
 
 .btn-outline {
-  background: white;
+  background: var(--bg-white);
   border-color: var(--border);
   color: var(--text-dark);
 }
@@ -344,7 +344,7 @@ body {
   position: sticky;
   top: 64px;
   z-index: 40;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(var(--bg-white-rgb, 255,255,255), 0.95);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
 }
@@ -430,7 +430,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: white;
+  background: var(--bg-white);
 }
 
 .product-thumb {
@@ -472,7 +472,7 @@ body {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: white;
+  background: var(--bg-white);
   padding: 4px 8px;
   font-size: 0.75rem;
   font-weight: 700;
@@ -539,7 +539,7 @@ body {
 
 .accordion-content {
   padding: 0 1rem 1rem 1rem;
-  background: rgba(239, 242, 255, 0.5);
+  background: var(--bg-light);
   border-top: 1px solid var(--border);
   animation: slideDown 0.3s ease;
 }
@@ -748,7 +748,7 @@ body {
 
 .about-text {
   line-height: 1.7;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 /* Accordion Extras */
@@ -844,13 +844,13 @@ body {
 .firma-tenders-gate .tenders-blur-cta h3 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-dark);
   margin: 0 0 6px;
 }
 
 .firma-tenders-gate .tenders-blur-cta p {
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin: 0 0 16px;
 }
 
@@ -875,7 +875,7 @@ body {
   display: block;
   margin-top: 10px;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--text-light);
 }
 
 .firma-tenders-gate .tenders-blur-register button {
@@ -919,7 +919,7 @@ body {
 .tender-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
-  color: #0f172a;
+  color: var(--text-dark);
   font-weight: 600;
 }
 
@@ -960,9 +960,9 @@ body {
 .tenders-empty-state-inline {
   padding: 18px 20px;
   border-radius: 18px;
-  border: 1px dashed #d7dee8;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  color: #64748b;
+  border: 1px dashed var(--border);
+  background: var(--bg-white);
+  color: var(--text-muted);
   line-height: 1.7;
 }
 
@@ -1003,7 +1003,7 @@ body {
 }
 
 .sidebar-card-contact {
-  background: #ffffff;
+  background: var(--bg-white);
 }
 
 .sidebar-heading {
@@ -1039,11 +1039,11 @@ body {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  color: #334155;
+  border: 1px solid var(--border);
+  color: var(--text-dark);
   font-size: 13px;
   outline: none;
-  background: #fff;
+  background: var(--bg-white);
 }
 
 .list-select:focus {
@@ -1053,7 +1053,7 @@ body {
 
 .list-helper-text {
   margin: 8px 0 0;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.78rem;
   line-height: 1.4;
 }
@@ -1100,10 +1100,11 @@ body {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   font-size: 0.92rem;
-  color: #0f172a;
+  color: var(--text-dark);
   outline: none;
+  background: var(--bg-white);
 }
 
 .create-list-inline-input:focus {
@@ -1143,14 +1144,14 @@ body {
 }
 
 .create-list-inline-cancel {
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  color: #475569;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  color: var(--text-muted);
 }
 
 .create-list-inline-cancel:hover:not(:disabled) {
-  background: #f8fafc;
-  border-color: #94a3b8;
+  background: var(--bg-light);
+  border-color: var(--text-light);
 }
 
 @media (max-width: 480px) {
@@ -1222,7 +1223,7 @@ body {
 /* Enes Doğanay | 6 Nisan 2026: Aktif favorinin hangi listede oldugu buton altinda gosterilir */
 .favorite-list-status {
   margin: 2px 0 0;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.82rem;
   line-height: 1.5;
   text-align: center;
@@ -1291,7 +1292,7 @@ body {
 
 .contact-gated-text {
   margin: 0;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.85rem;
   line-height: 1.5;
   text-align: center;
@@ -1357,14 +1358,14 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  color: #475569;
+  color: var(--text-muted);
   font-size: 0.9rem;
   line-height: 1.6;
 }
 
 .contact-info-stack {
   margin-top: 14px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .contact-info-stack .contact-info-row {
@@ -1372,7 +1373,7 @@ body {
 }
 
 .contact-info-stack .contact-info-row+.contact-info-row {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .contact-info-link {
@@ -1424,6 +1425,53 @@ body {
   gap: 12px;
   margin-bottom: 18px;
   flex-wrap: wrap;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Collapsible başlık — buton olarak çalışır */
+.notes-header--toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 0;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+
+.notes-header--toggle:hover {
+  background: rgba(180, 130, 55, 0.06);
+}
+
+[data-theme="dark"] .notes-header--toggle:hover {
+  background: rgba(180, 130, 55, 0.08);
+}
+
+.notes-card--open .notes-header--toggle {
+  margin-bottom: 18px;
+}
+
+.notes-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.notes-chevron {
+  font-size: 22px;
+  color: rgba(140, 100, 40, 0.6);
+  transition: transform 0.2s;
+}
+
+.notes-card--open .notes-chevron {
+  transform: rotate(180deg);
+}
+
+[data-theme="dark"] .notes-chevron {
+  color: rgba(180, 130, 55, 0.5);
 }
 
 .notes-header-icon {
@@ -1743,11 +1791,34 @@ body {
   opacity: 0.7;
 }
 
+/* Enes Doğanay | 2 Mayıs 2026: max-height + scroll — çok fazla not girilince iletişim bölümü kaybolmasın */
 .notes-feed {
   display: flex;
   flex-direction: column;
   gap: 14px;
   margin-top: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(180, 130, 55, 0.35) transparent;
+}
+
+.notes-feed::-webkit-scrollbar {
+  width: 4px;
+}
+
+.notes-feed::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notes-feed::-webkit-scrollbar-thumb {
+  background: rgba(180, 130, 55, 0.35);
+  border-radius: 999px;
+}
+
+[data-theme="dark"] .notes-feed {
+  scrollbar-color: rgba(180, 130, 55, 0.25) transparent;
 }
 
 .notes-group {
@@ -1875,7 +1946,7 @@ body {
 }
 
 .saved-note-delete-text {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 700;
   margin-right: 2px;
@@ -2001,23 +2072,23 @@ body {
 }
 
 .notes-lock-icon {
-  color: #d1d5db;
+  color: var(--border);
   font-size: 32px;
   margin-bottom: 8px;
 }
 
 .notes-login-text {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 15px;
 }
 
 .notes-login-btn {
   width: 100%;
   padding: 8px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  color: #374151;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  color: var(--text-dark);
   border-radius: 999px;
   font-weight: 700;
   cursor: pointer;
@@ -2025,8 +2096,8 @@ body {
 }
 
 .notes-login-btn:hover {
-  background: #f8fafc;
-  color: #111827;
+  background: var(--bg-light);
+  color: var(--text-dark);
 }
 
 /* Enes Doğanay | 7 Nisan 2026: Teklif İste popup modal stilleri */
@@ -2058,7 +2129,7 @@ body {
 }
 
 .quote-modal {
-  background: #ffffff;
+  background: var(--bg-white);
   border-radius: 16px;
   width: 100%;
   max-width: 520px;
@@ -2078,13 +2149,13 @@ body {
 .quote-modal-header h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-dark);
   margin: 0;
 }
 
 .quote-modal-subtitle {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 4px 0 0;
 }
 
@@ -2094,13 +2165,13 @@ body {
   cursor: pointer;
   padding: 4px;
   border-radius: 8px;
-  color: #9ca3af;
+  color: var(--text-light);
   transition: all 0.15s;
 }
 
 .quote-modal-close:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--bg-light);
+  color: var(--text-dark);
 }
 
 .quote-modal-body {
@@ -2120,7 +2191,7 @@ body {
 .quote-form-group label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-dark);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -2130,12 +2201,12 @@ body {
 .quote-form-group textarea,
 .quote-form-group select {
   padding: 10px 12px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 0.9rem;
   font-family: 'Inter', sans-serif;
-  color: #111827;
-  background: #fafbfc;
+  color: var(--text-dark);
+  background: var(--bg-light);
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
   width: 100%;
@@ -2151,7 +2222,7 @@ body {
 .quote-form-group select:focus {
   border-color: #137fec;
   box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
-  background: #ffffff;
+  background: var(--bg-white);
 }
 
 .quote-form-group textarea {
@@ -2169,15 +2240,15 @@ body {
   align-items: flex-start;
   gap: 8px;
   font-size: 0.78rem;
-  color: #9ca3af;
-  background: #f8fafc;
+  color: var(--text-light);
+  background: var(--bg-light);
   border-radius: 8px;
   padding: 10px 12px;
 }
 
 .quote-form-info .material-symbols-outlined {
   font-size: 16px;
-  color: #9ca3af;
+  color: var(--text-light);
   margin-top: 1px;
   flex-shrink: 0;
 }
@@ -2189,7 +2260,7 @@ body {
   gap: 0.75rem;
   padding: 1rem 1.5rem 1.5rem;
   justify-content: flex-end;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border);
 }
 
 .quote-btn-cancel {
@@ -2201,17 +2272,17 @@ body {
   font-weight: 600 !important;
   font-size: 0.9rem !important;
   line-height: 1.25 !important;
-  border: 1.5px solid #e5e7eb !important;
-  background: #ffffff !important;
-  color: #374151 !important;
+  border: 1.5px solid var(--border) !important;
+  background: var(--bg-white) !important;
+  color: var(--text-dark) !important;
   cursor: pointer;
   transition: all 0.2s !important;
 }
 
 .quote-btn-cancel:hover {
-  background: #f9fafb !important;
-  border-color: #d1d5db !important;
-  color: #111827 !important;
+  background: var(--bg-light) !important;
+  border-color: var(--text-light) !important;
+  color: var(--text-dark) !important;
 }
 
 .quote-btn-send {
@@ -2263,13 +2334,13 @@ body {
 .quote-modal-success h3 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-dark);
   margin: 0;
 }
 
 .quote-modal-success p {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -2287,4 +2358,351 @@ body {
     width: 100% !important;
     text-align: center;
   }
+}
+
+/* ── Dark Mode ─────────────────────────────────────────────────── */
+/* Enes Doğanay | 2 Mayıs 2026: Faz 7 — FirmaDetay.css dark mode override'ları */
+
+/* Tab navigasyon — sticky glassmorphism dark rengi */
+[data-theme="dark"] .tab-nav-wrapper {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+/* Verified badge (mavi) */
+[data-theme="dark"] .verified-badge {
+  background: #1e2d4a;
+  border-color: #1e40af;
+}
+
+/* Platform badge (amber) */
+[data-theme="dark"] .platform-profile-badge {
+  background: #292007;
+  color: #fbbf24;
+  border-color: #92400e;
+}
+
+/* Claim banner */
+[data-theme="dark"] .claim-profile-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #0f2318 100%);
+  border-bottom-color: #1e40af;
+}
+
+/* Supp avatar */
+[data-theme="dark"] .supp-avatar2 {
+  background: #1e2d4a;
+  color: #93c5fd;
+  border-color: #1e40af;
+}
+
+/* Edit hero button */
+[data-theme="dark"] .firma-edit-hero-btn {
+  background: #1e2d4a;
+  border-color: #1e40af;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .firma-edit-hero-btn:hover {
+  background: #1a2a44;
+  border-color: #2563eb;
+  color: #93c5fd;
+}
+
+/* Tender status badges — semantik, dark'ta koyu ton */
+[data-theme="dark"] .tender-status-canli {
+  background: #14291e;
+  color: #4ade80;
+  border-color: #166534;
+}
+
+[data-theme="dark"] .tender-status-yaklasan {
+  background: #292007;
+  color: #fbbf24;
+  border-color: #92400e;
+}
+
+[data-theme="dark"] .tender-status-kapali {
+  background: #2d1010;
+  color: #f87171;
+  border-color: #991b1b;
+}
+
+/* Tender meta chip (mavi) */
+[data-theme="dark"] .tender-meta-chip {
+  background: #1e2d4a;
+  color: #93c5fd;
+}
+
+/* Tender skeleton */
+[data-theme="dark"] .tender-item-skeleton {
+  background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+  background-size: 200% 100%;
+}
+
+/* Tenders blur CTA */
+[data-theme="dark"] .firma-tenders-gate .tenders-blur-cta {
+  background: rgba(30, 41, 59, 0.97);
+  border-color: var(--border);
+}
+
+/* Sidebar favori kartı */
+[data-theme="dark"] .sidebar-card-favorites {
+  background: linear-gradient(180deg, #1e293b 0%, #1a2640 100%);
+  border-color: #1e3a5f;
+}
+
+/* List selector kartı */
+[data-theme="dark"] .list-selector-card {
+  background: var(--bg-white);
+  border-color: var(--border);
+}
+
+/* Create list trigger */
+[data-theme="dark"] .create-list-inline-trigger {
+  background: #1e2d4a;
+  border-color: #1e40af;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .create-list-inline-trigger:hover {
+  background: #1a2a44;
+  border-color: #2563eb;
+  color: #bfdbfe;
+}
+
+/* Favorite list status */
+[data-theme="dark"] .favorite-list-status strong {
+  color: #93c5fd;
+}
+
+/* Contact details panel */
+[data-theme="dark"] .contact-details-panel {
+  background: var(--bg-white);
+  border-color: var(--border);
+}
+
+/* Accordion content */
+[data-theme="dark"] .accordion-content {
+  background: rgba(30, 41, 59, 0.5);
+}
+
+/* Product tag */
+[data-theme="dark"] .product-tag {
+  background: #1e2d4a;
+  color: #93c5fd;
+  border-color: #1e40af;
+}
+
+[data-theme="dark"] .product-tag:hover {
+  background: #1a2a44;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Notes kartı dark amber teması — tam rafine */
+[data-theme="dark"] .notes-card {
+  background: linear-gradient(180deg, #1e1a12 0%, #191510 100%);
+  border-color: rgba(180, 130, 55, 0.22);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(180, 130, 55, 0.08), inset 0 1px 0 rgba(255, 220, 120, 0.06);
+}
+
+[data-theme="dark"] .notes-card::before {
+  background: linear-gradient(90deg, #c4832a 0%, #e8b84a 45%, #a05e18 100%);
+  opacity: 0.9;
+}
+
+/* Header icon */
+[data-theme="dark"] .notes-header-icon {
+  background: linear-gradient(180deg, #2c2010 0%, #241a0c 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 80, 0.12), 0 8px 18px rgba(0, 0, 0, 0.28);
+  color: #e0a030;
+}
+
+/* Title ve subtitle */
+[data-theme="dark"] .notes-title {
+  color: #e8d5b0;
+}
+
+[data-theme="dark"] .notes-subtitle {
+  color: #8a7355;
+}
+
+/* Count badge */
+[data-theme="dark"] .notes-count-badge {
+  background: linear-gradient(180deg, #2e2010 0%, #261a09 100%);
+  color: #d4a040;
+  box-shadow: inset 0 1px 0 rgba(255, 200, 80, 0.1), 0 2px 6px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(180, 130, 55, 0.28);
+}
+
+/* Composer */
+[data-theme="dark"] .notes-composer {
+  background: linear-gradient(180deg, rgba(36, 28, 14, 0.95) 0%, rgba(30, 22, 10, 0.98) 100%);
+  border-color: rgba(180, 130, 55, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 80, 0.06), 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="dark"] .notes-composer-icon {
+  background: rgba(180, 130, 55, 0.15);
+  color: #d4953a;
+}
+
+[data-theme="dark"] .notes-composer-label {
+  color: #a88050;
+}
+
+/* Inputs */
+[data-theme="dark"] .note-meta-input,
+[data-theme="dark"] .note-textarea {
+  background: rgba(14, 10, 4, 0.6);
+  border-color: rgba(160, 115, 45, 0.4);
+  color: #dfc8a0;
+}
+
+[data-theme="dark"] .note-meta-input::placeholder,
+[data-theme="dark"] .note-textarea::placeholder {
+  color: rgba(180, 145, 85, 0.5);
+}
+
+[data-theme="dark"] .note-meta-input:focus,
+[data-theme="dark"] .note-textarea:focus {
+  border-color: #c4832a;
+  box-shadow: 0 0 0 3px rgba(196, 131, 42, 0.14);
+  background: rgba(20, 14, 6, 0.75);
+}
+
+/* Reminder toggle */
+[data-theme="dark"] .reminder-toggle {
+  background: rgba(30, 22, 10, 0.9);
+  border-color: rgba(160, 115, 45, 0.4);
+  color: #c09040;
+}
+
+[data-theme="dark"] .reminder-toggle:hover,
+[data-theme="dark"] .reminder-toggle.active {
+  background: rgba(40, 30, 12, 0.95);
+  border-color: rgba(196, 131, 42, 0.6);
+}
+
+/* Reminder panel */
+[data-theme="dark"] .reminder-panel {
+  background: linear-gradient(180deg, rgba(32, 24, 10, 0.97) 0%, rgba(26, 18, 7, 0.99) 100%);
+  border-color: rgba(160, 115, 45, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 80, 0.04);
+}
+
+[data-theme="dark"] .reminder-panel-header {
+  color: #8a7050;
+}
+
+[data-theme="dark"] .reminder-field span {
+  color: #8a7050;
+}
+
+[data-theme="dark"] .reminder-field input {
+  background: rgba(14, 10, 4, 0.7);
+  border-color: rgba(160, 115, 45, 0.4);
+  color: #dfc8a0;
+  color-scheme: dark;
+}
+
+[data-theme="dark"] .reminder-field input:focus {
+  border-color: #c4832a;
+  box-shadow: 0 0 0 3px rgba(196, 131, 42, 0.12);
+}
+
+[data-theme="dark"] .reminder-summary {
+  background: rgba(44, 30, 8, 0.9);
+  color: #d4a040;
+}
+
+/* Temizle butonu */
+[data-theme="dark"] .note-clear-btn {
+  background: rgba(30, 22, 10, 0.8);
+  border-color: rgba(160, 115, 45, 0.35);
+  color: #8a7050;
+}
+
+[data-theme="dark"] .note-clear-btn:hover {
+  background: rgba(40, 30, 12, 0.95);
+  border-color: rgba(196, 131, 42, 0.5);
+  color: #c09040;
+}
+
+/* Notes feed separator */
+[data-theme="dark"] .notes-group-title {
+  color: rgba(160, 125, 65, 0.7);
+}
+
+[data-theme="dark"] .notes-group-line {
+  background: linear-gradient(90deg, rgba(180, 130, 55, 0.22) 0%, transparent 100%);
+}
+
+/* Saved note */
+[data-theme="dark"] .saved-note {
+  background: linear-gradient(180deg, #201c12 0%, #1c180e 100%);
+  border-color: rgba(180, 130, 55, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 80, 0.04), 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="dark"] .saved-note::before {
+  background: linear-gradient(180deg, #c4832a 0%, #e0b050 100%);
+}
+
+[data-theme="dark"] .saved-note-title {
+  color: #dfc898;
+}
+
+[data-theme="dark"] .saved-note-text {
+  color: #bfa880;
+}
+
+[data-theme="dark"] .saved-note-date {
+  background: rgba(44, 32, 10, 0.85);
+  color: rgba(200, 155, 70, 0.85);
+}
+
+[data-theme="dark"] .saved-note-reminder {
+  background: rgba(20, 32, 58, 0.85);
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .saved-note-reminder.sent {
+  background: rgba(12, 36, 22, 0.85);
+  color: #4ade80;
+}
+
+/* Saved note action butonları */
+[data-theme="dark"] .saved-note-edit,
+[data-theme="dark"] .saved-note-delete,
+[data-theme="dark"] .saved-note-delete-cancel,
+[data-theme="dark"] .saved-note-delete-approve {
+  background: rgba(30, 22, 10, 0.85);
+  border-color: rgba(160, 115, 45, 0.32);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 80, 0.06);
+}
+
+[data-theme="dark"] .saved-note-edit:hover {
+  background: rgba(15, 25, 50, 0.92);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+[data-theme="dark"] .saved-note-delete:hover,
+[data-theme="dark"] .saved-note-delete-approve:hover {
+  background: rgba(45, 10, 10, 0.92);
+  border-color: rgba(252, 165, 165, 0.4);
+}
+
+[data-theme="dark"] .saved-note-delete-cancel:hover {
+  background: rgba(36, 28, 14, 0.95);
+  border-color: rgba(160, 115, 45, 0.5);
+}
+
+/* Empty state */
+[data-theme="dark"] .notes-empty-state {
+  background: linear-gradient(180deg, #1e1a12 0%, #191510 100%);
+  border-color: rgba(180, 130, 55, 0.25);
+  color: #8a7050;
+}
+
+[data-theme="dark"] .notes-empty-icon {
+  background: rgba(180, 130, 55, 0.12);
+  color: #c4832a;
 }

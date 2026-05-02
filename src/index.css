@@ -1,16 +1,52 @@
 /* Enes Doğanay | 6 Nisan 2026: Merkezi CSS değişkenleri — tüm sayfalarda paylaşılan design tokens */
+/* Enes Doğanay | 2 Mayıs 2026: Faz 1 — tüm :root blokları buraya toplandı, alias'lar eklendi */
 :root {
+  /* Ana renkler */
   --primary: #137fec;
+  --primary-color: var(--primary);     /* App.css uyumluluğu için alias */
   --primary-hover: #116ed1;
+
+  /* Arka plan */
   --bg-light: #f6f7f8;
   --bg-white: #ffffff;
+
+  /* Yazı renkleri */
   --text-dark: #101922;
   --text-gray: #64748b;
+  --text-muted: var(--text-gray);      /* Home.css uyumluluğu için alias */
   --text-light: #94a3b8;
+
+  /* Border */
   --border: #e2e8f0;
+  --border-color: var(--border);       /* App.css / Home.css uyumluluğu için alias */
+
+  /* Diğer */
+  --yellow-star: #facc15;
+  --max-width: 80%;
+  --radius: 8px;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Faz 2 — dark mode token override'ları */
+[data-theme="dark"] {
+  --primary: #3b9eff;
+  --primary-color: var(--primary);
+  --primary-hover: #2b8fe8;
+
+  --bg-light: #0f172a;
+  --bg-white: #1e293b;
+
+  --text-dark: #f1f5f9;
+  --text-gray: #94a3b8;
+  --text-muted: var(--text-gray);
+  --text-light: #64748b;
+
+  --border: #334155;
+  --border-color: var(--border);
+
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
 html,

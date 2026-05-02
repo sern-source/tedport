@@ -459,3 +459,131 @@ body {
   height: 1px;
   background: #e2e8f0;
 }
+
+/* Enes Doğanay | 2 Mayıs 2026: Faz 9 — Login dark mode */
+[data-theme="dark"] .login-card {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .tab-item:hover {
+  background-color: #0f172a;
+}
+
+[data-theme="dark"] .tab-item.active {
+  background-color: rgba(59, 158, 255, 0.08);
+}
+
+[data-theme="dark"] .form-input {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-input:focus {
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 1px #3b9eff;
+}
+
+[data-theme="dark"] .form-input::placeholder {
+  color: #475569;
+}
+
+[data-theme="dark"] .input-icon,
+[data-theme="dark"] .toggle-password {
+  color: #475569;
+}
+
+[data-theme="dark"] .toggle-password:hover {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .remember-me {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .login-error {
+  color: #fca5a5;
+  background: rgba(127, 29, 29, 0.3);
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .login-success {
+  color: #4ade80;
+}
+
+[data-theme="dark"] .login-info {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .corporate-login-callout {
+  background: linear-gradient(180deg, #1a2d45 0%, #1e293b 100%);
+  border-color: #1e3a5f;
+}
+
+[data-theme="dark"] .corporate-login-callout strong {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .corporate-login-callout p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .secure-badge {
+  background-color: #0f172a;
+  border-top-color: #1e293b;
+}
+
+[data-theme="dark"] .secure-badge span {
+  color: #475569;
+}
+
+[data-theme="dark"] .main-footer {
+  background-color: #1e293b;
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .footer-links a:hover {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .login-google-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .login-google-btn:hover {
+  background: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .login-linkedin-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .login-linkedin-btn:hover {
+  background: #1a2d45;
+  box-shadow: 0 2px 8px rgba(10, 102, 194, 0.2);
+}
+
+[data-theme="dark"] .login-divider {
+  color: #475569;
+}
+
+[data-theme="dark"] .login-divider::before,
+[data-theme="dark"] .login-divider::after {
+  background: #334155;
+}
+
+[data-theme="dark"] .login-btn-secondary {
+  background-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .login-btn-secondary:hover {
+  background-color: #475569;
+}

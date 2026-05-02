@@ -12,6 +12,18 @@
   <meta property="og:description" content="Tedport ile doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun. İhale açın, teklif verin, firmaları keşfedin. Ücretsiz üyelik." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://tedport.com" />
+  <!-- Enes Doğanay | 2 Mayıs 2026: Faz 2 — React yüklenmeden önce tema uygula (flash önleme) -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('tedport-theme');
+        var theme = saved === 'dark' || saved === 'light'
+          ? saved
+          : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"

@@ -21,6 +21,7 @@ import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-dom';
 import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
+import DatePicker from './DatePicker'; // Enes Doğanay | 2 Mayıs 2026: Özel takvim
 import { TURKEY_DISTRICTS } from './turkeyDistricts'; // Enes Doğanay | 14 Nisan 2026: İl/ilçe ayrımı için
 import { getManagedCompanyId } from './companyManagementApi';
 import { useSearchHistory } from './useSearchHistory';
@@ -678,10 +679,9 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                     </div>
                     <div className="quote-form-group">
                       <label>Talep Edilen Teslim Tarihi</label>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={quoteForm.teslim_tarihi}
-                        onChange={(e) => setQuoteForm(prev => ({ ...prev, teslim_tarihi: e.target.value }))}
+                        onChange={(val) => setQuoteForm(prev => ({ ...prev, teslim_tarihi: val }))}
                         min={new Date().toISOString().split('T')[0]}
                       />
                     </div>
@@ -1635,7 +1635,7 @@ function App() {
                     </div>
                     <div className="quote-form-group">
                       <label>Talep Edilen Teslim Tarihi</label>
-                      <input type="date" value={listQuoteForm.teslim_tarihi} onChange={(e) => setListQuoteForm(prev => ({ ...prev, teslim_tarihi: e.target.value }))} min={new Date().toISOString().split('T')[0]} />
+                      <DatePicker value={listQuoteForm.teslim_tarihi} onChange={(val) => setListQuoteForm(prev => ({ ...prev, teslim_tarihi: val }))} min={new Date().toISOString().split('T')[0]} />
                     </div>
                   </div>
                   <div className="quote-form-group">

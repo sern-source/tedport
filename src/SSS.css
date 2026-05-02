@@ -102,12 +102,9 @@
   margin: 0 auto;
   padding: 12px 20px;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
 }
-.sss-cats::-webkit-scrollbar { display: none; }
 
 .sss-cat-pill {
   display: inline-flex;
@@ -429,4 +426,89 @@
   .sss-cta h2 { font-size: 1.25rem; }
   .sss-cta-btns { flex-direction: column; align-items: stretch; }
   .sss-cta-btn { justify-content: center; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: SSS.css dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .sss-page {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .sss-search-wrap {
+  background: #1e293b;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .sss-search-wrap input {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .sss-cats-wrap {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .sss-cat-pill {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .sss-cat-pill:hover {
+  background: rgba(59, 158, 255, 0.1);
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .sss-pill-count {
+  background: rgba(59, 158, 255, 0.15);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .sss-group-title {
+  color: var(--text-dark);
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .sss-group-count {
+  background: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .sss-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .sss-item:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sss-item.open {
+  border-color: #3b9eff;
+  box-shadow: 0 4px 20px rgba(59, 158, 255, 0.12);
+}
+
+[data-theme="dark"] .sss-question {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .sss-question:hover {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .sss-item.open .sss-question {
+  color: #93c5fd;
+  background: rgba(59, 158, 255, 0.08);
+}
+
+[data-theme="dark"] .sss-answer {
+  color: #94a3b8;
+  border-top-color: rgba(59, 158, 255, 0.1);
+}
+
+[data-theme="dark"] .sss-answer strong {
+  color: var(--text-dark);
 }

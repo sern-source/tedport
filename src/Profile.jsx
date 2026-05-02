@@ -287,7 +287,7 @@ const ProfilePage = () => {
           const reminderMap = new Map((remindersResult.data || []).map((reminder) => [String(reminder.note_id), reminder]));
 
           const [firmsData, notesData] = await Promise.all([
-            supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
+            supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce, logo_url').in('firmaID', firmaIds),
             supabase.from('kisisel_notlar').select('*').eq('user_id', currentUser.id).in('firma_id', firmaIds)
           ]);
 
@@ -305,6 +305,8 @@ const ProfilePage = () => {
               name: firm.firma_adi || "Bilinmeyen Firma",
               category: firm.category_name || "Kategori Yok",
               location: firm.il_ilce || "Konum Yok",
+              // Enes Doğanay | 2 Mayıs 2026: Firma logosu favori kartında gösterilir
+              logo_url: firm.logo_url?.includes('firma-logolari') ? firm.logo_url : null,
               note: parsedNote.body,
               notes: allNotes.map((savedNote) => {
                 const parsedSavedNote = parseNotePayload(savedNote.not_metni || '');
@@ -585,7 +587,7 @@ const ProfilePage = () => {
       const reminderMap = new Map((remindersResult.data || []).map((reminder) => [String(reminder.note_id), reminder]));
 
       const [firmsData, notesData] = await Promise.all([
-        supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds),
+        supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce, logo_url').in('firmaID', firmaIds),
         supabase.from('kisisel_notlar').select('*').eq('user_id', userId).in('firma_id', firmaIds)
       ]);
 
@@ -603,6 +605,8 @@ const ProfilePage = () => {
           name: firm.firma_adi || "Bilinmeyen Firma",
           category: firm.category_name || "Kategori Yok",
           location: firm.il_ilce || "Konum Yok",
+          // Enes Doğanay | 2 Mayıs 2026: Firma logosu favori kartında gösterilir
+          logo_url: firm.logo_url?.includes('firma-logolari') ? firm.logo_url : null,
           note: parsedNote.body,
           notes: allNotes.map((savedNote) => {
             const parsedSavedNote = parseNotePayload(savedNote.not_metni || '');
@@ -787,6 +791,9 @@ const ProfilePage = () => {
         .update({ marketing_consent: newValue })
         .eq('id', user.id);
       if (error) throw error;
+      // Enes Doğanay | 2 Mayıs 2026: Kaydedildi badge'i diğer tercihlerle tutarlı
+      setNotifPrefSaved(true);
+      setTimeout(() => setNotifPrefSaved(false), 1500);
     } catch (err) {
       console.error('[Pazarlama Onayı] Güncelleme hatası:', err);
       setMarketingConsent(!newValue);
@@ -1556,8 +1563,12 @@ const ProfilePage = () => {
                           </div>
                         )}
 
-                        <div className="fav-avatar" style={{ background: fav.color }}>
-                          {fav.name.substring(0, 2).toUpperCase()}
+                        {/* Enes Doğanay | 2 Mayıs 2026: logo varsa gerçek logo, yoksa default logo */}
+                        <div className="fav-avatar" style={fav.logo_url ? { background: '#ffffff' } : { background: fav.color }}>
+                          {fav.logo_url ? (
+                            <img src={fav.logo_url} alt={fav.name} className="fav-avatar-logo" onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }} />
+                          ) : null}
+                          <img src="/tedport_default_company_logo.png" alt="Logo" className="fav-avatar-logo" style={{ display: fav.logo_url ? 'none' : 'block' }} />
                         </div>
 
                         <div className="fav-body">

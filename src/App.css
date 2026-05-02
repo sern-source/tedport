@@ -1,20 +1,7 @@
 /* App.css */
+/* Enes Doğanay | 2 Mayıs 2026: Faz 1 — :root bloğu index.css'e taşındı, buradaki duplicate kaldırıldı */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0');
-
-:root {
-  --primary-color: #137fec;
-  --primary-hover: #1066be;
-  --text-dark: #0f172a;
-  --text-gray: #64748b;
-  --text-light: #94a3b8;
-  --bg-light: #f6f7f8;
-  --bg-white: #ffffff;
-  --border-color: #e2e8f0;
-  --yellow-star: #facc15;
-  /* Enes Doğanay | 13 Nisan 2026: eksik semicolon düzeltildi */
-  --max-width: 80%;
-}
 
 * {
   box-sizing: border-box;

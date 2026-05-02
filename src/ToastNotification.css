@@ -174,3 +174,29 @@
     width: auto;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: ToastNotification.css dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .toast-item {
+  background: #1e293b;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .toast-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .toast-message {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .toast-close {
+  color: #64748b;
+}
+
+[data-theme="dark"] .toast-close:hover {
+  background: #334155;
+  color: #cbd5e1;
+}

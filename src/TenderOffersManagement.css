@@ -3469,3 +3469,629 @@
   from { opacity: 0; transform: translateX(-50%) translateY(16px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: TenderOffersManagement.css dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .tom-screen {
+  background: #0f172a;
+}
+
+/* Sidebar */
+[data-theme="dark"] .tom-sidebar {
+  background: #1e293b;
+  border-right-color: #334155;
+}
+
+[data-theme="dark"] .tom-sidebar__head {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-sidebar__head h2 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-sidebar__search {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-sidebar__search input {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-sidebar__list::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+[data-theme="dark"] .tom-tender-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-tender-card:hover {
+  background: #253347;
+  border-color: #3b9eff;
+}
+
+[data-theme="dark"] .tom-tender-card--active {
+  background: rgba(59, 158, 255, 0.13);
+  border-color: #3b9eff;
+  box-shadow: inset 0 0 0 1px #3b9eff, 0 4px 20px rgba(59, 158, 255, 0.25);
+}
+
+[data-theme="dark"] .tom-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-pill:hover {
+  background: #1e293b;
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Seçili pill dark modda belirgin olsun */
+[data-theme="dark"] .tom-pill--on {
+  background: linear-gradient(135deg, #3b9eff, #2563eb);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 158, 255, 0.4);
+}
+
+/* Main area */
+[data-theme="dark"] .tom-main {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .tom-info-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__toggle {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__toggle:hover {
+  background: #253347;
+}
+
+[data-theme="dark"] .tom-info-card__title-row h2 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-info-card__chevron {
+  background: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-info-card__desc {
+  color: #94a3b8;
+  border-left-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__files {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__files h4 {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-info-cell {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-cell:hover {
+  background: #1a2f4e;
+  border-color: #3b9eff;
+}
+
+[data-theme="dark"] .tom-info-cell .material-symbols-outlined {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .tom-info-cell small {
+  color: #64748b;
+}
+
+[data-theme="dark"] .tom-info-cell strong {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-tag {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-info-card__file-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-info-card__file-btn:hover {
+  background: rgba(59, 158, 255, 0.1);
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+/* Offers section */
+[data-theme="dark"] .tom-offers-section {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .tom-offers-toolbar {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-btn-icon {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-btn-icon:hover {
+  border-color: #3b9eff;
+  color: #93c5fd;
+  background: rgba(59, 158, 255, 0.08);
+}
+
+[data-theme="dark"] .tom-sort-trigger {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-sort-label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .tom-sort-menu {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .tom-sort-option {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-sort-option:hover {
+  background: #0f172a;
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-sort-option.active {
+  background: rgba(59, 158, 255, 0.1);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-chip {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-chip:hover {
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-score-panel {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+/* Offer cards */
+[data-theme="dark"] .tom-offer-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-offer-card:hover {
+  border-color: #3b9eff;
+}
+
+[data-theme="dark"] .tom-offer-card__main {
+  background: transparent;
+}
+
+[data-theme="dark"] .tom-offer-card__main:hover {
+  background: #253347;
+}
+
+[data-theme="dark"] .tom-metric strong {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-offer-status--accepted { background: rgba(34,197,94,0.12); color: #86efac; }
+[data-theme="dark"] .tom-offer-status--rejected { background: rgba(239,68,68,0.12); color: #fca5a5; }
+[data-theme="dark"] .tom-offer-status--review   { background: rgba(59,130,246,0.12); color: #93c5fd; }
+[data-theme="dark"] .tom-offer-status--draft    { background: #334155; color: #94a3b8; }
+
+[data-theme="dark"] .tom-badge--active     { background: rgba(34,197,94,0.12); color: #86efac; }
+[data-theme="dark"] .tom-badge--closed     { background: rgba(239,68,68,0.12); color: #fca5a5; }
+[data-theme="dark"] .tom-badge--draft      { background: #334155; color: #94a3b8; }
+[data-theme="dark"] .tom-badge--cancelled  { background: rgba(249,115,22,0.12); color: #fdba74; }
+[data-theme="dark"] .tom-badge--unknown    { background: #334155; color: #94a3b8; }
+
+[data-theme="dark"] .tom-icon-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-compare-check {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-offer-card__detail {
+  border-top-color: #334155;
+  background: #0f172a;
+}
+
+[data-theme="dark"] .tom-kalemler {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-kalemler__wrap th {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-kalemler__wrap td {
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-kalemler__wrap td strong {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-kalemler__wrap tbody tr:hover {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .tom-kalemler__grouped-total {
+  border-top-color: #334155;
+  background: #1e293b;
+}
+
+[data-theme="dark"] .tom-kalemler__grouped-total strong {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-kalemler__grouped-total span {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-my-note {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-my-note textarea {
+  background: #1e293b;
+  border-color: #334155;
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-my-note textarea:focus {
+  border-color: #3b9eff;
+}
+
+[data-theme="dark"] .tom-offer-card__footer {
+  background: #1e293b;
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-btn--outline {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-btn--outline:hover {
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+/* Chat modal */
+[data-theme="dark"] .tom-tender-chat-modal {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-tender-chat-header {
+  background: #0f172a;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-tender-chat-messages {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .tom-tender-chat-messages::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .tom-tender-chat-messages::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+[data-theme="dark"] .tom-tender-chat-bubble.theirs {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-tender-chat-input {
+  background: #1e293b;
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-tender-chat-input input {
+  background: #0f172a;
+  border-color: #334155;
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-chat-closed-banner {
+  background: #253347;
+  border-color: #334155;
+}
+
+/* Compare panel */
+[data-theme="dark"] .tom-compare {
+  background: #1e293b;
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-compare__head {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-compare-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-compare-row {
+  border-bottom-color: #334155;
+}
+
+/* Toast notifs */
+[data-theme="dark"] .tom-toast--green {
+  background: rgba(22,101,52,0.15);
+  border-color: rgba(134,239,172,0.3);
+  color: #86efac;
+}
+
+[data-theme="dark"] .tom-toast--red {
+  background: rgba(153,27,27,0.15);
+  border-color: rgba(252,165,165,0.3);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .tom-toast--amber {
+  background: rgba(120,53,15,0.15);
+  border-color: rgba(253,186,116,0.3);
+  color: #fdba74;
+}
+
+/* Report modal */
+[data-theme="dark"] .msg-report-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .msg-report-modal {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .msg-report-toast {
+  background: #1e293b;
+  color: #86efac;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Link kopyala satırı + aksiyon butonları + diğer eksikler */
+[data-theme="dark"] .tom-share-link-row {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .tom-share-link-row__input {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-tender-actions {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-bar {
+  background: #334155;
+}
+
+[data-theme="dark"] .tom-score-ring__val {
+  fill: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-count-badge {
+  background: rgba(59, 158, 255, 0.15);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-sidebar__filters {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-offers-filters {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-compare-hint {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-compare-nudge {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-detail-row {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-detail-row p,
+[data-theme="dark"] .tom-detail-row small {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-score-breakdown h4 {
+  color: var(--text-dark);
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-offers-toolbar__left h3 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-offer-card__company strong {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-offer-card__email {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-offer-card__time {
+  color: #64748b;
+}
+
+[data-theme="dark"] .tom-kalemler h4 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-my-note label {
+  color: #94a3b8;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Sidebar kart başlık + meta renk düzeltmeleri */
+[data-theme="dark"] .tom-tender-card__top h3 {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .tom-tender-card--active .tom-tender-card__top h3 {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-tender-card__meta {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-tender-card__offers {
+  color: #cbd5e1;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Puanlama bilgilendirme popup dark mode */
+[data-theme="dark"] .tom-scoring-info-card {
+  background: #1e293b;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .tom-scoring-info-card h3 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-scoring-info-card__body > p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-scoring-info-item {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-scoring-info-item:hover {
+  background: #1a2f4e;
+  border-color: #3b9eff;
+}
+
+[data-theme="dark"] .tom-scoring-info-item strong {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-scoring-info-item p {
+  color: #94a3b8;
+}
+
+/* Red nedeni popup dark mode */
+[data-theme="dark"] .tom-reject-note-card {
+  background: #1e293b;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .tom-reject-note-card h3 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-reject-note-textarea {
+  background: #0f172a;
+  border-color: #334155;
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-reject-note-textarea:focus {
+  background: #0f172a;
+  border-color: #f87171;
+}
+
+/* Kabul → kapat popup dark mode */
+[data-theme="dark"] .tom-accept-close-card {
+  background: #1e293b;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .tom-accept-close-card h3 {
+  color: var(--text-dark);
+}
+
+/* Status dropdown dark mode */
+[data-theme="dark"] .tom-btn--status-change {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-btn--status-change:hover {
+  background: rgba(59, 158, 255, 0.08);
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-status-dropdown {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .tom-status-dropdown button {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-status-dropdown button:hover {
+  background: #0f172a;
+  color: var(--text-dark);
+}

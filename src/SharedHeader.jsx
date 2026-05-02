@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+// Enes Doğanay | 2 Mayıs 2026: Faz 2 — dark mode tema hook'u
+import { useTheme } from './useTheme';
 
 /**
  * SharedHeader Component - Reusable Header for All Pages
@@ -48,6 +50,8 @@ const SharedHeader = ({
     const location = useLocation();
     // Enes Doğanay | 8 Nisan 2026: AuthContext'ten gelen global auth state kullanımı (her sayfada tekrar sorgu atılmaz)
     const { authChecked, userProfile, isCurrentUserAdmin, managedCompanyId, managedCompanyName, unreadNotifCount, pendingQuoteCount, logout } = useAuth();
+    // Enes Doğanay | 2 Mayıs 2026: Faz 2 — dark mode toggle
+    const { theme, toggleTheme } = useTheme();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchFocused, setSearchFocused] = useState(false);
@@ -112,11 +116,8 @@ const SharedHeader = ({
                     </button>
 
                     <Link to="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
-                        <img
-                            className="shared-logo-image"
-                            src="/tedport-logo.jpg"
-                            alt="Tedport Logo"
-                        />
+                        {/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG, light/dark her ikisinde de çalışır */}
+                        <img className="shared-logo-image" src="/tedport-logo_no-background.png" alt="Tedport Logo" />
                     </Link>
                 </div>
 
@@ -217,6 +218,19 @@ const SharedHeader = ({
 
                 {/* Enes Doğanay | 14 Nisan 2026: Sağ grup — nav + kullanıcı sabit konumda */}
                 <div className="shared-header-right">
+                    {/* Enes Doğanay | 2 Mayıs 2026: Faz 2 — dark mode toggle butonu */}
+                    <button
+                        type="button"
+                        className="shared-theme-toggle"
+                        onClick={toggleTheme}
+                        aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Karanlık temaya geç'}
+                        title={theme === 'dark' ? 'Açık tema' : 'Karanlık tema'}
+                    >
+                        <span className="material-symbols-outlined">
+                            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                        </span>
+                    </button>
+
                     {/* Mobile Hamburger */}
                     <button
                         className="shared-hamburger"

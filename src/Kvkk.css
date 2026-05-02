@@ -276,3 +276,82 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: Kvkk.css dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .kvkk-header {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .kvkk-header h1 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .kvkk-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .kvkk-section h2 {
+  color: var(--text-dark);
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .kvkk-section p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .kvkk-info-box {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .kvkk-info-row {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .kvkk-data-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .kvkk-data-card h3 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .kvkk-data-card p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .kvkk-list li {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .kvkk-transfer-item {
+  background: #0f172a;
+  border-color: #334155;
+  border-left-color: var(--primary);
+}
+
+[data-theme="dark"] .kvkk-transfer-item h3 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .kvkk-transfer-item p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .kvkk-consent-box {
+  background: rgba(234, 88, 12, 0.08);
+  border-color: rgba(234, 88, 12, 0.3);
+}
+
+[data-theme="dark"] .kvkk-consent-box p {
+  color: #fdba74 !important;
+}
+
+[data-theme="dark"] .kvkk-footer-nav {
+  border-top-color: #334155;
+}

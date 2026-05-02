@@ -1,12 +1,13 @@
 /* Enes Doğanay | 14 Nisan 2026: Ortak site footer stilleri */
 /* Enes Doğanay | 15 Nisan 2026: Footer arka planı beyaz yapıldı, renkler güncellendi */
+/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — hardcoded renkler CSS değişkenlerine bağlandı */
 
 .sf-footer {
-    background: #ffffff;
-    color: #475569;
+    background: var(--bg-white);
+    color: var(--text-gray);
     padding: 48px 0 0;
     margin-top: auto;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
 }
 
 .sf-container {
@@ -21,7 +22,7 @@
     grid-template-columns: 1.4fr 1fr 1fr 1fr;
     gap: 40px;
     padding-bottom: 36px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
 }
 
 @media (max-width: 900px) {
@@ -56,10 +57,12 @@
     border-radius: 8px;
 }
 
+/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG kullanılıyor, light/dark show-hide kaldırıldı */
+
 .sf-brand-desc {
     font-size: 14px;
     line-height: 1.7;
-    color: #64748b;
+    color: var(--text-gray);
     margin: 0;
     max-width: 300px;
 }
@@ -76,8 +79,8 @@
     gap: 6px;
     padding: 7px 14px;
     border-radius: 8px;
-    background: #f1f5f9;
-    color: #64748b;
+    background: var(--bg-light);
+    color: var(--text-gray);
     text-decoration: none;
     font-size: 13px;
     font-weight: 500;
@@ -93,7 +96,7 @@
 .sf-links h4 {
     font-size: 14px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-dark);
     text-transform: uppercase;
     letter-spacing: 0.6px;
     margin: 0 0 16px;
@@ -116,20 +119,20 @@
 
 .sf-links a,
 .sf-links li > span:not(.sf-contact-icon) {
-    color: #64748b;
+    color: var(--text-gray);
     text-decoration: none;
     font-size: 14px;
     transition: color 0.18s;
 }
 
 .sf-links a:hover {
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 /* Contact column icons */
 .sf-contact-icon {
     font-size: 16px;
-    color: #94a3b8;
+    color: var(--text-light);
     flex-shrink: 0;
 }
 
@@ -146,7 +149,7 @@
 .sf-bottom p {
     margin: 0;
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--text-light);
 }
 
 .sf-legal-links {
@@ -158,18 +161,18 @@
 
 .sf-legal-links a {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--text-light);
     text-decoration: none;
     padding: 0 8px;
     transition: color 0.18s;
 }
 
 .sf-legal-links a:hover {
-    color: #475569;
+    color: var(--text-gray);
 }
 
 .sf-legal-links a + a {
-    border-left: 1px solid #e2e8f0;
+    border-left: 1px solid var(--border);
 }
 
 @media (max-width: 600px) {
@@ -178,4 +181,13 @@
         align-items: center;
         text-align: center;
     }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: SharedFooter.css dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .sf-social-link:hover {
+    background: rgba(59, 158, 255, 0.12);
+    color: #93c5fd;
 }

@@ -14,7 +14,8 @@ const EmailChangeSuccess = () => {
       <header className="shared-header">
         <div className="shared-header-inner">
           <a href="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
-            <img className="shared-logo-image" src="/tedport-logo.jpg" alt="Tedport Logo" loading="lazy" />
+            {/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG, light/dark her ikisinde de çalışır */}
+            <img className="shared-logo-image" src="/tedport-logo_no-background.png" alt="Tedport Logo" loading="lazy" />
           </a>
           <div className="shared-nav">
             <div className="shared-nav-links">

@@ -3,10 +3,11 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
-import { updateTender, deleteTender, createTender as createTenderApi } from './ihaleManagementApi';
+import { listMyTenders, updateTender, deleteTender, createTender as createTenderApi } from './ihaleManagementApi';
 import { buildInviteMailto } from './tenderUtils';
 import CitySelect from './CitySelect';
 import SimpleSelect from './SimpleSelect';
+import DatePicker from './DatePicker';
 import { TURKEY_DISTRICTS } from './turkeyDistricts';
 import './TenderOffersManagement.css';
 import './Ihaleler.css';
@@ -465,18 +466,9 @@ const TenderOffersManagement = ({ companyId }) => {
             await supabase.auth.getSession();
 
             try {
-                const res = await supabase
-                    .from('firma_ihaleleri')
-                    .select('id, baslik, aciklama, referans_no, ihale_tipi, kategori, butce_notu, yayin_tarihi, son_basvuru_tarihi, durum, teslim_il, teslim_ilce, il_ilce, teslim_suresi, kdv_durumu, gereksinimler, created_at')
-                    .eq('firma_id', String(companyId))
-                    .order('created_at', { ascending: false });
-
-                let rows = res.data || [];
-                if (res.error) {
-                    const fb = await supabase.from('firma_ihaleleri').select('*').eq('firma_id', String(companyId)).order('created_at', { ascending: false });
-                    rows = fb.data || [];
-                    if (fb.error) { setError('İhaleler yüklenemedi.'); setLoading(false); return; }
-                }
+                /* Enes Doğanay | 2 Mayıs 2026: Edge Function üzerinden çek — direkt Supabase sorgusu RLS nedeniyle
+                   draft ihaleleri filtreler; listMyTenders service_role ile hepsini getirir */
+                let rows = await listMyTenders();
 
                 const ids = rows.map(t => t.id);
                 let grouped = {};
@@ -977,13 +969,10 @@ const TenderOffersManagement = ({ companyId }) => {
     };
 
     /* Enes Doğanay | 13 Nisan 2026: Veri yeniden yükleme (silme/güncelleme sonrası) */
+    /* Enes Doğanay | 2 Mayıs 2026: Edge Function — draft ihaleleri RLS bypass */
     const reloadTenders = async () => {
-        const res = await supabase
-            .from('firma_ihaleleri')
-            .select('id, baslik, aciklama, referans_no, ihale_tipi, kategori, butce_notu, yayin_tarihi, son_basvuru_tarihi, durum, teslim_il, teslim_ilce, il_ilce, teslim_suresi, kdv_durumu, gereksinimler, created_at')
-            .eq('firma_id', String(companyId))
-            .order('created_at', { ascending: false });
-        if (res.data) setTenders(res.data);
+        const rows = await listMyTenders();
+        setTenders(rows);
     };
 
     /* Enes Doğanay | 15 Nisan 2026: İhaleyi tekrarla — kapanan ihaleyi yeni referansla canli olarak kopyalar */
@@ -2076,13 +2065,23 @@ const TenderOffersManagement = ({ companyId }) => {
                             <div className="tom-edit-section">
                                 <h3><span className="material-symbols-outlined">event</span> Tarih & Koşullar</h3>
                                 <div className="tom-edit-grid">
+                                    {/* Enes Doğanay | 2 Mayıs 2026: Native date input → özel DatePicker */}
                                     <div className="tom-edit-field">
                                         <label>Yayın Tarihi</label>
-                                        <input type="date" value={editForm.yayin_tarihi} onChange={e => setEditForm(p => ({ ...p, yayin_tarihi: e.target.value }))} />
+                                        <DatePicker
+                                            value={editForm.yayin_tarihi}
+                                            onChange={val => setEditForm(p => ({ ...p, yayin_tarihi: val }))}
+                                            placeholder="gg.aa.yyyy"
+                                        />
                                     </div>
                                     <div className="tom-edit-field">
                                         <label>Son Başvuru Tarihi</label>
-                                        <input type="date" value={editForm.son_basvuru_tarihi} onChange={e => setEditForm(p => ({ ...p, son_basvuru_tarihi: e.target.value }))} />
+                                        <DatePicker
+                                            value={editForm.son_basvuru_tarihi}
+                                            onChange={val => setEditForm(p => ({ ...p, son_basvuru_tarihi: val }))}
+                                            min={editForm.yayin_tarihi || undefined}
+                                            placeholder="gg.aa.yyyy"
+                                        />
                                     </div>
                                     <div className="tom-edit-field">
                                         <label>Teslim Süresi</label>
@@ -2726,14 +2725,24 @@ const TenderOffersManagement = ({ companyId }) => {
                                                 ]}
                                             />
                                         </div>
-                                        <label className="ihale-field">
+                                        {/* Enes Doğanay | 2 Mayıs 2026: Native date input → özel DatePicker */}
+                                        <div className="ihale-field">
                                             <span>İhale Açılış Tarihi *</span>
-                                            <input type="date" value={createForm.yayin_tarihi} onChange={e => setCreateForm(p => ({ ...p, yayin_tarihi: e.target.value }))} />
-                                        </label>
-                                        <label className="ihale-field">
+                                            <DatePicker
+                                                value={createForm.yayin_tarihi}
+                                                onChange={val => setCreateForm(p => ({ ...p, yayin_tarihi: val }))}
+                                                placeholder="gg.aa.yyyy"
+                                            />
+                                        </div>
+                                        <div className="ihale-field">
                                             <span>İhale Kapanış Tarihi *</span>
-                                            <input type="date" value={createForm.son_basvuru_tarihi} onChange={e => setCreateForm(p => ({ ...p, son_basvuru_tarihi: e.target.value }))} />
-                                        </label>
+                                            <DatePicker
+                                                value={createForm.son_basvuru_tarihi}
+                                                onChange={val => setCreateForm(p => ({ ...p, son_basvuru_tarihi: val }))}
+                                                min={createForm.yayin_tarihi || undefined}
+                                                placeholder="gg.aa.yyyy"
+                                            />
+                                        </div>
                                         <label className="ihale-field">
                                             <span>Talep Edilen Teslim Süresi *</span>
                                             <input type="text" value={createForm.teslim_suresi} onChange={e => setCreateForm(p => ({ ...p, teslim_suresi: e.target.value }))} placeholder="Örn. 30 iş günü" />

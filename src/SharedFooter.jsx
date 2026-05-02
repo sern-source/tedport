@@ -1,10 +1,13 @@
 /* Enes Doğanay | 14 Nisan 2026: Ortak site footer bileşeni — tüm sayfalarda kullanılır */
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 import './SharedFooter.css';
 
 const SharedFooter = () => {
     const currentYear = new Date().getFullYear();
+    // Enes Doğanay | 2 Mayıs 2026: Giriş yapmış kullanıcıya Kayıt/Giriş linkleri gösterilmez
+    const { userProfile } = useAuth();
 
     return (
         <footer className="sf-footer">
@@ -13,7 +16,8 @@ const SharedFooter = () => {
                     {/* Brand */}
                     <div className="sf-brand">
                         <Link to="/" className="sf-logo-link">
-                            <img src="/tedport-logo.jpg" alt="Tedport Logo" className="sf-logo" loading="lazy" />
+                            {/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG, light/dark her ikisinde de çalışır */}
+                            <img src="/tedport-logo_no-background.png" alt="Tedport Logo" className="sf-logo" loading="lazy" />
                         </Link>
                         <p className="sf-brand-desc">
                             Türkiye'nin güvenilir B2B tedarik platformu. Firmalar arası ticareti dijitalleştiriyoruz.
@@ -32,10 +36,10 @@ const SharedFooter = () => {
                     <div className="sf-links">
                         <h4>Platform</h4>
                         <ul>
-                            <li><Link to="/firmalar">Firma Rehberi</Link></li>
+                            <li><Link to="/firmalar">Firmalar</Link></li>
                             <li><Link to="/ihaleler">İhaleler</Link></li>
-                            <li><Link to="/register">Ücretsiz Kayıt Ol</Link></li>
-                            <li><Link to="/login">Giriş Yap</Link></li>
+                            {!userProfile && <li><Link to="/register">Ücretsiz Kayıt Ol</Link></li>}
+                            {!userProfile && <li><Link to="/login">Giriş Yap</Link></li>}
                         </ul>
                     </div>
 

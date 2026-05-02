@@ -32,6 +32,7 @@ import './SharedHeader.css';
 import { supabase } from './supabaseClient';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
+import DatePicker from './DatePicker'; // Enes Doğanay | 2 Mayıs 2026: Özel takvim
 import { formatTenderDate, getTenderStatusMeta } from './tenderUtils';
 import { getManagedCompanyId } from './companyManagementApi';
 import PageLoader from './PageLoader';
@@ -263,6 +264,8 @@ const SupplierProfile = () => {
     const [isNoteSaving, setIsNoteSaving] = useState(false);
     const [editingNoteId, setEditingNoteId] = useState(null);
     const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState(null);
+    // Enes Doğanay | 2 Mayıs 2026: Notlar kartı collapsible — varsayılan kapalı
+    const [isNotesOpen, setIsNotesOpen] = useState(false);
     // Enes Doğanay | 6 Nisan 2026: Firma detay ihaleleri dinamik Supabase kayitlariyla gosterilir
     const [tenders, setTenders] = useState([]);
     const [tendersLoading, setTendersLoading] = useState(true);
@@ -1240,17 +1243,26 @@ const SupplierProfile = () => {
                                 </div>
 
                                 {/* 📝 KİŞİSEL NOTLAR BÖLÜMÜ */}
-                                <div className="card notes-card">
-                                    <div className="notes-header">
+                                {/* Enes Doğanay | 2 Mayıs 2026: Collapsible — başlığa tıklanınca açılır/kapanır */}
+                                <div className={`card notes-card${isNotesOpen ? ' notes-card--open' : ''}`}>
+                                    <button
+                                        type="button"
+                                        className="notes-header notes-header--toggle"
+                                        onClick={() => setIsNotesOpen(v => !v)}
+                                        aria-expanded={isNotesOpen}
+                                    >
                                         <span className="material-symbols-outlined notes-header-icon">edit_note</span>
                                         <div className="notes-header-copy">
                                             <h3 className="notes-title">Kişisel Notlarım</h3>
                                             <p className="notes-subtitle">Toplantı, teklif, termin ve takip detaylarını burada saklayın.</p>
                                         </div>
-                                        {userProfile && savedNotes.length > 0 && <span className="notes-count-badge">{savedNotes.length}</span>}
-                                    </div>
+                                        <div className="notes-header-right">
+                                            {userProfile && savedNotes.length > 0 && <span className="notes-count-badge">{savedNotes.length}</span>}
+                                            <span className="material-symbols-outlined notes-chevron">{isNotesOpen ? 'expand_less' : 'expand_more'}</span>
+                                        </div>
+                                    </button>
 
-                                    {userProfile ? (
+                                    {isNotesOpen && (userProfile ? (
                                         <>
                                             {/* Enes Doğanay | 6 Nisan 2026: Not yazma alani ve not akisi birbirinden ayristirildi */}
                                             <div className="notes-composer">
@@ -1299,7 +1311,7 @@ const SupplierProfile = () => {
                                                             <div className="reminder-grid">
                                                                 <label className="reminder-field">
                                                                     <span>Tarih</span>
-                                                                    <input type="date" value={reminderDate} onChange={(event) => setReminderDate(event.target.value)} min={new Date().toISOString().split('T')[0]} />
+                                                                    <DatePicker value={reminderDate} onChange={setReminderDate} min={new Date().toISOString().split('T')[0]} variant="amber" />
                                                                 </label>
                                                                 <label className="reminder-field">
                                                                     <span>Saat</span>
@@ -1406,7 +1418,7 @@ const SupplierProfile = () => {
                                             <p className="notes-login-text">Bu tedarikçi için özel notlar almak istiyorsanız lütfen giriş yapın.</p>
                                             <button onClick={() => navigate(`/login?redirect=/firmadetay/${id}`)} className="notes-login-btn">Giriş Yap</button>
                                         </div>
-                                    )}
+                                    ))}
                                 </div>
 
                             </aside>
@@ -1465,10 +1477,9 @@ const SupplierProfile = () => {
                                         </div>
                                         <div className="quote-form-group">
                                             <label>Talep Edilen Teslim Tarihi</label>
-                                            <input
-                                                type="date"
+                                            <DatePicker
                                                 value={quoteForm.teslim_tarihi}
-                                                onChange={(e) => setQuoteForm(prev => ({ ...prev, teslim_tarihi: e.target.value }))}
+                                                onChange={(val) => setQuoteForm(prev => ({ ...prev, teslim_tarihi: val }))}
                                                 min={new Date().toISOString().split('T')[0]}
                                             />
                                         </div>

@@ -17,19 +17,7 @@
  * - Adaptive header and search bar
  * - User authentication dropdown
  */
-
-:root {
-    --primary: #137fec;
-    --primary-hover: #1066be;
-    --bg-light: #f6f7f8;
-    --bg-white: #ffffff;
-    --text-dark: #111418;
-    --text-gray: #617589;
-    --text-muted: #64748b;
-    --border: #dbe0e6;
-    --radius: 8px;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
+/* Enes Doğanay | 2 Mayıs 2026: Faz 1 — :root bloğu index.css'e taşındı, buradaki duplicate kaldırıldı */
 
 * {
     box-sizing: border-box;
@@ -211,7 +199,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 0.35rem;
-    border-bottom: 1px solid #f0f2f4;
+    border-bottom: 1px solid var(--border);
 }
 
 .clear-btn {
@@ -250,7 +238,7 @@ summary {
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0.75rem;
-    background: #f9fafb;
+    background: var(--bg-light);
     cursor: pointer;
     font-weight: 700;
     font-size: 0.78rem;
@@ -277,17 +265,17 @@ summary {
 }
 
 .filter-content::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: var(--bg-light);
     border-radius: 3px;
 }
 
 .filter-content::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--border);
     border-radius: 3px;
 }
 
 .filter-content::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: var(--text-light);
 }
 
 .filter-apply {
@@ -305,7 +293,7 @@ summary {
 .apply-btn2 {
     width: 100%;
     padding: 0.4rem;
-    background: #137fec;
+    background: var(--primary);
     border: none;
     border-radius: var(--radius);
     font-weight: 700;
@@ -384,7 +372,7 @@ summary {
     display: flex;
     flex-direction: column;
     background: var(--bg-white);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 0.65rem 0.85rem;
     gap: 0.65rem;
@@ -393,7 +381,7 @@ summary {
 }
 
 .supplier-card:hover {
-    border-color: #d1d5db;
+    border-color: var(--border);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
 }
@@ -592,7 +580,7 @@ summary {
     align-items: center;
     gap: 0.35rem;
     margin: 0;
-    color: #1f2937;
+    color: var(--text-dark);
     cursor: pointer;
     transition: color 0.2s;
 }
@@ -680,7 +668,7 @@ summary {
 .dot {
     width: 4px;
     height: 4px;
-    background: #d1d5db;
+    background: var(--border);
     border-radius: 50%;
 }
 
@@ -719,19 +707,19 @@ summary {
 }
 
 .tag {
-    background: #f3f4f6;
+    background: var(--bg-light);
     padding: 0.15rem 0.5rem;
     border-radius: 10px;
     font-size: 0.62rem;
     font-weight: 500;
-    color: #4b5563;
-    border: 1px solid #e5e7eb;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
     transition: all 0.2s;
 }
 
 .tag:hover {
-    background: #e5e7eb;
-    border-color: #d1d5db;
+    background: var(--border);
+    border-color: var(--border);
 }
 
 @media (min-width: 640px) {
@@ -743,7 +731,7 @@ summary {
 
 .description {
     font-size: 0.68rem;
-    color: #6b7280;
+    color: var(--text-muted);
     line-height: 1.45;
     margin: 0.1rem 0 0.25rem 0;
     display: -webkit-box;
@@ -760,7 +748,7 @@ summary {
 
 .card-footer {
     margin-top: auto;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--border);
     padding-top: 0.5rem;
     display: flex;
     flex-direction: column;
@@ -821,15 +809,15 @@ summary {
 
 .btn-outline {
     background: transparent;
-    border: 1.5px solid #d1d5db;
-    color: #374151;
+    border: 1.5px solid var(--border);
+    color: var(--text-dark);
     transition: all 0.2s ease;
 }
 
 .btn-outline:hover {
-    border-color: #9ca3af;
-    background: #f9fafb;
-    color: #111827;
+    border-color: var(--text-light);
+    background: var(--bg-light);
+    color: var(--text-dark);
 }
 
 .btn-primary {
@@ -929,23 +917,25 @@ summary {
     width: 100%;
     padding: 8px;
     margin-bottom: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 13px;
     box-sizing: border-box;
+    background: var(--bg-white);
+    color: var(--text-dark);
 }
 
 .filter-show-more-btn {
     width: 100%;
     padding: 8px;
     margin-top: 8px;
-    background: #f1f5f9;
-    border: 1px solid #cbd5e1;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
     font-weight: 500;
-    color: #475569;
+    color: var(--text-muted);
     transition: background 0.2s;
 }
 
@@ -965,8 +955,8 @@ summary {
     bottom: calc(100% + 8px);
     left: 0;
     min-width: 240px;
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
     padding: 6px;
@@ -985,7 +975,7 @@ summary {
     gap: 10px;
     padding: 9px 12px;
     border-radius: 8px;
-    color: #334155;
+    color: var(--text-dark);
     text-decoration: none;
     font-size: 0.84rem;
     cursor: pointer;
@@ -998,13 +988,13 @@ summary {
 }
 
 .contact-dropdown-item:hover {
-    background: #f1f5f9;
+    background: var(--bg-light);
     color: var(--primary);
 }
 
 .contact-dropdown-item .material-symbols-outlined {
     font-size: 18px;
-    color: #64748b;
+    color: var(--text-muted);
     flex-shrink: 0;
 }
 
@@ -1015,7 +1005,7 @@ summary {
 .contact-dropdown-teklif {
     color: #7c3aed;
     font-weight: 600;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 2px;
     padding-bottom: 10px;
     border-radius: 8px 8px 0 0;
@@ -1055,7 +1045,7 @@ summary {
 
 .contact-gated-text {
     font-size: 0.8rem;
-    color: #64748b;
+    color: var(--text-muted);
     line-height: 1.4;
     margin: 0;
 }
@@ -1078,7 +1068,7 @@ summary {
 }
 
 .filter-show-more-btn:hover {
-    background: #e2e8f0;
+    background: var(--border);
 }
 
 /* Enes Doğanay | 5 Nisan 2026: Mobilde sidebar filtreleri toggle butonu */
@@ -1101,7 +1091,7 @@ summary {
 }
 
 .sidebar-mobile-toggle:hover {
-    background: #f0f2f4;
+    background: var(--bg-light);
 }
 
 @media (min-width: 1024px) {
@@ -1159,7 +1149,7 @@ summary {
     display: flex;
     gap: 1rem;
     background: var(--bg-white);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 1.25rem 1.5rem;
     animation: skeleton-pulse 1.5s ease-in-out infinite;
@@ -1169,7 +1159,7 @@ summary {
     width: 80px;
     height: 80px;
     border-radius: 8px;
-    background: #e5e7eb;
+    background: var(--border);
     flex-shrink: 0;
 }
 
@@ -1182,7 +1172,7 @@ summary {
 
 .skeleton-line {
     border-radius: 4px;
-    background: #e5e7eb;
+    background: var(--border);
 }
 
 .skeleton-line-title {
@@ -1245,7 +1235,7 @@ summary {
 }
 
 .quote-modal {
-  background: #ffffff;
+  background: var(--bg-white);
   border-radius: 16px;
   width: 100%;
   max-width: 520px;
@@ -1273,14 +1263,14 @@ summary {
 
 .firmalar-result-count {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 500;
   margin: 0;
   flex-shrink: 0;
 }
 
 .firmalar-result-count span {
-  color: #137fec;
+  color: var(--primary);
   font-weight: 700;
 }
 
@@ -1291,10 +1281,10 @@ summary {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #f8fafc;
-  color: #64748b;
+  background: var(--bg-light);
+  color: var(--text-muted);
   cursor: pointer;
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
@@ -1327,9 +1317,9 @@ summary {
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--bg-light);
   padding: 0 10px 0 10px;
   height: 40px;
   cursor: pointer;
@@ -1345,19 +1335,19 @@ summary {
 
 .firmalar-sort-icon {
   font-size: 18px;
-  color: #64748b;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .firmalar-sort-label {
   font-size: 13px;
   font-weight: 500;
-  color: #334155;
+  color: var(--text-dark);
 }
 
 .firmalar-sort-chevron {
   font-size: 18px;
-  color: #94a3b8;
+  color: var(--text-light);
   transition: transform 0.2s;
   flex-shrink: 0;
 }
@@ -1371,8 +1361,8 @@ summary {
   top: calc(100% + 6px);
   right: 0;
   min-width: 170px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.10);
   z-index: 200;
@@ -1396,7 +1386,7 @@ summary {
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: #334155;
+  color: var(--text-dark);
   cursor: pointer;
   transition: background 0.15s;
   text-align: left;
@@ -1404,11 +1394,11 @@ summary {
 
 .firmalar-sort-option .material-symbols-outlined {
   font-size: 17px;
-  color: #94a3b8;
+  color: var(--text-light);
 }
 
 .firmalar-sort-option:hover {
-  background: #f1f5f9;
+  background: var(--bg-light);
 }
 
 .firmalar-sort-option.active {
@@ -1439,9 +1429,9 @@ summary {
   display: flex;
   align-items: center;
   gap: 2px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--bg-light);
   padding: 0 2px;
   height: 40px;
   transition: border-color 0.2s;
@@ -1463,7 +1453,7 @@ summary {
   background: transparent;
   border-radius: 8px;
   cursor: pointer;
-  color: #475569;
+  color: var(--text-muted);
   transition: background 0.15s, color 0.15s;
 }
 
@@ -1473,7 +1463,7 @@ summary {
 }
 
 .mini-page-btn:disabled {
-  color: #cbd5e1;
+  color: var(--border);
   cursor: default;
 }
 
@@ -1484,7 +1474,7 @@ summary {
 .mini-page-info {
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-muted);
   padding: 0 6px;
   user-select: none;
   white-space: nowrap;
@@ -1517,8 +1507,8 @@ summary {
 /* Enes Doğanay | 8 Nisan 2026: overflow visible yapıldı (dropdown kırpılmasın) */
 .firmalar-list-view {
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  background: #fff;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
   overflow: visible;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
@@ -1528,12 +1518,12 @@ summary {
   grid-template-columns: 40px minmax(0,1.8fr) minmax(0,1fr) minmax(0,0.75fr) 140px;
   gap: 10px;
   padding: 12px 20px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--bg-light);
+  border-bottom: 1px solid var(--border);
   border-radius: 16px 16px 0 0;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   align-items: center;
@@ -1544,10 +1534,10 @@ summary {
   grid-template-columns: 40px minmax(0,1.8fr) minmax(0,1fr) minmax(0,0.75fr) 140px;
   gap: 10px;
   padding: 12px 20px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
   align-items: center;
   font-size: 0.875rem;
-  color: #334155;
+  color: var(--text-dark);
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -1558,7 +1548,7 @@ summary {
 }
 
 .firmalar-list-row:hover {
-  background: #f8fafc;
+  background: var(--bg-light);
 }
 
 .firmalar-list-col {
@@ -1578,8 +1568,8 @@ summary {
   height: 34px;
   border-radius: 8px;
   object-fit: contain;
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
   padding: 2px;
 }
 
@@ -1598,7 +1588,7 @@ summary {
 
 .firmalar-list-col--name {
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-dark);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -1634,12 +1624,12 @@ summary {
 
 .firmalar-list-col--sector {
   font-size: 0.82rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .firmalar-list-col--location {
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 /* Enes Doğanay | 8 Nisan 2026: Liste görünümü - iletişime geç butonu (kart ile aynı btn-outline, küçük) */
@@ -1757,13 +1747,13 @@ summary {
 .quote-modal-header h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-dark);
   margin: 0;
 }
 
 .quote-modal-subtitle {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 4px 0 0;
 }
 
@@ -1773,13 +1763,13 @@ summary {
   cursor: pointer;
   padding: 4px;
   border-radius: 8px;
-  color: #9ca3af;
+  color: var(--text-light);
   transition: all 0.15s;
 }
 
 .quote-modal-close:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--bg-light);
+  color: var(--text-dark);
 }
 
 .quote-modal-body {
@@ -1799,7 +1789,7 @@ summary {
 .quote-form-group label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-dark);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -1809,12 +1799,12 @@ summary {
 .quote-form-group textarea,
 .quote-form-group select {
   padding: 10px 12px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 10px;
   font-size: 0.9rem;
   font-family: 'Inter', sans-serif;
-  color: #111827;
-  background: #fafbfc;
+  color: var(--text-dark);
+  background: var(--bg-light);
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
   width: 100%;
@@ -1830,7 +1820,7 @@ summary {
 .quote-form-group select:focus {
   border-color: #137fec;
   box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
-  background: #ffffff;
+  background: var(--bg-white);
 }
 
 .quote-form-group textarea {
@@ -1848,15 +1838,15 @@ summary {
   align-items: flex-start;
   gap: 8px;
   font-size: 0.78rem;
-  color: #9ca3af;
-  background: #f8fafc;
+  color: var(--text-light);
+  background: var(--bg-light);
   border-radius: 8px;
   padding: 10px 12px;
 }
 
 .quote-form-info .material-symbols-outlined {
   font-size: 16px;
-  color: #9ca3af;
+  color: var(--text-light);
   margin-top: 1px;
   flex-shrink: 0;
 }
@@ -1868,7 +1858,7 @@ summary {
   gap: 0.75rem;
   padding: 1rem 1.5rem 1.5rem;
   justify-content: flex-end;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border);
 }
 
 .quote-btn-cancel {
@@ -1880,17 +1870,17 @@ summary {
   font-weight: 600 !important;
   font-size: 0.9rem !important;
   line-height: 1.25 !important;
-  border: 1.5px solid #e5e7eb !important;
-  background: #ffffff !important;
-  color: #374151 !important;
+  border: 1.5px solid var(--border) !important;
+  background: var(--bg-white) !important;
+  color: var(--text-dark) !important;
   cursor: pointer;
   transition: all 0.2s !important;
 }
 
 .quote-btn-cancel:hover {
-  background: #f9fafb !important;
-  border-color: #d1d5db !important;
-  color: #111827 !important;
+  background: var(--bg-light) !important;
+  border-color: var(--text-light) !important;
+  color: var(--text-dark) !important;
 }
 
 .quote-btn-send {
@@ -1942,13 +1932,13 @@ summary {
 .quote-modal-success h3 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-dark);
   margin: 0;
 }
 
 .quote-modal-success p {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -1980,11 +1970,11 @@ summary {
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border: 1.5px dashed #d1d5db;
+  border: 1.5px dashed var(--border);
   border-radius: 10px;
-  background: #fafbfc;
+  background: var(--bg-light);
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, color 0.2s;
   max-width: 100%;
@@ -2026,4 +2016,110 @@ summary {
 
 .quote-file-remove .material-symbols-outlined {
   font-size: 16px;
+}
+
+/* ── Dark Mode ─────────────────────────────────────────────────── */
+/* Enes Doğanay | 2 Mayıs 2026: Faz 6 — Firmalar.css dark mode override'ları */
+
+/* Filter chips — semantik renkler, dark'ta koyu ton */
+[data-theme="dark"] .filter-chip--cities {
+    background-color: #1e2d4a;
+    color: #93c5fd;
+    border-color: #1e40af;
+}
+
+[data-theme="dark"] .filter-chip--sectors {
+    background-color: #14291e;
+    color: #4ade80;
+    border-color: #166534;
+}
+
+[data-theme="dark"] .filter-chip--categories {
+    background-color: #2a1a0a;
+    color: #fb923c;
+    border-color: #9a3412;
+}
+
+/* Platform badge (amber) */
+[data-theme="dark"] .platform-badge-text {
+    background: #292007;
+    color: #fbbf24;
+    border-color: #92400e;
+}
+
+[data-theme="dark"] .platform-badge-icon {
+    color: #fbbf24;
+}
+
+/* "Bunu mu demek istediniz?" */
+[data-theme="dark"] .did-you-mean {
+    background: #1e2d4a;
+    border-color: #1e40af;
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .did-you-mean:hover {
+    background: #1a2a44;
+    border-color: #2563eb;
+}
+
+/* Toolbar hover */
+[data-theme="dark"] .firmalar-view-toggle:hover {
+    background: #1e2d4a;
+    color: #60a5fa;
+    border-color: #1e40af;
+}
+
+[data-theme="dark"] .firmalar-sort-trigger:hover {
+    background: #1e2d4a;
+    border-color: #1e40af;
+}
+
+[data-theme="dark"] .firmalar-sort-option.active {
+    color: #60a5fa;
+    background: #1e2d4a;
+}
+
+[data-theme="dark"] .firmalar-sort-option.active .material-symbols-outlined {
+    color: #60a5fa;
+}
+
+/* Mini pagination hover */
+[data-theme="dark"] .mini-page-btn:hover:not(:disabled) {
+    background: #1e2d4a;
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .mini-page-current {
+    color: #60a5fa;
+}
+
+/* Contact dropdown — teklif (purple) */
+[data-theme="dark"] .contact-dropdown-teklif {
+    color: #a78bfa;
+}
+
+[data-theme="dark"] .contact-dropdown-teklif .material-symbols-outlined {
+    color: #a78bfa;
+}
+
+[data-theme="dark"] .contact-dropdown-teklif:hover {
+    background: #1e1a2e;
+    color: #c4b5fd;
+}
+
+/* Gated lock icon */
+[data-theme="dark"] .contact-gated-lock {
+    color: var(--text-light);
+}
+
+/* Response badge (yeşil — semantic) */
+[data-theme="dark"] .response-badge {
+    background: #14291e;
+    color: #4ade80;
+}
+
+/* Rating yıldız */
+[data-theme="dark"] .rating {
+    color: #fbbf24;
 }

@@ -700,6 +700,77 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: hakkimizda.css dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .about-page-wrapper {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-gray-bg,
+[data-theme="dark"] .about-page-wrapper .about-stats-section {
+  background-color: #1e293b;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-badge {
+  background-color: rgba(59, 158, 255, 0.12);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-value-card {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-value-icon {
+  background-color: rgba(59, 158, 255, 0.12);
+  color: var(--primary);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-light {
+  background-color: #334155;
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-light:hover {
+  background-color: #475569;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-outline {
+  background-color: #1e293b;
+  color: var(--text-gray);
+  border-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-outline:hover {
+  background-color: #0f172a;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-feature-icon {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-line {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-dot {
+  border-color: #0f172a;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-dot.outline {
+  background-color: #0f172a;
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-dot.outline div {
+  background-color: var(--primary);
+}
+
 /* Footer */
 .about-page-wrapper .about-footer {
   background-color: white;
