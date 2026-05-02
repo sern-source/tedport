@@ -315,6 +315,240 @@ const SYNONYM_GROUPS = [
   ['geri dönüşüm', 'atık geri kazanım', 'hurda', 'hurdacı', 'ikincil hammadde'],
   ['atık yönetim', 'atık bertaraf', 'çevre danışmanlık'],
 
+  // ═══════════════════════════════════════════════════════
+  // Enes Doğanay | 2 Mayıs 2026: ÜRÜN TİPLERİ & VARYANTLAR
+  // ═══════════════════════════════════════════════════════
+
+  // POMPALAR — ürün tipleri
+  ['santrifüj pompa', 'merkezi pompa', 'centrifugal pump', 'volüt pompa', 'tek kademeli pompa', 'çok kademeli pompa', 'in-line pompa', 'end suction pompa'],
+  ['dalgıç pompa', 'submersible pump', 'derin kuyu pompası', 'drenaj dalgıç', 'pis su dalgıç pompası', 'kuyu pompası'],
+  ['dişli pompa', 'gear pump', 'loblu pompa', 'lob pompa', 'dişli çark pompa', 'döner dişli pompa'],
+  ['peristaltik pompa', 'hortum pompası', 'peristaltic pump', 'tüplü pompa', 'hose pump'],
+  ['pistonlu pompa', 'piston pump', 'alternatif pompa', 'krank pompa', 'plunger pompa'],
+  ['membran pompa', 'diyafram pompa', 'diaphragm pump', 'hava tahrikli membran pompa', 'AODD pompa', 'çift diyaframlı pompa'],
+  ['vida pompası', 'vidalı pompa', 'screw pump', 'tek vidalı pompa', 'çift vidalı pompa', 'mono pompa'],
+  ['vakum pompası', 'vacuum pump', 'halkalı vakum pompası', 'kuru vakum pompası', 'oil-free vakum', 'sıvı halkalı pompa'],
+  ['dozaj pompası', 'dozlama pompası', 'metering pump', 'dozajlama pompası', 'kimyasal dozaj', 'peristaltik dozaj'],
+  ['pompaj istasyonu', 'buster pompa', 'hidrofor', 'hidrofor seti', 'basınç artırma seti', 'hidrofor grubu'],
+
+  // VANALAR — ürün tipleri
+  ['küresel vana', 'ball valve', 'tam delikli küresel vana', 'v port küresel vana', 'trunnion ball valve', 'floating ball valve'],
+  ['kelebek vana', 'butterfly valve', 'diskli vana', 'flanşlı kelebek vana', 'wafer tip kelebek vana', 'double offset butterfly', 'triple offset butterfly'],
+  ['sürgülü vana', 'gate valve', 'kama vana', 'paralel disk vana', 'sluice valve', 'lineer hareket vana'],
+  ['çek valf', 'check valve', 'geri dönüş vanası', 'non-return valve', 'salınımlı çek valf', 'lift check valve', 'wafer check valve'],
+  ['globe vana', 'stop vana', 'kontrol vanası', 'düz akışlı vana', 'globe valve', 'needle globe'],
+  ['iğne vana', 'needle valve', 'ince ayar vanası', 'mikrodoz vanası', 'strangulation valve'],
+  ['basınç düşürücü vana', 'PRV', 'regülatör vana', 'pressure reducing valve', 'basınç kontrol vanası', 'balanslama vanası'],
+  ['emniyet valfi', 'güvenlik vanası', 'safety valve', 'relief valve', 'tahliye valfi', 'spring loaded safety valve'],
+  ['solenoid vana', 'elektro vana', 'solenoid valve', 'elektromanyetik vana', 'NC solenoid', 'NO solenoid', '2/2 solenoid', '3/2 solenoid'],
+  ['bileziksiz vana', 'bellow seal valve', 'körük sızdırmazlıklı vana', 'sızdırmaz vana'],
+  ['termostatik vana', 'termostat vanası', 'thermostatic valve', 'radyatör vanası', 'ısı kontrol vanası'],
+  ['3 yollu vana', 'üç yollu vana', '3-way valve', 'mixing valve', 'karıştırma vanası', 'bölücü vana', 'diverting valve'],
+  ['pnömatik aktüatörlü vana', 'motorlu vana', 'actuated valve', 'elektromotorlu vana', 'kontrol vanası aktüatörlü'],
+
+  // KOMPRESÖRLER — ürün tipleri
+  ['pistonlu kompresör', 'reciprocating compressor', 'alternatif kompresör', 'tek kademeli piston kompresör', 'çift kademeli piston kompresör', 'tankli kompresör'],
+  ['vidalı kompresör', 'screw compressor', 'rotary screw compressor', 'yağlı vidalı kompresör', 'yağsız vidalı kompresör', 'oil-free screw compressor'],
+  ['scroll kompresör', 'scroll compressor', 'spiral kompresör', 'hermetik scroll'],
+  ['santrifüj kompresör', 'centrifugal compressor', 'turbo kompresör', 'dinamik kompresör', 'turbo blower'],
+  ['diyafram kompresör', 'membran kompresör', 'diaphragm compressor', 'yüksek basınç diyafram kompresör'],
+  ['hava tankı', 'basınçlı hava tankı', 'kompresör tankı', 'alıcı tank', 'receiver tank', 'hava deposu'],
+  ['hava kurutucu', 'refrigerant dryer', 'adsorpsiyon kurutucu', 'nem alıcı hava', 'hava filtre kurutucu', 'desiccant dryer'],
+  ['hava filtresi kompresör', 'filtre regülatör', 'FRL grubu', 'filtre regülatör yağlayıcı', 'FRL set'],
+
+  // FİLTRELER — ürün tipleri
+  ['torba filtre', 'bag filter', 'filtre torbası', 'pulse jet torba filtre', 'jet pulse bag filter', 'toz toplama torba filtre'],
+  ['kartuş filtre', 'cartridge filter', 'katlanmış kartuş', 'membran kartuş', 'pleated cartridge', 'endüstriyel kartuş'],
+  ['kum filtresi', 'sand filter', 'kuvars kum filtresi', 'hızlı kum filtresi', 'yavaş kum filtresi'],
+  ['aktif karbon filtresi', 'karbon filtre', 'aktif kömür filtresi', 'koku giderme filtresi', 'GAC filtresi'],
+  ['HEPA filtre', 'mutlak filtre', 'yüksek verimli filtre', 'temiz oda filtresi', 'H13 filtre', 'H14 filtre', 'ULPA filtre'],
+  ['separator', 'siklonlu separator', 'santrifüj separator', 'yağ su separator', 'mist separator', 'sis filtresi'],
+  ['coalescer', 'birleştirici filtre', 'yağ tutucu filtre', 'mist eliminator', 'sıvı koaleser'],
+  ['panel filtre', 'hava panel filtresi', 'G4 filtre', 'F7 filtre', 'F9 filtre', 'EU4 filtre', 'EU7 filtre'],
+  ['sıvı filtresi', 'Y tipi filtre', 'basket filtre', 'duplex filtre', 'otomatik temizlemeli filtre', 'self cleaning filter'],
+  ['membran filtresi', 'UF membran', 'NF membran', 'RO membranı', 'mikrofiltrasyon membranı', 'ultrafiltrasyon'],
+
+  // ISI EŞANJÖRÜ — ürün tipleri
+  ['plakalı eşanjör', 'plate heat exchanger', 'PHE', 'lehimli plakalı eşanjör', 'gevşek plakalı eşanjör', 'brazed plate heat exchanger'],
+  ['borulu ısı eşanjörü', 'shell and tube heat exchanger', 'kabuk boru eşanjör', 'boru demeti eşanjör', 'double pipe heat exchanger'],
+  ['sarmal eşanjör', 'spiral heat exchanger', 'helikal eşanjör', 'wort chiller'],
+  ['kanatçıklı eşanjör', 'fin tube heat exchanger', 'finli boru eşanjör', 'yüzgeçli eşanjör', 'air cooled heat exchanger'],
+  ['plaka soğutucu', 'su soğutucu eşanjör', 'gıda eşanjör', 'süt eşanjör', 'içecek eşanjör'],
+
+  // TANKLAR VE DEPOLAR — ürün tipleri
+  ['paslanmaz tank', 'inox tank', 'paslanmaz depo', 'gıda tankı', 'kimyasal depolama tankı', 'AISI 304 tank', 'AISI 316 tank'],
+  ['polyester tank', 'GRP tank', 'cam elyaf tank', 'fiberglass tank', 'FRP tank', 'cam takviyeli polyester tank'],
+  ['PE tank', 'polietilen tank', 'polietilen depo', 'hdpe tank', 'polietilen su deposu', 'plastik depo'],
+  ['silobas', 'silo', 'konik silobas', 'kuru silo', 'toz silo', 'metal silo', 'tahıl silosu', 'çimento silosu'],
+  ['IBC tank', 'hazır kap', 'konteyner kap', 'ara yığın konteyner', '1000 lt konteyner'],
+  ['basınçlı kap', 'pressure vessel', 'basınç tankı', 'otoklav tank', 'ASME tankı', 'PED basınçlı kap'],
+  ['yakıt tankı', 'mazot tankı', 'dizel yakıt deposu', 'çelik yakıt tankı', 'yeraltı yakıt tankı', 'üst zemin yakıt tankı'],
+
+  // KLİMA & HVAC ÜRÜNLER
+  ['split klima', 'inverter klima', 'duvar tipi klima', 'eko inverter', 'A++ klima', 'monoblok klima'],
+  ['kaset klima', 'kaset tipi klima', 'dörtlü kaset klima', 'ikili kaset klima', 'slim kaset klima'],
+  ['kanal tipi klima', 'ducted klima', 'kanallı klima', 'kanal tipi ünite', 'yüksek statik kanallı klima'],
+  ['VRF sistemi', 'VRV sistemi', 'multi split sistem', 'çoklu iç ünite sistemi', 'heat recovery VRF'],
+  ['AHU', 'klima santrali', 'hava işleme ünitesi', 'air handling unit', 'havalandırma santrali', 'rooftop AHU'],
+  ['FCU', 'fan coil ünitesi', 'fan coil', 'fancoil', 'yatay FCU', 'dikey FCU', 'standart FCU', 'kanal FCU'],
+  ['chiller', 'su soğutma grubu', 'hava soğutmalı chiller', 'su soğutmalı chiller', 'absorbsiyonlu chiller', 'manyetik yataklı chiller'],
+  ['soğuk oda', 'cold room', 'şok dondurma odası', 'pozitif soğuk oda', 'negatif soğuk oda', 'derin dondurucu oda'],
+  ['hava perdesi', 'air curtain', 'hava corteni', 'ısıtmalı hava perdesi', 'endüstriyel hava perdesi'],
+  ['radyant ısıtıcı', 'infrared ısıtıcı', 'gaz radyant', 'elektrik radyant', 'tüplü radyant ısıtıcı'],
+
+  // ELEKTRİK ÜRÜNLER — tipler
+  ['güç kaynağı', 'SMPS', 'switch mode güç kaynağı', 'DC güç kaynağı', 'DIN ray güç kaynağı', 'power supply', '24V DC güç kaynağı', '48V DC güç kaynağı'],
+  ['otomatik sigorta', 'MCB', 'C eğrisi sigorta', 'B eğrisi sigorta', 'D eğrisi sigorta', 'bipolar sigorta', 'tripolar sigorta'],
+  ['artık akım koruma', 'RCCB', 'RCD', 'kaçak akım koruma', 'RCBO', '30mA RCD', 'diferansiyel şalter'],
+  ['kontaktör', 'AC kontaktör', 'DC kontaktör', 'güç kontaktörü', 'motor kontaktörü', 'kapasitör kontaktörü'],
+  ['termik röle', 'bimetalik röle', 'aşırı yük rölesi', 'thermal overload relay', 'elektronik aşırı yük rölesi'],
+  ['zaman rölesi', 'timer röle', 'on-delay röle', 'off-delay röle', 'dijital zaman rölesi', 'çok fonksiyonlu zaman rölesi'],
+  ['yumuşak yolvericisi', 'soft starter', 'yumuşak start', 'motorlu yumuşak yolvericisi', 'elektronik yolvericisi'],
+  ['motor koruma şalteri', 'motor circuit breaker', 'motor devre kesici', 'kompakt devre kesici'],
+  ['busbar', 'bara', 'bakır bara', 'alüminyum bara', 'bara sistemi', 'bara dağıtım', 'busbar trunking'],
+  ['enerji analizörü', 'güç analizörü', 'power analyzer', 'şebeke analizörü', 'enerji ölçer', 'power quality analyzer'],
+  ['yıldırım koruma', 'parafudr', 'SPD', 'surge protector', 'aşırı gerilim koruma', 'lightning arrester'],
+  ['izolasyon trafısı', 'medikal trafo', 'tıbbi izolasyon trafosu', 'IT sistemleri trafosu'],
+
+  // OTOMASYON & KONTROL — ürün tipleri
+  ['PLC modülü', 'CPU modül', 'I/O modül', 'dijital giriş modülü', 'analog giriş modülü', 'PLC kartı', 'remote I/O'],
+  ['HMI panel', 'dokunmatik panel', 'operatör paneli', 'HMI ekran', 'endüstriyel dokunmatik ekran', 'SCADA panel'],
+  ['servo sürücü', 'servo kontrol', 'servo amplifikatör', 'servo drive', 'servo sistemi', 'AC servo sürücü'],
+  ['step motor sürücü', 'step driver', 'adım motor sürücüsü', 'stepper controller'],
+  ['endüktif sensör', 'manyetik sensör', 'proximity switch', 'yakınlık sensörü', 'flush sensör', 'non-flush sensör'],
+  ['optik sensör', 'fotoelektrik sensör', 'lazer sensör', 'bariyer sensör', 'yansımalı sensör', 'diffuse sensör'],
+  ['ultrasonik sensör', 'mesafe sensörü', 'seviye sensörü', 'ultrasonic level sensor', 'ultrasonic distance sensor'],
+  ['basınç sensörü', 'basınç transmitteri', 'manometrik sensör', 'pressure transmitter', 'diferansiyel basınç transmitteri'],
+  ['sıcaklık sensörü', 'PT100', 'termokupl tip K', 'termokupl tip J', 'NTC sensör', 'temperature sensor', 'RTD sensör'],
+  ['akış sensörü', 'flow switch', 'manyetik akış ölçer', 'kütlesel akış ölçer', 'vortex flowmeter', 'turbine flowmeter'],
+  ['enkoder', 'rotary encoder', 'lineer enkoder', 'artımlı enkoder', 'mutlak enkoder', 'hollow shaft encoder'],
+  ['limit switch', 'son durak şalteri', 'mikro switch', 'pozisyon sensörü', 'roller limit switch'],
+  ['RFID okuyucu', 'barkod tarayıcı', 'QR okuyucu', 'endüstriyel barkod', '2D barkod', 'vision sensör'],
+
+  // BORU & TESİSAT BAĞLANTI ELEMANLARI
+  ['PPRC boru', 'polipropilen boru', 'PP-R boru', 'PPR boru', 'ısıtma PPR borusu', 'sıcak su PPR borusu', 'PN20 PPR', 'PN10 PPR'],
+  ['PEX boru', 'çapraz bağlı polietilen boru', 'PEX-A boru', 'PEX-B boru', 'esnek boru', 'yerden ısıtma borusu'],
+  ['HDPE boru', 'PE100 boru', 'PE80 boru', 'polietilen basınç borusu', 'PE içme suyu borusu', 'PN6 PE', 'PN16 PE'],
+  ['spiral çelik boru', 'kaynaklı spiral boru', 'SSAW boru', 'büyük çap çelik boru', 'ERW boru', 'LSAW boru'],
+  ['drenaj borusu', 'pis su borusu', 'PVC drenaj', 'yağmur suyu borusu', 'atık su borusu', 'üç kat boru'],
+  ['bakır boru', 'sert bakır boru', 'yarı sert bakır boru', 'yumuşak bakır', 'ACR bakır boru', 'klima bakır borusu'],
+  ['çelik flanş', 'weld neck flanş', 'slip on flanş', 'blind flanş', 'kör flanş', 'ANSI B16.5 flanş', 'PN16 flanş', 'PN40 flanş'],
+  ['dirsek boru', '90 derece dirsek', '45 derece dirsek', 'elbow', 'kaynaklı dirsek', 'vidalı dirsek', 'geçişli dirsek'],
+  ['te parçası', 'tee fitting', 'T bağlantı', 'eşit te', 'redüksiyonlu te', 'vidalı te', 'kaynaklı te'],
+  ['redüksiyon fitting', 'konik redüksiyon', 'konsantrik redüksiyon', 'eksentrik redüksiyon', 'boru indirgeyici'],
+  ['manşon', 'boru manşonu', 'sleeve coupling', 'birleştirici manşon', 'kompansatör', 'esnek boru bağlantısı'],
+  ['nipel', 'boru nipeli', 'uzatma nipeli', 'çift dış dişli', 'iç-dış dişli nipel'],
+  ['kompansatör', 'ekspansiyon kompansatörü', 'bükümlü kompansatör', 'aksiyel kompansatör', 'yanal kompansatör', 'metal bellows'],
+
+  // MAKİNE ALETLERİ & EL ALETLERİ — ürün tipleri
+  ['açı taşlama', 'avuç taşlama', 'angle grinder', '115mm taşlama', '125mm taşlama', '230mm taşlama'],
+  ['elektrikli matkap', 'şarjlı matkap', 'darbeli matkap', 'kırıcı delici', 'SDS plus matkap', 'SDS max matkap', 'kargabumu'],
+  ['vidalama makinesi', 'akülü tornavida', 'şarjlı tornavida', 'çift hızlı matkap', 'darbeli tornavida'],
+  ['tork anahtarı', 'dinamometrik anahtar', 'torque wrench', 'tork tabancası', 'dijital tork anahtarı'],
+  ['pnömatik tabanca', 'hava tabancası', 'darbe anahtarı', 'air impact wrench', 'pnömatik tornavida'],
+  ['hidrolik kriko', 'şişe kriko', 'makas kriko', 'hydraulic jack', 'döşeme krikosu'],
+  ['lehim aleti', 'kaynak torcu', 'propan torcu', 'asetilenli kaynak seti', 'mig kaynak makinesi tüketimleri'],
+  ['bant testere', 'metal kesim testeresi', 'daire testere', 'şerit testere', 'ahşap testere makinesi'],
+  ['zımpara makinesi', 'bant zımpara', 'diskli zımpara', 'titreşimli zımpara', 'random orbital zımpara'],
+  ['pres vida', 'mengene', 'tabla mengenesi', 'tezgah mengenesi', 'bench vise'],
+  ['ölçüm aleti', 'dijital kumpas', 'mikrometre', 'komparatör', 'açı ölçer', 'dijital seviye göstergesi', 'lazer seviye cihazı'],
+
+  // VİNÇ & KALDIRMA EKİPMANLARI — ürün tipleri
+  ['köprülü vinç', 'overhead crane', 'tek kirişli köprülü vinç', 'çift kirişli köprülü vinç', 'portal vinç', 'gantry crane'],
+  ['konsol vinç', 'jib crane', 'döner vinç', 'duvar tipi vinç', 'sabit konsol vinç', 'zemin konsollu vinç'],
+  ['zincirli palanga', 'zincirli vinç', 'chain hoist', 'elektrikli palanga', 'manuel palanga', 'monoraylı palanga'],
+  ['halatli vinç', 'wire rope hoist', 'çelik halatlı vinç', 'tek halatlı vinç', 'çift halatlı vinç'],
+  ['transpalet', 'el transpaleti', 'elektrikli transpalet', 'hand pallet truck', 'motorlu transpalet', 'yüksek kaldırmalı transpalet'],
+  ['istif makinesi', 'reach truck', 'counterbalance forklift', 'order picker', 'çekici araç', 'çekici forklift'],
+
+  // KONVEYÖR — ürün tipleri
+  ['bant konveyör', 'belt conveyor', 'lastik bantlı konveyör', 'düz bant konveyör', 'yükseltici bant konveyör', 'moduler bant konveyör'],
+  ['makaralı konveyör', 'roller conveyor', 'rulolu konveyör', 'çekilmeli makaralı', 'motorlu makaralı konveyör'],
+  ['vidalı konveyör', 'helezon konveyör', 'screw conveyor', 'spiral konveyör', 'toz taşıyıcı helezon'],
+  ['titreşimli konveyör', 'vibrasyon konveyör', 'rezonans konveyör', 'shaker konveyör'],
+  ['zincirli konveyör', 'chain conveyor', 'traction chain conveyor', 'scraper conveyor', 'apron konveyör'],
+  ['pnömatik taşıma', 'pneumatic conveying', 'vakumlu taşıma', 'basınçlı taşıma', 'dense phase', 'dilute phase'],
+
+  // ÇELİK YAPI & ÇATI ÜRÜNLER
+  ['sandviç panel', 'çatı sandviç paneli', 'cephe sandviç paneli', 'PUR sandviç panel', 'PIR sandviç panel', 'EPS sandviç panel', 'rockwool sandviç panel'],
+  ['trapez sac', 'trapez profil', 'oluklu sac', 'çatı trapez sacı', 'cephe trapez sacı', 'galvanizli trapez', 'T35 trapez', 'T50 trapez'],
+  ['Z purlin', 'C purlin', 'çatı aşığı', 'aşık', 'çatı mertekleri', 'galvanizli aşık', 'soğuk hadde aşık'],
+  ['çelik kolon', 'kolon profili', 'HEA kolon', 'HEB kolon', 'kutu profil kolon', 'kafes kolon'],
+  ['çelik kiriş', 'ana kiriş', 'çatı kirişi', 'I kiriş', 'H kiriş', 'kafes kiriş', 'makaslar'],
+  ['döşeme sacı', 'composition deck', 'corrugated deck', 'çelik döşeme sacı', 'betonarme için döşeme sacı'],
+  ['grating', 'çelik ızgara', 'platform ızgarası', 'yürüme platformu sacı', 'steel grating', 'servis platformu sacı'],
+
+  // OTOMOTİV ÜRÜNLER — tipler
+  ['motor yağı', 'SAE 5W30', 'SAE 10W40', 'SAE 15W40', 'tam sentetik motor yağı', 'yarı sentetik motor yağı', 'mineral motor yağı'],
+  ['akü araç', '12V akü', '24V akü', 'kuru akü', 'bakımsız akü', 'AGM akü', 'EFB akü', 'gel akü', 'stop-start akü'],
+  ['antifriz', 'soğutma suyu', 'coolant', 'glikol bazlı antifriz', 'organik OAT antifriz', 'hazır karışım antifriz'],
+  ['silecek', 'ön cam sileceği', 'flat silecek', 'beam silecek', 'hybrid silecek', 'arka silecek'],
+  ['fren balatası', 'ön balata', 'arka balata', 'disk balata', 'pabuç balata', 'semi metalik balata', 'seramik balata'],
+  ['ateşleme bujisi', 'buji', 'spark plug', 'iridyum buji', 'platin buji', 'çift elektrotlu buji'],
+  ['transmisyon sıvısı', 'otomatik şanzıman yağı', 'ATF', 'DSG yağı', 'CVT yağı', 'manuel şanzıman yağı'],
+  ['diferansiyel yağı', 'arka aks yağı', 'gear oil', 'SAE 80W90', 'SAE 75W90', 'GL-5 yağı'],
+
+  // AMBALAJ ÜRÜNLER — tipler
+  ['vakum torbası', 'vakum poşet', 'vakum ambalaj torbası', 'bariyer torba', 'PA/PE vakum', 'cook-in torba'],
+  ['standart karton kutu', 'RSC kutu', 'çift oluklu karton', 'tek oluklu karton', 'mikro oluklu karton', 'nakliye karton kutusu'],
+  ['streç film', 'makine steci', 'el steci', 'stretch wrap', 'palet sargı filmi', 'cast stretch film'],
+  ['termal etiket', 'direkt termal etiket', 'termal transfer etiket', 'barkod etiketi', 'endüstriyel termal etiket'],
+  ['buble wrap', 'kabarcıklı naylon rulo', 'small bubble wrap', 'large bubble wrap', 'anti-statik bubble wrap'],
+  ['PP çember bant', 'PET çember bant', 'çemberleme bandı', 'çember bant', 'çemberleme aksesuarı', 'çemberleme makinesi'],
+  ['akıllı etiket', 'RFID etiket', 'NFC etiket', 'elektronik etiket', 'smart label'],
+  ['köpük ambalaj', 'strafor ambalaj', 'EPS köpük ambalaj', 'PE köpük ambalaj', 'pu köpük ambalaj', 'şekillendirilmiş köpük'],
+  ['alüminyum kap', 'alüminyum folyo kap', 'alüminyum tepsi', 'gastronorm alüminyum', 'food tray'],
+
+  // MOBİLYA & İÇ MEKAN
+  ['kapı', 'iç kapı', 'ahşap iç kapı', 'amerikan kapı', 'laminat kapı', 'masif kapı', 'ateş kapısı', 'duman kapısı'],
+  ['dolap', 'ankastre dolap', 'gardırop', 'ofis dolabı', 'arşiv dolabı', 'metal kasa', 'kilitli dolap'],
+  ['masa', 'çalışma masası', 'toplantı masası', 'ofis masası', 'bilgisayar masası', 'yükseklik ayarlı masa'],
+  ['sandalye', 'ofis sandalyesi', 'ergonomik sandalye', 'yönetici koltuğu', 'misafir sandalyesi', 'bekleme koltuğu'],
+  ['raf sistemi', 'depo rafı', 'paletli raf', 'konsol raf', 'cantilever raf', 'küçük parça rafı', 'arabalı raf'],
+  ['perde', 'stor perde', 'zebra perde', 'dikey perde', 'güneşlik perde', 'blackout perde', 'roller blind'],
+
+  // MEDIKAL & LABORATuvar ÜRÜNLER
+  ['muayene eldiveni', 'nitril muayene eldiveni', 'latex muayene eldiveni', 'vinil muayene eldiveni', 'pudrasız eldiven'],
+  ['laboratuvar ekipmanı', 'analitik terazi', 'hassas terazi', 'pipet', 'mikropipet', 'beher', 'erlenmayer balonu', 'cam malzeme lab'],
+  ['otoklav', 'sterilizatör', 'buhar sterilizatörü', 'kuru ısı sterilizatörü', 'UV sterilizatör'],
+  ['tanı cihazı', 'biyokimya analizörü', 'kan sayım cihazı', 'PCR cihazı', 'immunoassay analizörü', 'idrar analizörü'],
+  ['ilaç ambalajı', 'blister ambalaj', 'ilaç şişesi', 'amber şişe', 'ilaç tüpü', 'çocuklara güvenli kapak'],
+
+  // BİNA ELEKTRİK TESİSATI
+  ['LED armatür', 'led panel armatür', 'led tüp armatür', 'led downlight', 'highbay armatür', 'floodlight armatür', 'sokak armatürü'],
+  ['buton ve anahtar', 'endüstriyel buton', 'acil stop butonu', 'aydınlatmalı buton', 'selector switch', 'cam altı buton'],
+  ['kablo kanalı', 'plastik kablo kanalı', 'metal kablo kanalı', 'PVC kablo kanalı', 'kablo oluk', 'kablo kanalı kapağı'],
+  ['dağıtım kutusu', 'buat', 'junction box', 'branşman kutusu', 'pano kutusu', 'elektrik dağıtım kutusu'],
+  ['koruge boru', 'esnek elektrik borusu', 'PVC elektrik borusu', 'kablo borusu', 'esnek tesisat borusu'],
+  ['topraklama elektrodu', 'bakır topraklama çubuğu', 'topraklama barası', 'earth rod', 'toprak iletkeni'],
+
+  // GÜVENLIK & YANGIN
+  ['kuru kimyevi toz söndürücü', 'CO2 yangın söndürücü', 'köpüklü söndürücü', 'yangın söndürücü tüp', '6 kg söndürücü', '12 kg söndürücü'],
+  ['sprinkler başlığı', 'deluge sprinkler', 'pre-action sprinkler', 'wet pipe sprinkler', 'gizli tip sprinkler'],
+  ['yangın alarm paneli', 'yangın algılama sistemi', 'duman dedektörü', 'ısı dedektörü', 'alev dedektörü', 'adresli yangın paneli'],
+  ['acil aydınlatma', 'exit işareti', 'kaçış yolu armatürü', 'emergency luminaire', 'akülü acil armatür'],
+  ['güvenlik kamerası', 'IP kamera', 'dome kamera', 'bullet kamera', 'PTZ kamera', 'fisheye kamera', '4K güvenlik kamerası'],
+  ['geçiş kontrol', 'turnike', 'bariyer', 'full beden turnike', 'tripod turnike', 'kartlı geçiş sistemi'],
+  ['alarm sistemi', 'hırsız alarm', 'hareket sensörü', 'PIR dedektör', 'manyetik kontak', 'dokunma dedektörü'],
+
+  // İŞ GÜVENLİĞİ KİŞİSEL KORUYUCU DONANIM
+  ['baret', 'koruyucu kask', 'ABS baret', 'HDPE baret', 'elektrikli işler bareti', 'yansıtıcılı baret'],
+  ['eldiven', 'iş eldiveni', 'nitril eldiven', 'latex eldiven', 'mekanik risk eldiveni', 'kesilme önleyici eldiven', 'kaynakçı eldiveni'],
+  ['iş ayakkabısı', 'çelik burun ayakkabı', 'safety shoes', 'kompozit burunlu ayakkabı', 'su geçirmez iş botu', 'anti-statik ayakkabı'],
+  ['yüz siperi', 'güvenlik gözlüğü', 'face shield', 'polisaj gözlüğü', 'toz gözlüğü', 'kaynak maskesi'],
+  ['solunum koruyucu', 'toz maskesi', 'FFP1 maske', 'FFP2 maske', 'FFP3 maske', 'yarım yüz maskesi', 'tam yüz maskesi'],
+  ['yüksekte çalışma', 'paraşüt tipi emniyet kemeri', 'emniyet kemeri', 'lanyard', 'fall arrest', 'bağlama halatı'],
+  ['koruyucu kıyafet', 'tyvek tulum', 'atex giysi', 'high-vis yelek', 'reflektif tulum', 'kimyasal koruma elbisesi'],
+  ['kulak koruyucu', 'kulaklık', 'tıkaç', 'ear plug', 'ear muff', 'SNR kulak koruyucu'],
+
+  // GENEL SANAYİ ÜRÜNLER
+  ['endüstriyel raf', 'çelik raf', 'depo raf sistemi', 'yük rafı', 'orta yük rafı', 'ağır yük rafı'],
+  ['endüstriyel merdiven', 'çelik merdiven', 'alüminyum merdiven', 'sabit platform merdiveni', 'seyyar merdiven', 'vinç merdiveni'],
+  ['korkuluk', 'çelik korkuluk', 'paslanmaz korkuluk', 'alüminyum korkuluk', 'endüstriyel barikat', 'bariyer korkuluk'],
+  ['zemin kaplama endüstriyel', 'epoksi zemin kaplama', 'pu zemin kaplama', 'poliüretan zemin', 'antistatic zemin', 'aşınmaya dayanıklı zemin'],
+  ['endüstriyel zemin ızgarası', 'platform ızgarası', 'galvanizli ızgara', 'paslanmaz ızgara', 'FRP ızgara'],
+  ['boya tabancası', 'sprey tabancası', 'airless boya tabancası', 'HVLP tabanca', 'elektrostatik boya tabancası'],
+
 ];
 
 // ─── Eşleştirme Fonksiyonu ───────────────────────────────────────────────────
