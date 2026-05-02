@@ -62,6 +62,8 @@ export function AuthProvider({ children }) {
 
   // Enes Doğanay | 10 Nisan 2026: Logout sırasında auto-refresh yarış koşulunu engelleyen flag
   const isLoggingOutRef = useRef(false);
+  // Enes Doğanay | 2 Mayıs 2026: Sekme doğrulaması sürerken SIGNED_IN → loadUserData'yı engelle
+  const validatingLoginRef = useRef(false);
 
   // Enes Doğanay | 13 Nisan 2026: useCallback ile sarıldı — stabil referans, gereksiz yeniden oluşturma önlenir
   const loadUserData = useCallback(async () => {
@@ -206,6 +208,8 @@ export function AuthProvider({ children }) {
         return;
       }
 
+      // Enes Doğanay | 2 Mayıs 2026: Sekme doğrulaması sürüyorsa SIGNED_IN'i işleme — Login kontrolü tamamlandıktan sonra reloadUserData çağırır
+      if (validatingLoginRef.current) return;
       // Token yenilendiğinde realtime auth'u güncelle
       if (session?.access_token) {
         supabase.realtime.setAuth(session.access_token);
@@ -446,7 +450,10 @@ export function AuthProvider({ children }) {
       refreshCounts,
       latestNotification,
       setActiveViewingTeklifId,
-      updateNotifPrefsCache
+      updateNotifPrefsCache,
+      // Enes Doğanay | 2 Mayıs 2026: Login sekme doğrulaması için — flag ve yeniden yükleme
+      setValidatingLogin: (v) => { validatingLoginRef.current = v; },
+      reloadUserData: loadUserData
     }}>
       {children}
     </AuthContext.Provider>

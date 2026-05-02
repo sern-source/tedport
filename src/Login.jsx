@@ -5,10 +5,13 @@ import './SharedHeader.css';
 import SEO from './SEO'; // Enes Doğanay | 16 Nisan 2026: SEO meta tag desteği
 import { supabase, setAuthPersistenceMode } from './supabaseClient';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  // Enes Doğanay | 2 Mayıs 2026: Sekme doğrulaması için AuthContext flag'leri
+  const { setValidatingLogin, reloadUserData } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
@@ -79,12 +82,16 @@ const LoginPage = () => {
     // Enes Doğanay | 6 Nisan 2026: Beni Hatirla secimine gore auth storage login oncesi belirlenir
     setAuthPersistenceMode(rememberMe);
 
+    // Enes Doğanay | 2 Mayıs 2026: Sekme doğrulaması bitene kadar SIGNED_IN → loadUserData engellenir
+    setValidatingLogin(true);
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      setValidatingLogin(false);
       setLoading(false);
       // Supabase'in kendi dönen İngilizce hatalarını da baz alarak uyarıları kişiselleştirebiliriz
       if (error.message.includes("Email not confirmed")) {
@@ -106,6 +113,7 @@ const LoginPage = () => {
 
     if (activeTab === 'individual' && isCorporateUser) {
       // Kurumsal hesap bireysel sekmeden giriş yapmaya çalışıyor
+      setValidatingLogin(false);
       await supabase.auth.signOut();
       setLoading(false);
       setError('Bu hesap bir kurumsal hesaptır. Lütfen "Kurumsal Giriş" sekmesinden giriş yapın.');
@@ -114,11 +122,16 @@ const LoginPage = () => {
 
     if (activeTab === 'corporate' && !isCorporateUser) {
       // Bireysel hesap kurumsal sekmeden giriş yapmaya çalışıyor
+      setValidatingLogin(false);
       await supabase.auth.signOut();
       setLoading(false);
       setError('Bu hesap bir bireysel hesaptır. Lütfen "Bireysel Giriş" sekmesinden giriş yapın.');
       return;
     }
+
+    // Enes Doğanay | 2 Mayıs 2026: Doğrulama geçti — flag kaldır ve kullanıcı verilerini yükle
+    setValidatingLogin(false);
+    await reloadUserData();
 
     setLoading(false);
     // Enes Doğanay | 13 Nisan 2026: console.log kaldırıldı, ortak yönlendirme fonksiyonu kullanılıyor
