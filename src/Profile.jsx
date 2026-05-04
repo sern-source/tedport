@@ -154,6 +154,16 @@ const ProfilePage = () => {
   // Enes Doğanay | 6 Nisan 2026: Profilde bildirim merkezi ve yaklasan hatirlaticilar tutulur
   const [notifications, setNotifications] = useState([]);
   const [upcomingReminders, setUpcomingReminders] = useState([]);
+  // Enes Doğanay | 4 Mayıs 2026: Bildirim listesi görüntü limiti
+  const [showAllNotifications, setShowAllNotifications] = useState(false);
+  // Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine
+  const [prToast, setPrToast] = useState(null);
+  const prToastTimerRef = useRef(null);
+  const showPrToast = (type, message) => {
+    if (prToastTimerRef.current) clearTimeout(prToastTimerRef.current);
+    setPrToast({ type, message });
+    prToastTimerRef.current = setTimeout(() => setPrToast(null), 3800);
+  };
   // Enes Doğanay | 7 Nisan 2026: Kullanıcının gönderdiği teklif talepleri
   const [myQuotes, setMyQuotes] = useState([]);
   const [myQuotesLoading, setMyQuotesLoading] = useState(true);
@@ -190,7 +200,7 @@ const ProfilePage = () => {
   const [marketingConsentSaving, setMarketingConsentSaving] = useState(false);
 
   // Enes Doğanay | 4 Mayıs 2026: Şirketim sekmesi state'leri
-  const [myCompany, setMyCompany] = useState(null);    // { firma_id, role, title }
+  const [myCompany, setMyCompany] = useState(null);    // { firma_id, role, title, page_permissions }
   const [myCompanyFirma, setMyCompanyFirma] = useState(null); // firma kaydı
   const [pendingInvites, setPendingInvites] = useState([]); // bekleyen davetler
 
@@ -234,7 +244,7 @@ const ProfilePage = () => {
         // Enes Doğanay | 4 Mayıs 2026: Sadece owner firma-profil'e yönlenir; admin/member kendi profilinde kalır
         const { data: companyData } = await supabase
           .from('kurumsal_firma_yoneticileri')
-          .select('firma_id, role')
+          .select('firma_id, role, title, page_permissions')
           .eq('user_id', currentUser.id)
           .maybeSingle();
         if (companyData?.firma_id && companyData.role === 'owner') {
@@ -250,7 +260,7 @@ const ProfilePage = () => {
         // Enes Doğanay | 4 Mayıs 2026: Admin/member üyeliği varsa state'e kaydet
         // Enes Doğanay | 4 Mayıs 2026: Davetleri her kullanıcı için çek — firma üyesi olmayanlar da kabul edebilmeli
         if (companyData?.firma_id) {
-          setMyCompany({ firma_id: companyData.firma_id, role: companyData.role, title: companyData.title || null });
+          setMyCompany({ firma_id: companyData.firma_id, role: companyData.role, title: companyData.title || null, page_permissions: companyData.page_permissions || {} });
           const { data: firmaRes } = await supabase.from('firmalar').select('firmaID, firma_adi, ana_sektor, il_ilce').eq('firmaID', companyData.firma_id).maybeSingle();
           if (firmaRes) setMyCompanyFirma(firmaRes);
         }
@@ -680,7 +690,7 @@ const ProfilePage = () => {
   const handleMarkNotificationRead = async (notificationId) => {
     const { error } = await supabase.from('bildirimler').update({ is_read: true }).eq('id', notificationId).eq('user_id', user.id);
     if (error && !isMissingRelationError(error)) {
-      alert('Bildirim güncellenemedi.');
+      showPrToast('error', 'Bildirim güncellenemedi.');
       return;
     }
 
@@ -696,7 +706,7 @@ const ProfilePage = () => {
     const unreadNotificationIds = unreadNotifications.map((notification) => notification.id);
     const { error } = await supabase.from('bildirimler').update({ is_read: true }).eq('user_id', user.id).in('id', unreadNotificationIds);
     if (error && !isMissingRelationError(error)) {
-      alert('Bildirimler güncellenemedi.');
+      showPrToast('error', 'Bildirimler güncellenemedi.');
       return;
     }
 
@@ -709,7 +719,7 @@ const ProfilePage = () => {
     const { error } = await supabase.from('bildirimler').delete().eq('id', notificationId).eq('user_id', user.id);
     if (error) {
       console.error('[Bildirim Sil] Hata:', error);
-      alert('Bildirim silinemedi.');
+      showPrToast('error', 'Bildirim silinemedi.');
       return;
     }
     setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
@@ -725,7 +735,7 @@ const ProfilePage = () => {
       .eq('user_id', user.id);
     if (reminderError) {
       console.error('[Hatırlatıcı Sil] Hata:', reminderError);
-      alert('Hatırlatıcı silinemedi.');
+      showPrToast('error', 'Hatırlatıcı silinemedi.');
       return;
     }
     if (reminder.note_id) {
@@ -748,7 +758,7 @@ const ProfilePage = () => {
     const { error } = await supabase.from('bildirimler').delete().eq('user_id', user.id);
     if (error) {
       console.error('[Bildirim Toplu Sil] Hata:', error);
-      alert('Bildirimler silinemedi.');
+      showPrToast('error', 'Bildirimler silinemedi.');
       return;
     }
     setNotifications([]);
@@ -810,7 +820,7 @@ const ProfilePage = () => {
 
       if (upsertErr) {
         console.error('[Bildirim Tercihleri] Upsert hata:', upsertErr);
-        alert('Bildirim tercihi kaydedilemedi: ' + upsertErr.message);
+        showPrToast('error', 'Bildirim tercihi kaydedilemedi.');
         setNotifPrefs(prev => ({ ...prev, [key]: !newValue }));
         return;
       }
@@ -951,7 +961,7 @@ const ProfilePage = () => {
       setNewListName("");
       setIsCreatingList(false);
     } else {
-      alert("Liste oluşturulamadı.");
+      showPrToast('error', 'Liste oluşturulamadı.');
     }
   };
 
@@ -983,7 +993,7 @@ const ProfilePage = () => {
       setSelectedListId((currentListId) => currentListId === listId ? null : currentListId);
       setConfirmDeleteList(null);
     } catch (error) {
-      alert('Liste silinirken bir hata oluştu.');
+      showPrToast('error', 'Liste silinirken bir hata oluştu.');
     }
   };
 
@@ -993,7 +1003,7 @@ const ProfilePage = () => {
       setFavorites(favorites.filter(fav => fav.id !== favoriteId));
       setConfirmDelete(null);
     } else {
-      alert("Silme işlemi başarısız oldu.");
+      showPrToast('error', 'Silme işlemi başarısız oldu.');
     }
   };
 
@@ -1004,7 +1014,7 @@ const ProfilePage = () => {
       setFavorites(prev => prev.map(f => f.id === favoriteId ? { ...f, liste_id: listId } : f));
       setAssigningListId(null);
     } else {
-      alert("Liste güncellenemedi.");
+      showPrToast('error', 'Liste güncellenemedi.');
     }
   };
 
@@ -1082,7 +1092,7 @@ const ProfilePage = () => {
       setSaveFeedbackFavoriteId(favId);
       setTimeout(() => setSaveFeedbackFavoriteId((currentId) => currentId === favId ? null : currentId), 1800);
     } catch (error) {
-      alert("Not kaydedilirken bir hata oluştu.");
+      showPrToast('error', 'Not kaydedilirken bir hata oluştu.');
     } finally {
       setIsSavingNote(false);
     }
@@ -1104,7 +1114,7 @@ const ProfilePage = () => {
 
       setPendingDeleteNoteId(null);
     } catch (error) {
-      alert('Not silinirken bir hata oluştu.');
+      showPrToast('error', 'Not silinirken bir hata oluştu.');
     }
   };
 
@@ -1116,7 +1126,7 @@ const ProfilePage = () => {
     if (error) { console.error('Davet kabul hatası:', error); return; }
     const accepted = pendingInvites.find(d => d.id === davetId);
     if (accepted) {
-      setMyCompany({ firma_id: accepted.firma_id, role: accepted.role, title: accepted.title || null });
+      setMyCompany({ firma_id: accepted.firma_id, role: accepted.role, title: accepted.title || null, page_permissions: accepted.page_permissions || {} });
       const { data: firmaRes } = await supabase.from('firmalar').select('firmaID, firma_adi, ana_sektor, il_ilce').eq('firmaID', accepted.firma_id).maybeSingle();
       if (firmaRes) setMyCompanyFirma(firmaRes);
     }
@@ -1143,7 +1153,7 @@ const ProfilePage = () => {
       const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(fileName);
       await handleUpdateField("avatar", publicUrl);
     } catch (error) {
-      alert("Fotoğraf yüklenirken bir hata oluştu: " + error.message);
+      showPrToast('error', 'Fotoğraf yüklenirken bir hata oluştu.');
     } finally {
       setUploading(false);
     }
@@ -1289,6 +1299,10 @@ const ProfilePage = () => {
     if (prefKey && notifPrefs[prefKey] === false) return false;
     return true;
   });
+  // Enes Doğanay | 4 Mayıs 2026: Bildirim listesi limiti sabitleri
+  const NOTIF_LIMIT = 3;
+  const visibleNotifications = showAllNotifications ? filteredNotifications : filteredNotifications.slice(0, NOTIF_LIMIT);
+  const hasMoreNotifications = filteredNotifications.length > NOTIF_LIMIT;
 
   const unreadNotificationsCount = filteredNotifications.filter((notification) => !notification.is_read).length;
   // Enes Doğanay | 6 Nisan 2026: Zamani gecen ancak henuz server tarafinda islenmemis hatirlaticilar yaklasan olarak gosterilmez
@@ -1297,6 +1311,25 @@ const ProfilePage = () => {
 
   return (
     <>
+      {/* Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine */}
+      {prToast && (
+        <div style={{
+          position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+          zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+          padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
+          boxShadow: '0 8px 28px rgba(15,23,42,0.18)',
+          background: '#fef2f2', border: '1.5px solid #fca5a5', color: '#991b1b',
+          fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
+          animation: 'prToastIn 0.22s ease'
+        }}>
+          <style>{`@keyframes prToastIn { from { opacity:0; transform:translate(-50%,10px);} to { opacity:1; transform:translate(-50%,0);} }`}</style>
+          <span className="material-symbols-outlined" style={{ fontSize: '19px', flexShrink: 0 }}>error</span>
+          {prToast.message}
+          <button onClick={() => setPrToast(null)} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+          </button>
+        </div>
+      )}
       <SharedHeader
         navItems={[
           { label: 'Anasayfa', href: '/' },
@@ -1321,7 +1354,7 @@ const ProfilePage = () => {
                   <span className="material-symbols-outlined">person</span>
                 </div>
               )}
-              <div>
+              <div className="sidebar-user-info">
                 <div className="sidebar-user-name">{`${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || "Kullanıcı"}</div>
                 <div className="sidebar-user-company">{profile?.company_name || "Şirket Yok"}</div>
               </div>
@@ -1986,7 +2019,7 @@ const ProfilePage = () => {
               <div className="sirketim-panel">
                 <div className="sirketim-header">
                   <h2>Şirketim</h2>
-                  <p>Bağlı olduğunuz firma bilgileri ve gelen davetler.</p>
+                  <p>Bağlı olduğunuz firmanın size tanımlı panellerine buradan erişebilirsiniz.</p>
                 </div>
 
                 {pendingInvites.length > 0 && (
@@ -2029,28 +2062,56 @@ const ProfilePage = () => {
                       </span>
                       {myCompany.title && <span className="sirketim-my-title">{myCompany.title}</span>}
                     </div>
-                    {/* Enes Doğanay | 4 Mayıs 2026: Admin/üye — owner ile aynı sayfaya yönlendir */}
+                    {/* Enes Doğanay | 4 Mayıs 2026: Admin/üye — page_permissions ile sayfa erişim düğmeleri */}
                     <div className="sirketim-panel-actions">
-                      <button
-                        className={`sirketim-panel-btn${sirketimSubPanel === 'teklifler' ? ' active' : ''}`}
-                        onClick={() => setSirketimSubPanel(p => p === 'teklifler' ? null : 'teklifler')}
-                      >
-                        <span className="material-symbols-outlined">request_quote</span>
-                        Teklif Yönetimi
-                        <span className="material-symbols-outlined sirketim-panel-btn-arrow">
-                          {sirketimSubPanel === 'teklifler' ? 'expand_less' : 'expand_more'}
-                        </span>
-                      </button>
-                      <button
-                        className={`sirketim-panel-btn${sirketimSubPanel === 'ihaleler' ? ' active' : ''}`}
-                        onClick={() => setSirketimSubPanel(p => p === 'ihaleler' ? null : 'ihaleler')}
-                      >
-                        <span className="material-symbols-outlined">gavel</span>
-                        İhale Yönetimi
-                        <span className="material-symbols-outlined sirketim-panel-btn-arrow">
-                          {sirketimSubPanel === 'ihaleler' ? 'expand_less' : 'expand_more'}
-                        </span>
-                      </button>
+                      {myCompany.page_permissions?.firma_paneli && (
+                        <button
+                          className={`sirketim-panel-btn${sirketimSubPanel === 'panel' ? ' active' : ''}`}
+                          onClick={() => setSirketimSubPanel(p => p === 'panel' ? null : 'panel')}
+                        >
+                          <span className="material-symbols-outlined">storefront</span>
+                          Firma Paneli
+                          <span className="material-symbols-outlined sirketim-panel-btn-arrow">
+                            {sirketimSubPanel === 'panel' ? 'expand_less' : 'expand_more'}
+                          </span>
+                        </button>
+                      )}
+                      {myCompany.page_permissions?.teklif_yonetimi && (
+                        <button
+                          className={`sirketim-panel-btn${sirketimSubPanel === 'teklifler' ? ' active' : ''}`}
+                          onClick={() => setSirketimSubPanel(p => p === 'teklifler' ? null : 'teklifler')}
+                        >
+                          <span className="material-symbols-outlined">request_quote</span>
+                          Teklif Yönetimi
+                          <span className="material-symbols-outlined sirketim-panel-btn-arrow">
+                            {sirketimSubPanel === 'teklifler' ? 'expand_less' : 'expand_more'}
+                          </span>
+                        </button>
+                      )}
+                      {myCompany.page_permissions?.ihale_yonetimi && (
+                        <button
+                          className={`sirketim-panel-btn${sirketimSubPanel === 'ihaleler' ? ' active' : ''}`}
+                          onClick={() => setSirketimSubPanel(p => p === 'ihaleler' ? null : 'ihaleler')}
+                        >
+                          <span className="material-symbols-outlined">gavel</span>
+                          İhale Yönetimi
+                          <span className="material-symbols-outlined sirketim-panel-btn-arrow">
+                            {sirketimSubPanel === 'ihaleler' ? 'expand_less' : 'expand_more'}
+                          </span>
+                        </button>
+                      )}
+                      {myCompany.page_permissions?.ekip_yonetimi && (
+                        <button
+                          className={`sirketim-panel-btn${sirketimSubPanel === 'ekip' ? ' active' : ''}`}
+                          onClick={() => setSirketimSubPanel(p => p === 'ekip' ? null : 'ekip')}
+                        >
+                          <span className="material-symbols-outlined">group</span>
+                          Ekip Yönetimi
+                          <span className="material-symbols-outlined sirketim-panel-btn-arrow">
+                            {sirketimSubPanel === 'ekip' ? 'expand_less' : 'expand_more'}
+                          </span>
+                        </button>
+                      )}
                     </div>
 
                     {/* Enes Doğanay | 4 Mayıs 2026: iframe ile tam sayfa gömme — aynı origin, aynı session */}
@@ -2059,9 +2120,19 @@ const ProfilePage = () => {
                         <iframe
                           key={sirketimSubPanel}
                           ref={sirketimIframeRef}
-                          src={`/firma-profil?tab=${sirketimSubPanel === 'teklifler' ? 'teklifler' : 'ihale-yonetimi'}&embedded=1`}
+                          src={`/firma-profil?tab=${
+                            sirketimSubPanel === 'teklifler' ? 'teklifler' :
+                            sirketimSubPanel === 'ihaleler' ? 'ihale-yonetimi' :
+                            sirketimSubPanel === 'ekip' ? 'ekip' :
+                            'panel'
+                          }&embedded=1`}
                           className="sirketim-iframe"
-                          title={sirketimSubPanel === 'teklifler' ? 'Teklif Yönetimi' : 'İhale Yönetimi'}
+                          title={
+                            sirketimSubPanel === 'teklifler' ? 'Teklif Yönetimi' :
+                            sirketimSubPanel === 'ihaleler' ? 'İhale Yönetimi' :
+                            sirketimSubPanel === 'ekip' ? 'Ekip Yönetimi' :
+                            'Firma Paneli'
+                          }
                           onLoad={() => {
                             // Enes Doğanay | 4 Mayıs 2026: iframe yüklenince mevcut temayı gönder
                             sirketimIframeRef.current?.contentWindow?.postMessage(
@@ -2203,7 +2274,7 @@ const ProfilePage = () => {
                       </div>
                     ) : (
                       <div className="notifications-feed-list">
-                        {filteredNotifications.map((notification) => (
+                        {visibleNotifications.map((notification) => (
                           <article
                             key={notification.id}
                             className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${notification.metadata?.teklif_id || notification.firma_id || notification.type?.startsWith('tender_') ? 'clickable' : ''}`}
@@ -2266,6 +2337,23 @@ const ProfilePage = () => {
                             </div>
                           </article>
                         ))}
+                        {/* Enes Doğanay | 4 Mayıs 2026: Tümünü Göster / Gizle butonu */}
+                        {hasMoreNotifications && (
+                          <button
+                            type="button"
+                            onClick={() => setShowAllNotifications(v => !v)}
+                            style={{
+                              display: 'block', width: '100%', marginTop: '8px',
+                              padding: '10px', borderRadius: '10px', border: '1.5px solid #e2e8f0',
+                              background: 'transparent', cursor: 'pointer', fontSize: '0.85rem',
+                              fontWeight: 600, color: '#4f73f8', fontFamily: 'inherit'
+                            }}
+                          >
+                            {showAllNotifications
+                              ? 'Daha Az Göster'
+                              : `Tümünü Göster (${filteredNotifications.length - NOTIF_LIMIT} daha)`}
+                          </button>
+                        )}
                       </div>
                     )}
                   </section>

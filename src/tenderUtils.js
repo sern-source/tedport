@@ -33,7 +33,7 @@ export const formatTenderDate = (dateValue) => {
     }
 
     const date = new Date(dateValue);
-    return `${date.toLocaleDateString('tr-TR')} • ${date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+    return date.toLocaleDateString('tr-TR');
 };
 
 // Enes Doğanay | 6 Nisan 2026: Ihaleler sayfasinda kart alt basliklari temiz kalmasi icin butce notu normalize edilir

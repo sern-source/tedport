@@ -98,7 +98,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 14px;
+    padding: 8px 10px;
     border-bottom: 1px solid var(--border);
     background: var(--bg-light);
 }
@@ -203,8 +203,8 @@
 .dp-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-    padding: 8px 10px 4px;
+    gap: 1px;
+    padding: 6px 8px 2px;
 }
 
 .dp-weekday {
@@ -224,8 +224,8 @@
     aspect-ratio: 1;
     border: none;
     background: none;
-    border-radius: 8px;
-    font-size: 0.82rem;
+    border-radius: 6px;
+    font-size: 0.77rem;
     font-family: inherit;
     color: var(--text-dark);
     cursor: pointer;
@@ -283,9 +283,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px 10px;
+    padding: 5px 10px 7px;
     border-top: 1px solid var(--border);
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .dp-footer-clear,
@@ -321,12 +321,15 @@
 /* ═══════════════════════════════════ */
 /*  Amber variant (FirmaDetay)        */
 /* ═══════════════════════════════════ */
+/* Enes Doğanay | 4 Mayıs 2026: amber trigger sıkıştırıldı */
 .dp--amber .dp-trigger {
     border-color: #e7d7bc;
     background: #fff;
     color: #5a4528;
-    border-radius: 12px;
-    height: 42px;
+    border-radius: 8px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 0.8rem;
     border-width: 1px;
 }
 

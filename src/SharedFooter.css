@@ -2,10 +2,11 @@
 /* Enes Doğanay | 15 Nisan 2026: Footer arka planı beyaz yapıldı, renkler güncellendi */
 /* Enes Doğanay | 2 Mayıs 2026: Faz 3 — hardcoded renkler CSS değişkenlerine bağlandı */
 
+/* Enes Doğanay | 4 Mayıs 2026: footer compact */
 .sf-footer {
     background: var(--bg-white);
     color: var(--text-gray);
-    padding: 48px 0 0;
+    padding: 36px 0 0;
     margin-top: auto;
     border-top: 1px solid var(--border);
 }
@@ -20,22 +21,22 @@
 .sf-grid {
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr 1fr;
-    gap: 40px;
-    padding-bottom: 36px;
+    gap: 28px;
+    padding-bottom: 28px;
     border-bottom: 1px solid var(--border);
 }
 
 @media (max-width: 900px) {
     .sf-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 32px;
+        gap: 24px;
     }
 }
 
 @media (max-width: 540px) {
     .sf-grid {
         grid-template-columns: 1fr;
-        gap: 28px;
+        gap: 20px;
     }
 }
 
@@ -52,7 +53,7 @@
 }
 
 .sf-logo {
-    height: 42px;
+    height: 36px;
     object-fit: contain;
     border-radius: 8px;
 }
@@ -94,12 +95,12 @@
 
 /* Links */
 .sf-links h4 {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-dark);
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    margin: 0 0 16px;
+    margin: 0 0 12px;
 }
 
 .sf-links ul {
@@ -108,7 +109,7 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .sf-links li {
@@ -138,12 +139,12 @@
 
 /* Bottom */
 .sf-bottom {
-    padding: 20px 0;
+    padding: 16px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
 }
 
 .sf-bottom p {

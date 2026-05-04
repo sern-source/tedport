@@ -1,43 +1,44 @@
 ﻿/* Enes Doğanay | 11 Nisan 2026: Kompakt hero — tek satır başlık + inline stat rozetleri */
+/* Enes Doğanay | 4 Mayıs 2026: kompakt hero */
 .tenders-hero-compact {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    padding: 22px 28px;
-    border-radius: 20px;
+    gap: 16px;
+    padding: 14px 20px;
+    border-radius: 14px;
     background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
     color: #fff;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 32px rgba(30, 58, 138, 0.18);
+    margin-bottom: 14px;
+    box-shadow: 0 4px 18px rgba(30, 58, 138, 0.18);
 }
 
 .tenders-hero-compact__left h1 {
-    margin: 0 0 4px;
-    font-size: 1.5rem;
+    margin: 0 0 2px;
+    font-size: 1.15rem;
     font-weight: 800;
     line-height: 1.2;
 }
 
 .tenders-hero-compact__left p {
     margin: 0;
-    font-size: 0.88rem;
-    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.68);
     max-width: 480px;
 }
 
 .tenders-hero-compact__stats {
     display: flex;
-    gap: 10px;
+    gap: 7px;
     flex-shrink: 0;
 }
 
 .tenders-mini-stat {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 14px;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -50,18 +51,18 @@
 }
 
 .tenders-mini-stat .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 16px;
     opacity: 0.9;
 }
 
 .tenders-mini-stat strong {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 800;
     line-height: 1;
 }
 
 .tenders-mini-stat span:last-child {
-    font-size: 0.78rem;
+    font-size: 0.73rem;
     opacity: 0.8;
     font-weight: 600;
 }
@@ -249,25 +250,26 @@
 }
 
 /* Enes Doğanay | 11 Nisan 2026: Toolbar */
+/* Enes Doğanay | 4 Mayıs 2026: kompakt toolbar */
 .tenders-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
 }
 
 .tenders-search-box {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex: 1 1 280px;
-    min-height: 48px;
-    padding: 0 14px;
-    border-radius: 14px;
+    gap: 8px;
+    flex: 1 1 240px;
+    min-height: 38px;
+    padding: 0 12px;
+    border-radius: 10px;
     background: var(--bg-white);
     border: 1px solid var(--border);
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -276,7 +278,7 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.tenders-search-box .material-symbols-outlined { color: #94a3b8; font-size: 20px; }
+.tenders-search-box .material-symbols-outlined { color: #94a3b8; font-size: 17px; }
 
 .tenders-search-box input {
     flex: 1;
@@ -284,7 +286,7 @@
     outline: none;
     background: transparent;
     color: var(--text-dark);
-    font-size: 0.9rem;
+    font-size: 0.83rem;
     font-family: inherit;
 }
 
@@ -314,12 +316,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    min-height: 48px;
-    padding: 0 12px;
-    border-radius: 14px;
+    min-height: 38px;
+    padding: 0 10px;
+    border-radius: 10px;
     background: var(--bg-white);
     border: 1px solid var(--border);
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
     cursor: pointer;
     font-family: inherit;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -335,7 +337,7 @@
 
 .tenders-sort-label {
     color: var(--text-dark);
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
@@ -409,10 +411,10 @@
     align-items: center;
     gap: 2px;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 9px;
     background: var(--bg-light);
     padding: 0 2px;
-    height: 40px;
+    height: 34px;
     transition: border-color 0.2s;
     flex-shrink: 0;
 }
@@ -534,17 +536,17 @@
 .tenders-filter-pill {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    min-height: 42px;
+    gap: 4px;
+    min-height: 34px;
     border: 1px solid var(--border);
     background: var(--bg-white);
     color: var(--text-muted);
-    border-radius: 12px;
-    padding: 0 14px;
+    border-radius: 9px;
+    padding: 0 11px;
     font-weight: 700;
-    font-size: 0.84rem;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
 }
 
 .tenders-filter-pill .material-symbols-outlined { font-size: 16px; }
@@ -566,22 +568,23 @@
 }
 
 /* Enes Doğanay | 11 Nisan 2026: Yeniden tasarlanan ihale kartı */
+/* Enes Doğanay | 4 Mayıs 2026: compact + cool kart */
 .tender-card {
-    border-radius: 20px;
+    border-radius: 14px;
     padding: 0;
     background: var(--bg-white);
     border: 1px solid var(--border);
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
 }
 
 .tender-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
 }
 
 /* Sol üst kenar renk şeridi */
@@ -591,8 +594,8 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    border-radius: 20px 20px 0 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
     background: #94a3b8;
 }
 .tender-card--canli::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
@@ -665,20 +668,20 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
-    padding: 18px 20px 0;
+    gap: 8px;
+    padding: 12px 14px 0;
 }
 
 .tender-card__company {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     background: none;
     border: none;
-    padding: 4px 10px 4px 6px;
-    border-radius: 8px;
+    padding: 3px 8px 3px 4px;
+    border-radius: 6px;
     color: #2563eb;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     cursor: pointer;
@@ -690,22 +693,22 @@
 }
 
 .tender-card__company .material-symbols-outlined {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 /* Başlık + Açıklama */
 .tender-card__title {
-    margin: 10px 20px 0;
-    font-size: 1.1rem;
+    margin: 8px 14px 0;
+    font-size: 0.97rem;
     font-weight: 700;
     line-height: 1.3;
     color: var(--text-dark);
 }
 
 .tender-card__desc {
-    margin: 6px 20px 0;
-    font-size: 0.86rem;
-    line-height: 1.6;
+    margin: 4px 14px 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
     color: var(--text-muted);
 }
 
@@ -713,21 +716,21 @@
 .tender-card__chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    padding: 12px 20px 0;
+    gap: 5px;
+    padding: 8px 14px 0;
 }
 
 .tender-chip {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 0.74rem;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
     font-weight: 700;
 }
 
-.tender-chip .material-symbols-outlined { font-size: 14px; }
+.tender-chip .material-symbols-outlined { font-size: 12px; }
 
 .tender-chip--type {
     background: #eff6ff;
@@ -749,8 +752,8 @@
     display: flex;
     flex-direction: column;
     gap: 0;
-    margin: 14px 20px 0;
-    border-radius: 12px;
+    margin: 8px 14px 0;
+    border-radius: 9px;
     overflow: hidden;
     border: 1px solid var(--border);
 }
@@ -758,9 +761,9 @@
 .tender-card__info-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    font-size: 0.82rem;
+    gap: 6px;
+    padding: 5px 10px;
+    font-size: 0.76rem;
     border-bottom: 1px solid var(--border);
     background: var(--bg-light);
     transition: background 0.15s;
@@ -770,7 +773,7 @@
 .tender-card__info-row:hover { background: #f1f5f9; }
 
 .tender-card__info-row .material-symbols-outlined {
-    font-size: 16px;
+    font-size: 13px;
     color: #94a3b8;
     flex-shrink: 0;
 }
@@ -778,7 +781,7 @@
 .tender-card__info-label {
     color: var(--text-muted);
     font-weight: 600;
-    min-width: 70px;
+    min-width: 60px;
 }
 
 .tender-card__info-value {
@@ -792,18 +795,18 @@
 .tender-card__countdown {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin: 12px 20px 0;
-    padding: 8px 14px;
-    border-radius: 10px;
+    gap: 5px;
+    margin: 7px 14px 0;
+    padding: 5px 10px;
+    border-radius: 7px;
     background: linear-gradient(135deg, #fef3c7, #fde68a);
     color: #92400e;
-    font-size: 0.8rem;
+    font-size: 0.73rem;
     font-weight: 700;
     animation: countdownPulse 2s ease-in-out infinite;
 }
 
-.tender-card__countdown .material-symbols-outlined { font-size: 16px; }
+.tender-card__countdown .material-symbols-outlined { font-size: 13px; }
 
 @keyframes countdownPulse {
     0%, 100% { opacity: 1; }
@@ -814,23 +817,23 @@
 .tender-card__ref {
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin: 8px 20px 0;
-    font-size: 0.75rem;
+    gap: 4px;
+    margin: 5px 14px 0;
+    font-size: 0.68rem;
     color: #94a3b8;
     font-family: 'Courier New', monospace;
     font-weight: 600;
 }
 
-.tender-card__ref .material-symbols-outlined { font-size: 14px; }
+.tender-card__ref .material-symbols-outlined { font-size: 12px; }
 
 /* Aksiyon butonları */
 /* Enes Doğanay | 15 Nisan 2026: flex-wrap eklendi — 3 buton sığmadığında alt satıra geçsin */
 .tender-card__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 16px 20px 18px;
+    gap: 6px;
+    padding: 10px 14px 12px;
     margin-top: auto;
 }
 
@@ -838,53 +841,63 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 9px 14px;
-    border-radius: 10px;
-    font-size: 0.8rem;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.76rem;
     font-weight: 700;
     cursor: pointer;
     border: none;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
     text-decoration: none;
     white-space: nowrap;
 }
 
-.tender-action .material-symbols-outlined { font-size: 16px; }
+.tender-action .material-symbols-outlined { font-size: 14px; }
 
 .tender-action--firma {
     background: var(--bg-light);
-    color: var(--text-dark);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
 }
 
 .tender-action--firma:hover {
     background: var(--border);
+    color: var(--text-dark);
     transform: translateY(-1px);
 }
 
 .tender-action--join {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
 }
 
 .tender-action--join:hover {
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
     transform: translateY(-1px);
 }
 
 /* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi düzenle butonu — grid card + detail drawer */
 .tender-action--own-edit {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
 }
 .tender-action--own-edit:hover {
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
     transform: translateY(-1px);
 }
 .tender-action--own-edit:disabled {
-    background: #94a3b8;
+    background: var(--bg-light);
+    color: #94a3b8;
+    border-color: var(--border);
     cursor: default;
     box-shadow: none;
     transform: none;
@@ -1222,67 +1235,78 @@
 /* Enes Do�anay | 6 Nisan 2026: Kurumsal ihale y�netim paneli ve modal stilleri */
 
 /* �� Benim �halelerim Paneli ����������������������������������������������� */
+/* Enes Doğanay | 4 Mayıs 2026: İhalelerim paneli — compact + cool yeniden tasarım */
 .my-tenders-panel {
     background: var(--bg-white);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
+    border-radius: 14px;
+    overflow: hidden;
     margin-bottom: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .my-tenders-panel__head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 12px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+    border-bottom: none;
 }
 
 .my-tenders-panel__head h2 {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 18px;
+    gap: 7px;
+    font-size: 15px;
     font-weight: 700;
-    color: var(--text-dark);
-    margin: 0 0 4px;
-}
-
-.my-tenders-panel__head h2 .material-symbols-outlined {
-    font-size: 22px;
-    color: #3b82f6;
-}
-
-.my-tenders-panel__head p {
-    font-size: 13px;
-    color: var(--text-muted);
+    color: #fff;
     margin: 0;
 }
 
+.my-tenders-panel__head h2 .material-symbols-outlined {
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+}
+
+.my-tenders-panel__head p {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.7);
+    margin: 2px 0 0;
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: solid beyaz — header gradientinde öne çıkar */
 .my-tenders-add-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 9px 18px;
-    background: #2563eb;
-    color: #fff;
+    gap: 5px;
+    padding: 7px 14px;
+    background: #fff;
+    color: #1d4ed8;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 12.5px;
+    font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: background 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 
 .my-tenders-add-btn:hover {
-    background: #1d4ed8;
+    background: #f0f7ff;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+    transform: translateY(-1px);
 }
 
 .my-tenders-add-btn .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 16px;
+}
+
+.my-tenders-panel__body {
+    padding: 12px 14px;
 }
 
 .my-tenders-empty {
@@ -1308,7 +1332,7 @@
 .my-tenders-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 /* Enes Doğanay | 13 Nisan 2026: İhalelerim paneli genişlet/küçült butonu */
@@ -1316,17 +1340,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
     width: 100%;
-    padding: 10px 0;
+    padding: 7px 0;
     border: 1px dashed var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     background: var(--bg-light);
     color: var(--text-muted);
-    font-size: 13.5px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin-top: 2px;
 }
 
 .my-tenders-toggle-btn:hover {
@@ -1336,26 +1361,26 @@
 }
 
 .my-tenders-toggle-btn .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .my-tender-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 14px 16px;
+    gap: 10px;
+    padding: 9px 12px;
     background: var(--bg-light);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 9px;
 }
 
 .my-tender-row__info {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
-    font-size: 14px;
+    gap: 7px;
+    font-size: 13px;
     color: var(--text-dark);
     flex: 1;
     min-width: 0;
@@ -1363,17 +1388,18 @@
 
 .my-tender-row__info strong {
     font-weight: 600;
+    font-size: 13px;
 }
 
 .my-tender-row__date {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
 }
 
-/* Enes Doğanay | 15 Nisan 2026: İhalelerim butonları — TOM stiliyle eşleşen renkli yazılı butonlar */
+/* Enes Doğanay | 4 Mayıs 2026: İhalelerim butonları — compact ikon+yazı */
 .my-tender-row__actions {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     flex-shrink: 0;
     flex-wrap: wrap;
     justify-content: flex-end;
@@ -1383,30 +1409,33 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 4px;
     border: none;
-    border-radius: 8px;
+    border-radius: 7px;
     cursor: pointer;
-    font-size: 0.78rem;
+    font-size: 0.73rem;
     font-weight: 700;
-    padding: 7px 14px;
+    padding: 5px 10px;
     font-family: inherit;
-    transition: all 0.2s;
+    transition: all 0.18s;
     white-space: nowrap;
 }
 
 .my-tender-btn .material-symbols-outlined {
-    font-size: 16px;
+    font-size: 14px;
 }
 
-/* Düzenle — mavi */
+/* Enes Doğanay | 4 Mayıs 2026: Düzenle — outline mavi, fill on hover */
 .my-tender-btn--edit {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
 }
 .my-tender-btn--edit:hover {
-    background: linear-gradient(135deg, #1d4ed8, #1e40af);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
     transform: translateY(-1px);
 }
 
@@ -1424,46 +1453,58 @@
     box-shadow: none;
 }
 
-/* İhaleyi Kapat — turuncu/amber */
+/* Enes Doğanay | 4 Mayıs 2026: İhaleyi Kapat — outline amber, fill on hover */
 .my-tender-btn--close {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: #fff;
+    background: #fffbeb;
+    color: #b45309;
+    border: 1.5px solid #fcd34d;
 }
 .my-tender-btn--close:hover {
-    background: linear-gradient(135deg, #d97706, #b45309);
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    background: #d97706;
+    color: #fff;
+    border-color: #d97706;
+    box-shadow: 0 2px 8px rgba(217,119,6,0.25);
     transform: translateY(-1px);
 }
 
-/* Sil — kırmızı */
+/* Enes Doğanay | 4 Mayıs 2026: Sil — outline kırmızı, fill on hover */
 .my-tender-btn--delete {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
 }
 .my-tender-btn--delete:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+    box-shadow: 0 2px 8px rgba(220,38,38,0.25);
     transform: translateY(-1px);
 }
 
-/* İhaleyi Tekrarla — yeşil */
+/* Enes Doğanay | 4 Mayıs 2026: İhaleyi Tekrarla — outline yeşil, fill on hover */
 .my-tender-btn--repeat {
-    background: linear-gradient(135deg, #059669, #10b981);
-    color: #fff;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1.5px solid #a7f3d0;
 }
 .my-tender-btn--repeat:hover {
-    background: linear-gradient(135deg, #047857, #059669);
-    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    background: #059669;
+    color: #fff;
+    border-color: #059669;
+    box-shadow: 0 2px 8px rgba(5,150,105,0.25);
     transform: translateY(-1px);
 }
 
 /* Onay/İptal inline */
 .my-tender-btn--confirm {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
 }
 .my-tender-btn--confirm:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
     transform: translateY(-1px);
 }
 
@@ -1478,13 +1519,19 @@
 }
 
 /* Enes Doğanay | 15 Nisan 2026: Satır içi onay bloğu */
+/* Enes Doğanay | 4 Mayıs 2026: compact inline confirm */
 .my-tender-confirm-inline {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     color: var(--text-muted);
     font-weight: 600;
+    flex-wrap: nowrap;
+}
+
+.my-tender-confirm-inline .material-symbols-outlined {
+    flex-shrink: 0;
 }
 
 /* Enes Doğanay | 15 Nisan 2026: Kalıcı silme uyarısı — TOM stiliyle birebir */
@@ -1617,27 +1664,27 @@
     padding: 16px;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: compact modal */
 .ihale-modal {
     background: var(--bg-white);
-    border-radius: 16px;
+    border-radius: 14px;
     width: 100%;
-    max-width: 680px;
+    max-width: 620px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
 }
 
 .ihale-modal__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px 0;
+    padding: 14px 18px 12px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 16px;
 }
 
 .ihale-modal__head h3 {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
     margin: 0;
     color: var(--text-dark);
@@ -1649,7 +1696,7 @@
     cursor: pointer;
     color: #94a3b8;
     display: flex;
-    padding: 4px;
+    padding: 2px;
 }
 
 .ihale-modal__close:hover {
@@ -1657,22 +1704,22 @@
 }
 
 .ihale-modal__form {
-    padding: 20px 24px;
+    padding: 14px 18px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
 }
 
 .ihale-modal__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
 }
 
 .ihale-field {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 }
 
 .ihale-field--full {
@@ -1680,7 +1727,7 @@
 }
 
 .ihale-field span {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-dark);
 }
@@ -1688,10 +1735,10 @@
 .ihale-field input,
 .ihale-field select,
 .ihale-field textarea {
-    padding: 10px 14px;
+    padding: 7px 11px;
     border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 13px;
     color: var(--text-dark);
     background: var(--bg-white);
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
@@ -1763,20 +1810,21 @@
 .ihale-modal__footer {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    padding: 16px 24px;
+    gap: 8px;
+    padding: 12px 18px;
     border-top: 1px solid var(--border);
 }
 
 .ihale-btn-cancel {
-    padding: 9px 18px;
+    padding: 7px 14px;
     background: var(--bg-light);
     color: var(--text-muted);
-    border: none;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.15s;
 }
 
 .ihale-btn-cancel:hover {
@@ -1784,19 +1832,20 @@
 }
 
 .ihale-btn-save {
-    padding: 9px 22px;
+    padding: 7px 18px;
     background: #2563eb;
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, box-shadow 0.15s;
 }
 
 .ihale-btn-save:hover:not(:disabled) {
     background: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.2);
 }
 
 .ihale-btn-save:disabled {
@@ -1804,24 +1853,24 @@
     cursor: not-allowed;
 }
 
-/* Enes Doğanay | 10 Nisan 2026: Taslak Kaydet butonu */
+/* Enes Doğanay | 4 Mayıs 2026: Taslak Kaydet butonu compact */
 .ihale-btn-draft {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 9px 18px;
+    gap: 5px;
+    padding: 7px 14px;
     background: var(--bg-light);
     color: var(--text-muted);
     border: 1px solid var(--border);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
 }
 
 .ihale-btn-draft .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .ihale-btn-draft:hover:not(:disabled) {
@@ -1888,32 +1937,32 @@
     border-color: #bbf7d0 !important;
 }
 
-/* Enes Doğanay | 10 Nisan 2026: Bölüm başlıkları (gereksinimler, e-posta, ek dosya, davetli firma) */
+/* --- Bölüm Başlıkları --- */
 .ihale-section {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 14px 0 0;
+    gap: 8px;
+    padding: 10px 0 0;
     border-top: 1px solid var(--border);
 }
 
 .ihale-section__title {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: 6px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-dark);
 }
 
 .ihale-section__title .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 16px;
     color: #3b82f6;
 }
 
 .ihale-section__desc {
     margin: 0;
-    font-size: 12.5px;
+    font-size: 11.5px;
     color: #94a3b8;
     line-height: 1.4;
 }
@@ -1926,10 +1975,10 @@
 
 .ihale-req-input-row input {
     flex: 1;
-    padding: 9px 12px;
+    padding: 7px 10px;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13.5px;
+    border-radius: 7px;
+    font-size: 13px;
     color: var(--text-dark);
     background: var(--bg-light);
     font-family: inherit;
@@ -1946,11 +1995,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
     border: none;
-    border-radius: 8px;
+    border-radius: 7px;
     background: #3b82f6;
     color: #fff;
     cursor: pointer;
@@ -2522,10 +2571,11 @@
 
 /* --- Stepper Progress Bar --- */
 /* Enes Doğanay | 10 Nisan 2026: Segment tabanlı stepper — her adım arası ayrı çizgi */
+/* Enes Doğanay | 4 Mayıs 2026: compact stepper */
 .ihale-stepper-bar {
     display: flex;
     align-items: center;
-    padding: 20px 28px 16px;
+    padding: 12px 20px 10px;
     gap: 0;
     position: relative;
 }
@@ -2556,7 +2606,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     background: none;
     border: none;
     cursor: pointer;
@@ -2574,19 +2624,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background: var(--bg-light);
     border: 2px solid var(--border);
     color: var(--text-light);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12px;
     transition: all 0.25s;
 }
 
 .ihale-stepper-num .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .ihale-stepper-item--active .ihale-stepper-num {
@@ -2603,7 +2653,7 @@
 }
 
 .ihale-stepper-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: #94a3b8;
     white-space: nowrap;
@@ -2620,10 +2670,10 @@
 
 /* --- Step Content --- */
 .ihale-step-content {
-    padding: 20px 28px 8px;
+    padding: 14px 20px 6px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 12px;
     max-height: 58vh;
     overflow-y: auto;
     scrollbar-width: thin;
@@ -2634,8 +2684,8 @@
 .ihale-stepper-nav {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 14px 28px;
+    gap: 8px;
+    padding: 10px 20px;
     border-top: 1px solid var(--border);
 }
 
@@ -2647,10 +2697,10 @@
 .ihale-stepper-next {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 9px 20px;
-    border-radius: 10px;
-    font-size: 14px;
+    gap: 5px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 600;
     border: none;
     cursor: pointer;
@@ -2660,6 +2710,7 @@
 .ihale-stepper-back {
     background: var(--bg-light);
     color: var(--text-muted);
+    border: 1px solid var(--border);
 }
 
 .ihale-stepper-back:hover {
@@ -2678,19 +2729,19 @@
 
 .ihale-stepper-back .material-symbols-outlined,
 .ihale-stepper-next .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
 }
 
 /* --- Deadline Sticky --- */
 .ihale-deadline-sticky {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: #fffbeb;
     border: 1px solid #fde68a;
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-size: 13px;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
     color: #92400e;
     position: sticky;
     top: 0;
@@ -2698,7 +2749,7 @@
 }
 
 .ihale-deadline-sticky .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 14px;
     color: #f59e0b;
 }
 
@@ -2920,11 +2971,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 9px;
     background: var(--bg-light);
     color: var(--text-muted);
     cursor: pointer;
@@ -3118,16 +3169,17 @@
     to { opacity: 1; }
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: compact cool detail modal */
 .tender-detail-modal {
-    width: 680px;
+    width: 580px;
     max-width: 92vw;
     max-height: 88vh;
     background: var(--bg-white);
     display: flex;
     flex-direction: column;
-    border-radius: 20px;
-    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.2), 0 8px 24px rgba(15, 23, 42, 0.08);
-    animation: detailModalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 14px;
+    box-shadow: 0 12px 48px rgba(15, 23, 42, 0.18), 0 4px 16px rgba(15, 23, 42, 0.06);
+    animation: detailModalIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
 }
 
@@ -3140,16 +3192,15 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 16px;
-    padding: 24px 28px 18px;
+    gap: 12px;
+    padding: 14px 16px 12px;
     border-bottom: 1px solid var(--border);
     background: linear-gradient(180deg, var(--bg-light), var(--bg-white));
-    border-radius: 20px 20px 0 0;
 }
 
 .tender-detail__head h2 {
-    margin: 8px 0 6px;
-    font-size: 1.3rem;
+    margin: 5px 0 4px;
+    font-size: 1.05rem;
     color: var(--text-dark);
     line-height: 1.3;
 }
@@ -3157,30 +3208,30 @@
 .tender-detail__company-link {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     background: none;
     border: none;
-    padding: 4px 8px 4px 4px;
-    border-radius: 8px;
+    padding: 3px 6px 3px 3px;
+    border-radius: 6px;
     color: #2563eb;
-    font-size: 0.84rem;
+    font-size: 0.76rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.15s;
 }
 
 .tender-detail__company-link:hover { background: #eff6ff; }
-.tender-detail__company-link .material-symbols-outlined { font-size: 18px; }
+.tender-detail__company-link .material-symbols-outlined { font-size: 14px; }
 
 .tender-detail__close {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     border: none;
     background: var(--bg-light);
-    border-radius: 10px;
+    border-radius: 7px;
     color: var(--text-muted);
     cursor: pointer;
     flex-shrink: 0;
@@ -3192,55 +3243,57 @@
     color: var(--text-dark);
 }
 
+.tender-detail__close .material-symbols-outlined { font-size: 17px; }
+
 .tender-detail__body {
     flex: 1;
     overflow-y: auto;
-    padding: 24px 28px;
+    padding: 14px 16px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 14px;
 }
 
 .tender-detail__section h3 {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.92rem;
+    gap: 5px;
+    font-size: 0.82rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin: 0 0 10px;
+    margin: 0 0 7px;
 }
 
 .tender-detail__section h3 .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
     color: #3b82f6;
 }
 
 .tender-detail__section p {
     margin: 0;
-    font-size: 0.9rem;
-    line-height: 1.7;
+    font-size: 0.82rem;
+    line-height: 1.6;
     color: var(--text-muted);
 }
 
 .tender-detail__grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 7px;
 }
 
 .tender-detail__grid-item {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: flex-start;
-    padding: 12px 14px;
-    border-radius: 12px;
+    padding: 8px 10px;
+    border-radius: 9px;
     background: var(--bg-light);
     border: 1px solid var(--border);
 }
 
 .tender-detail__grid-item .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
     color: #3b82f6;
     flex-shrink: 0;
     margin-top: 1px;
@@ -3248,15 +3301,15 @@
 
 .tender-detail__grid-item strong {
     display: block;
-    font-size: 0.76rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
     font-weight: 600;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .tender-detail__grid-item span {
     display: block;
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     color: var(--text-dark);
     font-weight: 500;
 }
@@ -3267,27 +3320,27 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .tender-detail__req-list li {
-    padding: 10px 14px;
-    border-radius: 10px;
+    padding: 7px 10px;
+    border-radius: 8px;
     background: var(--bg-light);
     border: 1px solid var(--border);
 }
 
 .tender-detail__req-list li strong {
     display: block;
-    font-size: 0.86rem;
+    font-size: 0.8rem;
     color: var(--text-dark);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .tender-detail__req-list li span {
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     color: var(--text-muted);
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .tender-detail__files {
@@ -3300,37 +3353,34 @@
 .tender-detail__file-link {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 8px 14px;
-    border-radius: 10px;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 7px;
     background: #eff6ff;
     color: #1d4ed8;
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     font-weight: 600;
     text-decoration: none;
     transition: background 0.15s;
-    border: none;
+    border: 1px solid #bfdbfe;
     cursor: pointer;
     font-family: inherit;
 }
 
-.tender-detail__file-link:hover { background: #dbeafe; }
-.tender-detail__file-link .material-symbols-outlined { font-size: 16px; }
+.tender-detail__file-link:hover { background: #dbeafe; border-color: #93c5fd; }
+.tender-detail__file-link .material-symbols-outlined { font-size: 13px; }
 
 .tender-detail__footer {
     display: flex;
-    gap: 10px;
-    padding: 18px 28px;
+    gap: 8px;
+    padding: 10px 16px;
     border-top: 1px solid var(--border);
     background: var(--bg-light);
-    border-radius: 0 0 20px 20px;
 }
 
 .tender-detail__footer .tender-action {
     flex: 1;
     justify-content: center;
-    padding: 12px 16px;
-    font-size: 0.88rem;
 }
 
 /* Enes Doğanay | 1 Mayıs 2026: Giriş yapmamış kullanıcı için ihale detay blur/gate */
@@ -3484,17 +3534,18 @@
     to { opacity: 1; }
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: compact cool teklif popup */
 .teklif-popup {
-    width: 720px;
+    width: 640px;
     max-width: 100%;
     max-height: 90vh;
     background: var(--bg-white);
-    border-radius: 24px;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 32px 80px rgba(15, 23, 42, 0.2);
-    animation: tpSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 12px 48px rgba(15, 23, 42, 0.18);
+    animation: tpSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes tpSlideIn {
@@ -3507,37 +3558,40 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 16px;
-    padding: 24px 28px 18px;
+    gap: 12px;
+    padding: 13px 16px 11px;
     border-bottom: 1px solid var(--border);
     background: linear-gradient(180deg, var(--bg-light), var(--bg-white));
 }
 
 .teklif-popup__head-left {
     display: flex;
-    gap: 14px;
-    align-items: flex-start;
+    gap: 10px;
+    align-items: center;
 }
 
 .teklif-popup__head-icon {
-    font-size: 28px;
+    font-size: 18px;
     color: #2563eb;
     background: #eff6ff;
-    padding: 10px;
-    border-radius: 14px;
+    padding: 7px;
+    border-radius: 9px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .teklif-popup__head h2 {
-    margin: 0 0 4px;
-    font-size: 1.2rem;
+    margin: 0 0 2px;
+    font-size: 1rem;
     font-weight: 800;
     color: var(--text-dark);
 }
 
 .teklif-popup__tender-name {
-    margin: 0 0 4px;
-    font-size: 0.88rem;
+    margin: 0 0 2px;
+    font-size: 0.8rem;
     color: var(--text-dark);
     font-weight: 600;
 }
@@ -3547,22 +3601,22 @@
     align-items: center;
     gap: 4px;
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.74rem;
     color: var(--text-muted);
 }
 
-.teklif-popup__tender-firma .material-symbols-outlined { font-size: 15px; }
-.teklif-popup__ref { color: #94a3b8; font-family: monospace; font-size: 0.75rem; }
+.teklif-popup__tender-firma .material-symbols-outlined { font-size: 13px; }
+.teklif-popup__ref { color: #94a3b8; font-family: monospace; font-size: 0.7rem; }
 
 .teklif-popup__close {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     border: none;
     background: var(--bg-light);
-    border-radius: 10px;
+    border-radius: 7px;
     color: var(--text-muted);
     cursor: pointer;
     flex-shrink: 0;
@@ -3570,45 +3624,46 @@
 }
 
 .teklif-popup__close:hover { background: var(--border); color: var(--text-dark); }
+.teklif-popup__close .material-symbols-outlined { font-size: 17px; }
 
 /* Body */
 .teklif-popup__body {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 28px 24px;
+    padding: 14px 16px 16px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 14px;
 }
 
 /* İhale özet şeridi */
 .teklif-popup__summary-strip {
     display: flex;
-    gap: 10px;
+    gap: 7px;
     flex-wrap: wrap;
 }
 
 .teklif-popup__summary-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 12px;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: 9px;
     background: var(--bg-light);
     border: 1px solid var(--border);
     flex: 1;
-    min-width: 140px;
+    min-width: 120px;
 }
 
 .teklif-popup__summary-item .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
     color: #3b82f6;
     flex-shrink: 0;
 }
 
 .teklif-popup__summary-item strong {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     color: var(--text-light);
     font-weight: 600;
     text-transform: uppercase;
@@ -3617,7 +3672,7 @@
 
 .teklif-popup__summary-item span {
     display: block;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--text-dark);
     font-weight: 500;
 }
@@ -3626,14 +3681,14 @@
 .teklif-popup__section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .teklif-popup__section h3 {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.9rem;
+    gap: 5px;
+    font-size: 0.82rem;
     font-weight: 700;
     color: var(--text-dark);
     margin: 0;
@@ -3641,36 +3696,36 @@
 
 /* Enes Doğanay | 2 Mayıs 2026: Section başlık ikonu — pill arka plan */
 .teklif-popup__section h3 .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 14px;
     color: #2563eb;
     background: rgba(37, 99, 235, 0.1);
-    padding: 5px;
-    border-radius: 8px;
+    padding: 4px;
+    border-radius: 6px;
     flex-shrink: 0;
 }
 
 .teklif-popup__section h3 small {
     font-weight: 500;
     color: #94a3b8;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
 }
 
 /* Kalem tablosu */
 .teklif-kalem-table {
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: 10px;
     overflow: hidden;
 }
 
 /* Enes Doğanay | 14 Nisan 2026: Grid 6 sütun — para birimi sütunu eklendi */
 .teklif-kalem-table__head {
     display: grid;
-    grid-template-columns: 36px 1fr 80px 110px 110px 110px;
-    gap: 8px;
-    padding: 10px 16px;
+    grid-template-columns: 28px 1fr 70px 100px 100px 100px;
+    gap: 6px;
+    padding: 7px 12px;
     background: var(--bg-light);
     border-bottom: 1px solid var(--border);
-    font-size: 0.72rem;
+    font-size: 0.67rem;
     font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -3680,9 +3735,9 @@
 
 .teklif-kalem-table__row {
     display: grid;
-    grid-template-columns: 36px 1fr 80px 110px 110px 110px;
-    gap: 8px;
-    padding: 12px 16px;
+    grid-template-columns: 28px 1fr 70px 100px 100px 100px;
+    gap: 6px;
+    padding: 8px 12px;
     border-bottom: 1px solid var(--border);
     align-items: center;
 }
@@ -3690,7 +3745,7 @@
 .teklif-kalem-table__row:last-child { border-bottom: none; }
 
 .teklif-kalem-col--no {
-    font-size: 0.78rem;
+    font-size: 0.73rem;
     color: #94a3b8;
     font-weight: 700;
     text-align: center;
@@ -3698,17 +3753,17 @@
 
 .teklif-kalem-col--madde strong {
     display: block;
-    font-size: 0.84rem;
+    font-size: 0.79rem;
     color: var(--text-dark);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .teklif-kalem-input {
     width: 100%;
-    padding: 7px 10px;
+    padding: 5px 8px;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.84rem;
+    border-radius: 7px;
+    font-size: 0.79rem;
     font-family: inherit;
     color: var(--text-dark);
     background: var(--bg-white);
@@ -3718,7 +3773,7 @@
 
 .teklif-kalem-input:focus {
     border-color: #93c5fd;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 .teklif-kalem-input--note {
@@ -3730,30 +3785,30 @@
 .teklif-kalem-col--amount {
     font-weight: 700;
     color: var(--text-dark);
-    font-size: 0.86rem;
+    font-size: 0.8rem;
     text-align: right;
     white-space: nowrap;
 }
 
-/* Enes Doğanay | 2 Mayıs 2026: Kalem tablo footer — görsel iyileştirme */
+/* Enes Doğanay | 2 Mayıs 2026: Kalem tablo footer */
 .teklif-kalem-table__footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 18px;
+    padding: 9px 14px;
     background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
-    border-top: 2px solid rgba(37, 99, 235, 0.15);
-    border-radius: 0 0 13px 13px;
+    border-top: 1.5px solid rgba(37, 99, 235, 0.12);
+    border-radius: 0 0 9px 9px;
 }
 
 .teklif-kalem-table__footer span {
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-dark);
 }
 
 .teklif-kalem-table__footer strong {
-    font-size: 1.1rem;
+    font-size: 0.97rem;
     color: var(--text-dark);
 }
 
@@ -3800,13 +3855,13 @@
 /* Enes Doğanay | 14 Nisan 2026: Diğer para birimi modal */
 .teklif-currency-modal {
     background: var(--bg-white);
-    border-radius: 20px;
-    width: 480px;
+    border-radius: 12px;
+    width: 420px;
     max-width: 95vw;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
     overflow: hidden;
 }
 
@@ -3814,15 +3869,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 24px;
+    padding: 11px 14px;
     border-bottom: 1px solid var(--border);
 }
 
 .teklif-currency-modal__head h3 {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 1.08rem;
+    gap: 6px;
+    font-size: 0.9rem;
     font-weight: 700;
     color: var(--text-dark);
     margin: 0;
@@ -3954,12 +4009,13 @@
 
 .teklif-popup__amount-input {
     flex: 1;
-    padding: 10px 14px;
+    padding: 7px 11px;
     border: 1px solid var(--border);
-    border-radius: 12px;
-    font-size: 1.1rem;
+    border-radius: 8px;
+    font-size: 0.92rem;
     font-family: inherit;
     color: var(--text-dark);
+    background: var(--bg-white);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -4342,31 +4398,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    padding: 18px 28px;
-    border-top: 2px solid var(--border);
-    background: linear-gradient(180deg, var(--bg-light) 0%, var(--bg-white) 100%);
-    position: relative;
-}
-
-.teklif-popup__footer::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: 28px;
-    right: 28px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.3), transparent);
-    border-radius: 2px;
-}
-
-.teklif-popup__footer-total {
-    display: flex;
-    flex-direction: column;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-light);
 }
 
 .teklif-popup__footer-total span {
-    font-size: 0.76rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
     font-weight: 600;
     text-transform: uppercase;
@@ -4374,57 +4413,60 @@
 }
 
 .teklif-popup__footer-total strong {
-    font-size: 1.35rem;
+    font-size: 1.1rem;
     color: var(--text-dark);
     font-weight: 800;
     letter-spacing: -0.01em;
 }
 
 .teklif-popup__footer-total small {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: #22c55e;
     font-weight: 600;
 }
 
 .teklif-popup__footer-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .teklif-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 11px 20px;
-    border-radius: 12px;
-    font-size: 0.88rem;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
     border: none;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
     white-space: nowrap;
 }
 
-.teklif-btn .material-symbols-outlined { font-size: 18px; }
+.teklif-btn .material-symbols-outlined { font-size: 15px; }
 
 .teklif-btn--draft {
-    background: var(--bg-light);
+    background: var(--bg-white);
     color: var(--text-dark);
+    border: 1px solid var(--border);
 }
 
-.teklif-btn--draft:hover { background: var(--border); transform: translateY(-1px); }
+.teklif-btn--draft:hover { background: var(--bg-light); transform: translateY(-1px); }
 
 /* Enes Doğanay | 13 Nisan 2026: Teklifi Geri Çek butonu */
 .teklif-btn--withdraw {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
 }
 
 .teklif-btn--withdraw:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.3);
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+    box-shadow: 0 3px 10px rgba(220,38,38,0.22);
     transform: translateY(-1px);
 }
 
@@ -4448,13 +4490,16 @@
 }
 
 .teklif-btn--submit {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.22);
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
 }
 
 .teklif-btn--submit:hover {
-    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.32);
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.22);
     transform: translateY(-1px);
 }
 
@@ -4979,14 +5024,82 @@
 [data-theme="dark"] .tenders-list-action-btn--rejected:hover { background: #7f1d1d; color: #fee2e2; }
 
 /* === İhalelerim paneli ek === */
+/* Enes Doğanay | 4 Mayıs 2026: dark mode */
+[data-theme="dark"] .my-tenders-panel {
+    border-color: #1e293b;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+[data-theme="dark"] .my-tenders-panel__head {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
+}
+[data-theme="dark"] .my-tender-row {
+    background: #0f172a;
+    border-color: #1e293b;
+}
+[data-theme="dark"] .my-tenders-toggle-btn {
+    background: #0f172a;
+    border-color: #1e293b;
+    color: #64748b;
+}
 [data-theme="dark"] .my-tenders-toggle-btn:hover {
-    background: var(--border);
-    border-color: var(--text-light);
-    color: var(--text-dark);
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
 }
 [data-theme="dark"] .my-tender-btn--cancel:hover { background: var(--border); color: var(--text-dark); }
 [data-theme="dark"] .my-tender-btn--cancel-link { color: var(--text-muted); }
 [data-theme="dark"] .my-tender-btn--cancel-link:hover { color: var(--text-dark); }
+/* Enes Doğanay | 4 Mayıs 2026: dark mode outline butonlar */
+[data-theme="dark"] .my-tender-btn--edit {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #1e40af;
+}
+[data-theme="dark"] .my-tender-btn--edit:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+[data-theme="dark"] .my-tender-btn--close {
+    background: #1c1200;
+    color: #fbbf24;
+    border-color: #78350f;
+}
+[data-theme="dark"] .my-tender-btn--close:hover {
+    background: #d97706;
+    color: #fff;
+    border-color: #d97706;
+}
+[data-theme="dark"] .my-tender-btn--delete {
+    background: #1c0505;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+[data-theme="dark"] .my-tender-btn--delete:hover {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+}
+[data-theme="dark"] .my-tender-btn--repeat {
+    background: #052e16;
+    color: #34d399;
+    border-color: #064e3b;
+}
+[data-theme="dark"] .my-tender-btn--repeat:hover {
+    background: #059669;
+    color: #fff;
+    border-color: #059669;
+}
+[data-theme="dark"] .my-tender-btn--confirm {
+    background: #1c0505;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+[data-theme="dark"] .my-tender-btn--confirm:hover {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+}
 [data-theme="dark"] .my-tender-confirm-inline--danger {
     background: #450a0a;
     border-color: #7f1d1d;
@@ -5109,11 +5222,29 @@
 [data-theme="dark"] .tender-detail-auth-gate__register button { color: #60a5fa; }
 
 /* === Teklif popup ek === */
-[data-theme="dark"] .teklif-popup__head-icon { background: #1e3a5f; }
+/* Enes Doğanay | 4 Mayıs 2026: compact cool dark mode teklif popup */
+[data-theme="dark"] .teklif-popup { background: var(--bg-white); }
+[data-theme="dark"] .teklif-popup__head { background: linear-gradient(180deg, var(--bg-light), var(--bg-white)); }
+[data-theme="dark"] .teklif-popup__head-icon { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .teklif-popup__close { background: var(--bg-light); }
+[data-theme="dark"] .teklif-popup__close:hover { background: var(--border); }
+[data-theme="dark"] .teklif-popup__summary-item { background: var(--bg-light); border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-table { border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-table__head { background: var(--bg-light); border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-table__row { border-bottom-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-input { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
 [data-theme="dark"] .teklif-kalem-table__footer {
     background: linear-gradient(135deg, #1e3a5f 0%, #1a3328 100%);
     border-top-color: rgba(59, 130, 246, 0.2);
 }
+[data-theme="dark"] .teklif-popup__footer { background: var(--bg-light); border-top-color: var(--border); }
+[data-theme="dark"] .teklif-btn--draft { background: var(--bg-white); border-color: var(--border); color: var(--text-dark); }
+[data-theme="dark"] .teklif-btn--draft:hover { background: var(--bg-light); }
+[data-theme="dark"] .teklif-btn--withdraw { background: #450a0a; color: #f87171; border-color: #7f1d1d; }
+[data-theme="dark"] .teklif-btn--withdraw:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+[data-theme="dark"] .teklif-btn--submit { background: #1e3a5f; color: #93c5fd; border-color: #1e40af; }
+[data-theme="dark"] .teklif-btn--submit:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
 [data-theme="dark"] .teklif-popup__file-upload {
     background: linear-gradient(160deg, #1e293b 0%, rgba(37, 99, 235, 0.04) 100%);
     border-color: #334155;
@@ -5135,9 +5266,6 @@
     color: #60a5fa;
     background: rgba(96, 165, 250, 0.12);
 }
-[data-theme="dark"] .teklif-popup__footer::before {
-    background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.3), transparent);
-}
 [data-theme="dark"] .teklif-popup__file-chip { background: #1e3a5f; color: #93c5fd; }
 [data-theme="dark"] .teklif-popup__file-chip button { background: rgba(96, 165, 250, 0.1); color: #93c5fd; }
 [data-theme="dark"] .teklif-popup__file-chip button:hover { background: rgba(96, 165, 250, 0.2); }
@@ -5148,6 +5276,12 @@
 }
 [data-theme="dark"] .teklif-btn--delete-draft:hover { background: #450a0a; border-color: #f87171; }
 [data-theme="dark"] .teklif-currency-modal__symbol { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .teklif-currency-modal { background: var(--bg-white); }
+[data-theme="dark"] .teklif-currency-modal__head { border-bottom-color: var(--border); }
+[data-theme="dark"] .teklif-currency-modal__search { border-bottom-color: var(--border); background: var(--bg-light); }
+[data-theme="dark"] .teklif-currency-modal__search input { color: var(--text-dark); background: transparent; }
+[data-theme="dark"] .teklif-currency-modal__item:hover { background: var(--bg-light); }
+[data-theme="dark"] .teklif-popup__amount-input { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }
 
 /* === Firma iletişim ek === */
 [data-theme="dark"] .firma-contact-row:hover {
@@ -5163,7 +5297,28 @@
 }
 [data-theme="dark"] .ihale-publish-link-row__input { color: #93c5fd; background: transparent; }
 
-/* === Tender action disabled === */
-[data-theme="dark"] .tender-action--update:disabled { background: #334155; color: var(--text-muted); }
-[data-theme="dark"] .tender-action--own-edit:disabled { background: #334155; color: var(--text-muted); }
-[data-theme="dark"] .tender-action--firma { background: var(--bg-light); color: var(--text-dark); }
+/* === Tender action dark mode === */
+/* Enes Doğanay | 4 Mayıs 2026: outline→fill butonlar dark */
+[data-theme="dark"] .tender-action--join {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #1e40af;
+}
+[data-theme="dark"] .tender-action--join:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+[data-theme="dark"] .tender-action--own-edit {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #1e40af;
+}
+[data-theme="dark"] .tender-action--own-edit:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+[data-theme="dark"] .tender-action--update:disabled { background: #334155; color: var(--text-muted); border-color: #334155; }
+[data-theme="dark"] .tender-action--own-edit:disabled { background: #334155; color: var(--text-muted); border-color: #334155; }
+[data-theme="dark"] .tender-action--firma { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }

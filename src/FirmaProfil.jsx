@@ -93,6 +93,18 @@ const FirmaProfil = () => {
     const [firma, setFirma] = useState(null);
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
+    // Enes Doğanay | 4 Mayıs 2026: Bildirim listesi görüntü limiti
+    const [showAllNotifications, setShowAllNotifications] = useState(false);
+    const FP_NOTIF_LIMIT = 3;
+
+    // Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine
+    const [fpToast, setFpToast] = useState(null);
+    const fpToastTimerRef = useRef(null);
+    const showFpToast = (type, message) => {
+        if (fpToastTimerRef.current) clearTimeout(fpToastTimerRef.current);
+        setFpToast({ type, message });
+        fpToastTimerRef.current = setTimeout(() => setFpToast(null), 3800);
+    };
 
     // Enes Doğanay | 7 Nisan 2026: Teklif state'leri
     const [incomingQuotes, setIncomingQuotes] = useState([]);
@@ -178,7 +190,8 @@ const FirmaProfil = () => {
     // Enes Doğanay | 4 Mayıs 2026: Ekip yönetimi state'leri
     const [ekip, setEkip] = useState([]);            // { user_id, role, title, first_name, last_name }
     const [ekipLoading, setEkipLoading] = useState(false);
-    const [myRole, setMyRole] = useState('owner');   // mevcut kullanıcının rolü
+    // Enes Doğanay | 4 Mayıs 2026: null başlangıç — 'owner' default flash'ı önler
+    const [myRole, setMyRole] = useState(null);   // mevcut kullanıcının rolü
     const [davetEmail, setDavetEmail] = useState('');
     const [davetRole, setDavetRole] = useState('member');
     const [davetTitle, setDavetTitle] = useState('');
@@ -188,6 +201,11 @@ const FirmaProfil = () => {
     const [bekleyenDavetler, setBekleyenDavetler] = useState([]);
     const [confirmRemoveMember, setConfirmRemoveMember] = useState(null); // { user_id, name }
     const [editingMember, setEditingMember] = useState(null); // { user_id, title, role }
+    // Enes Doğanay | 4 Mayıs 2026: Sayfa bazlı yetki düzenlemesi — hangi üye hangi sayfayı görebilir
+    const [editingPermissions, setEditingPermissions] = useState(null); // { user_id } | null
+    // Enes Doğanay | 4 Mayıs 2026: Firma geneli ekip görünürlüğü — detay sayfasında göster/gizle
+    const [showEkipPublic, setShowEkipPublic] = useState(true);
+    const [ekipVisibilitySaving, setEkipVisibilitySaving] = useState(false);
 
     // ── İlk yükleme ──
     useEffect(() => {
@@ -213,6 +231,8 @@ const FirmaProfil = () => {
             ]);
 
             setFirma(firmaRes.data);
+            // Enes Doğanay | 4 Mayıs 2026: Firma geneli ekip görünürlüğünü state'e ata
+            setShowEkipPublic(firmaRes.data?.show_ekip_public !== false);
             setNotifications(notifRes.data || []);
             setUpcomingReminders((remindersRes.data || []).filter(r => r.status === 'pending'));
             if (listsRes.data) setMyLists(listsRes.data);
@@ -644,7 +664,7 @@ const FirmaProfil = () => {
         const { error } = await supabase.from('bildirimler').delete().eq('id', notificationId).eq('user_id', userId);
         if (error) {
             console.error('[Bildirim Sil] Hata:', error);
-            alert('Bildirim silinemedi.');
+            showFpToast('error', 'Bildirim silinemedi.');
             return;
         }
         setNotifications(prev => prev.filter(n => n.id !== notificationId));
@@ -660,7 +680,7 @@ const FirmaProfil = () => {
             .eq('user_id', userId);
         if (reminderError) {
             console.error('[Hatırlatıcı Sil] Hata:', reminderError);
-            alert('Hatırlatıcı silinemedi.');
+            showFpToast('error', 'Hatırlatıcı silinemedi.');
             return;
         }
         if (reminder.note_id) {
@@ -683,7 +703,7 @@ const FirmaProfil = () => {
         const { error } = await supabase.from('bildirimler').delete().eq('user_id', userId);
         if (error) {
             console.error('[Bildirim Toplu Sil] Hata:', error);
-            alert('Bildirimler silinemedi.');
+            showFpToast('error', 'Bildirimler silinemedi.');
             return;
         }
         setNotifications([]);
@@ -728,7 +748,7 @@ const FirmaProfil = () => {
 
         if (upsertErr) {
           console.error('[Bildirim Tercihleri] Upsert hata:', upsertErr);
-          alert('Bildirim tercihi kaydedilemedi: ' + upsertErr.message);
+          showFpToast('error', 'Bildirim tercihi kaydedilemedi: ' + upsertErr.message);
           setNotifPrefs(prev => ({ ...prev, [key]: !newValue }));
           return;
         }
@@ -747,7 +767,7 @@ const FirmaProfil = () => {
         if (!newListName.trim()) return;
         const { data, error } = await supabase.from('kullanici_listeleri').insert([{ user_id: userId, liste_adi: newListName }]).select().single();
         if (!error && data) { setMyLists([...myLists, data]); setNewListName(''); setIsCreatingList(false); }
-        else alert('Liste oluşturulamadı.');
+        else showFpToast('error', 'Liste oluşturulamadı.');
     };
     const handleDeleteList = async (listId) => {
         try {
@@ -757,17 +777,17 @@ const FirmaProfil = () => {
             setFavorites(prev => prev.map(f => f.liste_id === listId ? { ...f, liste_id: null } : f));
             setSelectedListId(cur => cur === listId ? null : cur);
             setConfirmDeleteList(null);
-        } catch { alert('Liste silinirken bir hata oluştu.'); }
+        } catch { showFpToast('error', 'Liste silinirken bir hata oluştu.'); }
     };
     const handleRemoveFavorite = async (favoriteId) => {
         const { error } = await supabase.from('kullanici_favorileri').delete().eq('id', favoriteId);
         if (!error) { setFavorites(favorites.filter(fav => fav.id !== favoriteId)); setConfirmDelete(null); }
-        else alert('Silme işlemi başarısız oldu.');
+        else showFpToast('error', 'Silme işlemi başarısız oldu.');
     };
     const handleAssignList = async (favoriteId, listId) => {
         const { error } = await supabase.from('kullanici_favorileri').update({ liste_id: listId }).eq('id', favoriteId);
         if (!error) { setFavorites(prev => prev.map(f => f.id === favoriteId ? { ...f, liste_id: listId } : f)); setAssigningListId(null); }
-        else alert('Liste güncellenemedi.');
+        else showFpToast('error', 'Liste güncellenemedi.');
     };
     const updateFavoriteNotesState = (favoriteId, nextNotes) => {
         const ordered = [...nextNotes].sort((a, b) => (b.updated_at || b.created_at || '').localeCompare(a.updated_at || a.created_at || ''));
@@ -796,7 +816,7 @@ const FirmaProfil = () => {
             resetInlineNoteEditor();
             setSaveFeedbackFavoriteId(favId);
             setTimeout(() => setSaveFeedbackFavoriteId(cur => cur === favId ? null : cur), 1800);
-        } catch { alert('Not kaydedilirken bir hata oluştu.'); }
+        } catch { showFpToast('error', 'Not kaydedilirken bir hata oluştu.'); }
         finally { setIsSavingNote(false); }
     };
     const handleDeleteSavedNote = async (favoriteId, noteId) => {
@@ -806,10 +826,51 @@ const FirmaProfil = () => {
             updateFavoriteNotesState(favoriteId, (target?.notes || []).filter(n => n.id !== noteId));
             if (editingSavedNoteId === noteId) resetInlineNoteEditor();
             setPendingDeleteNoteId(null);
-        } catch { alert('Not silinirken bir hata oluştu.'); }
+        } catch { showFpToast('error', 'Not silinirken bir hata oluştu.'); }
     };
 
-    // Enes Doğanay | 4 Mayıs 2026: Ekip sekmesi açıldığında yükle
+    // Enes Doğanay | 4 Mayıs 2026: Ekip görünürlüğü bireysel toggle
+    const handleVisibilityToggle = async (targetUserId, currentValue) => {
+        const newValue = !currentValue;
+        const { error } = await supabase.from('kurumsal_firma_yoneticileri')
+            .update({ is_public: newValue })
+            .eq('user_id', targetUserId)
+            .eq('firma_id', String(companyId));
+        if (error) {
+            console.error('Görünürlük güncellenemedi:', error);
+            return;
+        }
+        setEkip(prev => prev.map(m => m.user_id === targetUserId ? { ...m, is_public: newValue } : m));
+    };
+
+    // Enes Doğanay | 4 Mayıs 2026: Firma geneli ekip toggle — firmalar.show_ekip_public güncelle
+    const handleEkipPublicToggle = async () => {
+        const newValue = !showEkipPublic;
+        setEkipVisibilitySaving(true);
+        const { error } = await supabase.from('firmalar')
+            .update({ show_ekip_public: newValue })
+            .eq('firmaID', String(companyId));
+        if (error) {
+            console.error('Ekip görünürlüğü kaydedilemedi:', error);
+        } else {
+            setShowEkipPublic(newValue);
+        }
+        setEkipVisibilitySaving(false);
+    };
+
+    // Enes Doğanay | 4 Mayıs 2026: Üye sayfa izinleri güncelleme
+    const handlePermissionsUpdate = async (targetUserId, key, value) => {
+        const member = ekip.find(m => m.user_id === targetUserId);
+        if (!member) return;
+        const newPerms = { ...member.page_permissions, [key]: value };
+        const { error } = await supabase.from('kurumsal_firma_yoneticileri')
+            .update({ page_permissions: newPerms })
+            .eq('user_id', targetUserId)
+            .eq('firma_id', String(companyId));
+        if (error) { console.error('İzin güncellenemedi:', error); return; }
+        setEkip(prev => prev.map(m => m.user_id === targetUserId ? { ...m, page_permissions: newPerms } : m));
+    };
+
     useEffect(() => {
         if (currentTab !== 'ekip' || !companyId) return;
         loadEkip();
@@ -829,8 +890,9 @@ const FirmaProfil = () => {
         // user_id bilgisi için ayrıca çek
         const { data: rawEkip } = await supabase
             .from('kurumsal_firma_yoneticileri')
-            .select('user_id, role, title, created_at')
+            .select('user_id, role, title, created_at, is_public, page_permissions')
             .eq('firma_id', String(companyId));
+        const DEFAULT_PERMS = { firma_paneli: false, teklif_yonetimi: true, ihale_yonetimi: true, ekip_yonetimi: false };
         if (rawEkip) {
             const userIds = rawEkip.map(r => r.user_id);
             const { data: profiles } = await supabase
@@ -842,6 +904,9 @@ const FirmaProfil = () => {
                 ...r,
                 first_name: profileMap[r.user_id]?.first_name || '',
                 last_name: profileMap[r.user_id]?.last_name || '',
+                is_public: r.is_public !== false,
+                // Enes Doğanay | 4 Mayıs 2026: page_permissions — yoksa varsayılan
+                page_permissions: r.page_permissions || DEFAULT_PERMS,
             })));
         }
         setBekleyenDavetler(davetRes.data || []);
@@ -875,6 +940,10 @@ const FirmaProfil = () => {
                 setDavetSending(false);
                 return;
             }
+            // Enes Doğanay | 4 Mayıs 2026: Varsayılan page_permissions role göre belirlenir
+            const defaultPerms = davetRole === 'admin'
+                ? { firma_paneli: true,  teklif_yonetimi: true, ihale_yonetimi: true, ekip_yonetimi: false }
+                : { firma_paneli: false, teklif_yonetimi: true, ihale_yonetimi: true, ekip_yonetimi: false };
             // Davet oluştur
             const { error } = await supabase.from('firma_davetleri').insert({
                 firma_id: String(companyId),
@@ -883,6 +952,7 @@ const FirmaProfil = () => {
                 invited_by: userId,
                 role: davetRole,
                 title: davetTitle.trim() || null,
+                page_permissions: defaultPerms,
             });
             if (error) throw error;
             // Kullanıcıya bildirim gönder
@@ -990,6 +1060,8 @@ const FirmaProfil = () => {
       if (prefKey && notifPrefs[prefKey] === false) return false;
       return true;
     });
+    const fpVisibleNotifications = showAllNotifications ? filteredNotifications : filteredNotifications.slice(0, FP_NOTIF_LIMIT);
+    const fpHasMoreNotifications = filteredNotifications.length > FP_NOTIF_LIMIT;
     const unreadNotifCount = filteredNotifications.filter(n => !n.is_read).length;
 
     /* Enes Doğanay | 9 Nisan 2026: Okunmamış teklif bildirimlerinin teklif_id'lerini topla — kart üzerinde yeni mesaj göstergesi için */
@@ -1012,6 +1084,29 @@ const FirmaProfil = () => {
 
     return (
         <>
+            {/* Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine */}
+            {fpToast && (
+                <div style={{
+                    position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+                    zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+                    padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
+                    boxShadow: '0 8px 28px rgba(15,23,42,0.18)',
+                    background: fpToast.type === 'error' ? '#fef2f2' : fpToast.type === 'warning' ? '#fffbeb' : '#eff6ff',
+                    border: `1.5px solid ${fpToast.type === 'error' ? '#fca5a5' : fpToast.type === 'warning' ? '#fcd34d' : '#bfdbfe'}`,
+                    color: fpToast.type === 'error' ? '#991b1b' : fpToast.type === 'warning' ? '#92400e' : '#1e40af',
+                    fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
+                    animation: 'fpToastIn 0.22s ease'
+                }}>
+                    <style>{`@keyframes fpToastIn { from { opacity:0; transform:translate(-50%,10px);} to { opacity:1; transform:translate(-50%,0);} }`}</style>
+                    <span className="material-symbols-outlined" style={{ fontSize: '19px', flexShrink: 0 }}>
+                        {fpToast.type === 'error' ? 'error' : fpToast.type === 'warning' ? 'warning' : 'info'}
+                    </span>
+                    {fpToast.message}
+                    <button onClick={() => setFpToast(null)} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+                    </button>
+                </div>
+            )}
             {!isEmbedded && <SharedHeader
                 navItems={[
                     { label: 'Anasayfa', href: '/' },
@@ -1036,7 +1131,7 @@ const FirmaProfil = () => {
                                     {firma?.firma_adi?.charAt(0) || 'F'}
                                 </div>
                             )}
-                            <div>
+                            <div className="sidebar-user-info">
                                 <div className="sidebar-user-name">{firma?.firma_adi || 'Firma'}</div>
                                 <div className="sidebar-user-company">{firma?.category_name || 'Sektör belirtilmemiş'}</div>
                             </div>
@@ -1058,8 +1153,8 @@ const FirmaProfil = () => {
                             <a className={`nav-item ${currentTab === 'ihale-yonetimi' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ihale-yonetimi' })}>
                                 <span className="material-symbols-outlined">gavel</span> İhale Yönetimi
                             </a>
-                            {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi sekmesi — sadece owner görür */}
-                            {myRole === 'owner' && (
+                            {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi sekmesi — owner ve admin görür */}
+                            {(myRole === 'owner' || myRole === 'admin') && (
                                 <a className={`nav-item ${currentTab === 'ekip' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ekip' })}>
                                     <span className="material-symbols-outlined">group</span> Ekip Yönetimi
                                 </a>
@@ -1555,7 +1650,7 @@ const FirmaProfil = () => {
                                             </div>
                                         ) : (
                                             <div className="notifications-feed-list">
-                                                {filteredNotifications.map((notification) => (
+                                                {fpVisibleNotifications.map((notification) => (
                                                     <article
                                                         key={notification.id}
                                                         className={`notification-feed-card ${notification.is_read ? '' : 'unread'} ${(notification.metadata?.teklif_id || notification.metadata?.ihale_id) ? 'clickable' : ''}`}
@@ -1628,6 +1723,23 @@ const FirmaProfil = () => {
                                                         </div>
                                                     </article>
                                                 ))}
+                                                {/* Enes Doğanay | 4 Mayıs 2026: Tümünü Göster / Gizle */}
+                                                {fpHasMoreNotifications && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowAllNotifications(v => !v)}
+                                                        style={{
+                                                            display: 'block', width: '100%', marginTop: '8px',
+                                                            padding: '10px', borderRadius: '10px', border: '1.5px solid #e2e8f0',
+                                                            background: 'transparent', cursor: 'pointer', fontSize: '0.85rem',
+                                                            fontWeight: 600, color: '#4f73f8', fontFamily: 'inherit'
+                                                        }}
+                                                    >
+                                                        {showAllNotifications
+                                                            ? 'Daha Az Göster'
+                                                            : `Tümünü Göster (${filteredNotifications.length - FP_NOTIF_LIMIT} daha)`}
+                                                    </button>
+                                                )}
                                             </div>
                                         )}
                                     </section>
@@ -1732,14 +1844,32 @@ const FirmaProfil = () => {
                         })()}
 
                         {/* Enes Doğanay | 4 Mayıs 2026: Tab → Ekip Yönetimi */}
-                        {currentTab === 'ekip' && myRole === 'owner' && (
+                        {currentTab === 'ekip' && (myRole === 'owner' || myRole === 'admin') && (
                             <div className="ekip-panel">
                                 <div className="ekip-panel__header">
                                     <h2><span className="material-symbols-outlined">group</span> Ekip Yönetimi</h2>
                                     <p>Firmanıza çalışan ekleyebilir, rollerini ve unvanlarını yönetebilirsiniz.</p>
                                 </div>
 
-                                {/* Davet formu */}
+                                {/* Enes Doğanay | 4 Mayıs 2026: Firma geneli ekip gösterim toggle */}
+                                <div className="ekip-global-visibility-card">
+                                    <div className="ekip-global-visibility-info">
+                                        <span className="material-symbols-outlined">visibility</span>
+                                        <div>
+                                            <strong>Ekibimizi Firma Detay Sayfasında Göster</strong>
+                                            <p>Kapatırsanız "Ekibi İncele" butonu ve ekip bölümü ziyaretçilere gösterilmez.</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className={`ekip-global-toggle${showEkipPublic ? ' ekip-global-toggle--on' : ''}`}
+                                        onClick={handleEkipPublicToggle}
+                                        disabled={ekipVisibilitySaving}
+                                        aria-label="Ekip görünürlüğünü değiştir"
+                                    >
+                                        <span className="ekip-global-toggle-knob" />
+                                    </button>
+                                </div>
                                 <div className="ekip-invite-card">
                                     <h3><span className="material-symbols-outlined">person_add</span> Yeni Üye Davet Et</h3>
                                     <div className="ekip-invite-form">
@@ -1773,17 +1903,7 @@ const FirmaProfil = () => {
                                         {davetError && <p className="ekip-msg ekip-msg--error"><span className="material-symbols-outlined">error</span>{davetError}</p>}
                                         {davetSuccess && <p className="ekip-msg ekip-msg--success"><span className="material-symbols-outlined">check_circle</span>Davet başarıyla gönderildi!</p>}
                                     </div>
-                                    {/* Yetki matrisi ipucu */}
-                                    <div className="ekip-role-hint">
-                                        <div className="ekip-role-hint__row">
-                                            <span className="ekip-role-badge ekip-role-badge--admin">Yönetici</span>
-                                            <span>Teklif ve ihaleleri görüntüleyebilir, mesaj yazabilir, firma adına teklif gönderebilir.</span>
-                                        </div>
-                                        <div className="ekip-role-hint__row">
-                                            <span className="ekip-role-badge ekip-role-badge--member">Üye</span>
-                                            <span>Teklif ve ihaleleri sadece görüntüleyebilir. Mesaj yazamaz.</span>
-                                        </div>
-                                    </div>
+                                    {/* Enes Doğanay | 4 Mayıs 2026: Rol ipucu kaldırıldı — erişim page_permissions ile yönetiliyor */}
                                 </div>
 
                                 {/* Bekleyen davetler */}
@@ -1826,7 +1946,7 @@ const FirmaProfil = () => {
                                                 const fullName = [m.first_name, m.last_name].filter(Boolean).join(' ') || 'İsimsiz';
                                                 const initials = ((m.first_name?.[0] || '') + (m.last_name?.[0] || '')).toUpperCase() || '?';
                                                 return (
-                                                    <div key={m.user_id} className={`ekip-card${isMe ? ' ekip-card--me' : ''}`}>
+                                                    <div key={m.user_id} className={`ekip-card${isMe ? ' ekip-card--me' : ''}${!m.is_public ? ' ekip-card--hidden' : ''}`}>
                                                         <div className="ekip-card__info">
                                                             <div className="ekip-card__avatar">{initials}</div>
                                                             <div>
@@ -1836,11 +1956,21 @@ const FirmaProfil = () => {
                                                                         {m.role === 'owner' ? 'Sahip' : m.role === 'admin' ? 'Yönetici' : 'Üye'}
                                                                     </span>
                                                                     {m.title && <span className="ekip-card__title-tag">{m.title}</span>}
+                                                                    {/* Enes Doğanay | 4 Mayıs 2026: Gizli üye etiketi */}
+                                                                    {!m.is_public && <span className="ekip-hidden-chip">Gizli</span>}
                                                                 </span>
                                                             </div>
                                                         </div>
                                                         {!isOwner && (
                                                             <div className="ekip-card__actions">
+                                                                {/* Enes Doğanay | 4 Mayıs 2026: Görünürlük toggle — detay sayfasında göster/gizle */}
+                                                                <button
+                                                                    className={`ekip-visibility-btn${m.is_public ? '' : ' ekip-visibility-btn--hidden'}`}
+                                                                    onClick={() => handleVisibilityToggle(m.user_id, m.is_public)}
+                                                                    title={m.is_public ? 'Detay sayfasında görünür — gizlemek için tıkla' : 'Detay sayfasında gizli — göstermek için tıkla'}
+                                                                >
+                                                                    <span className="material-symbols-outlined">{m.is_public ? 'visibility' : 'visibility_off'}</span>
+                                                                </button>
                                                                 {editingMember?.user_id === m.user_id ? (
                                                                     <div className="ekip-edit-inline">
                                                                         <input className="ekip-input ekip-input--sm" value={editingMember.title} onChange={e => setEditingMember(p => ({ ...p, title: e.target.value }))} placeholder="Unvan" />
@@ -1873,6 +2003,33 @@ const FirmaProfil = () => {
                                                                         )}
                                                                     </>
                                                                 )}
+                                                            </div>
+                                                        )}
+                                                        {/* Enes Doğanay | 4 Mayıs 2026: Sayfa bazlı yetki matrisi */}
+                                                        {!isOwner && (
+                                                            <div className="ekip-permissions">
+                                                                <div className="ekip-permissions-label">
+                                                                    <span className="material-symbols-outlined">admin_panel_settings</span>
+                                                                    Erişebileceği Sayfalar
+                                                                </div>
+                                                                <div className="ekip-permissions-grid">
+                                                                    {[
+                                                                        { key: 'firma_paneli',    icon: 'storefront',     label: 'Firma Paneli' },
+                                                                        { key: 'teklif_yonetimi', icon: 'request_quote',  label: 'Teklif Yönetimi' },
+                                                                        { key: 'ihale_yonetimi',  icon: 'gavel',          label: 'İhale Yönetimi' },
+                                                                        { key: 'ekip_yonetimi',   icon: 'group',          label: 'Ekip Yönetimi' },
+                                                                    ].map(({ key, icon, label }) => (
+                                                                        <label key={key} className={`ekip-perm-item${m.page_permissions?.[key] ? ' ekip-perm-item--on' : ''}`}>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={!!m.page_permissions?.[key]}
+                                                                                onChange={e => handlePermissionsUpdate(m.user_id, key, e.target.checked)}
+                                                                            />
+                                                                            <span className="material-symbols-outlined">{icon}</span>
+                                                                            {label}
+                                                                        </label>
+                                                                    ))}
+                                                                </div>
                                                             </div>
                                                         )}
                                                     </div>

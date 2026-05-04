@@ -19,13 +19,14 @@
 
 /* ========== HEADER STYLING ========== */
 
+/* Enes Doğanay | 4 Mayıs 2026: header padding azaltıldı */
 .shared-header {
     position: sticky;
     top: 0;
     z-index: 50;
     background-color: var(--bg-white);
     border-bottom: 1px solid var(--border);
-    padding: 12px 0;
+    padding: 10px 0;
     width: 100%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
@@ -53,7 +54,7 @@
 @media (min-width: 768px) {
     .shared-header-inner {
         padding: 0 40px;
-        gap: 32px;
+        gap: 24px;
     }
 }
 
@@ -147,18 +148,19 @@
 
 /* ========== LOGO ========== */
 
+/* Enes Doğanay | 4 Mayıs 2026: logo küçültüldü */
 .shared-logo-area {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    height: 60px;
+    height: 52px;
     cursor: pointer;
     text-decoration: none;
 }
 
 .shared-logo-image {
     max-width: 100%;
-    height: 60px;
+    height: 52px;
     object-fit: contain;
 }
 
@@ -193,7 +195,7 @@
 
 .shared-search-bar input {
     width: 100%;
-    padding: 10px 32px 10px 36px;
+    padding: 7px 28px 7px 32px;
     border: none;
     background: var(--bg-light);
     border-radius: 8px;
@@ -205,7 +207,7 @@
 @media (min-width: 640px) {
     .shared-search-bar input {
         font-size: 14px;
-        padding: 10px 34px 10px 38px;
+        padding: 7px 30px 7px 34px;
     }
 }
 
@@ -420,7 +422,7 @@
     cursor: pointer;
     background: none;
     border: none;
-    padding: 12px 4px;
+    padding: 8px 4px;
     flex-shrink: 0;
     transition: opacity 0.2s;
 }
@@ -455,7 +457,7 @@
 .shared-nav {
     display: none;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     flex-shrink: 1;
     min-width: 0;
 }
@@ -468,7 +470,7 @@
 
 .shared-nav-links {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
 }
 
@@ -490,7 +492,7 @@
 /* Enes Doğanay | 9 Nisan 2026: Kullanıcı alanı shrink edilebilir */
 .shared-user-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
     flex-shrink: 1;
     min-width: 0;
@@ -501,20 +503,21 @@
 }
 
 /* Enes Doğanay | 9 Nisan 2026: Uzun isimler için taşmayı önle */
+/* Enes Doğanay | 4 Mayıs 2026: user-btn boyutu */
 .shared-user-btn {
     background: var(--bg-white);
     color: #1d4ed8;
-    padding: 8px 16px;
+    padding: 7px 14px;
     border: 1px solid #bfdbfe;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13.5px;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 6px;
-    max-width: 240px;
+    max-width: 220px;
 }
 
 /* Enes Doğanay | 9 Nisan 2026: İsim metnini kısalt */
@@ -526,7 +529,7 @@
 }
 
 .shared-user-btn-icon {
-    font-size: 18px;
+    font-size: 17px;
     flex-shrink: 0;
 }
 
@@ -552,9 +555,10 @@
     overflow: hidden;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: menu item padding azaltıldı */
 .shared-user-menu-item {
     width: 100%;
-    padding: 12px 16px;
+    padding: 9px 14px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -565,7 +569,7 @@
     background: transparent;
     text-align: left;
     transition: background 0.18s ease, color 0.18s ease;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
 }
 
@@ -591,13 +595,13 @@
 }
 
 .shared-user-menu-icon {
-    font-size: 20px;
+    font-size: 18px;
     pointer-events: none;
 }
 
 .shared-user-menu-label {
     pointer-events: none;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
 }
 
@@ -620,15 +624,16 @@
     box-shadow: 0 2px 6px rgba(19, 127, 236, 0.3);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: register btn boyutu */
 .shared-register-btn {
     background: var(--bg-white);
     color: #1d4ed8;
-    padding: 8px 16px;
+    padding: 7px 14px;
     border-radius: 8px;
     border: 1px solid #bfdbfe;
     cursor: pointer;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13.5px;
     transition: all 0.2s ease;
 }
 
@@ -678,14 +683,15 @@
     }
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: mobil menu item compact */
 .shared-mobile-menu a,
 .shared-mobile-menu button {
     display: flex;
     align-items: center;
     gap: 10px;
     color: var(--text-dark);
-    padding: 14px 12px;
-    font-size: 15px;
+    padding: 11px 10px;
+    font-size: 14px;
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s;
@@ -736,10 +742,10 @@
 }
 
 .shared-mobile-logout {
-    padding: 12px 0 !important;
+    padding: 9px 0 !important;
     color: #ef4444 !important;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 /* ========== DARK MODE OVERRIDE'LAR ========== */

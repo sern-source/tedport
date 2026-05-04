@@ -9,12 +9,13 @@
 }
 
 /* ── BANNER ──────────────────────────────────────────────────────────────── */
+/* Enes Doğanay | 4 Mayıs 2026: cmp-banner compact */
 .cmp-banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
-    padding: 28px 32px;
+    gap: 16px;
+    padding: 20px 24px;
     background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
     border-radius: var(--radius-xl);
     color: #fff;
@@ -33,9 +34,10 @@
     margin-bottom: 10px;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: banner title küçültüldü */
 .cmp-banner__title {
-    margin: 0 0 8px;
-    font-size: 26px;
+    margin: 0 0 6px;
+    font-size: 20px;
     font-weight: 800;
     color: #fff;
 }
@@ -55,18 +57,19 @@
     flex-shrink: 0;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: cmp-metric compact */
 .cmp-metric {
-    padding: 14px 18px;
+    padding: 10px 14px;
     border-radius: var(--radius-lg);
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(8px);
     text-align: center;
-    min-width: 72px;
+    min-width: 60px;
 }
 
 .cmp-metric strong {
     display: block;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 800;
     color: #fff;
 }
@@ -88,15 +91,16 @@
 }
 
 /* ── CARD — matches FirmaDetay .card style ───────────────────────────────── */
+/* Enes Doğanay | 4 Mayıs 2026: cmp-card compact */
 .cmp-card {
     background: var(--bg-white);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
-    padding: 24px;
+    padding: 18px;
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
 }
 
 .cmp-card__head {
@@ -112,15 +116,16 @@
     flex-shrink: 0;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: cmp-card h3 küçültüldü */
 .cmp-card__head h3 {
-    margin: 0 0 4px;
-    font-size: 1.1rem;
+    margin: 0 0 3px;
+    font-size: 0.95rem;
     color: var(--text-dark);
 }
 
 .cmp-card__head p {
     margin: 0;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-gray);
     line-height: 1.6;
 }
@@ -537,26 +542,28 @@
     border-color: var(--primary);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: cmp-btn--save compact */
 .cmp-btn--save {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 28px;
+    gap: 6px;
+    padding: 9px 20px;
     font: inherit;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
     border: none;
     border-radius: 999px;
     background: var(--primary);
     color: #fff;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(19, 127, 236, 0.35);
-    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 3px 10px rgba(19, 127, 236, 0.3);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
 .cmp-btn--save:hover:not(:disabled) {
     background: var(--primary-hover);
-    box-shadow: 0 6px 18px rgba(19, 127, 236, 0.4);
+    box-shadow: 0 5px 14px rgba(19, 127, 236, 0.38);
+    transform: translateY(-1px);
 }
 
 /* Enes Doğanay | 13 Nisan 2026: Deaktif butonda not-allowed cursor */
@@ -594,20 +601,21 @@
 }
 
 /* ── ACTIONS BAR ─────────────────────────────────────────────────────────── */
+/* Enes Doğanay | 4 Mayıs 2026: cmp-actions compact */
 .cmp-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    padding: 16px 24px;
+    gap: 12px;
+    padding: 12px 18px;
     background: rgba(248, 250, 252, 0.96);
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     backdrop-filter: blur(8px);
     position: sticky;
-    bottom: 16px;
+    bottom: 12px;
     z-index: 10;
-    box-shadow: 0 -2px 12px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 -2px 10px rgba(15, 23, 42, 0.06);
 }
 
 .cmp-actions__hint {
@@ -626,7 +634,7 @@
     .cmp-banner {
         flex-direction: column;
         align-items: flex-start;
-        padding: 22px 24px;
+        padding: 16px 18px;
     }
 
     .cmp-banner__metrics {
@@ -648,15 +656,15 @@
     }
 
     .cmp-banner {
-        padding: 18px 20px;
+        padding: 14px 16px;
     }
 
     .cmp-banner__title {
-        font-size: 20px;
+        font-size: 17px;
     }
 
     .cmp-card {
-        padding: 16px;
+        padding: 14px;
     }
 
     .cmp-card__head {
@@ -850,11 +858,12 @@
     overflow: hidden;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: cmp-quotes-header compact */
 .cmp-quotes-header {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 1.25rem 1.5rem;
+    gap: 12px;
+    padding: 0.875rem 1.125rem;
     user-select: none;
     transition: background 0.15s;
 }
@@ -890,9 +899,10 @@
     transform: rotate(180deg);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: cmp-quotes-body padding azaltıldı */
 .cmp-quotes-body {
     border-top: 1px solid #f3f4f6;
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 0.75rem 1.125rem 1.125rem;
 }
 
 .cmp-quotes-empty {

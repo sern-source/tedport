@@ -139,6 +139,14 @@ const MyOffersPanel = ({ companyId } = {}) => {
     /* Enes Doğanay | 15 Nisan 2026: Teklifi sil — onay modal state */
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [deleting, setDeleting] = useState(false);
+    // Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine
+    const [mopToast, setMopToast] = useState(null);
+    const mopToastTimerRef = useRef(null);
+    const showMopToast = (type, message) => {
+        if (mopToastTimerRef.current) clearTimeout(mopToastTimerRef.current);
+        setMopToast({ type, message });
+        mopToastTimerRef.current = setTimeout(() => setMopToast(null), 3800);
+    };
 
     /* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma — bidder tarafı */
     const [activeMopChat, setActiveMopChat] = useState(null); // { offer, tenderTitle, firmaAdi }
@@ -512,7 +520,7 @@ const MyOffersPanel = ({ companyId } = {}) => {
             setDeleteConfirm(null);
         } catch (err) {
             console.error('Teklif silinemedi:', err);
-            alert('Teklif silinirken bir hata oluştu.');
+            showMopToast('error', 'Teklif silinirken bir hata oluştu.');
         } finally {
             setDeleting(false);
         }
@@ -717,6 +725,25 @@ const MyOffersPanel = ({ companyId } = {}) => {
 
     return (
         <div className="mop-screen">
+            {/* Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine */}
+            {mopToast && (
+                <div style={{
+                    position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+                    zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+                    padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
+                    boxShadow: '0 8px 28px rgba(15,23,42,0.18)',
+                    background: '#fef2f2', border: '1.5px solid #fca5a5', color: '#991b1b',
+                    fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
+                    animation: 'mopToastIn 0.22s ease'
+                }}>
+                    <style>{`@keyframes mopToastIn { from { opacity:0; transform:translate(-50%,10px);} to { opacity:1; transform:translate(-50%,0);} }`}</style>
+                    <span className="material-symbols-outlined" style={{ fontSize: '19px', flexShrink: 0 }}>error</span>
+                    {mopToast.message}
+                    <button onClick={() => setMopToast(null)} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+                    </button>
+                </div>
+            )}
             {/* ═══ Hero Banner ═══ */}
             <div className="mop-hero">
                 <div className="mop-hero__text">

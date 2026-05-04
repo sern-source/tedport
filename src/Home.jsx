@@ -397,10 +397,11 @@ const SupplierConnect = () => {
                                 return (
                                 <div className="sc-sup-card" key={`supplier-${index}`}>
                                     <div className="sc-sup-header">
+                                        {/* Enes Doğanay | 4 Mayıs 2026: Logo da detay sayfasına yönlendirir */}
                                         {validLogo ? (
-                                            <img className="sc-sup-avatar" src={validLogo} alt={firma.firma_adi} style={{ objectFit: 'contain', background: '#fff', border: '1px solid #e0e7ff' }} />
+                                            <img className="sc-sup-avatar" src={validLogo} alt={firma.firma_adi} onClick={() => navigate(`/firmadetay/${firma.firmaID}`)} style={{ objectFit: 'contain', background: '#fff', border: '1px solid #e0e7ff', cursor: 'pointer' }} />
                                         ) : (
-                                            <div className="sc-sup-avatar" style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>{firma.firma_adi?.charAt(0)}</div>
+                                            <div className="sc-sup-avatar" onClick={() => navigate(`/firmadetay/${firma.firmaID}`)} style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', cursor: 'pointer' }}>{firma.firma_adi?.charAt(0)}</div>
                                         )}
                                         {firma._isVerified && (
                                             <div className="sc-sup-verified"><span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span> Onaylı Firma</div>

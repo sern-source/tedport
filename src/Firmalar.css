@@ -63,8 +63,8 @@ body {
 .breadcrumb-row {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 @media (min-width: 768px) {
@@ -100,14 +100,14 @@ body {
 }
 
 .titles h1 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     line-height: 1.2;
 }
 
 @media (min-width: 768px) {
     .titles h1 {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
 }
 
@@ -292,14 +292,12 @@ summary {
 
 .apply-btn2 {
     width: 100%;
-    padding: 0.4rem;
+    padding: 8px;
     background: var(--primary);
     border: none;
     border-radius: var(--radius);
     font-weight: 700;
     cursor: pointer;
-    padding-top: 12px;
-    padding-bottom: 12px;
     color: #fff;
     font-size: 12px;
 }
@@ -390,11 +388,11 @@ summary {
 /* Enes Doğanay | 11 Nisan 2026: FirmaDetay sayfasındaki altın→mavi renk şemasıyla uyumlu hale getirildi */
 .card-fav-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 7px;
+    right: 7px;
     z-index: 2;
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     border: 1.5px solid #fbbf24;
     border-radius: 50%;
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
@@ -403,11 +401,11 @@ summary {
     justify-content: center;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.18);
+    box-shadow: 0 2px 6px rgba(251, 191, 36, 0.18);
 }
 
 .card-fav-btn .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 16px;
     color: #d97706;
     transition: color 0.2s, transform 0.25s;
 }
@@ -1076,15 +1074,15 @@ summary {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    padding: 12px;
-    margin-bottom: 1rem;
+    padding: 8px 10px;
+    margin-bottom: 0.75rem;
     background: var(--bg-white);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-dark);
     transition: background 0.2s;
@@ -1236,9 +1234,9 @@ summary {
 
 .quote-modal {
   background: var(--bg-white);
-  border-radius: 16px;
+  border-radius: 12px;
   width: 100%;
-  max-width: 520px;
+  max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18), 0 4px 16px rgba(15, 23, 42, 0.08);
@@ -1249,7 +1247,7 @@ summary {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 1.5rem 1.5rem 0;
+  padding: 1rem 1.25rem 0;
 }
 
 /* Enes Doğanay | 8 Nisan 2026: Grid/Liste toggle toolbar + liste görünümü */
@@ -1278,11 +1276,11 @@ summary {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9px;
   background: var(--bg-light);
   color: var(--text-muted);
   cursor: pointer;
@@ -1296,7 +1294,7 @@ summary {
 }
 
 .firmalar-view-toggle .material-symbols-outlined {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* Enes Doğanay | 14 Nisan 2026: Sıralama + görünüm toggle kapsayıcı */
@@ -1316,12 +1314,12 @@ summary {
 .firmalar-sort-trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9px;
   background: var(--bg-light);
-  padding: 0 10px 0 10px;
-  height: 40px;
+  padding: 0 8px;
+  height: 34px;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   font-family: inherit;
@@ -1412,15 +1410,15 @@ summary {
 
 @media (max-width: 480px) {
   .firmalar-sort-trigger {
-    height: 36px;
-    border-radius: 10px;
-    padding: 0 8px;
+    height: 30px;
+    border-radius: 8px;
+    padding: 0 7px;
   }
   .firmalar-sort-label {
-    font-size: 12px;
+    font-size: 11px;
   }
   .firmalar-sort-icon {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
@@ -1430,10 +1428,10 @@ summary {
   align-items: center;
   gap: 2px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9px;
   background: var(--bg-light);
   padding: 0 2px;
-  height: 40px;
+  height: 34px;
   transition: border-color 0.2s;
   margin-left: auto;
   flex-shrink: 0;
@@ -1447,11 +1445,11 @@ summary {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   color: var(--text-muted);
   transition: background 0.15s, color 0.15s;
@@ -1468,14 +1466,14 @@ summary {
 }
 
 .mini-page-btn .material-symbols-outlined {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .mini-page-info {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-muted);
-  padding: 0 6px;
+  padding: 0 5px;
   user-select: none;
   white-space: nowrap;
 }
@@ -1487,19 +1485,19 @@ summary {
 
 @media (max-width: 480px) {
   .mini-pagination {
-    height: 36px;
-    border-radius: 10px;
+    height: 30px;
+    border-radius: 8px;
   }
   .mini-page-btn {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
   }
   .mini-page-btn .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 16px;
   }
   .mini-page-info {
-    font-size: 12px;
-    padding: 0 4px;
+    font-size: 11px;
+    padding: 0 3px;
   }
 }
 
@@ -1745,16 +1743,16 @@ summary {
 }
 
 .quote-modal-header h3 {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-dark);
   margin: 0;
 }
 
 .quote-modal-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  margin: 4px 0 0;
+  margin: 3px 0 0;
 }
 
 .quote-modal-close {
@@ -1773,10 +1771,10 @@ summary {
 }
 
 .quote-modal-body {
-  padding: 1.25rem 1.5rem;
+  padding: 0.875rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .quote-form-group {
@@ -1856,7 +1854,7 @@ summary {
 .quote-modal-footer {
   display: flex;
   gap: 0.75rem;
-  padding: 1rem 1.5rem 1.5rem;
+  padding: 0.75rem 1.25rem 1rem;
   justify-content: flex-end;
   border-top: 1px solid var(--border);
 }
@@ -1865,10 +1863,10 @@ summary {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 11px 28px !important;
-  border-radius: 10px !important;
+  padding: 7px 18px !important;
+  border-radius: 8px !important;
   font-weight: 600 !important;
-  font-size: 0.9rem !important;
+  font-size: 0.82rem !important;
   line-height: 1.25 !important;
   border: 1.5px solid var(--border) !important;
   background: var(--bg-white) !important;
@@ -1887,12 +1885,12 @@ summary {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 11px 32px !important;
-  border-radius: 10px !important;
+  padding: 7px 22px !important;
+  border-radius: 8px !important;
   font-weight: 600 !important;
-  font-size: 0.9rem !important;
+  font-size: 0.82rem !important;
   line-height: 1.25 !important;
-  background: linear-gradient(135deg, #137fec, #0b6dd4) !important;
+  background: var(--primary) !important;
   color: #ffffff !important;
   border: none !important;
   cursor: pointer;
@@ -1901,7 +1899,7 @@ summary {
 }
 
 .quote-btn-send:hover {
-  background: linear-gradient(135deg, #1a8af8, #137fec) !important;
+  background: #0d6fd4 !important;
   box-shadow: 0 4px 12px rgba(19, 127, 236, 0.35);
   transform: translateY(-1px);
 }
@@ -1918,15 +1916,15 @@ summary {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2rem;
+  padding: 1.75rem 1.5rem;
   text-align: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .quote-success-icon {
-  font-size: 56px;
+  font-size: 42px;
   color: #10b981;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .quote-modal-success h3 {
@@ -2122,4 +2120,31 @@ summary {
 /* Rating yıldız */
 [data-theme="dark"] .rating {
     color: #fbbf24;
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: fav btn dark mode */
+[data-theme="dark"] .card-fav-btn {
+    background: linear-gradient(135deg, #292007 0%, #3b2900 100%);
+    border-color: #78350f;
+    box-shadow: none;
+}
+[data-theme="dark"] .card-fav-btn .material-symbols-outlined {
+    color: #fbbf24;
+}
+[data-theme="dark"] .card-fav-btn--active {
+    background: linear-gradient(135deg, #1e2d4a 0%, #1e3a5f 100%);
+    border-color: #1e40af;
+}
+[data-theme="dark"] .card-fav-btn--active .material-symbols-outlined {
+    color: #60a5fa;
+}
+[data-theme="dark"] .list-fav-btn {
+    background: linear-gradient(135deg, #292007 0%, #3b2900 100%);
+    border-color: #78350f;
+    color: #fbbf24;
+}
+[data-theme="dark"] .list-fav-btn--active {
+    background: linear-gradient(135deg, #1e2d4a 0%, #1e3a5f 100%);
+    border-color: #1e40af;
+    color: #60a5fa;
 }

@@ -418,6 +418,14 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
   const [userProfile, setUserProfile] = useState(null);
   // Enes Doğanay | 9 Nisan 2026: Ek dosya yükleme state'leri
   const [quoteFile, setQuoteFile] = useState(null);
+  // Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine
+  const [flToast, setFlToast] = useState(null);
+  const flToastTimerRef = useRef(null);
+  const showFlToast = (type, message) => {
+    if (flToastTimerRef.current) clearTimeout(flToastTimerRef.current);
+    setFlToast({ type, message });
+    flToastTimerRef.current = setTimeout(() => setFlToast(null), 3800);
+  };
 
   // Enes Doğanay | 8 Nisan 2026: Modal açıldığında kullanıcı profili çek
   useEffect(() => {
@@ -460,7 +468,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
         } else {
           // Enes Doğanay | 9 Nisan 2026: Upload hatası kullanıcıya gösterilir
           console.error('Dosya yükleme hatası:', uploadErr);
-          alert('Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
+          showFlToast('error', 'Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
           return;
         }
       }
@@ -492,7 +500,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
       }, 2000);
     } catch (error) {
       console.error('Teklif talebi gönderilemedi:', error);
-      alert('Teklif talebi gönderilemedi: ' + (error?.message || JSON.stringify(error)));
+      showFlToast('error', 'Teklif talebi gönderilemedi.');
     } finally {
       setQuoteSending(false);
     }
@@ -500,6 +508,29 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
 
   return (
     <>
+    {/* Enes Doğanay | 4 Mayıs 2026: SupplierCard local toast */}
+    {flToast && (
+      <div style={{
+        position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+        zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
+        boxShadow: '0 8px 28px rgba(15,23,42,0.18)',
+        background: flToast.type === 'error' ? '#fef2f2' : flToast.type === 'warning' ? '#fffbeb' : '#eff6ff',
+        border: `1.5px solid ${flToast.type === 'error' ? '#fca5a5' : flToast.type === 'warning' ? '#fcd34d' : '#bfdbfe'}`,
+        color: flToast.type === 'error' ? '#991b1b' : flToast.type === 'warning' ? '#92400e' : '#1e40af',
+        fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
+        animation: 'flToastIn 0.22s ease'
+      }}>
+        <style>{`@keyframes flToastIn { from { opacity:0; transform:translate(-50%,10px);} to { opacity:1; transform:translate(-50%,0);} }`}</style>
+        <span className="material-symbols-outlined" style={{ fontSize: '19px', flexShrink: 0 }}>
+          {flToast.type === 'error' ? 'error' : flToast.type === 'warning' ? 'warning' : 'info'}
+        </span>
+        {flToast.message}
+        <button onClick={() => setFlToast(null)} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+        </button>
+      </div>
+    )}
     <div className="supplier-card">
       {/* Enes Doğanay | 8 Nisan 2026: Kart sağ üst köşesinde favori toggle butonu */}
       {/* Enes Doğanay | 11 Nisan 2026: Giriş yapılmamışsa buton deaktif */}
@@ -722,7 +753,7 @@ const SupplierCard = ({ data, onSearchTag, isFavorited, onToggleFavorite, isLogg
                         onChange={(e) => {
                           const f = e.target.files?.[0];
                           if (f && f.size <= 10 * 1024 * 1024) setQuoteFile(f);
-                          else if (f) alert('Dosya boyutu en fazla 10 MB olabilir.');
+                          else if (f) showFlToast('warning', 'Dosya boyutu en fazla 10 MB olabilir.');
                         }}
                       />
                       {quoteFile && (
@@ -875,6 +906,14 @@ function App() {
   const [listUserProfile, setListUserProfile] = useState(null);
   // Enes Doğanay | 9 Nisan 2026: Liste görünümü ek dosya state'i
   const [listQuoteFile, setListQuoteFile] = useState(null);
+  // Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine (App scope)
+  const [flToast, setFlToast] = useState(null);
+  const flToastTimerRef = useRef(null);
+  const showFlToast = (type, message) => {
+    if (flToastTimerRef.current) clearTimeout(flToastTimerRef.current);
+    setFlToast({ type, message });
+    flToastTimerRef.current = setTimeout(() => setFlToast(null), 3800);
+  };
 
   // Enes Doğanay | 8 Nisan 2026: Kullanıcının favori firma ID'leri — kart üzerinde kalp toggle için
   const [favoriteIds, setFavoriteIds] = useState(new Set());
@@ -953,7 +992,7 @@ function App() {
         } else {
           // Enes Doğanay | 9 Nisan 2026: Upload hatası kullanıcıya gösterilir
           console.error('Dosya yükleme hatası:', uploadErr);
-          alert('Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
+          showFlToast('error', 'Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
           return;
         }
       }
@@ -983,7 +1022,7 @@ function App() {
       }, 2000);
     } catch (error) {
       console.error('Teklif talebi gönderilemedi:', error);
-      alert('Teklif talebi gönderilemedi: ' + (error?.message || JSON.stringify(error)));
+      showFlToast('error', 'Teklif talebi gönderilemedi.');
     } finally {
       setListQuoteSending(false);
     }
@@ -1225,6 +1264,29 @@ function App() {
   return (
     /* Enes Doğanay | 5 Nisan 2026: Font <link> etiketleri kaldırıldı, SharedHeader.css'de zaten yüklü */
     <div className="app">
+      {/* Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine */}
+      {flToast && (
+        <div style={{
+          position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+          zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+          padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
+          boxShadow: '0 8px 28px rgba(15,23,42,0.18)',
+          background: flToast.type === 'error' ? '#fef2f2' : flToast.type === 'warning' ? '#fffbeb' : '#eff6ff',
+          border: `1.5px solid ${flToast.type === 'error' ? '#fca5a5' : flToast.type === 'warning' ? '#fcd34d' : '#bfdbfe'}`,
+          color: flToast.type === 'error' ? '#991b1b' : flToast.type === 'warning' ? '#92400e' : '#1e40af',
+          fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
+          animation: 'flToastIn 0.22s ease'
+        }}>
+          <style>{`@keyframes flToastIn { from { opacity:0; transform:translate(-50%,10px);} to { opacity:1; transform:translate(-50%,0);} }`}</style>
+          <span className="material-symbols-outlined" style={{ fontSize: '19px', flexShrink: 0 }}>
+            {flToast.type === 'error' ? 'error' : flToast.type === 'warning' ? 'warning' : 'info'}
+          </span>
+          {flToast.message}
+          <button onClick={() => setFlToast(null)} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+          </button>
+        </div>
+      )}
       <SharedHeader
         search={search}
         setSearch={setSearch}
@@ -1657,7 +1719,7 @@ function App() {
                         <span className="material-symbols-outlined">attach_file</span>
                         {listQuoteFile ? listQuoteFile.name : 'Dosya Seç'}
                       </label>
-                      <input id="list-quote-file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f && f.size <= 10 * 1024 * 1024) setListQuoteFile(f); else if (f) alert('Dosya boyutu en fazla 10 MB olabilir.'); }} />
+                      <input id="list-quote-file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f && f.size <= 10 * 1024 * 1024) setListQuoteFile(f); else if (f) showFlToast('warning', 'Dosya boyutu en fazla 10 MB olabilir.'); }} />
                       {listQuoteFile && (
                         <button type="button" className="quote-file-remove" onClick={() => setListQuoteFile(null)}>
                           <span className="material-symbols-outlined">close</span>

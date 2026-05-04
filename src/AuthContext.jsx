@@ -380,7 +380,7 @@ export function AuthProvider({ children }) {
         (payload) => handleNewNotification(payload.new)
       )
       .subscribe((status, err) => {
-        if (status === 'SUBSCRIBED') console.log('[Realtime] bildirimler kanalına bağlandı, userId:', userId);
+        if (status === 'SUBSCRIBED') { /* bildirimler kanalına bağlandı */ }
         else console.warn('[Realtime] bildirimler kanal durumu:', status, err);
       });
 

@@ -601,6 +601,7 @@ const SharedHeader = ({
                                 )}
                             </div>
                         ) : (
+                            location.pathname !== '/register' && (
                             <button
                                 className="shared-register-btn"
                                 onClick={() => navigate('/register')}
@@ -608,6 +609,7 @@ const SharedHeader = ({
                             >
                                 Kayıt Ol
                             </button>
+                            )
                         )}
                     </div>
                 </div>
@@ -635,7 +637,7 @@ const SharedHeader = ({
                         </Link>
                     ))}
                     {authChecked && !userProfile && location.pathname !== '/login' && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Giriş Yap</Link>}
-                    {authChecked && !userProfile && <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="shared-mobile-register">Kayıt Ol</Link>}
+                    {authChecked && !userProfile && location.pathname !== '/register' && <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="shared-mobile-register">Kayıt Ol</Link>}
                     {userProfile && (
                         <>
                             {managedCompanyId ? (

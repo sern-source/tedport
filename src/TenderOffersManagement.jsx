@@ -973,7 +973,6 @@ const TenderOffersManagement = ({ companyId }) => {
                 console.warn('E-posta gönderilemedi: oturum veya alıcı e-posta eksik', { hasToken: !!session?.access_token, email: offer.gonderen_email });
                 return;
             }
-            console.log('E-posta gönderiliyor:', { to: offer.gonderen_email, status, ihale_baslik: selectedTender?.baslik, gonderen_ad: offer.gonderen_ad_soyad });
             const { data, error: fnError } = await supabase.functions.invoke('ihale-management', {
                 body: {
                     action: 'send_offer_status_email',
@@ -991,7 +990,7 @@ const TenderOffersManagement = ({ companyId }) => {
                 try { detail = fnError.context ? await fnError.context.json() : ''; } catch { /* */ }
                 console.error('Edge function hatası:', fnError, 'Detay:', detail);
             } else {
-                console.log('Teklif durum e-postası gönderildi:', data);
+                // e-posta gönderildi
             }
         } catch (e) {
             console.error('Teklif durum e-postası gönderilemedi:', e);

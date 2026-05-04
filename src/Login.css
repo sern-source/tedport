@@ -49,22 +49,29 @@ body {
   background-color: var(--primary-hover);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: submit butonu compact + cool */
 .login-btn-full {
   width: 100%;
-  height: 2.75rem;
+  height: 2.4rem;
+  transition: all 0.2s;
+}
+
+.login-btn-full:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(19, 127, 236, 0.28);
 }
 
 .mt-4 {
   margin-top: 1rem;
 }
 
-/* Main Content */
+/* Enes Doğanay | 4 Mayıs 2026: main-content padding azaltıldı */
 .main-content {
   flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
+  padding: 2rem 1rem;
 }
 
 .login-card {
@@ -84,17 +91,18 @@ body {
   border-bottom: 1px solid var(--border-color);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: tab-item padding azaltıldı */
 .tab-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
+  gap: 0.4rem;
+  padding: 0.6rem;
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.825rem;
   color: var(--text-muted);
   transition: all 0.2s;
 }
@@ -110,33 +118,37 @@ body {
   font-weight: 700;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: card-body padding azaltıldı */
 .card-body {
-  padding: 2rem;
+  padding: 1.25rem 1.5rem 1.5rem;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: card-header-text margin azaltıldı */
 .card-header-text {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: başlık küçültüldü */
 .card-header-text h1 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .card-header-text p {
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: 0.82rem;
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Social login CSS kaldırıldı (JSX'te kullanılmıyor) */
 
 /* Form */
+/* Enes Doğanay | 4 Mayıs 2026: form gap azaltıldı */
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .form-group {
@@ -157,13 +169,14 @@ body {
   align-items: center;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: input height azaltıldı */
 .form-input {
   width: 100%;
-  height: 2.75rem;
-  padding: 0 1rem;
+  height: 2.3rem;
+  padding: 0 0.85rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  font-size: 0.875rem;
+  font-size: 0.855rem;
   font-family: inherit;
   transition: border-color 0.2s;
 }
@@ -291,10 +304,11 @@ body {
   gap: 0.5rem;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: signup-prompt margin azaltıldı */
 .signup-prompt {
-  margin-top: 2rem;
+  margin-top: 1.25rem;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
 }
 
@@ -310,10 +324,11 @@ body {
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Kurumsal giris sekmesine basvuru bilgilendirme kutusu eklendi */
+/* Enes Doğanay | 4 Mayıs 2026: callout padding azaltıldı */
 .corporate-login-callout {
-  margin-top: 1.25rem;
-  padding: 1rem;
-  border-radius: 1rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 10px;
   background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
   border: 1px solid #dbeafe;
   text-align: left;
@@ -346,14 +361,15 @@ body {
 }
 
 /* Secure Badge */
+/* Enes Doğanay | 4 Mayıs 2026: secure-badge padding azaltıldı */
 .secure-badge {
   background-color: #f9fafb;
-  padding: 0.75rem 2rem;
+  padding: 0.5rem 2rem;
   border-top: 1px solid #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .secure-badge span {
@@ -397,59 +413,64 @@ body {
 }
 
 /* Enes Doğanay | 14 Nisan 2026: Google ile giriş butonu ve ayırıcı stilleri */
+/* Enes Doğanay | 4 Mayıs 2026: Google butonu compact */
 .login-google-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  height: 48px;
+  height: 38px;
   background: #fff;
   border: 1px solid #dadce0;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: #3c4043;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
 .login-google-btn:hover {
   background: #f8f9fa;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 /* Enes Doğanay | 15 Nisan 2026: LinkedIn ile giriş butonu */
+/* Enes Doğanay | 4 Mayıs 2026: LinkedIn butonu compact */
 .login-linkedin-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  height: 48px;
+  height: 38px;
   background: #fff;
   border: 1px solid #dadce0;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: #3c4043;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  margin-top: 10px;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  margin-top: 8px;
 }
 
 .login-linkedin-btn:hover {
   background: #f0f7ff;
   box-shadow: 0 2px 8px rgba(10, 102, 194, 0.15);
+  transform: translateY(-1px);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: divider margin azaltıldı */
 .login-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0;
+  gap: 10px;
+  margin: 10px 0;
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .login-divider::before,

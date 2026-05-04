@@ -52,12 +52,18 @@ export default function DatePicker({ value, onChange, min, placeholder = 'gg.aa.
 
     const calcPosition = useCallback(() => {
         if (!triggerRef.current) return;
-        const rect = triggerRef.current.getBoundingClientRect();
+        const rect   = triggerRef.current.getBoundingClientRect();
+        const panelW = Math.max(rect.width, 280);
+        const panelH = 320;
+        const vw     = window.innerWidth;
+        const vh     = window.innerHeight;
+        const left   = Math.min(rect.left, vw - panelW - 8);
+        const top    = rect.bottom + 6 + panelH > vh ? rect.top - panelH - 6 : rect.bottom + 6;
         setPanelStyle({
             position: 'fixed',
-            top:  rect.bottom + 6,
-            left: rect.left,
-            width: Math.max(rect.width, 280),
+            top:  Math.max(8, top),
+            left: Math.max(8, left),
+            width: panelW,
             zIndex: 99999,
         });
     }, []);

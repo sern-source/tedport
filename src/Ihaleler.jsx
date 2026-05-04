@@ -193,6 +193,8 @@ const IhalelerPage = () => {
 
     // Enes Doğanay | 6 Nisan 2026: Kurumsal kullanıcı state'leri
     const [managedFirmaId, setManagedFirmaId] = useState(null);
+    // Enes Doğanay | 4 Mayıs 2026: Sadece owner rolündeki kullanıcılar İhalelerim panelini görür
+    const [isOwner, setIsOwner] = useState(false);
     const [myTenders, setMyTenders] = useState([]);
     const [myTendersLoading, setMyTendersLoading] = useState(false);
     /* Enes Doğanay | 13 Nisan 2026: İhalelerim paneli genişlet/küçült — varsayılan 2 ihale gösterir */
@@ -202,6 +204,14 @@ const IhalelerPage = () => {
     const [form, setForm] = useState(EMPTY_FORM);
     const [formSaving, setFormSaving] = useState(false);
     const [formError, setFormError] = useState('');
+    // Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine
+    const [ihToast, setIhToast] = useState(null);
+    const ihToastTimerRef = useRef(null);
+    const showIhToast = (type, message) => {
+        if (ihToastTimerRef.current) clearTimeout(ihToastTimerRef.current);
+        setIhToast({ type, message });
+        ihToastTimerRef.current = setTimeout(() => setIhToast(null), 3800);
+    };
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     /* Enes Doğanay | 15 Nisan 2026: İhaleyi kapat state'leri */
     const [closeConfirmId, setCloseConfirmId] = useState(null);
@@ -274,8 +284,15 @@ const IhalelerPage = () => {
         getManagedCompanyId().then(async (id) => {
             setManagedFirmaId(id || null);
             if (id) {
-                const { data } = await supabase.from('firmalar').select('onayli_hesap').eq('firmaID', id).maybeSingle();
-                setIsVerifiedUser(data?.onayli_hesap === true);
+                // Enes Doğanay | 4 Mayıs 2026: Hem onayli_hesap hem rol aynı anda sorgulanır — user_id filtresi zorunlu
+                const { data: { session } } = await supabase.auth.getSession();
+                const userId = session?.user?.id;
+                const [firmaRes, rolRes] = await Promise.all([
+                    supabase.from('firmalar').select('onayli_hesap').eq('firmaID', id).maybeSingle(),
+                    supabase.from('kurumsal_firma_yoneticileri').select('role').eq('firma_id', id).eq('user_id', userId).maybeSingle(),
+                ]);
+                setIsVerifiedUser(firmaRes.data?.onayli_hesap === true);
+                setIsOwner(rolRes.data?.role === 'owner');
             }
         }).catch(() => {});
     }, []);
@@ -661,7 +678,7 @@ const IhalelerPage = () => {
             await fetchMyTenders();
             await fetchPublicTenders();
         } catch (err) {
-            alert(err.message || 'Silinemedi.');
+            showIhToast('error', err.message || 'Silinemedi.');
         }
     };
 
@@ -694,7 +711,7 @@ const IhalelerPage = () => {
             await fetchMyTenders();
             await fetchPublicTenders();
         } catch (err) {
-            alert(err.message || 'İhale kapatılamadı.');
+            showIhToast('error', err.message || 'İhale kapatılamadı.');
         } finally {
             setClosingTenderId(null);
         }
@@ -1257,13 +1274,37 @@ const IhalelerPage = () => {
 
     return (
         <div className="tenders-page">
+            {/* Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine */}
+            {ihToast && (
+                <div style={{
+                    position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+                    zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+                    padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
+                    boxShadow: '0 8px 28px rgba(15,23,42,0.18)',
+                    background: ihToast.type === 'error' ? '#fef2f2' : '#eff6ff',
+                    border: `1.5px solid ${ihToast.type === 'error' ? '#fca5a5' : '#bfdbfe'}`,
+                    color: ihToast.type === 'error' ? '#991b1b' : '#1e40af',
+                    fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
+                    animation: 'ihToastIn 0.22s ease'
+                }}>
+                    <style>{`@keyframes ihToastIn { from { opacity:0; transform:translate(-50%,10px);} to { opacity:1; transform:translate(-50%,0);} }`}</style>
+                    <span className="material-symbols-outlined" style={{ fontSize: '19px', flexShrink: 0 }}>
+                        {ihToast.type === 'error' ? 'error' : 'info'}
+                    </span>
+                    {ihToast.message}
+                    <button onClick={() => setIhToast(null)} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+                    </button>
+                </div>
+            )}
             <SEO title="İhaleler" description="Canlı ihaleleri keşfedin, teklif verin. Türkiye genelinde B2B ihale platformu." path="/ihaleler" />
             <SharedHeader />
 
             <main className="tenders-page-main">
 
                 {/* ── Enes Doğanay | 6 Nisan 2026: Kurumsal kullanıcıya özel ihale yönetim paneli ── */}
-                {managedFirmaId && (
+                {/* Enes Doğanay | 4 Mayıs 2026: İhalelerim sadece owner rolündeki kullanıcılara gösterilir */}
+                {managedFirmaId && isOwner && (
                     <section className="my-tenders-panel">
                         <div className="my-tenders-panel__head">
                             <div>
@@ -1278,7 +1319,9 @@ const IhalelerPage = () => {
                         </div>
 
                         {myTendersLoading ? (
-                            <p className="my-tenders-loading">Yükleniyor…</p>
+                            <div className="my-tenders-panel__body">
+                                <p className="my-tenders-loading">Yükleniyor…</p>
+                            </div>
                         ) : myTenders.length === 0 ? (
                             /* Enes Doğanay | 1 Mayıs 2026: Hiç ihalesi olmayan firmaya onboarding bannerı */
                             <div className="my-tenders-first-banner">
@@ -1295,6 +1338,7 @@ const IhalelerPage = () => {
                                 </button>
                             </div>
                         ) : (
+                            <div className="my-tenders-panel__body">
                             <div className="my-tenders-list">
                                 {/* Enes Doğanay | 13 Nisan 2026: Varsayılan 2 ihale göster, genişletildiğinde tamamını göster */}
                                 {(myTendersExpanded ? myTenders : myTenders.slice(0, 2)).map(t => {
@@ -1332,13 +1376,14 @@ const IhalelerPage = () => {
                                                     )
                                                 )}
                                                 {deleteConfirmId === t.id ? (
-                                                    <div className="my-tender-confirm-inline my-tender-confirm-inline--danger">
-                                                        <div>
-                                                            <span style={{ fontWeight: 700, color: '#991b1b' }}>⚠ Dikkat!</span>
-                                                            <span style={{ display: 'block', fontSize: '0.78rem', marginTop: 2 }}>Bu işlem kalıcıdır. İhale ve tüm teklifler geri getirilemez şekilde silinecektir.</span>
-                                                        </div>
-                                                        <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => handleDelete(t.id)}>Kalıcı Olarak Sil</button>
-                                                        <button type="button" className="my-tender-btn my-tender-btn--cancel-link" onClick={() => setDeleteConfirmId(null)}>İptal</button>
+                                                    <div className="my-tender-confirm-inline">
+                                                        <span className="material-symbols-outlined" style={{fontSize:15,color:'#dc2626'}}>warning</span>
+                                                        <span>Kalıcı olarak silinecek, emin misiniz?</span>
+                                                        <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => handleDelete(t.id)}>
+                                                            <span className="material-symbols-outlined">delete</span>
+                                                            Sil
+                                                        </button>
+                                                        <button type="button" className="my-tender-btn my-tender-btn--cancel" onClick={() => setDeleteConfirmId(null)}>İptal</button>
                                                     </div>
                                                 ) : (
                                                     <button type="button" className="my-tender-btn my-tender-btn--delete" onClick={() => setDeleteConfirmId(t.id)}>
@@ -1363,6 +1408,7 @@ const IhalelerPage = () => {
                                         {myTendersExpanded ? 'Küçült' : `Tümünü Göster (${myTenders.length})`}
                                     </button>
                                 )}
+                            </div>
                             </div>
                         )}
                     </section>

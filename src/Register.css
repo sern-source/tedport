@@ -386,72 +386,78 @@ body {
   background-color: var(--primary-hover);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: submit butonu compact + cool */
 .register-btn-submit {
   width: 100%;
-  height: 48px;
-  font-size: 1rem;
-  margin-top: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  height: 40px;
+  font-size: 0.9rem;
+  margin-top: 6px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
 .register-btn-submit:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 14px -3px rgba(19, 127, 236, 0.3);
+  transform: translateY(-1px);
 }
 
-/* Enes Doğanay | 14 Nisan 2026: Google ile kayıt ol butonu */
+/* Enes Doğanay | 4 Mayıs 2026: Google butonu compact */
 .register-google-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  height: 48px;
+  height: 38px;
   background: #fff;
   border: 1px solid #dadce0;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: #3c4043;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
 .register-google-btn:hover {
   background: #f8f9fa;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
-/* Enes Doğanay | 15 Nisan 2026: LinkedIn ile kayıt ol butonu */
+/* Enes Doğanay | 4 Mayıs 2026: LinkedIn butonu compact */
 .register-linkedin-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  height: 48px;
+  height: 38px;
   background: #fff;
   border: 1px solid #dadce0;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: #3c4043;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  margin-top: 10px;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  margin-top: 8px;
 }
 
 .register-linkedin-btn:hover {
   background: #f0f7ff;
   box-shadow: 0 2px 8px rgba(10, 102, 194, 0.15);
+  transform: translateY(-1px);
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: divider margin azaltıldı */
 .register-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0;
+  gap: 10px;
+  margin: 10px 0;
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .register-divider::before,
@@ -462,13 +468,13 @@ body {
   background: #e2e8f0;
 }
 
-/* Main Content Styles */
+/* Enes Doğanay | 4 Mayıs 2026: main-content padding azaltıldı */
 .main-content {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 16px;
+  padding: 28px 16px;
 }
 
 .registration-card {
@@ -500,25 +506,27 @@ body {
   font-size: 1rem;
 }
 
-/* Tabs */
+/* Enes Doğanay | 4 Mayıs 2026: tabs-container padding azaltıldı */
 .tabs-container {
-  padding: 8px 32px;
+  padding: 8px 24px 0;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: tabs height azaltıldı */
 .tabs {
   display: flex;
   background-color: #f0f2f4;
   border-radius: 8px;
-  padding: 4px;
-  height: 48px;
+  padding: 3px;
+  height: 40px;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: tab-btn font azaltıldı */
 .tab-btn {
   flex: 1;
   border: none;
   background: transparent;
   color: var(--text-gray);
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   font-weight: 500;
   border-radius: 6px;
   cursor: pointer;
@@ -532,18 +540,18 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Form Styles */
+/* Enes Doğanay | 4 Mayıs 2026: form-body padding+gap azaltıldı */
 .form-body {
-  padding: 16px 32px;
+  padding: 14px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
-/* Enes Doğanay | 6 Nisan 2026: Kurumsal form daha uzun oldugu icin alanlarin nefesi artirildi */
+/* Enes Doğanay | 4 Mayıs 2026: kurumsal form gap azaltıldı */
 .corporate-form-body {
-  padding-top: 8px;
-  gap: 18px;
+  padding-top: 6px;
+  gap: 14px;
 }
 
 .photo-upload-container {
@@ -553,9 +561,10 @@ body {
   margin-bottom: 8px;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: foto yükleme küçültüldü */
 .photo-upload-box {
-  width: 96px;
-  height: 96px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   border: 2px dashed var(--border);
   background-color: #f0f2f4;
@@ -611,14 +620,15 @@ body {
   min-width: 0;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: form-input height+font azaltıldı */
 .form-input {
   width: 100%;
-  height: 48px;
-  padding: 0 16px;
+  height: 40px;
+  padding: 0 14px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background-color: var(--bg-white);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
@@ -845,12 +855,12 @@ body {
   text-decoration: underline;
 }
 
-/* Footer */
+/* Enes Doğanay | 4 Mayıs 2026: card-footer padding azaltıldı */
 .card-footer {
-  padding: 8px 32px 32px;
+  padding: 6px 24px 20px;
   text-align: center;
   align-items: center;
-  font-size: 0.875rem;
+  font-size: 0.825rem;
   color: var(--text-gray);
 }
 
@@ -952,42 +962,43 @@ body {
 
 /* Enes Doğanay | 6 Nisan 2026: Kurumsal kayit akisinda sureci aciklayan ust panel eklendi */
 /* Enes Doğanay | 14 Nisan 2026: margin-bottom eklendi — gradient label'a taşmasın, box-shadow kaldırıldı */
+/* Enes Doğanay | 4 Mayıs 2026: corporate-intro compact */
 .corporate-intro-panel {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  margin: 4px 32px 20px;
-  padding: 18px 20px;
-  border-radius: 18px;
+  gap: 12px;
+  margin: 4px 24px 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1d4ed8 100%);
   color: #fff;
 }
 
 .corporate-intro-icon {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.14);
 }
 
 .corporate-intro-icon .material-symbols-outlined {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .corporate-intro-copy h1 {
-  margin: 0 0 8px;
-  font-size: 1.4rem;
+  margin: 0 0 5px;
+  font-size: 1.1rem;
 }
 
 .corporate-intro-copy p {
   margin: 0;
   color: rgba(255, 255, 255, 0.86);
-  line-height: 1.7;
-  font-size: 0.92rem;
+  line-height: 1.6;
+  font-size: 0.84rem;
 }
 
 .corporate-process-box {
@@ -1173,36 +1184,36 @@ body {
   background-color: #f1f5f9;
 }
 
-/* Enes Doğanay | 6 Nisan 2026: Basvuru sonrasi guven veren onay ekrani eklendi */
+/* Enes Doğanay | 4 Mayıs 2026: corporate-success compact */
 .corporate-success-state {
-  margin: 12px 32px 0;
-  padding: 28px;
-  border-radius: 22px;
+  margin: 12px 24px 0;
+  padding: 20px;
+  border-radius: 18px;
   border: 1px solid #dbeafe;
   background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
   text-align: center;
 }
 
 .corporate-success-badge {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 18px;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 24px;
+  border-radius: 20px;
   background: radial-gradient(circle at top, rgba(37, 99, 235, 0.22), rgba(37, 99, 235, 0.08));
   color: #1d4ed8;
 }
 
 .corporate-success-badge .material-symbols-outlined {
-  font-size: 34px;
+  font-size: 28px;
 }
 
 .corporate-success-state h2 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: #0f172a;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .corporate-success-state p {
@@ -1214,18 +1225,18 @@ body {
 .corporate-success-steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 22px;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 .corporate-success-step {
-  padding: 16px;
-  border-radius: 16px;
+  padding: 12px;
+  border-radius: 12px;
   background: #fff;
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .corporate-success-step strong {
@@ -1242,9 +1253,9 @@ body {
 .corporate-success-actions {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-top: 22px;
+  margin-top: 16px;
 }
 
 .register-btn-secondary-soft,
@@ -1266,21 +1277,21 @@ body {
   height: 40px;
 }
 
-@media (max-width: 767px) {
+  @media (max-width: 767px) {
   .tabs-container {
-    padding: 12px 20px 0;
+    padding: 8px 16px 0;
   }
 
   .form-body,
   .card-footer {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .corporate-intro-panel,
   .corporate-success-state {
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 16px;
+    margin-right: 16px;
   }
 
   .corporate-intro-panel {

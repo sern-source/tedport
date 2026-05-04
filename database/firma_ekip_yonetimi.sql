@@ -251,8 +251,9 @@ BEGIN
   END IF;
 
   -- Firmaya ekle
-  INSERT INTO public.kurumsal_firma_yoneticileri (user_id, firma_id, role, title)
-  VALUES (auth.uid(), v_davet.firma_id, v_davet.role, v_davet.title);
+  INSERT INTO public.kurumsal_firma_yoneticileri (user_id, firma_id, role, title, page_permissions)
+  VALUES (auth.uid(), v_davet.firma_id, v_davet.role, v_davet.title,
+    COALESCE(v_davet.page_permissions, '{"firma_paneli": false, "teklif_yonetimi": true, "ihale_yonetimi": true, "ekip_yonetimi": false}'::jsonb));
 
   -- Daveti kabul edildi olarak işaretle
   UPDATE public.firma_davetleri

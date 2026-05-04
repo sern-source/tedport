@@ -33,6 +33,7 @@ import { supabase } from './supabaseClient';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 import CitySelect from './CitySelect'; // Enes Doğanay | 9 Nisan 2026: Aranabilir şehir seçici
 import DatePicker from './DatePicker'; // Enes Doğanay | 2 Mayıs 2026: Özel takvim
+import TimePicker from './TimePicker'; // Enes Doğanay | 4 Mayıs 2026: Amber temalı saat seçici
 import { formatTenderDate, getTenderStatusMeta } from './tenderUtils';
 import { getManagedCompanyId } from './companyManagementApi';
 import PageLoader from './PageLoader';
@@ -289,12 +290,26 @@ const SupplierProfile = () => {
     const [isCreatingList, setIsCreatingList] = useState(false);
     const [newListName, setNewListName] = useState('');
     const [isListCreating, setIsListCreating] = useState(false);
+    // Enes Doğanay | 4 Mayıs 2026: Liste seçici custom dropdown aç/kapa state
+    const [listDropdownOpen, setListDropdownOpen] = useState(false);
+    const listDropdownRef = React.useRef(null);
+
+    // Enes Doğanay | 4 Mayıs 2026: Local toast bildirimi — alert() yerine
+    const [fdToast, setFdToast] = useState(null);
+    const fdToastTimerRef = React.useRef(null);
+    const showFdToast = (type, message) => {
+        if (fdToastTimerRef.current) clearTimeout(fdToastTimerRef.current);
+        setFdToast({ type, message });
+        fdToastTimerRef.current = setTimeout(() => setFdToast(null), 3800);
+    };
 
     // Enes Doğanay | 7 Nisan 2026: Firma verified kontrolü — kurumsal yöneticisi var mı
     const [isVerified, setIsVerified] = useState(false);
 
     // Enes Doğanay | 7 Nisan 2026: Teklif iste popup formu state'leri
     const [showQuoteModal, setShowQuoteModal] = useState(false);
+    // Enes Doğanay | 4 Mayıs 2026: Ekip modal state'i — hero preview "Ekibi Gör" butonuyla açılır
+    const [showEkipModal, setShowEkipModal] = useState(false);
     const [quoteForm, setQuoteForm] = useState({ konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' });
     const [quoteSending, setQuoteSending] = useState(false);
     const [quoteSent, setQuoteSent] = useState(false);
@@ -357,6 +372,15 @@ const SupplierProfile = () => {
         checkUserSessionAndNotes();
     }, [id]);
 
+    // Enes Doğanay | 4 Mayıs 2026: ESC tuşuyla ekip modalı kapat
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') setShowEkipModal(false);
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     const fetchFirma = async () => {
         setLoading(true);
         setTendersLoading(true);
@@ -364,7 +388,7 @@ const SupplierProfile = () => {
         const [firmaResult, tenderResult] = await Promise.all([
             supabase
                 .from('firmalar')
-                .select('firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best, onayli_hesap')
+                .select('firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best, onayli_hesap, show_ekip_public')
                 .eq('firmaID', id)
                 .single(),
             supabase
@@ -437,7 +461,7 @@ const SupplierProfile = () => {
     const toggleFavorite = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
-            alert("Lütfen önce giriş yapın.");
+            showFdToast('info', 'Lütfen önce giriş yapın.');
             return;
         }
 
@@ -469,7 +493,7 @@ const SupplierProfile = () => {
             }
         } catch (error) {
             console.error("Favori işlemi sırasında hata:", error);
-            alert("İşlem gerçekleştirilemedi.");
+            showFdToast('error', 'İşlem gerçekleştirilemedi.');
         }
     };
 
@@ -480,13 +504,13 @@ const SupplierProfile = () => {
 
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
-            alert('Lütfen önce giriş yapın.');
+            showFdToast('info', 'Lütfen önce giriş yapın.');
             return;
         }
 
         const isDuplicate = myLists.some((liste) => (liste.liste_adi || '').trim().toLocaleLowerCase('tr-TR') === trimmedListName.toLocaleLowerCase('tr-TR'));
         if (isDuplicate) {
-            alert('Bu isimde bir listeniz zaten var.');
+            showFdToast('warning', 'Bu isimde bir listeniz zaten var.');
             return;
         }
 
@@ -507,7 +531,7 @@ const SupplierProfile = () => {
             setIsCreatingList(false);
         } catch (error) {
             console.error('Liste oluşturulamadı:', error);
-            alert('Liste oluşturulamadı.');
+            showFdToast('error', 'Liste oluşturulamadı.');
         } finally {
             setIsListCreating(false);
         }
@@ -528,6 +552,18 @@ const SupplierProfile = () => {
         }
     };
 
+    // Enes Doğanay | 4 Mayıs 2026: Liste dropdown dışarı tıklanınca kapansın
+    useEffect(() => {
+        if (!listDropdownOpen) return;
+        const handleOutside = (e) => {
+            if (listDropdownRef.current && !listDropdownRef.current.contains(e.target)) {
+                setListDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutside);
+        return () => document.removeEventListener('mousedown', handleOutside);
+    }, [listDropdownOpen]);
+
     // Enes Doğanay | 7 Nisan 2026: Teklif talebi gönderme fonksiyonu (bireysel + kurumsal destek)
     const handleSendQuoteRequest = async () => {
         if (!quoteForm.konu.trim() || !quoteForm.mesaj.trim()) return;
@@ -535,7 +571,7 @@ const SupplierProfile = () => {
 
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user) { alert('Lütfen önce giriş yapın.'); return; }
+            if (!session?.user) { showFdToast('info', 'Lütfen önce giriş yapın.'); return; }
 
             // Enes Doğanay | 7 Nisan 2026: Kurumsal gönderici bilgisi — firma adı ve id
             let senderFirmaId = null;
@@ -559,7 +595,7 @@ const SupplierProfile = () => {
                 } else {
                     // Enes Doğanay | 9 Nisan 2026: Upload hatası kullanıcıya gösterilir
                     console.error('Dosya yükleme hatası:', uploadErr);
-                    alert('Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
+                    showFdToast('error', 'Dosya yüklenemedi: ' + (uploadErr.message || 'Bilinmeyen hata'));
                     return;
                 }
             }
@@ -592,7 +628,7 @@ const SupplierProfile = () => {
             }, 2000);
         } catch (error) {
             console.error('Teklif talebi gönderilemedi:', error);
-            alert('Teklif talebi gönderilemedi: ' + (error?.message || JSON.stringify(error)));
+            showFdToast('error', 'Teklif talebi gönderilemedi.');
         } finally {
             setQuoteSending(false);
         }
@@ -606,7 +642,7 @@ const SupplierProfile = () => {
 
         try {
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user) return alert("Lütfen önce giriş yapın.");
+            if (!session?.user) return showFdToast('info', 'Lütfen önce giriş yapın.');
 
             let reminderAtIso = null;
             if (reminderEnabled) {
@@ -711,7 +747,7 @@ const SupplierProfile = () => {
             resetReminderForm();
         } catch (error) {
             console.error("Not kaydedilemedi:", error);
-            alert("Not kaydedilirken bir hata oluştu.");
+            showFdToast('error', 'Not kaydedilirken bir hata oluştu.');
         } finally {
             setIsNoteSaving(false);
         }
@@ -748,7 +784,7 @@ const SupplierProfile = () => {
             .eq('user_id', session.user.id);
 
         if (error) {
-            alert('Not silinemedi.');
+            showFdToast('error', 'Not silinemedi.');
             return;
         }
 
@@ -798,7 +834,29 @@ const SupplierProfile = () => {
 
     return (
         <>
-            {/* Enes Doğanay | 5 Nisan 2026: Search bar + autocomplete öneri dropdown + noResults */}
+            {/* Enes Doğanay | 4 Mayıs 2026: Local toast — alert() yerine */}
+            {fdToast && (
+                <div style={{
+                    position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+                    zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
+                    padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
+                    boxShadow: '0 8px 28px rgba(15,23,42,0.18)',
+                    background: fdToast.type === 'error' ? '#fef2f2' : fdToast.type === 'warning' ? '#fffbeb' : '#eff6ff',
+                    border: `1.5px solid ${fdToast.type === 'error' ? '#fca5a5' : fdToast.type === 'warning' ? '#fcd34d' : '#bfdbfe'}`,
+                    color: fdToast.type === 'error' ? '#991b1b' : fdToast.type === 'warning' ? '#92400e' : '#1e40af',
+                    fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
+                    animation: 'fdToastIn 0.22s ease'
+                }}>
+                    <style>{`@keyframes fdToastIn { from { opacity:0; transform:translate(-50%,10px);} to { opacity:1; transform:translate(-50%,0);} }`}</style>
+                    <span className="material-symbols-outlined" style={{ fontSize: '19px', flexShrink: 0 }}>
+                        {fdToast.type === 'error' ? 'error' : fdToast.type === 'warning' ? 'warning' : 'info'}
+                    </span>
+                    {fdToast.message}
+                    <button onClick={() => setFdToast(null)} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+                    </button>
+                </div>
+            )}
             <SharedHeader
                 search={detaySearch}
                 setSearch={setDetaySearch}
@@ -877,6 +935,34 @@ const SupplierProfile = () => {
                                     </div>
                                 </div>
                             </div>
+                            {/* Enes Doğanay | 4 Mayıs 2026: Ekip preview — firma show_ekip_public=true ise göster */}
+                            {firma.show_ekip_public !== false && firmaEkip.length > 0 && (
+                                <div className="hero-ekip-preview">
+                                    <div className="hero-ekip-stack">
+                                        {firmaEkip.slice(0, 3).map((uye, i) => (
+                                            <div key={uye.user_id} className="hero-ekip-avatar-wrap" style={{ zIndex: 10 - i }}>
+                                                {uye.avatar_url ? (
+                                                    <img src={uye.avatar_url} alt={uye.full_name || ''} className="hero-ekip-avatar-img" />
+                                                ) : (
+                                                    <span className="hero-ekip-avatar-initials">
+                                                        {(uye.full_name || '?').charAt(0).toUpperCase()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {firmaEkip.length > 3 && (
+                                            <div className="hero-ekip-more">+{firmaEkip.length - 3}</div>
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="hero-ekip-btn"
+                                        onClick={() => setShowEkipModal(true)}
+                                    >
+                                        Ekibi İncele
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -1071,84 +1157,73 @@ const SupplierProfile = () => {
                                     </div>
                                 </section>
 
-                                {/* Enes Doğanay | 4 Mayıs 2026: Firma ekip bölümü — public görünüm */}
-                                {firmaEkip.length > 0 && (
-                                    <section className="fd-ekip-section">
-                                        <h2 className="section-title">Ekibimiz</h2>
-                                        <div className="fd-ekip-grid">
-                                            {firmaEkip.map(uye => (
-                                                <div key={uye.user_id} className="fd-ekip-card">
-                                                    <div className="fd-ekip-avatar">
-                                                        {uye.avatar_url ? (
-                                                            <img src={uye.avatar_url} alt={uye.full_name || ''} />
-                                                        ) : (
-                                                            <span className="material-symbols-outlined">person</span>
-                                                        )}
-                                                    </div>
-                                                    <div className="fd-ekip-info">
-                                                        <strong>{uye.full_name || 'Ekip Üyesi'}</strong>
-                                                        {uye.title && <span className="fd-ekip-title">{uye.title}</span>}
-                                                        <span className={`ekip-role-badge ekip-role-badge--${uye.role}`}>
-                                                            {uye.role === 'owner' ? 'Yetkili' : uye.role === 'admin' ? 'Yönetici' : 'Üye'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
+                                {/* Enes Doğanay | 4 Mayıs 2026: Ekip bölümü hero preview'a ve modal'a taşındı */}
                             </div>
 
                             {/* RIGHT COLUMN (Sidebar) */}
                             <aside className="sticky-sidebar">
                                 <div className="card sidebar-card sidebar-card-favorites">
-                                    {/* Enes Doğanay | 6 Nisan 2026: Favori ve liste akışı iletişim kartından ayrılarak ayrı bağlama taşındı */}
+                                    {/* Enes Doğanay | 4 Mayıs 2026: Kompakt favori kartı — label/helper text kaldırıldı */}
                                     <h3 className="sidebar-heading">Listelere Ekle</h3>
 
                                     {userProfile ? (
                                         <>
                                             {!isFavorited && (
                                                 <div className="list-selector-card">
-                                                    {/* Enes Doğanay | 6 Nisan 2026: Liste secme ve yeni liste olusturma ayni blokta toplandi */}
-                                                    <div className="list-selector-header">
-                                                        <label className="list-label">
-                                                            Hangi listeye eklensin?
-                                                        </label>
-                                                        {!isCreatingList && (
-                                                            <button
-                                                                type="button"
-                                                                className="create-list-inline-trigger"
-                                                                onClick={() => setIsCreatingList(true)}
-                                                            >
-                                                                <span className="material-symbols-outlined">add</span>
-                                                                Yeni Liste
-                                                            </button>
+                                                    {/* Enes Doğanay | 4 Mayıs 2026: Custom dropdown */}
+                                                    <div className="list-dropdown-wrap" ref={listDropdownRef}>
+                                                        <button
+                                                            type="button"
+                                                            className={`list-dropdown-trigger${listDropdownOpen ? ' open' : ''}`}
+                                                            onClick={() => setListDropdownOpen(o => !o)}
+                                                        >
+                                                            <span className="material-symbols-outlined">bookmarks</span>
+                                                            <span className="list-dropdown-label">
+                                                                {selectedListId
+                                                                    ? myLists.find(l => String(l.id) === String(selectedListId))?.liste_adi || 'Liste'
+                                                                    : 'Genel Favoriler (Tümü)'}
+                                                            </span>
+                                                            <span className={`material-symbols-outlined list-dropdown-chevron${listDropdownOpen ? ' open' : ''}`}>expand_more</span>
+                                                        </button>
+                                                        {listDropdownOpen && (
+                                                            <div className="list-dropdown-menu">
+                                                                <button
+                                                                    type="button"
+                                                                    className={`list-dropdown-option${!selectedListId ? ' active' : ''}`}
+                                                                    onClick={() => { setSelectedListId(''); setListDropdownOpen(false); }}
+                                                                >
+                                                                    <span className="material-symbols-outlined">folder_special</span>
+                                                                    Genel Favoriler (Tümü)
+                                                                    {!selectedListId && <span className="material-symbols-outlined list-dropdown-check">check</span>}
+                                                                </button>
+                                                                {myLists.map(liste => (
+                                                                    <button
+                                                                        key={liste.id}
+                                                                        type="button"
+                                                                        className={`list-dropdown-option${String(selectedListId) === String(liste.id) ? ' active' : ''}`}
+                                                                        onClick={() => { setSelectedListId(liste.id); setListDropdownOpen(false); }}
+                                                                    >
+                                                                        <span className="material-symbols-outlined">folder</span>
+                                                                        {liste.liste_adi}
+                                                                        {String(selectedListId) === String(liste.id) && <span className="material-symbols-outlined list-dropdown-check">check</span>}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
                                                         )}
                                                     </div>
 
-                                                    <select
-                                                        value={selectedListId}
-                                                        onChange={(e) => setSelectedListId(e.target.value)}
-                                                        className="list-select"
-                                                    >
-                                                        <option value="">Genel Favoriler (Tümü)</option>
-                                                        {myLists.map(liste => (
-                                                            <option key={liste.id} value={liste.id}>{liste.liste_adi}</option>
-                                                        ))}
-                                                    </select>
-
-                                                    <p className="list-helper-text">
-                                                        Yeni oluşturulan liste otomatik olarak seçilir.
-                                                    </p>
-
-                                                    {isCreatingList && (
+                                                    {!isCreatingList ? (
+                                                        <button type="button" className="list-new-link" onClick={() => setIsCreatingList(true)}>
+                                                            <span className="material-symbols-outlined">add</span>Yeni liste oluştur
+                                                        </button>
+                                                    ) : (
                                                         <div className="create-list-inline create-list-inline-form">
                                                             <input
                                                                 type="text"
                                                                 value={newListName}
                                                                 onChange={(e) => setNewListName(e.target.value)}
                                                                 onKeyDown={handleListInputKeyDown}
-                                                                placeholder="Yeni liste adı"
+                                                                placeholder="Liste adı"
                                                                 className="create-list-inline-input"
                                                                 maxLength={60}
                                                                 autoFocus
@@ -1160,18 +1235,15 @@ const SupplierProfile = () => {
                                                                     onClick={handleCreateList}
                                                                     disabled={isListCreating || !newListName.trim()}
                                                                 >
-                                                                    {isListCreating ? 'Oluşturuluyor...' : 'Liste Oluştur'}
+                                                                    {isListCreating ? 'Oluşturuluyor...' : 'Oluştur'}
                                                                 </button>
                                                                 <button
                                                                     type="button"
                                                                     className="create-list-inline-cancel"
-                                                                    onClick={() => {
-                                                                        setIsCreatingList(false);
-                                                                        setNewListName('');
-                                                                    }}
+                                                                    onClick={() => { setIsCreatingList(false); setNewListName(''); }}
                                                                     disabled={isListCreating}
                                                                 >
-                                                                    Vazgeç
+                                                                    İptal
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -1179,7 +1251,6 @@ const SupplierProfile = () => {
                                                 </div>
                                             )}
 
-                                            {/* Enes Doğanay | 8 Nisan 2026: Favori butonu canlandırıldı — yıldız ikonlu, dikkat çekici */}
                                             <button
                                                 onClick={toggleFavorite}
                                                 className={`btn-favorite ${isFavorited ? 'btn-favorite--active' : ''}`}
@@ -1187,9 +1258,7 @@ const SupplierProfile = () => {
                                                 <span className="material-symbols-outlined btn-favorite-icon">
                                                     {isFavorited ? 'bookmark_added' : 'bookmark_add'}
                                                 </span>
-                                                <span>
-                                                    {isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
-                                                </span>
+                                                <span>{isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}</span>
                                             </button>
 
                                             {isFavorited && (
@@ -1200,7 +1269,6 @@ const SupplierProfile = () => {
                                         </>
                                     ) : (
                                         <div className="notes-login-prompt">
-                                            {/* Enes Doğanay | 6 Nisan 2026: Giriş yapmayan kullanıcı için favori kartında da not kartıyla aynı boş durum gösterilir */}
                                             <span className="material-symbols-outlined notes-lock-icon">lock</span>
                                             <p className="notes-login-text">Bu firmayı listelerinize eklemek için lütfen giriş yapın.</p>
                                             <button onClick={() => navigate(`/login?redirect=/firmadetay/${id}`)} className="notes-login-btn">Giriş Yap</button>
@@ -1231,7 +1299,7 @@ const SupplierProfile = () => {
                                     {userProfile && firma.telefon && (
                                         <a href={`tel:${firma.telefon}`} className="contact-link-wrap">
                                             <button className="btn btn-outline btn-full btn-contact">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 11.5v2a1.4 1.4 0 0 1-1.5 1.4 13.8 13.8 0 0 1-6-2.14 13.5 13.5 0 0 1-4.17-4.17 13.8 13.8 0 0 1-2.14-6.02A1.4 1.4 0 0 1 2.6 1h2a1.4 1.4 0 0 1 1.4 1.2c.09.65.25 1.28.49 1.9a1.4 1.4 0 0 1-.32 1.47L5.58 6.67A11.2 11.2 0 0 0 9.75 10.8l1.1-.89a1.4 1.4 0 0 1 1.47-.31c.62.24 1.25.4 1.9.49A1.4 1.4 0 0 1 15 11.5z"/></svg>
                                                 {firma.telefon}
                                             </button>
                                         </a>
@@ -1251,39 +1319,33 @@ const SupplierProfile = () => {
                                         </div>
 
                                         {/* Enes Doğanay | 19 Nisan 2026: Konum alanına dinamik Google Maps iframe eklendi */}
-                                        <div className="map-iframe-wrapper" style={{ width: "100%", borderRadius: 8, overflow: "hidden", margin: "8px 0" }}>
+                                        <div className="map-iframe-wrapper" style={{ width: "100%", borderRadius: 8, overflow: "hidden", margin: "6px 0" }}>
                                             <iframe
                                                 title="Firma Konumu"
                                                 width="100%"
-                                                height="200"
-                                                style={{ border: 0, minHeight: 180 }}
+                                                height="150"
+                                                style={{ border: 0, minHeight: 150, display: 'block' }}
                                                 loading="lazy"
                                                 allowFullScreen
                                                 referrerPolicy="no-referrer-when-downgrade"
                                                 src={`https://maps.google.com/maps?q=${encodedAddress}&output=embed`}
                                             />
                                         </div>
-                                        <div style={{ marginTop: 4, fontWeight: 600, color: "#1a73e8", fontSize: 15 }}>
+                                        <div style={{ marginTop: 3, fontWeight: 600, color: "#1a73e8", fontSize: 12.5, lineHeight: 1.4 }}>
                                             {adresText}
                                         </div>
 
-                                        {(firma.adres || firma.web_sitesi || firma.eposta) && (
+                                        {(firma.web_sitesi || firma.eposta) && (
                                             <div className="contact-info-stack">
-                                                {firma.adres && (
-                                                    <div className="contact-info-row">
-                                                        <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                                                        <span>{firma.adres}</span>
-                                                    </div>
-                                                )}
                                                 {firma.web_sitesi && (
                                                     <a href={firma.web_sitesi.startsWith("http") ? firma.web_sitesi : `https://${firma.web_sitesi}`} target="_blank" rel="noopener noreferrer" className="contact-info-row contact-info-link">
-                                                        <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20z" /></svg>
+                                                        <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="7" /><line x1="1" y1="8" x2="15" y2="8" /><path d="M8 1a10.3 10.3 0 0 1 0 14M8 1a10.3 10.3 0 0 0 0 14" /></svg>
                                                         {firma.web_sitesi}
                                                     </a>
                                                 )}
                                                 {firma.eposta && (
                                                     <a href={`mailto:${firma.eposta}`} className="contact-info-row contact-info-link">
-                                                        <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v16H4z" /><polyline points="22,6 12,13 2,6" /></svg>
+                                                        <svg className="contact-info-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="#137fec" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="14" height="10" rx="1"/><polyline points="1,4 8,9 15,4" /></svg>
                                                         {firma.eposta}
                                                     </a>
                                                 )}
@@ -1365,7 +1427,7 @@ const SupplierProfile = () => {
                                                                 </label>
                                                                 <label className="reminder-field">
                                                                     <span>Saat</span>
-                                                                    <input type="time" value={reminderTime} onChange={(event) => setReminderTime(event.target.value)} />
+                                                                    <TimePicker value={reminderTime} onChange={setReminderTime} variant="amber" />
                                                                 </label>
                                                             </div>
                                                             {(reminderDate && reminderTime) && (
@@ -1562,7 +1624,7 @@ const SupplierProfile = () => {
                                                 <span className="material-symbols-outlined">attach_file</span>
                                                 {quoteFile ? quoteFile.name : 'Dosya Seç'}
                                             </label>
-                                            <input id="detay-quote-file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f && f.size <= 10 * 1024 * 1024) setQuoteFile(f); else if (f) alert('Dosya boyutu en fazla 10 MB olabilir.'); }} />
+                                            <input id="detay-quote-file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f && f.size <= 10 * 1024 * 1024) setQuoteFile(f); else if (f) showFdToast('warning', 'Dosya boyutu en fazla 10 MB olabilir.'); }} />
                                             {quoteFile && (
                                                 <button type="button" className="quote-file-remove" onClick={() => setQuoteFile(null)}>
                                                     <span className="material-symbols-outlined">close</span>
@@ -1593,6 +1655,40 @@ const SupplierProfile = () => {
                                 </div>
                             </>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* Enes Doğanay | 4 Mayıs 2026: Ekip modal — hero'daki "Ekibi Gör" butonuyla açılır */}
+            {showEkipModal && (
+                <div className="ekip-modal-overlay" onClick={() => setShowEkipModal(false)}>
+                    <div className="ekip-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="ekip-modal-header">
+                            <h3>Ekibimiz</h3>
+                            <button type="button" className="ekip-modal-close" onClick={() => setShowEkipModal(false)}>
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="ekip-modal-body">
+                            {firmaEkip.map(uye => (
+                                <div key={uye.user_id} className="fd-ekip-card">
+                                    <div className="fd-ekip-avatar">
+                                        {uye.avatar_url ? (
+                                            <img src={uye.avatar_url} alt={uye.full_name || ''} />
+                                        ) : (
+                                            <span className="material-symbols-outlined">person</span>
+                                        )}
+                                    </div>
+                                    <div className="fd-ekip-info">
+                                        <strong>{uye.full_name || 'Ekip Üyesi'}</strong>
+                                        {uye.title && <span className="fd-ekip-title">{uye.title}</span>}
+                                        <span className={`ekip-role-badge ekip-role-badge--${uye.role}`}>
+                                            {uye.role === 'owner' ? 'Yetkili' : uye.role === 'admin' ? 'Yönetici' : 'Üye'}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
