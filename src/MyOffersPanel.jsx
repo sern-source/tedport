@@ -120,15 +120,18 @@ const timeAgo = (iso) => {
     return formatDate(iso);
 };
 
-const MyOffersPanel = ({ companyId } = {}) => {
+const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
     const navigate = useNavigate();
-    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName, setActiveViewingTeklifId } = useAuth() || {};
+    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName, setActiveViewingTeklifId, refreshCounts } = useAuth() || {};
     const [loading, setLoading] = useState(true);
     const [offers, setOffers] = useState([]);
     const [tenderMap, setTenderMap] = useState({});
     const [firmaMap, setFirmaMap] = useState({});
     const [filter, setFilter] = useState('all');
     const [search, setSearch] = useState('');
+    // Enes Doğanay | 4 Mayıs 2026: Sayfalama state
+    const [currentPage, setCurrentPage] = useState(1);
+    const MOP_PAGE_SIZE = 10;
     const [expandedId, setExpandedId] = useState(null);
     /* Enes Doğanay | 13 Nisan 2026: Bildirimden gelen highlight */
     const [highlightId, setHighlightId] = useState(null);
@@ -206,6 +209,13 @@ const MyOffersPanel = ({ companyId } = {}) => {
                 setUnreadMopChatIds(prev => { const s = new Set(prev); s.delete(offer.id); return s; });
                 setUnreadMopChatCounts(prev => { const n = { ...prev }; delete n[offer.id]; return n; });
             }
+            // Enes Doğanay | 22 Mayıs 2026: Bu teklife ait tender_offer_message bildirimlerini okundu yap — Bildirimler badge azalsın
+            supabase.from('bildirimler')
+                .update({ is_read: true })
+                .eq('type', 'tender_offer_message')
+                .filter('metadata->>teklif_id', 'eq', String(offer.id))
+                .eq('is_read', false)
+                .then(() => { refreshCounts?.(); });
         } catch (err) {
             if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
         } finally {
@@ -465,6 +475,13 @@ const MyOffersPanel = ({ companyId } = {}) => {
         return () => { supabase.removeChannel(channel); unreadBroadcastChannelRef.current = null; };
     }, [loading, offers]);
 
+    // Enes Doğanay | 22 Mayıs 2026: Üst bileşene (Profile.jsx) okunmamış toplam sayısını bildir
+    useEffect(() => {
+        if (onUnreadCountChange) {
+            onUnreadCountChange(unreadMopChatIds.size);
+        }
+    }, [unreadMopChatIds, onUnreadCountChange]);
+
     /* Enes Doğanay | 2 Mayıs 2026: Bildirimden yönlendirme — sessionStorage mop_open_teklif_chat ile chat aç */
     useEffect(() => {
         if (loading || offers.length === 0) return;
@@ -494,8 +511,15 @@ const MyOffersPanel = ({ companyId } = {}) => {
                     (firmaMap[String(t?.firma_id)] || '').toLocaleLowerCase('tr-TR').includes(q);
             });
         }
+        // Enes Doğanay | 22 Mayıs 2026: Akıllı sıralama — okunmamış mesaj olanlar önce, sonra tarihe göre
+        list.sort((a, b) => {
+            const aUnread = unreadMopChatIds.has(a.id) ? 0 : 1;
+            const bUnread = unreadMopChatIds.has(b.id) ? 0 : 1;
+            if (aUnread !== bUnread) return aUnread - bUnread;
+            return new Date(b.created_at) - new Date(a.created_at);
+        });
         return list;
-    }, [offers, filter, search, tenderMap, firmaMap]);
+    }, [offers, filter, search, tenderMap, firmaMap, unreadMopChatIds]);
 
     /* KPI'lar */
     const kpis = useMemo(() => ({
@@ -779,7 +803,7 @@ const MyOffersPanel = ({ companyId } = {}) => {
                     <span className="material-symbols-outlined">search</span>
                     <input
                         value={search}
-                        onChange={e => setSearch(e.target.value)}
+                        onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
                         placeholder="İhale adı, referans no veya firma ara..."
                     />
                     {search && (
@@ -799,7 +823,7 @@ const MyOffersPanel = ({ companyId } = {}) => {
                         <button
                             key={f.key}
                             className={`mop-chip${filter === f.key ? ' mop-chip--on' : ''}`}
-                            onClick={() => setFilter(f.key)}
+                            onClick={() => { setFilter(f.key); setCurrentPage(1); }}
                         >
                             <span className="material-symbols-outlined">{f.icon}</span>
                             {f.label}
@@ -825,8 +849,9 @@ const MyOffersPanel = ({ companyId } = {}) => {
                     )}
                 </div>
             ) : (
+                <>
                 <div className="mop-list">
-                    {filtered.map((offer) => {
+                    {filtered.slice((currentPage - 1) * MOP_PAGE_SIZE, currentPage * MOP_PAGE_SIZE).map((offer) => {
                         const st = getStatus(offer.durum);
                         const tender = tenderMap[String(offer.ihale_id)] || {};
                         const firmaAdi = firmaMap[String(tender.firma_id)] || 'Firma bilinmiyor';
@@ -841,7 +866,7 @@ const MyOffersPanel = ({ companyId } = {}) => {
                                 ref={highlightId === offer.id ? highlightRef : undefined}
                             >
                                 {/* Ana satır */}
-                                <div className="mop-card__main" onClick={() => setExpandedId(isExpanded ? null : offer.id)}>
+                                <div className={`mop-card__main${unreadMopChatIds.has(offer.id) ? ' mop-card__main--has-unread' : ''}`} onClick={() => setExpandedId(isExpanded ? null : offer.id)}>
                                     {/* Sol: İhale bilgisi */}
                                     <div className="mop-card__tender">
                                         <h3>{tender.baslik || 'İhale bulunamadı'}</h3>
@@ -886,6 +911,13 @@ const MyOffersPanel = ({ companyId } = {}) => {
 
                                     {/* Sağ: Durum + tarih */}
                                     <div className="mop-card__status-area">
+                                        {/* Enes Doğanay | 22 Mayıs 2026: Okunmamış mesaj göstergesi — kart kapalıyken de görünsün */}
+                                        {unreadMopChatIds.has(offer.id) && (
+                                            <div className="mop-card__unread-msg-indicator">
+                                                <span className="material-symbols-outlined">forum</span>
+                                                {(unreadMopChatCounts[offer.id] || 0) > 0 ? unreadMopChatCounts[offer.id] : ''} Yeni Mesaj
+                                            </div>
+                                        )}
                                         <span className={`mop-status mop-status--${st.tone}`}>
                                             <span className="material-symbols-outlined">{st.icon}</span>
                                             {st.label}
@@ -1075,8 +1107,20 @@ const MyOffersPanel = ({ companyId } = {}) => {
                         );
                     })}
                 </div>
+                {/* Enes Doğanay | 4 Mayıs 2026: Sayfalama bar — ihale teklifleri */}
+                {Math.ceil(filtered.length / MOP_PAGE_SIZE) > 1 && (
+                    <div className="pagination-bar">
+                        <button className="pagination-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>
+                            <span className="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <span className="pagination-info">Sayfa {currentPage} / {Math.ceil(filtered.length / MOP_PAGE_SIZE)}</span>
+                        <button className="pagination-btn" disabled={currentPage === Math.ceil(filtered.length / MOP_PAGE_SIZE)} onClick={() => setCurrentPage(p => p + 1)}>
+                            <span className="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                )}
+                </>
             )}
-
             {/* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma modal — bidder tarafı */}
             {activeMopChat && (
                 <div className="mop-chat-overlay" onClick={closeMopChat}>

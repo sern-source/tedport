@@ -49,7 +49,7 @@ const SharedHeader = ({
     const navigate = useNavigate();
     const location = useLocation();
     // Enes Doğanay | 8 Nisan 2026: AuthContext'ten gelen global auth state kullanımı (her sayfada tekrar sorgu atılmaz)
-    const { authChecked, userProfile, isCurrentUserAdmin, managedCompanyId, managedCompanyName, unreadNotifCount, pendingQuoteCount, logout } = useAuth();
+    const { authChecked, userProfile, isCurrentUserAdmin, managedCompanyId, managedCompanyName, unreadNotifCount, pendingQuoteCount, myOffersUnreadCount, ihaleYonetimiUnreadCount, logout } = useAuth();
     // Enes Doğanay | 2 Mayıs 2026: Faz 2 — dark mode toggle
     const { theme, toggleTheme } = useTheme();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -332,6 +332,7 @@ const SharedHeader = ({
                                                 <span className="shared-user-menu-label">
                                                     İhale Yönetimi
                                                 </span>
+                                                {ihaleYonetimiUnreadCount > 0 && <span className="shared-menu-badge">{ihaleYonetimiUnreadCount}</span>}
                                             </button>
                                             {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi dropdown — sadece owner (managedCompanyId) */}
                                             <button
@@ -544,6 +545,8 @@ const SharedHeader = ({
                                                     <span className="shared-user-menu-label">
                                                         İhale Tekliflerim
                                                     </span>
+                                                    {/* Enes Doğanay | 22 Mayıs 2026: Okunmamış ihale teklif mesajı badge */}
+                                                    {myOffersUnreadCount > 0 && <span className="shared-menu-badge">{myOffersUnreadCount}</span>}
                                                 </button>
 
                                                 {/* Enes Doğanay | 4 Mayıs 2026: Şirketim menü girişi — bireysel */}
@@ -660,6 +663,7 @@ const SharedHeader = ({
                                     <Link to="/firma-profil?tab=ihale-yonetimi" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">gavel</span>
                                         İhale Yönetimi
+                                        {ihaleYonetimiUnreadCount > 0 && <span className="shared-mobile-badge">{ihaleYonetimiUnreadCount}</span>}
                                     </Link>
                                     {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi mobil menü — sadece owner */}
                                     <Link to="/firma-profil?tab=ekip" onClick={() => setIsMobileMenuOpen(false)}>
@@ -692,6 +696,8 @@ const SharedHeader = ({
                                     <Link to="/profile?tab=my-offers" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">assignment_turned_in</span>
                                         İhale Tekliflerim
+                                        {/* Enes Doğanay | 22 Mayıs 2026: Okunmamış ihale teklif mesajı badge — mobil */}
+                                        {myOffersUnreadCount > 0 && <span className="shared-mobile-badge">{myOffersUnreadCount}</span>}
                                     </Link>
                                     {/* Enes Doğanay | 4 Mayıs 2026: Şirketim mobil menü — bireysel */}
                                     <Link to="/profile?tab=sirketim" onClick={() => setIsMobileMenuOpen(false)}>

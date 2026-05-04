@@ -171,6 +171,8 @@ const ProfilePage = () => {
   const [activeQuoteId, setActiveQuoteId] = useState(null);
   // Enes Doğanay | 10 Nisan 2026: Durum filtreleme state'i
   const [quoteStatusFilter, setQuoteStatusFilter] = useState('all');
+  // Enes Doğanay | 4 Mayıs 2026: Teklif taleplerim sayfalama
+  const [quoteCurrentPage, setQuoteCurrentPage] = useState(1);
   const [quoteChatMessages, setQuoteChatMessages] = useState([]);
   const [quoteChatLoading, setQuoteChatLoading] = useState(false);
   const [quoteChatInput, setQuoteChatInput] = useState('');
@@ -466,7 +468,7 @@ const ProfilePage = () => {
   }, [searchParams.get('teklif_id'), loading]);
 
   // Enes Doğanay | 9 Nisan 2026: AuthContext'ten gelen latestNotification ve pendingQuoteCount
-  const { latestNotification, pendingQuoteCount, setActiveViewingTeklifId, updateNotifPrefsCache } = useAuth();
+  const { latestNotification, pendingQuoteCount, setActiveViewingTeklifId, updateNotifPrefsCache, myOffersUnreadCount, setMyOffersUnreadCount } = useAuth();
   useEffect(() => {
     if (!latestNotification) return;
     const isQuoteNotif = (latestNotification.type === 'quote_reply' || latestNotification.type === 'quote_message');
@@ -618,6 +620,22 @@ const ProfilePage = () => {
     const reminderPollInterval = setInterval(pollReminders, 15000);
     return () => clearInterval(reminderPollInterval);
   }, [user]);
+
+  // Enes Doğanay | 4 Mayıs 2026: bildirimler UPDATE'lerini realtime dinle — MyOffersPanel'den okundu yapılanlar Bildirimler sekmesine anında yansısın
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`profile-notif-updates-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'bildirimler', filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          setNotifications(prev => prev.map(n => n.id === payload.new.id ? { ...n, ...payload.new } : n));
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user?.id]);
 
   // Enes Doğanay | 6 Nisan 2026: Promise.all paralel sorgular
   const fetchListsAndFavorites = async (userId) => {
@@ -863,11 +881,22 @@ const ProfilePage = () => {
     setQuoteChatInput('');
 
     /* Enes Doğanay | 9 Nisan 2026: Teklif açıldığında ilgili okunmamış bildirimleri okundu yap */
-    const relatedUnread = notifications.filter(n => !n.is_read && (n.type === 'quote_reply' || n.type === 'quote_message') && n.metadata?.teklif_id === quoteId);
-    if (relatedUnread.length > 0) {
-      const ids = relatedUnread.map(n => n.id);
-      supabase.from('bildirimler').update({ is_read: true }).in('id', ids).then(() => refreshCounts());
-      setNotifications(prev => prev.map(n => ids.includes(n.id) ? { ...n, is_read: true } : n));
+    /* Enes Doğanay | 22 Mayıs 2026: Yerel notifications state yerine doğrudan DB sorgusu — 30 limit'ten bağımsız */
+    if (user?.id) {
+      supabase.from('bildirimler')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .in('type', ['quote_reply', 'quote_message'])
+        .filter('metadata->>teklif_id', 'eq', String(quoteId))
+        .eq('is_read', false)
+        .then(() => {
+          refreshCounts();
+          // Yerel state'i de güncelle — Bildirimler sekmesi açıksa anında yansısın
+          setNotifications(prev => prev.map(n =>
+            (!n.is_read && (n.type === 'quote_reply' || n.type === 'quote_message') && n.metadata?.teklif_id === quoteId)
+              ? { ...n, is_read: true } : n
+          ));
+        });
     }
 
     const { data, error } = await supabase.from('teklif_mesajlari')
@@ -1373,9 +1402,10 @@ const ProfilePage = () => {
                 <span className="material-symbols-outlined">request_quote</span> Teklif Taleplerim
                 {pendingQuoteCount > 0 && <span className="nav-item-badge">{pendingQuoteCount}</span>}
               </a>
-              {/* Enes Doğanay | 13 Nisan 2026: İhale Tekliflerim sekmesi */}
+              {/* Enes Doğanay | 22 Mayıs 2026: İhale Tekliflerim sekmesi — okunmamış mesaj badge */}
               <a className={`nav-item ${currentTab === 'my-offers' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'my-offers' })}>
                 <span className="material-symbols-outlined">assignment_turned_in</span> İhale Tekliflerim
+                {myOffersUnreadCount > 0 && <span className="nav-item-badge">{myOffersUnreadCount}</span>}
               </a>
               {/* Enes Doğanay | 4 Mayıs 2026: Şirketim sekmesi — admin/member olan kullanıcılar için */}
               {(myCompany || pendingInvites.length > 0) && (
@@ -1959,49 +1989,86 @@ const ProfilePage = () => {
                       {/* Enes Doğanay | 9 Nisan 2026: Durum filtre butonları — kurumsal formatla aynı tasarım */}
                       <div className="cmp-quotes-status-filter">
                         {[{ key: 'all', label: 'Tümü' }, { key: 'pending', label: 'Beklemede' }, { key: 'read', label: 'Firma Görüntüledi' }, { key: 'replied', label: 'Yanıt Geldi' }, { key: 'awaiting_reply', label: 'Yanıt Bekleniyor' }, { key: 'rejected', label: 'Reddedildi' }, { key: 'closed', label: 'Sonlandırıldı' }].map(f => (
-                          <button key={f.key} className={`cmp-quotes-status-filter-btn${quoteStatusFilter === f.key ? ' active' : ''}`} onClick={() => setQuoteStatusFilter(f.key)}>
+                          <button key={f.key} className={`cmp-quotes-status-filter-btn${quoteStatusFilter === f.key ? ' active' : ''}`} onClick={() => { setQuoteStatusFilter(f.key); setQuoteCurrentPage(1); }}>
                             {f.label}
                             {f.key !== 'all' && <span>({myQuotes.filter(q => (q._displayStatus || q.durum) === f.key).length})</span>}
                           </button>
                         ))}
                       </div>
-                      <div className="cmp-quotes-list">
-                        {(quoteStatusFilter === 'all' ? myQuotes : myQuotes.filter(q => (q._displayStatus || q.durum) === quoteStatusFilter)).map((q) => {
-                          // Enes Doğanay | 9 Nisan 2026: Son mesaja göre hesaplanan _displayStatus kullan
-                          const displayDurum = q._displayStatus || q.durum;
-                          const stMap = { pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
-
-                          return (
-                            <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openQuoteChat(q.id)} style={{ cursor: 'pointer' }}>
-                              <div className="cmp-quote-top">
-                                <div className="cmp-quote-top-left">
-                                  <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>{stMap[displayDurum] || 'Beklemede'}</span>
-                                  {/* Enes Doğanay | 9 Nisan 2026: Okunmamış bildirimi olan tekliflerde "Yeni Mesaj" göstergesi */}
-                                  {unreadQuoteIds.has(q.id) && <span className="cmp-quote-new-badge">Yeni Mesaj</span>}
-                                  <strong className="cmp-quote-subject">{q.konu}</strong>
-                                </div>
-                                <div className="cmp-quote-top-right">
-                                  <div className="cmp-quote-sender-info">
-                                    <span className="cmp-quote-sender">{q._firma_adi}</span>
-                                    <span className="cmp-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                                  </div>
-                                  <button className="cmp-quote-delete-trigger" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(q.id); }} title="Teklifi Sil">
-                                    <span className="material-symbols-outlined">delete</span>
-                                  </button>
-                                </div>
+                      {/* Enes Doğanay | 4 Mayıs 2026: Sayfalı liste */}
+                      {(() => {
+                        // Enes Doğanay | 4 Mayıs 2026: Sıralama kuralları —
+                        // 1) Yeni Mesaj (okunmamış) en üste
+                        // 2) Aktif konuşmalar (yanıt_geldi, yanıt_bekleniyor)
+                        // 3) Beklemede / firma görüntüledi
+                        // 4) Kapalı / reddedildi en alta
+                        // 5) Aynı grupta en yeni önce
+                        const _STATUS_PRI = { replied: 1, awaiting_reply: 1, read: 1, pending: 2, rejected: 3, closed: 3 };
+                        const _fq = (quoteStatusFilter === 'all' ? myQuotes : myQuotes.filter(q => (q._displayStatus || q.durum) === quoteStatusFilter))
+                          .slice()
+                          .sort((a, b) => {
+                            const aU = unreadQuoteIds.has(a.id) ? 0 : 1;
+                            const bU = unreadQuoteIds.has(b.id) ? 0 : 1;
+                            if (aU !== bU) return aU - bU;
+                            const aP = _STATUS_PRI[a._displayStatus || a.durum] ?? 2;
+                            const bP = _STATUS_PRI[b._displayStatus || b.durum] ?? 2;
+                            if (aP !== bP) return aP - bP;
+                            return new Date(b.created_at) - new Date(a.created_at);
+                          });
+                        const _qps = 10;
+                        const _qtp = Math.ceil(_fq.length / _qps) || 1;
+                        const _pq = _fq.slice((quoteCurrentPage - 1) * _qps, quoteCurrentPage * _qps);
+                        const stMap = { pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
+                        return (
+                          <>
+                            <div className="cmp-quotes-list">
+                              {_pq.map((q) => {
+                                const displayDurum = q._displayStatus || q.durum;
+                                return (
+                                  <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openQuoteChat(q.id)} style={{ cursor: 'pointer' }}>
+                                    <div className="cmp-quote-top">
+                                      <div className="cmp-quote-top-left">
+                                        <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>{stMap[displayDurum] || 'Beklemede'}</span>
+                                        {unreadQuoteIds.has(q.id) && <span className="cmp-quote-new-badge">Yeni Mesaj</span>}
+                                        <strong className="cmp-quote-subject">{q.konu}</strong>
+                                      </div>
+                                      <div className="cmp-quote-top-right">
+                                        <div className="cmp-quote-sender-info">
+                                          <span className="cmp-quote-sender">{q._firma_adi}</span>
+                                          <span className="cmp-quote-date">{new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                        </div>
+                                        <button className="cmp-quote-delete-trigger" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(q.id); }} title="Teklifi Sil">
+                                          <span className="material-symbols-outlined">delete</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <p className="cmp-quote-preview">{q.mesaj}</p>
+                                    {confirmDeleteQuoteId === q.id && (
+                                      <div className="cmp-quote-delete-confirm" onClick={(e) => e.stopPropagation()}>
+                                        <span>Silmek istediğinize emin misiniz?</span>
+                                        <button className="cmp-quote-delete-btn cmp-quote-delete-btn--yes" onClick={(e) => { e.stopPropagation(); handleDeleteQuote(q.id); }}>Evet</button>
+                                        <button className="cmp-quote-delete-btn cmp-quote-delete-btn--no" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(null); }}>Hayır</button>
+                                      </div>
+                                    )}
+                                  </article>
+                                );
+                              })}
+                            </div>
+                            {/* Enes Doğanay | 4 Mayıs 2026: Sayfalama bar — teklif talepleri */}
+                            {_qtp > 1 && (
+                              <div className="pagination-bar">
+                                <button className="pagination-btn" disabled={quoteCurrentPage === 1} onClick={() => setQuoteCurrentPage(p => p - 1)}>
+                                  <span className="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                <span className="pagination-info">Sayfa {quoteCurrentPage} / {_qtp}</span>
+                                <button className="pagination-btn" disabled={quoteCurrentPage === _qtp} onClick={() => setQuoteCurrentPage(p => p + 1)}>
+                                  <span className="material-symbols-outlined">chevron_right</span>
+                                </button>
                               </div>
-                              <p className="cmp-quote-preview">{q.mesaj}</p>
-                              {confirmDeleteQuoteId === q.id && (
-                                <div className="cmp-quote-delete-confirm" onClick={(e) => e.stopPropagation()}>
-                                  <span>Silmek istediğinize emin misiniz?</span>
-                                  <button className="cmp-quote-delete-btn cmp-quote-delete-btn--yes" onClick={(e) => { e.stopPropagation(); handleDeleteQuote(q.id); }}>Evet</button>
-                                  <button className="cmp-quote-delete-btn cmp-quote-delete-btn--no" onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(null); }}>Hayır</button>
-                                </div>
-                              )}
-                            </article>
-                          );
-                        })}
-                      </div>
+                            )}
+                          </>
+                        );
+                      })()}
                       </>
                     )}
                   </>
@@ -2009,10 +2076,10 @@ const ProfilePage = () => {
               </div>
             )}
 
-            {/* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler tab içeriği */}
-            {currentTab === 'my-offers' && (
-              <MyOffersPanel />
-            )}
+            {/* Enes Doğanay | 22 Mayıs 2026: Verdiğim Teklifler — display:none ile kalıcı mount; tab geçişinde unmount olmaz */}
+            <div style={{ display: currentTab === 'my-offers' ? 'block' : 'none' }}>
+              <MyOffersPanel onUnreadCountChange={setMyOffersUnreadCount} />
+            </div>
 
             {/* Enes Doğanay | 4 Mayıs 2026: Şirketim sekmesi — ekip üyesi profil paneli */}
             {currentTab === 'sirketim' && (

@@ -36,6 +36,10 @@ export function AuthProvider({ children }) {
   const [managedCompanyName, setManagedCompanyName] = useState(null);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [pendingQuoteCount, setPendingQuoteCount] = useState(0);
+  // Enes Doğanay | 22 Mayıs 2026: İhale Tekliflerim okunmamış mesaj sayısı — bireysel kullanıcı için
+  const [myOffersUnreadCount, setMyOffersUnreadCount] = useState(0);
+  // Enes Doğanay | 22 Mayıs 2026: İhale Yönetimi okunmamış mesaj sayısı — kurumsal kullanıcı için
+  const [ihaleYonetimiUnreadCount, setIhaleYonetimiUnreadCount] = useState(0);
   // Enes Doğanay | 8 Nisan 2026: Anlık toast bildirimleri state'i
   const [toasts, setToasts] = useState([]);
   const realtimeChannelRef = useRef(null);
@@ -58,6 +62,8 @@ export function AuthProvider({ children }) {
     setManagedCompanyName(null);
     setUnreadNotifCount(0);
     setPendingQuoteCount(0);
+    setMyOffersUnreadCount(0);
+    setIhaleYonetimiUnreadCount(0);
   };
 
   // Enes Doğanay | 10 Nisan 2026: Logout sırasında auto-refresh yarış koşulunu engelleyen flag
@@ -164,22 +170,51 @@ export function AuthProvider({ children }) {
 
       // Enes Doğanay | 13 Nisan 2026: Girintileme düzeltildi
       if (companyId) {
-        const [firmResult, quoteResult] = await Promise.all([
+        const [firmResult, quoteResult, firmTendersResult] = await Promise.all([
           supabase.from('firmalar').select('firma_adi').eq('firmaID', companyId).single(),
-          supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', companyId).eq('durum', 'pending')
+          supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', companyId).eq('durum', 'pending'),
+          // Enes Doğanay | 22 Mayıs 2026: İhale yönetimi okunmamış mesaj sayısı
+          supabase.from('firma_ihaleleri').select('id').eq('firma_id', companyId)
         ]);
         setManagedCompanyName(firmResult.data?.firma_adi || null);
         setPendingQuoteCount(quoteResult.count || 0);
+        const tenderIds = (firmTendersResult.data || []).map(t => t.id);
+        if (tenderIds.length > 0) {
+          const { data: allOfferIds } = await supabase.from('ihale_teklifleri').select('id').in('ihale_id', tenderIds);
+          const offerIds = (allOfferIds || []).map(o => o.id);
+          if (offerIds.length > 0) {
+            const { count: tomCount } = await supabase.from('ihale_teklif_mesajlari')
+              .select('id', { count: 'exact', head: true })
+              .in('teklif_id', offerIds).eq('sender_role', 'bidder').eq('okundu_firma', false);
+            setIhaleYonetimiUnreadCount(tomCount || 0);
+          } else {
+            setIhaleYonetimiUnreadCount(0);
+          }
+        } else {
+          setIhaleYonetimiUnreadCount(0);
+        }
       } else {
         setManagedCompanyName(null);
         /* Enes Doğanay | 9 Nisan 2026: Bireysel kullanıcı için okunmamış teklif yanıt/mesaj bildirimlerini say */
-        const { count: quoteNotifCount } = await supabase
-          .from('bildirimler')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', session.user.id)
-          .eq('is_read', false)
-          .in('type', ['quote_reply', 'quote_message']);
+        const [{ count: quoteNotifCount }, { data: userOffersForMop }] = await Promise.all([
+          supabase.from('bildirimler').select('id', { count: 'exact', head: true })
+            .eq('user_id', session.user.id).eq('is_read', false).in('type', ['quote_reply', 'quote_message']),
+          // Enes Doğanay | 22 Mayıs 2026: İhale teklifleri okunmamış mesaj sayısı için offer id'leri al
+          supabase.from('ihale_teklifleri').select('id').eq('user_id', session.user.id)
+        ]);
         setPendingQuoteCount(quoteNotifCount || 0);
+        // Enes Doğanay | 22 Mayıs 2026: Okunmamış ihale teklif mesajlarını say (bidder tarafı)
+        const mopOfferIds = (userOffersForMop || []).map(o => o.id);
+        if (mopOfferIds.length > 0) {
+          const { count: mopCount } = await supabase.from('ihale_teklif_mesajlari')
+            .select('id', { count: 'exact', head: true })
+            .in('teklif_id', mopOfferIds)
+            .eq('sender_role', 'company')
+            .eq('okundu_bidder', false);
+          setMyOffersUnreadCount(mopCount || 0);
+        } else {
+          setMyOffersUnreadCount(0);
+        }
       }
     } catch (err) {
       // Enes Doğanay | 10 Nisan 2026: AbortError = race condition, state'i temizleme — onAuthStateChange tekrar tetikleyecek
@@ -285,21 +320,43 @@ export function AuthProvider({ children }) {
     // Enes Doğanay | 8 Nisan 2026: Bekleyen teklif sayısını da yenile
     const cid = await getManagedCompanyId();
     if (cid) {
-      const { count: qCount } = await supabase
-        .from('teklif_talepleri')
-        .select('id', { count: 'exact', head: true })
-        .eq('firma_id', cid)
-        .eq('durum', 'pending');
+      const [{ count: qCount }, { data: refreshTenders }] = await Promise.all([
+        supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', cid).eq('durum', 'pending'),
+        // Enes Doğanay | 22 Mayıs 2026: Refresh sırasında ihale yönetimi okunmamış sayısını da güncelle
+        supabase.from('firma_ihaleleri').select('id').eq('firma_id', cid)
+      ]);
       setPendingQuoteCount(qCount || 0);
+      const tidList = (refreshTenders || []).map(t => t.id);
+      if (tidList.length > 0) {
+        const { data: tomOfferIds } = await supabase.from('ihale_teklifleri').select('id').in('ihale_id', tidList);
+        const oidList = (tomOfferIds || []).map(o => o.id);
+        if (oidList.length > 0) {
+          const { count: tomCount } = await supabase.from('ihale_teklif_mesajlari')
+            .select('id', { count: 'exact', head: true })
+            .in('teklif_id', oidList).eq('sender_role', 'bidder').eq('okundu_firma', false);
+          setIhaleYonetimiUnreadCount(tomCount || 0);
+        } else { setIhaleYonetimiUnreadCount(0); }
+      } else { setIhaleYonetimiUnreadCount(0); }
     } else {
       /* Enes Doğanay | 9 Nisan 2026: Bireysel kullanıcı için okunmamış teklif yanıt/mesaj bildirimi say */
-      const { count: qCount } = await supabase
-        .from('bildirimler')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', session.user.id)
-        .eq('is_read', false)
-        .in('type', ['quote_reply', 'quote_message']);
+      const [{ count: qCount }, { data: userOffersRefresh }] = await Promise.all([
+        supabase.from('bildirimler').select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id).eq('is_read', false).in('type', ['quote_reply', 'quote_message']),
+        // Enes Doğanay | 22 Mayıs 2026: Refresh sırasında da mop sayısını güncelle
+        supabase.from('ihale_teklifleri').select('id').eq('user_id', session.user.id)
+      ]);
       setPendingQuoteCount(qCount || 0);
+      const mopIds = (userOffersRefresh || []).map(o => o.id);
+      if (mopIds.length > 0) {
+        const { count: mopCount } = await supabase.from('ihale_teklif_mesajlari')
+          .select('id', { count: 'exact', head: true })
+          .in('teklif_id', mopIds)
+          .eq('sender_role', 'company')
+          .eq('okundu_bidder', false);
+        setMyOffersUnreadCount(mopCount || 0);
+      } else {
+        setMyOffersUnreadCount(0);
+      }
     }
   };
 
@@ -464,6 +521,12 @@ export function AuthProvider({ children }) {
       managedCompanyName,
       unreadNotifCount,
       pendingQuoteCount,
+      // Enes Doğanay | 22 Mayıs 2026: İhale Tekliflerim badge — SharedHeader ve Profile.jsx tarafından kullanılır
+      myOffersUnreadCount,
+      setMyOffersUnreadCount,
+      // Enes Doğanay | 22 Mayıs 2026: İhale Yönetimi badge — FirmaProfil ve SharedHeader tarafından kullanılır
+      ihaleYonetimiUnreadCount,
+      setIhaleYonetimiUnreadCount,
       toasts,
       dismissToast,
       logout,

@@ -262,6 +262,43 @@
     50% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.25); }
 }
 
+/* Enes Doğanay | 22 Mayıs 2026: Okunmamış mesaj olan kart — mavi pulse çerçeve */
+.mop-card__main--has-unread {
+    border-left: 3px solid #2563eb;
+    padding-left: 17px;
+    animation: mopUnreadPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes mopUnreadPulse {
+    0%, 100% { border-left-color: #2563eb; }
+    50% { border-left-color: #93c5fd; }
+}
+
+/* Enes Doğanay | 22 Mayıs 2026: Kart satırındaki "Yeni Mesaj" göstergesi — pulsing mavi pill */
+.mop-card__unread-msg-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px 3px 6px;
+    border-radius: 99px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.71rem;
+    font-weight: 700;
+    border: 1.5px solid #93c5fd;
+    white-space: nowrap;
+    animation: mopMsgBadgePulse 1.8s ease-in-out infinite;
+}
+
+.mop-card__unread-msg-indicator .material-symbols-outlined {
+    font-size: 13px;
+}
+
+@keyframes mopMsgBadgePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3); }
+    50% { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0); }
+}
+
 .mop-card__main {
     display: grid;
     grid-template-columns: 1fr auto auto 28px;
@@ -1250,6 +1287,21 @@
 [data-theme="dark"] .mop-card--expanded {
     border-color: #4f46e5;
     box-shadow: 0 8px 28px rgba(79, 70, 229, 0.15);
+}
+
+/* Enes Doğanay | 22 Mayıs 2026: Dark mode — okunmamış kart ve mesaj göstergesi */
+[data-theme="dark"] .mop-card__main--has-unread {
+    border-left-color: #3b9eff;
+    animation: mopUnreadPulseDark 2.2s ease-in-out infinite;
+}
+@keyframes mopUnreadPulseDark {
+    0%, 100% { border-left-color: #3b9eff; }
+    50% { border-left-color: #1e3a5f; }
+}
+[data-theme="dark"] .mop-card__unread-msg-indicator {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #3b82f6;
 }
 
 [data-theme="dark"] .mop-card__tender h3 {

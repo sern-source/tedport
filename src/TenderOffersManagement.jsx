@@ -238,9 +238,9 @@ const ScoreRing = ({ score, size = 52 }) => {
 /* ═══════════════════════════════════════════════════
    ANA BİLEŞEN
    ═══════════════════════════════════════════════════ */
-const TenderOffersManagement = ({ companyId }) => {
+const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
     /* ─── State ─── */
-    const { setActiveViewingTeklifId } = useAuth() || {};
+    const { setActiveViewingTeklifId, refreshCounts } = useAuth() || {};
     const [searchParams, setSearchParams] = useSearchParams();
     // Enes Doğanay | 2 Mayıs 2026: İhaleler sayfasındaki 4-adımlı forma yönlendirmek için
     const navigate = useNavigate();
@@ -254,6 +254,9 @@ const TenderOffersManagement = ({ companyId }) => {
     const [tenderFilter, setTenderFilter] = useState('all');
     const [offerFilter, setOfferFilter] = useState('all');
     const [offerSort, setOfferSort] = useState('score');
+    // Enes Doğanay | 4 Mayıs 2026: Sidebar ihale listesi sayfalama
+    const [tenderPage, setTenderPage] = useState(1);
+    const TOM_PAGE_SIZE = 10;
     // Enes Doğanay | 1 Mayıs 2026: Sıralama dropdown state + dışarı tıklama ile kapanma
     const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
     const sortDropdownRef = useRef(null);
@@ -441,6 +444,13 @@ const TenderOffersManagement = ({ companyId }) => {
         setUnreadTenderChatIds(prev => { const s = new Set(prev); s.delete(offer.id); return s; });
                 setUnreadTenderChatCounts(prev => { const n = { ...prev }; delete n[offer.id]; return n; });
             }
+            // Enes Doğanay | 22 Mayıs 2026: Bu teklife ait tender_offer_message bildirimlerini okundu yap
+            supabase.from('bildirimler')
+                .update({ is_read: true })
+                .eq('type', 'tender_offer_message')
+                .filter('metadata->>teklif_id', 'eq', String(offer.id))
+                .eq('is_read', false)
+                .then(() => { refreshCounts?.(); });
         } catch (err) {
             if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
         } finally {
@@ -749,6 +759,20 @@ const TenderOffersManagement = ({ companyId }) => {
         return () => { supabase.removeChannel(channel); unreadBroadcastChannelRef.current = null; };
     }, [loading, offersByTender]);
 
+    // Enes Doğanay | 22 Mayıs 2026: Üst bileşene toplam okunmamış sayısını bildir
+    useEffect(() => {
+        if (onUnreadCountChange) onUnreadCountChange(unreadTenderChatIds.size);
+    }, [unreadTenderChatIds, onUnreadCountChange]);
+
+    // Enes Doğanay | 22 Mayıs 2026: tender id → okunmamış var mı? map — sidebar göstergesi için
+    const tenderUnreadSet = useMemo(() => {
+        const s = new Set();
+        for (const [tenderId, offers] of Object.entries(offersByTender)) {
+            if (offers.some(o => unreadTenderChatIds.has(o.id))) s.add(String(tenderId));
+        }
+        return s;
+    }, [offersByTender, unreadTenderChatIds]);
+
     /* Enes Doğanay | 13 Nisan 2026: Highlight edilen teklif kartına scroll */
     useEffect(() => {
         if (highlightOfferId && highlightRef.current) {
@@ -757,6 +781,17 @@ const TenderOffersManagement = ({ companyId }) => {
             }, 200);
         }
     }, [highlightOfferId]);
+
+    // Enes Doğanay | 22 Mayıs 2026: İhale seçilince o ihaleye ait tender_new_offer / tender_offer_updated / tender_offer_withdrawn bildirimlerini okundu yap
+    useEffect(() => {
+        if (!selectedId) return;
+        supabase.from('bildirimler')
+            .update({ is_read: true })
+            .in('type', ['tender_new_offer', 'tender_offer_updated', 'tender_offer_withdrawn'])
+            .filter('metadata->>ihale_id', 'eq', String(selectedId))
+            .eq('is_read', false)
+            .then(() => { refreshCounts?.(); });
+    }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     /* ─── Hesaplamalar ─── */
     const selectedTender = useMemo(() => tenders.find(t => String(t.id) === String(selectedId)) || null, [tenders, selectedId]);
@@ -798,8 +833,26 @@ const TenderOffersManagement = ({ companyId }) => {
             );
         }
         if (tenderFilter !== 'all') list = list.filter(t => getTenderStatus(t.durum).tone === tenderFilter);
+        // Enes Doğanay | 22 Mayıs 2026: Akıllı sıralama
+        // 1) Okunmamış mesaj olan ihaleler önce
+        // 2) Durum sırası: aktif > taslak > kapandı/diğer
+        // 3) Son başvuru tarihine göre yakın olan önce (aktif için), oluşturma tarihine göre (diğerler için)
+        const STATUS_ORDER = { active: 0, canli: 0, draft: 1, taslak: 1, closed: 2, kapali: 2, completed: 2, cancelled: 3, iptal: 3 };
+        list.sort((a, b) => {
+            const aUnread = tenderUnreadSet.has(String(a.id)) ? 0 : 1;
+            const bUnread = tenderUnreadSet.has(String(b.id)) ? 0 : 1;
+            if (aUnread !== bUnread) return aUnread - bUnread;
+            const aOrd = STATUS_ORDER[String(a.durum || '').toLowerCase()] ?? 2;
+            const bOrd = STATUS_ORDER[String(b.durum || '').toLowerCase()] ?? 2;
+            if (aOrd !== bOrd) return aOrd - bOrd;
+            // Aktif ihaleler: son başvuru tarihi yakın olan önce
+            if (aOrd === 0 && a.son_basvuru_tarihi && b.son_basvuru_tarihi) {
+                return new Date(a.son_basvuru_tarihi) - new Date(b.son_basvuru_tarihi);
+            }
+            return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
         return list;
-    }, [tenders, tenderSearch, tenderFilter]);
+    }, [tenders, tenderSearch, tenderFilter, tenderUnreadSet]);
 
     /* KPI'lar */
     const totalOffers = useMemo(() => Object.values(offersByTender).flat().length, [offersByTender]);
@@ -1579,7 +1632,7 @@ const TenderOffersManagement = ({ companyId }) => {
                         <span className="material-symbols-outlined">search</span>
                         <input
                             value={tenderSearch}
-                            onChange={e => setTenderSearch(e.target.value)}
+                            onChange={e => { setTenderSearch(e.target.value); setTenderPage(1); }}
                             placeholder="İhale ara..."
                         />
                         {tenderSearch && (
@@ -1599,7 +1652,7 @@ const TenderOffersManagement = ({ companyId }) => {
                             <button
                                 key={f.key}
                                 className={`tom-pill${tenderFilter === f.key ? ' tom-pill--on' : ''}`}
-                                onClick={() => setTenderFilter(f.key)}
+                                onClick={() => { setTenderFilter(f.key); setTenderPage(1); }}
                             >
                                 {f.label}
                             </button>
@@ -1613,15 +1666,16 @@ const TenderOffersManagement = ({ companyId }) => {
                                 <p>İhale bulunamadı</p>
                             </div>
                         ) : (
-                            filteredTenders.map(t => {
+                            filteredTenders.slice((tenderPage - 1) * TOM_PAGE_SIZE, tenderPage * TOM_PAGE_SIZE).map(t => {
                                 const st = getTenderStatus(t.durum);
                                 const cnt = (offersByTender[String(t.id)] || []).length;
                                 const isActive = String(selectedId) === String(t.id);
                                 const dl = daysUntil(t.son_basvuru_tarihi);
+                                const hasUnread = tenderUnreadSet.has(String(t.id));
                                 return (
                                     <button
                                         key={t.id}
-                                        className={`tom-tender-card${isActive ? ' tom-tender-card--active' : ''}`}
+                                        className={`tom-tender-card${isActive ? ' tom-tender-card--active' : ''}${hasUnread ? ' tom-tender-card--has-unread' : ''}`}
                                         onClick={() => { setSelectedId(t.id); setCompareIds([]); setExpandedOfferId(null); setOfferFilter('all'); }}
                                     >
                                         <div className={`tom-tender-card__bar tom-tender-card__bar--${st.tone}`} />
@@ -1645,11 +1699,30 @@ const TenderOffersManagement = ({ companyId }) => {
                                                         {dl > 0 ? `${dl} gün kaldı` : dl === 0 ? 'Son gün!' : 'Süre doldu'}
                                                     </span>
                                                 )}
+                                                {/* Enes Doğanay | 22 Mayıs 2026: Okunmamış mesaj göstergesi — sidebar ihale kartı */}
+                                                {hasUnread && (
+                                                    <span className="tom-tender-card__unread-pill">
+                                                        <span className="material-symbols-outlined">forum</span>
+                                                        Yeni Mesaj
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </button>
                                 );
                             })
+                        )}
+                        {/* Enes Doğanay | 4 Mayıs 2026: Sayfalama — sidebar ihale listesi */}
+                        {Math.ceil(filteredTenders.length / TOM_PAGE_SIZE) > 1 && (
+                            <div className="pagination-bar pagination-bar--sidebar">
+                                <button className="pagination-btn" disabled={tenderPage === 1} onClick={() => setTenderPage(p => p - 1)}>
+                                    <span className="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                <span className="pagination-info">{tenderPage} / {Math.ceil(filteredTenders.length / TOM_PAGE_SIZE)}</span>
+                                <button className="pagination-btn" disabled={tenderPage === Math.ceil(filteredTenders.length / TOM_PAGE_SIZE)} onClick={() => setTenderPage(p => p + 1)}>
+                                    <span className="material-symbols-outlined">chevron_right</span>
+                                </button>
+                            </div>
                         )}
                     </div>
                 </aside>
@@ -2043,7 +2116,7 @@ const TenderOffersManagement = ({ companyId }) => {
                                                     {/* Enes Doğanay | 4 Mayıs 2026: body wrapper — bar dışı tüm içerik column layout */}
                                                     <div className="tom-offer-card__body">
                                                     {/* Ana satır */}
-                                                    <div className="tom-offer-card__main" onClick={() => setExpandedOfferId(isExpanded ? null : offer.id)}>
+                                                    <div className={`tom-offer-card__main${unreadTenderChatIds.has(offer.id) ? ' tom-offer-card__main--has-unread' : ''}`} onClick={() => setExpandedOfferId(isExpanded ? null : offer.id)}>
                                                         <ScoreRing score={offer._score.overall} />
 
                                                         <div className="tom-offer-card__info">
@@ -2052,6 +2125,13 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                 <span className="tom-offer-card__email">{offer.gonderen_email}</span>
                                                             </div>
                                                             <div className="tom-offer-card__metrics">
+                                                                {/* Enes Doğanay | 22 Mayıs 2026: Okunmamış mesaj pill — kart kapalıyken de görünsün */}
+                                                                {unreadTenderChatIds.has(offer.id) && (
+                                                                    <div className="tom-offer-card__unread-msg-indicator">
+                                                                        <span className="material-symbols-outlined">forum</span>
+                                                                        {(unreadTenderChatCounts[offer.id] || 0) > 0 ? unreadTenderChatCounts[offer.id] : ''} Yeni Mesaj
+                                                                    </div>
+                                                                )}
                                                                 <div className="tom-metric">
                                                                     <span className="material-symbols-outlined">payments</span>
                                                                     <strong>{renderOfferAmount(offer)}</strong>

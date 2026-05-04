@@ -431,6 +431,22 @@ const FirmaProfil = () => {
         return () => clearInterval(interval);
     }, [userId]);
 
+    // Enes Doğanay | 4 Mayıs 2026: bildirimler UPDATE'lerini realtime dinle — TOM/MOP'tan okundu yapılanlar Bildirimler sekmesine anında yansısın
+    useEffect(() => {
+        if (!userId) return;
+        const channel = supabase
+            .channel(`fp-notif-updates-${userId}`)
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'bildirimler', filter: `user_id=eq.${userId}` },
+                (payload) => {
+                    setNotifications(prev => prev.map(n => n.id === payload.new.id ? { ...n, ...payload.new } : n));
+                }
+            )
+            .subscribe();
+        return () => { supabase.removeChannel(channel); };
+    }, [userId]);
+
     // ── Teklif durum güncelle ──
     const handleQuoteStatusChange = async (quoteId, newStatus) => {
         const { error } = await supabase.from('teklif_talepleri').update({ durum: newStatus }).eq('id', quoteId);
@@ -620,7 +636,7 @@ const FirmaProfil = () => {
     };
 
     // Enes Doğanay | 8 Nisan 2026: Sağ üst menü badge'lerini güncellemek için AuthContext refreshCounts
-    const { refreshCounts, latestNotification, setActiveViewingTeklifId, updateNotifPrefsCache } = useAuth();
+    const { refreshCounts, latestNotification, setActiveViewingTeklifId, updateNotifPrefsCache, ihaleYonetimiUnreadCount, setIhaleYonetimiUnreadCount } = useAuth();
 
     // Enes Doğanay | 9 Nisan 2026: AuthContext'ten gelen yeni bildirimi listeye ekle
     // Enes Doğanay | 9 Nisan 2026: Kullanıcı zaten ilgili teklifin chat'indeyse bildirimi anında okundu yap
@@ -1071,6 +1087,18 @@ const FirmaProfil = () => {
             .map(n => n.metadata.teklif_id)
     );
 
+    // Enes Doğanay | 22 Mayıs 2026: Akıllı sıralama — okunmamış mesajlar önce, sonra bekleyen, sonra yanıt bekleniyor, sonra tarih
+    const QUOTE_STATUS_SORT = { pending: 0, awaiting_reply: 1, read: 2, replied: 3, closed: 4, rejected: 5 };
+    const sortedIncomingQuotes = [...incomingQuotes].sort((a, b) => {
+        const aU = unreadQuoteIds.has(a.id) ? 0 : 1;
+        const bU = unreadQuoteIds.has(b.id) ? 0 : 1;
+        if (aU !== bU) return aU - bU;
+        const aOrd = QUOTE_STATUS_SORT[a._displayStatus || a.durum] ?? 2;
+        const bOrd = QUOTE_STATUS_SORT[b._displayStatus || b.durum] ?? 2;
+        if (aOrd !== bOrd) return aOrd - bOrd;
+        return new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at);
+    });
+
     // Enes Doğanay | 8 Nisan 2026: Favori filtreleme + sıralama
     let displayedFavorites = selectedListId ? favorites.filter(fav => fav.liste_id === selectedListId) : [...favorites];
     if (favSearch.trim()) {
@@ -1147,11 +1175,16 @@ const FirmaProfil = () => {
                             </a>
                             <a className={`nav-item ${currentTab === 'teklifler' ? 'active' : ''}`} onClick={() => { setTab({ tab: 'teklifler' }); setActiveQuoteChat(null); }}>
                                 <span className="material-symbols-outlined">request_quote</span> Teklif Yönetimi
-                                {pendingCount > 0 && <span className="nav-item-badge">{pendingCount}</span>}
+                                {/* Enes Doğanay | 22 Mayıs 2026: Hem yeni teklif hem okunmamış mesaj içeren teklifler badge'e dahil */}
+                                {new Set([...incomingQuotes.filter(q => q.durum === 'pending').map(q => q.id), ...[...unreadQuoteIds]]).size > 0 && (
+                                    <span className="nav-item-badge">{new Set([...incomingQuotes.filter(q => q.durum === 'pending').map(q => q.id), ...[...unreadQuoteIds]]).size}</span>
+                                )}
                             </a>
                             {/* Enes Doğanay | 13 Nisan 2026: İhale Yönetimi — İhalelerim + Katıldığım İhaleler birleştirildi */}
-                            <a className={`nav-item ${currentTab === 'ihale-yonetimi' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ihale-yonetimi' })}>
+                            {/* Enes Doğanay | 22 Mayıs 2026: setActiveQuoteChat(null) eklendi — tab geçişinde polling hatası önlenir */}
+                            <a className={`nav-item ${currentTab === 'ihale-yonetimi' ? 'active' : ''}`} onClick={() => { setActiveQuoteChat(null); setTab({ tab: 'ihale-yonetimi' }); }}>
                                 <span className="material-symbols-outlined">gavel</span> İhale Yönetimi
+                                {ihaleYonetimiUnreadCount > 0 && <span className="nav-item-badge">{ihaleYonetimiUnreadCount}</span>}
                             </a>
                             {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi sekmesi — owner ve admin görür */}
                             {(myRole === 'owner' || myRole === 'admin') && (
@@ -1427,7 +1460,7 @@ const FirmaProfil = () => {
                                                     ))}
                                                 </div>
                                                 <div className="cmp-quotes-list">
-                                                    {(statusFilter === 'all' ? incomingQuotes : incomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).map((q) => {
+                                                    {(statusFilter === 'all' ? sortedIncomingQuotes : sortedIncomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).map((q) => {
                                                         const stMap = { pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
                                                         return (
                                                             <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openQuoteChat(q)} style={{ cursor: 'pointer' }}>
@@ -1525,8 +1558,10 @@ const FirmaProfil = () => {
                             </div>
                         )}
 
-                        {/* Enes Doğanay | 13 Nisan 2026: İhale Yönetimi — 2 alt sekme: İhalelerim + Katıldığım İhaleler */}
-                        {currentTab === 'ihale-yonetimi' && (
+                        {/* Enes Doğanay | 22 Mayıs 2026: İhale Yönetimi — display:none ile kalıcı mount.
+                            Conditional render yerine CSS hide/show kullanılır; tab geçişlerinde
+                            TenderOffersManagement/MyOffersPanel unmount olmaz, Edge Function yeniden çağrılmaz. */}
+                        <div style={{ display: currentTab === 'ihale-yonetimi' ? 'block' : 'none' }}>
                             <div className="firma-profil-section">
                                 <div className="cmp-quotes-tabs" style={{ marginBottom: '16px' }}>
                                     <button className={`cmp-quotes-tab ${(searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ihale-yonetimi', subtab: 'ihalelerim' })}>
@@ -1536,13 +1571,18 @@ const FirmaProfil = () => {
                                         <span className="material-symbols-outlined">assignment_turned_in</span> Katıldığım İhaleler
                                     </button>
                                 </div>
-                                {(searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? (
-                                    <TenderOffersManagement companyId={companyId} />
-                                ) : (
-                                    <MyOffersPanel companyId={companyId} />
+                                {companyId && (
+                                    <>
+                                        <div style={{ display: (searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? 'block' : 'none' }}>
+                                            <TenderOffersManagement companyId={companyId} onUnreadCountChange={setIhaleYonetimiUnreadCount} />
+                                        </div>
+                                        <div style={{ display: searchParams.get('subtab') === 'katildigim' ? 'block' : 'none' }}>
+                                            <MyOffersPanel companyId={companyId} />
+                                        </div>
+                                    </>
                                 )}
                             </div>
-                        )}
+                        </div>
 
                         {/* Enes Doğanay | 7 Nisan 2026: Tab → Bildirimler (kurumsal kullanıcı bildirimleri) */}
                         {currentTab === 'bildirimler' && (() => {

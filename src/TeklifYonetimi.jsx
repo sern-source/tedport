@@ -6,7 +6,7 @@ import { getManagedCompanyId } from './companyManagementApi';
 import { useAuth } from './AuthContext';
 import './CompanyManagementPanel.css';
 
-const TeklifYonetimi = () => {
+const TeklifYonetimi = ({ onUnreadCountChange } = {}) => {
     const navigate = useNavigate();
     const [companyId, setCompanyId] = useState(null);
     const [companyName, setCompanyName] = useState('');
@@ -21,6 +21,10 @@ const TeklifYonetimi = () => {
     const [statusFilter, setStatusFilter] = useState('all');
     // Enes Doğanay | 9 Nisan 2026: Giden teklifler için ayrı filtre
     const [outStatusFilter, setOutStatusFilter] = useState('all');
+    // Enes Doğanay | 4 Mayıs 2026: Sayfalama state'leri
+    const [inPage, setInPage] = useState(1);
+    const [outPage, setOutPage] = useState(1);
+    const TKY_PAGE_SIZE = 10;
     const [activeQuoteChat, setActiveQuoteChat] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
     const [chatLoading, setChatLoading] = useState(false);
@@ -235,6 +239,11 @@ const TeklifYonetimi = () => {
     /* Enes Doğanay | 9 Nisan 2026: Kullanıcı teklif chat'indeyken gelen bildirimi anında okundu yap */
     const { latestNotification, refreshCounts, setActiveViewingTeklifId } = useAuth();
 
+    // Enes Doğanay | 22 Mayıs 2026: Üst bileşene okunmamış mesaj sayısını bildir
+    useEffect(() => {
+        if (onUnreadCountChange) onUnreadCountChange(unreadQuoteIds.size);
+    }, [unreadQuoteIds, onUnreadCountChange]);
+
     /* Enes Doğanay | 9 Nisan 2026: AuthContext'e aktif görüntülenen teklif id'sini bildir — toast bastırma için */
     useEffect(() => {
         setActiveViewingTeklifId(activeQuoteChat?.id || null);
@@ -351,6 +360,18 @@ const TeklifYonetimi = () => {
     if (loading) return <div className="teklif-page-loading">Yükleniyor...</div>;
 
     const pendingCount = incomingQuotes.filter(q => q.durum === 'pending').length;
+
+    // Enes Doğanay | 22 Mayıs 2026: Akıllı sıralama — okunmamış mesajlar önce, sonra bekleyen, sonra yanıt bekleniyor, sonra tarih
+    const TKY_STATUS_SORT = { pending: 0, awaiting_reply: 1, read: 2, replied: 3, closed: 4, rejected: 5 };
+    const sortedIncomingQuotes = [...incomingQuotes].sort((a, b) => {
+        const aU = unreadQuoteIds.has(a.id) ? 0 : 1;
+        const bU = unreadQuoteIds.has(b.id) ? 0 : 1;
+        if (aU !== bU) return aU - bU;
+        const aOrd = TKY_STATUS_SORT[a._displayStatus || a.durum] ?? 2;
+        const bOrd = TKY_STATUS_SORT[b._displayStatus || b.durum] ?? 2;
+        if (aOrd !== bOrd) return aOrd - bOrd;
+        return new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at);
+    });
 
     return (
         <div className="teklif-page">
@@ -517,14 +538,14 @@ const TeklifYonetimi = () => {
                                 {/* Enes Doğanay | 10 Nisan 2026: Durum filtre butonları */}
                                 <div className="cmp-quotes-status-filter">
                                     {[{ key: 'all', label: 'Tümü' }, { key: 'pending', label: 'Yeni' }, { key: 'read', label: 'Okundu' }, { key: 'replied', label: 'Yanıtlandı' }, { key: 'awaiting_reply', label: 'Yanıt Bekleniyor' }, { key: 'rejected', label: 'Reddedildi' }, { key: 'closed', label: 'Sonlandırıldı' }].map(f => (
-                                        <button key={f.key} className={`cmp-quotes-status-filter-btn${statusFilter === f.key ? ' active' : ''}`} onClick={() => setStatusFilter(f.key)}>
+                                        <button key={f.key} className={`cmp-quotes-status-filter-btn${statusFilter === f.key ? ' active' : ''}`} onClick={() => { setStatusFilter(f.key); setInPage(1); }}>
                                             {f.label}
                                             {f.key !== 'all' && <span>({incomingQuotes.filter(q => (q._displayStatus || q.durum) === f.key).length})</span>}
                                         </button>
                                     ))}
                                 </div>
                                 <div className="cmp-quotes-list">
-                                {(statusFilter === 'all' ? incomingQuotes : incomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).map((q) => {
+                                {(statusFilter === 'all' ? sortedIncomingQuotes : sortedIncomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).slice((inPage - 1) * TKY_PAGE_SIZE, inPage * TKY_PAGE_SIZE).map((q) => {
                                     const stMap = { pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
                                     return (
                                         <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openCompanyQuoteChat(q)} style={{ cursor: 'pointer' }}>
@@ -558,8 +579,18 @@ const TeklifYonetimi = () => {
                                         </article>
                                     );
                                 })}
-                            </div>
-                            </>
+                            </div>                            {/* Enes Doğanay | 4 Mayıs 2026: Sayfalama — gelen teklifler */}
+                            {Math.ceil((statusFilter === 'all' ? sortedIncomingQuotes : sortedIncomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).length / TKY_PAGE_SIZE) > 1 && (
+                                <div className="pagination-bar">
+                                    <button className="pagination-btn" disabled={inPage === 1} onClick={() => setInPage(p => p - 1)}>
+                                        <span className="material-symbols-outlined">chevron_left</span>
+                                    </button>
+                                    <span className="pagination-info">Sayfa {inPage} / {Math.ceil((statusFilter === 'all' ? sortedIncomingQuotes : sortedIncomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).length / TKY_PAGE_SIZE)}</span>
+                                    <button className="pagination-btn" disabled={inPage === Math.ceil((statusFilter === 'all' ? sortedIncomingQuotes : sortedIncomingQuotes.filter(q => (q._displayStatus || q.durum) === statusFilter)).length / TKY_PAGE_SIZE)} onClick={() => setInPage(p => p + 1)}>
+                                        <span className="material-symbols-outlined">chevron_right</span>
+                                    </button>
+                                </div>
+                            )}                            </>
                         )
                     ) : (
                         outgoingQuotes.length === 0 ? (
@@ -572,14 +603,14 @@ const TeklifYonetimi = () => {
                             {/* Enes Doğanay | 9 Nisan 2026: Giden teklifler durum filtresi */}
                             <div className="cmp-quotes-status-filter">
                                 {[{ key: 'all', label: 'Tümü' }, { key: 'pending', label: 'Beklemede' }, { key: 'read', label: 'Firma Görüntüledi' }, { key: 'replied', label: 'Yanıt Geldi' }, { key: 'awaiting_reply', label: 'Yanıt Bekleniyor' }, { key: 'rejected', label: 'Reddedildi' }, { key: 'closed', label: 'Sonlandırıldı' }].map(f => (
-                                    <button key={f.key} className={`cmp-quotes-status-filter-btn${outStatusFilter === f.key ? ' active' : ''}`} onClick={() => setOutStatusFilter(f.key)}>
+                                    <button key={f.key} className={`cmp-quotes-status-filter-btn${outStatusFilter === f.key ? ' active' : ''}`} onClick={() => { setOutStatusFilter(f.key); setOutPage(1); }}>
                                         {f.label}
                                         {f.key !== 'all' && <span>({outgoingQuotes.filter(q => (q._displayStatus || q.durum) === f.key).length})</span>}
                                     </button>
                                 ))}
                             </div>
                             <div className="cmp-quotes-list">
-                                {(outStatusFilter === 'all' ? outgoingQuotes : outgoingQuotes.filter(q => (q._displayStatus || q.durum) === outStatusFilter)).map((q) => {
+                                {(outStatusFilter === 'all' ? outgoingQuotes : outgoingQuotes.filter(q => (q._displayStatus || q.durum) === outStatusFilter)).slice((outPage - 1) * TKY_PAGE_SIZE, outPage * TKY_PAGE_SIZE).map((q) => {
                                     const stMap = { pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi', awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı' };
                                     return (
                                         <article key={q.id} className={`cmp-quote-card${unreadQuoteIds.has(q.id) ? ' cmp-quote-card--new' : ''}`} onClick={() => openCompanyQuoteChat(q)} style={{ cursor: 'pointer' }}>
@@ -613,6 +644,18 @@ const TeklifYonetimi = () => {
                                     );
                                 })}
                             </div>
+                            {/* Enes Doğanay | 4 Mayıs 2026: Sayfalama — giden teklifler */}
+                            {Math.ceil((outStatusFilter === 'all' ? outgoingQuotes : outgoingQuotes.filter(q => (q._displayStatus || q.durum) === outStatusFilter)).length / TKY_PAGE_SIZE) > 1 && (
+                                <div className="pagination-bar">
+                                    <button className="pagination-btn" disabled={outPage === 1} onClick={() => setOutPage(p => p - 1)}>
+                                        <span className="material-symbols-outlined">chevron_left</span>
+                                    </button>
+                                    <span className="pagination-info">Sayfa {outPage} / {Math.ceil((outStatusFilter === 'all' ? outgoingQuotes : outgoingQuotes.filter(q => (q._displayStatus || q.durum) === outStatusFilter)).length / TKY_PAGE_SIZE)}</span>
+                                    <button className="pagination-btn" disabled={outPage === Math.ceil((outStatusFilter === 'all' ? outgoingQuotes : outgoingQuotes.filter(q => (q._displayStatus || q.durum) === outStatusFilter)).length / TKY_PAGE_SIZE)} onClick={() => setOutPage(p => p + 1)}>
+                                        <span className="material-symbols-outlined">chevron_right</span>
+                                    </button>
+                                </div>
+                            )}
                             </>
                         )
                     )}

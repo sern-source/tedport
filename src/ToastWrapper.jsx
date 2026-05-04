@@ -31,6 +31,16 @@ const ToastWrapper = () => {
         sessionStorage.setItem('mop_highlight_ihale', String(toast.metadata.ihale_id));
       }
       navigate(managedCompanyId ? '/firma-profil?tab=ihale-yonetimi&subtab=katildigim' : '/profile?tab=my-offers');
+    } else if (toast.type === 'tender_offer_message' && toast.metadata?.teklif_id) {
+      // Enes Doğanay | 4 Mayıs 2026: İhale teklif mesajı — bireysel: my-offers chat, kurumsal: ihale-yonetimi chat
+      if (managedCompanyId) {
+        const params = new URLSearchParams({ tab: 'ihale-yonetimi' });
+        if (toast.metadata.ihale_id) params.set('ihale', String(toast.metadata.ihale_id));
+        if (toast.metadata.teklif_id) params.set('open_tender_chat', String(toast.metadata.teklif_id));
+        navigate(`/firma-profil?${params.toString()}`);
+      } else {
+        navigate(`/profile?tab=my-offers&open_mop_chat=${toast.metadata.teklif_id}`);
+      }
     } else if (toast.metadata?.teklif_id) {
       // Enes Doğanay | 9 Nisan 2026: Teklif bildirimi — teklif_id ile direkt ilgili chat'e yönlendir
       const teklifId = toast.metadata.teklif_id;
