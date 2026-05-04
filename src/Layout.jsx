@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Chatbot from './Chatbot';
 
 export default function Layout() {
     const location = useLocation();
     const navigate = useNavigate();
+    // Enes Doğanay | 4 Mayıs 2026: iframe embed modunda chatbot gizlenir
+    const [searchParams] = useSearchParams();
+    const isEmbedded = searchParams.get('embedded') === '1';
     /* Enes Doğanay | 13 Nisan 2026: Geri tuşuyla dönüşte scroll pozisyonunu koru, yeni navigasyonda smooth scroll top */
     const isPopRef = useRef(false);
 
@@ -47,7 +50,7 @@ export default function Layout() {
     return (
         <div className="app-container">
             <Outlet />
-            <Chatbot />
+            {!isEmbedded && <Chatbot />}
         </div>
     );
 }

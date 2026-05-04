@@ -181,6 +181,8 @@ const SupplierProfile = () => {
 
     const [firma, setFirma] = useState(null);
     const [loading, setLoading] = useState(true);
+    // Enes Doğanay | 4 Mayıs 2026: Firma ekip üyeleri (public view)
+    const [firmaEkip, setFirmaEkip] = useState([]);
 
     // Enes Doğanay | 5 Nisan 2026: Autocomplete öneri sistemi
     // Search bar'a yazıldıkça Supabase'den firma önerileri çeker ve dropdown liste olarak gösterir.
@@ -270,6 +272,9 @@ const SupplierProfile = () => {
     const [tenders, setTenders] = useState([]);
     const [tendersLoading, setTendersLoading] = useState(true);
     const [isTendersTableMissing, setIsTendersTableMissing] = useState(false);
+    // Enes Doğanay | 4 Mayıs 2026: İhale listesi varsayılan olarak 3 ile sınırlıdır
+    const [showAllTenders, setShowAllTenders] = useState(false);
+    const TENDERS_PREVIEW = 3;
     // Enes Doğanay | 6 Nisan 2026: Not bazli hatirlatici akisi icin form ve liste state'leri eklendi
     const [noteReminders, setNoteReminders] = useState([]);
     const [reminderEnabled, setReminderEnabled] = useState(false);
@@ -374,6 +379,10 @@ const SupplierProfile = () => {
             setFirma(firmaResult.data);
             // Enes Doğanay | 8 Nisan 2026: onayli_hesap doğrudan firmalar tablosundan okunuyor
             setIsVerified(firmaResult.data?.onayli_hesap === true);
+            // Enes Doğanay | 4 Mayıs 2026: Firma ekibini public view'dan çek
+            supabase.from('firma_ekip_public').select('*').eq('firma_id', id).neq('role', 'owner').order('role').then(({ data: ekipData }) => {
+                setFirmaEkip(ekipData || []);
+            });
         }
 
         if (tenderResult.error) {
@@ -1014,30 +1023,44 @@ const SupplierProfile = () => {
                                                 </div>
                                             ) : tenders.length > 0 ? (
                                                 <div className="tenders-list">
-                                                    {tenders.map((tender) => {
+                                                    {(showAllTenders ? tenders : tenders.slice(0, TENDERS_PREVIEW)).map((tender) => {
                                                         const tenderStatus = getTenderStatusMeta(tender);
                                                         return (
-                                                            <div key={tender.id} className="tender-item">
-                                                                <div className="tender-header">
-                                                                    <div className="tender-info">
-                                                                        <h3 className="tender-title">{tender.baslik}</h3>
-                                                                        <p className="tender-desc">{tender.aciklama}</p>
+                                                            <div
+                                                                key={tender.id}
+                                                                className="tender-item tender-item--clickable"
+                                                                onClick={() => navigate(`/ihaleler?ihale=${tender.id}`)}
+                                                            >
+                                                                <div className="tender-item-row">
+                                                                    <div className="tender-item-left">
+                                                                        <span className={`tender-status tender-status-${tenderStatus.className}`}>{tenderStatus.label}</span>
+                                                                        <span className="tender-item-title">{tender.baslik}</span>
                                                                     </div>
-                                                                    <div className={`tender-status tender-status-${tenderStatus.className}`}>
-                                                                        {tenderStatus.label}
+                                                                    <div className="tender-item-right">
+                                                                        {tender.kategori && <span className="tender-meta-chip">{tender.kategori}</span>}
+                                                                        <span className="tender-item-date">
+                                                                            <span className="material-symbols-outlined">calendar_today</span>
+                                                                            {formatTenderDate(tender.son_basvuru_tarihi)}
+                                                                        </span>
                                                                     </div>
                                                                 </div>
-                                                                <div className="tender-meta-row">
-                                                                    <div className="tender-date">
-                                                                        <span className="material-symbols-outlined tender-date-icon">calendar_today</span>
-                                                                        {formatTenderDate(tender.son_basvuru_tarihi)}
-                                                                    </div>
-                                                                    {tender.kategori && <span className="tender-meta-chip">{tender.kategori}</span>}
-                                                                    {tender.ihale_tipi && <span className="tender-meta-chip">{tender.ihale_tipi}</span>}
-                                                                </div>
+                                                                {tender.aciklama && <p className="tender-item-desc">{tender.aciklama}</p>}
                                                             </div>
                                                         );
                                                     })}
+                                                    {tenders.length > TENDERS_PREVIEW && (
+                                                        <button
+                                                            type="button"
+                                                            className="tenders-show-more-btn"
+                                                            onClick={() => setShowAllTenders(v => !v)}
+                                                        >
+                                                            {showAllTenders ? (
+                                                                <><span className="material-symbols-outlined">expand_less</span> Daha Az Göster</>
+                                                            ) : (
+                                                                <><span className="material-symbols-outlined">expand_more</span> {tenders.length - TENDERS_PREVIEW} İhale Daha</>  
+                                                            )}
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ) : (
                                                 <div className="tenders-empty-state-inline">
@@ -1047,6 +1070,33 @@ const SupplierProfile = () => {
                                         </div>
                                     </div>
                                 </section>
+
+                                {/* Enes Doğanay | 4 Mayıs 2026: Firma ekip bölümü — public görünüm */}
+                                {firmaEkip.length > 0 && (
+                                    <section className="fd-ekip-section">
+                                        <h2 className="section-title">Ekibimiz</h2>
+                                        <div className="fd-ekip-grid">
+                                            {firmaEkip.map(uye => (
+                                                <div key={uye.user_id} className="fd-ekip-card">
+                                                    <div className="fd-ekip-avatar">
+                                                        {uye.avatar_url ? (
+                                                            <img src={uye.avatar_url} alt={uye.full_name || ''} />
+                                                        ) : (
+                                                            <span className="material-symbols-outlined">person</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="fd-ekip-info">
+                                                        <strong>{uye.full_name || 'Ekip Üyesi'}</strong>
+                                                        {uye.title && <span className="fd-ekip-title">{uye.title}</span>}
+                                                        <span className={`ekip-role-badge ekip-role-badge--${uye.role}`}>
+                                                            {uye.role === 'owner' ? 'Yetkili' : uye.role === 'admin' ? 'Yönetici' : 'Üye'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
                             </div>
 
                             {/* RIGHT COLUMN (Sidebar) */}

@@ -120,9 +120,9 @@ const timeAgo = (iso) => {
     return formatDate(iso);
 };
 
-const MyOffersPanel = () => {
+const MyOffersPanel = ({ companyId } = {}) => {
     const navigate = useNavigate();
-    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
+    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName, setActiveViewingTeklifId } = useAuth() || {};
     const [loading, setLoading] = useState(true);
     const [offers, setOffers] = useState([]);
     const [tenderMap, setTenderMap] = useState({});
@@ -149,6 +149,9 @@ const MyOffersPanel = () => {
     const mopChatChannelRef = useRef(null);
     const mopChatEndRef = useRef(null);
     const [unreadMopChatIds, setUnreadMopChatIds] = useState(() => new Set());
+    // Enes Doğanay | 4 Mayıs 2026: offer id → okunmamış sayısı (bidder tarafı)
+    const [unreadMopChatCounts, setUnreadMopChatCounts] = useState({});
+    const unreadBroadcastChannelRef = useRef(null);
     // Enes Doğanay | 2 Mayıs 2026: Mesaj Şikayet state
     const [reportModal, setReportModal] = useState(null); // { mesajId, mesajIcerik }
     const [reportSending, setReportSending] = useState(false);
@@ -173,6 +176,8 @@ const MyOffersPanel = () => {
         setMopChatLoading(true);
         setMopChatInput('');
         setMopChatMessages([]);
+        // Enes Doğanay | 4 Mayıs 2026: Toast bastirma — pop-up açıkken aynı teklif için toast gösterme
+        setActiveViewingTeklifId?.(String(offer.id));
 
         try {
             const { data } = await supabase
@@ -191,6 +196,7 @@ const MyOffersPanel = () => {
                     .in('id', unread.map(m => m.id))
                     .then(() => {});
                 setUnreadMopChatIds(prev => { const s = new Set(prev); s.delete(offer.id); return s; });
+                setUnreadMopChatCounts(prev => { const n = { ...prev }; delete n[offer.id]; return n; });
             }
         } catch (err) {
             if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
@@ -198,8 +204,9 @@ const MyOffersPanel = () => {
             setMopChatLoading(false);
         }
 
+        // Enes Doğanay | 4 Mayıs 2026: Kanal ismi firma tarafıyla aynı olmalı — tender-chat-{id}
         const channel = supabase
-            .channel(`tender-chat-bidder-${offer.id}`)
+            .channel(`tender-chat-${offer.id}`)
             .on('broadcast', { event: 'new-tender-message' }, ({ payload }) => {
                 setMopChatMessages(prev => {
                     if (prev.some(m => m.id === payload.id)) return prev;
@@ -220,6 +227,8 @@ const MyOffersPanel = () => {
             supabase.removeChannel(mopChatChannelRef.current);
             mopChatChannelRef.current = null;
         }
+        // Enes Doğanay | 4 Mayıs 2026: Pop-up kapanınca toast bastirmayi kaldır
+        setActiveViewingTeklifId?.(null);
         setActiveMopChat(null);
         setMopChatMessages([]);
         setMopChatInput('');
@@ -334,11 +343,23 @@ const MyOffersPanel = () => {
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session?.user) { setLoading(false); return; }
 
-                const { data: myOffers } = await supabase
-                    .from('ihale_teklifleri')
-                    .select('*')
-                    .eq('user_id', session.user.id)
-                    .order('created_at', { ascending: false });
+                let myOffers;
+                if (companyId) {
+                    // Enes Doğanay | 4 Mayıs 2026: Şirket bağlamı — gonderen_firma_id ile firma adına verilen teklifler
+                    const { data: compOffers } = await supabase
+                        .from('ihale_teklifleri')
+                        .select('*')
+                        .eq('gonderen_firma_id', String(companyId))
+                        .order('created_at', { ascending: false });
+                    myOffers = compOffers;
+                } else {
+                    const { data: indOffers } = await supabase
+                        .from('ihale_teklifleri')
+                        .select('*')
+                        .eq('user_id', session.user.id)
+                        .order('created_at', { ascending: false });
+                    myOffers = indOffers;
+                }
 
                 if (!myOffers?.length) { setOffers([]); setLoading(false); return; }
 
@@ -365,6 +386,25 @@ const MyOffersPanel = () => {
                 setOffers(myOffers);
                 setTenderMap(tMap);
                 setFirmaMap(fMap);
+
+                // Enes Doğanay | 4 Mayıs 2026: Okunmamış teklif mesajlarını yükle (company'den gelip bidder okumamış)
+                const myOfferIds = myOffers.map(o => o.id);
+                const { data: unreadMsgs } = await supabase
+                    .from('ihale_teklif_mesajlari')
+                    .select('teklif_id')
+                    .in('teklif_id', myOfferIds)
+                    .eq('sender_role', 'company')
+                    .eq('okundu_bidder', false);
+                if (unreadMsgs && unreadMsgs.length > 0) {
+                    const counts = {};
+                    const ids = new Set();
+                    unreadMsgs.forEach(m => {
+                        counts[m.teklif_id] = (counts[m.teklif_id] || 0) + 1;
+                        ids.add(m.teklif_id);
+                    });
+                    setUnreadMopChatCounts(counts);
+                    setUnreadMopChatIds(ids);
+                }
             } catch (err) {
                 console.error('İhale teklifleri yüklenemedi:', err);
                 setOffers([]);
@@ -373,7 +413,7 @@ const MyOffersPanel = () => {
             }
         };
         load();
-    }, []);
+    }, [companyId]);
 
     /* Enes Doğanay | 13 Nisan 2026: sessionStorage'dan highlight — data yüklenince oku, bul, aç */
     useEffect(() => {
@@ -395,6 +435,27 @@ const MyOffersPanel = () => {
             setTimeout(() => highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
         }
     }, [highlightId]);
+
+    // Enes Doğanay | 4 Mayıs 2026: Realtime — company'den yeni mesaj gelince badge güncelle
+    useEffect(() => {
+        if (loading || offers.length === 0) return;
+        const myOfferIds = offers.map(o => o.id);
+        if (unreadBroadcastChannelRef.current) supabase.removeChannel(unreadBroadcastChannelRef.current);
+        const channel = supabase.channel('mop-unread-broadcast-watch')
+            .on('postgres_changes', {
+                event: 'INSERT', schema: 'public', table: 'ihale_teklif_mesajlari',
+                filter: 'sender_role=eq.company',
+            }, (payload) => {
+                const m = payload.new;
+                if (!myOfferIds.includes(m.teklif_id)) return;
+                // Chat bu teklif için açık değilse sayacı artır
+                setUnreadMopChatIds(prev => { const s = new Set(prev); s.add(m.teklif_id); return s; });
+                setUnreadMopChatCounts(prev => ({ ...prev, [m.teklif_id]: (prev[m.teklif_id] || 0) + 1 }));
+            })
+            .subscribe();
+        unreadBroadcastChannelRef.current = channel;
+        return () => { supabase.removeChannel(channel); unreadBroadcastChannelRef.current = null; };
+    }, [loading, offers]);
 
     /* Enes Doğanay | 2 Mayıs 2026: Bildirimden yönlendirme — sessionStorage mop_open_teklif_chat ile chat aç */
     useEffect(() => {
@@ -952,7 +1013,11 @@ const MyOffersPanel = () => {
                                                 >
                                                     <span className="material-symbols-outlined">forum</span>
                                                     Mesaj Gönder
-                                                    {unreadMopChatIds.has(offer.id) && <span className="mop-chat-unread-dot" />}
+                                                    {unreadMopChatIds.has(offer.id) && (
+                                                        <span className="mop-chat-unread-badge">
+                                                            {unreadMopChatCounts[offer.id] || ''}
+                                                        </span>
+                                                    )}
                                                 </button>
                                             )}
                                             {/* Enes Doğanay | 2 Mayıs 2026: Anonim ihalede firma iletişim butonu gizlenir */}

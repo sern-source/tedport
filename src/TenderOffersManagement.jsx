@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
+import { useAuth } from './AuthContext'; // Enes Doğanay | 4 Mayıs 2026: Toast bastirma için setActiveViewingTeklifId
 import { listMyTenders, updateTender, deleteTender, createTender as createTenderApi } from './ihaleManagementApi';
 import { buildInviteMailto } from './tenderUtils';
 import CitySelect from './CitySelect';
@@ -104,6 +105,46 @@ const getOfferStatus = (v) => OFFER_STATUS[String(v || '').toLowerCase()] || { l
 
 /* Enes Doğanay | 13 Nisan 2026: Akıllı puanlama — fiyat ve süre düşükse puan yükselir */
 /* Enes Doğanay | 13 Nisan 2026: İçerik kalitesi kaldırıldı — sadece fiyat ve teslim süresi */
+
+// Enes Doğanay | 4 Mayıs 2026: Mesaj listesine gönderen profil bilgisi ekle (ekip üyeleri için)
+const enrichMessagesWithSender = async (messages, supabaseClient) => {
+    if (!messages || messages.length === 0) return messages;
+    const senderIds = [...new Set(messages.map(m => m.sender_id).filter(Boolean))];
+    if (senderIds.length === 0) return messages;
+    const { data: profiles } = await supabaseClient
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', senderIds);
+    const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+    // Firma üyelerinin rollerini ve firma_id'lerini çek
+    const { data: members } = await supabaseClient
+        .from('kurumsal_firma_yoneticileri')
+        .select('user_id, role, title, firma_id')
+        .in('user_id', senderIds);
+    const memberMap = Object.fromEntries((members || []).map(m => [m.user_id, m]));
+    // Enes Doğanay | 4 Mayıs 2026: Owner sender'lar için firma adını çek
+    const ownerFirmaIds = [...new Set((members || []).filter(m => m.role === 'owner' && m.firma_id).map(m => m.firma_id))];
+    const firmaNameMap = {};
+    if (ownerFirmaIds.length > 0) {
+        const { data: firmalar } = await supabaseClient.from('firmalar').select('firmaID, firma_adi').in('firmaID', ownerFirmaIds);
+        (firmalar || []).forEach(f => { firmaNameMap[f.firmaID] = f.firma_adi; });
+    }
+    return messages.map(msg => {
+        const p = profileMap[msg.sender_id];
+        const m = memberMap[msg.sender_id];
+        // Owner ise firma adını göster
+        const isOwner = m?.role === 'owner';
+        const firmaAdi = isOwner && m?.firma_id ? firmaNameMap[m.firma_id] : null;
+        return {
+            ...msg,
+            _senderName: firmaAdi || (p ? [p.first_name, p.last_name].filter(Boolean).join(' ') || null : null),
+            _senderRole: m?.role || null,
+            _senderTitle: m?.title || null,
+            _senderIsFirma: !!firmaAdi,
+        };
+    });
+};
+
 const calculateOfferScore = (offer, allOffers, weights) => {
     const prices = allOffers.map(o => Number(o.toplam_tutar || 0)).filter(v => v > 0);
     const deliveries = allOffers.map(o => Number(o.teslim_suresi_gun || 0)).filter(v => v > 0);
@@ -131,12 +172,50 @@ const calculateOfferScore = (offer, allOffers, weights) => {
     };
 };
 
+/* ─── Count-Up Sayaç ─── */
+/* Enes Doğanay | 4 Mayıs 2026: Hero KPI sayaçları için animasyonlu sayaç */
+const CountUp = ({ value }) => {
+    const [displayed, setDisplayed] = useState(0);
+    useEffect(() => {
+        setDisplayed(0);
+        if (!value) return;
+        const steps = 20;
+        const intervalMs = 600 / steps;
+        let current = 0;
+        const timer = setInterval(() => {
+            current += 1;
+            setDisplayed(Math.round((value / steps) * current));
+            if (current >= steps) { setDisplayed(value); clearInterval(timer); }
+        }, intervalMs);
+        return () => clearInterval(timer);
+    }, [value]);
+    return <>{displayed}</>;
+};
+
 /* ─── Score Ring SVG ─── */
-/* Enes Doğanay | 13 Nisan 2026: Animasyonlu skor çemberi */
+/* Enes Doğanay | 4 Mayıs 2026: Count-up animasyonu eklendi — 0'dan hedefe smooth sayaç */
 const ScoreRing = ({ score, size = 52 }) => {
+    const [displayed, setDisplayed] = useState(0);
+    useEffect(() => {
+        setDisplayed(0);
+        if (!score) return;
+        const steps = 28;
+        const interval = 600 / steps;
+        let current = 0;
+        const timer = setInterval(() => {
+            current += 1;
+            setDisplayed(Math.round((score / steps) * current));
+            if (current >= steps) {
+                setDisplayed(score);
+                clearInterval(timer);
+            }
+        }, interval);
+        return () => clearInterval(timer);
+    }, [score]);
+
     const r = (size - 6) / 2;
     const circ = 2 * Math.PI * r;
-    const offset = circ - (score / 100) * circ;
+    const offset = circ - (displayed / 100) * circ;
     const color = score >= 75 ? '#059669' : score >= 50 ? '#d97706' : '#ef4444';
     return (
         <div className="tom-score-ring" style={{ width: size, height: size }}>
@@ -148,10 +227,10 @@ const ScoreRing = ({ score, size = 52 }) => {
                     strokeDasharray={circ} strokeDashoffset={offset}
                     strokeLinecap="round"
                     transform={`rotate(-90 ${size / 2} ${size / 2})`}
-                    style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                    style={{ transition: 'stroke-dashoffset 0.05s linear' }}
                 />
             </svg>
-            <span className="tom-score-ring__val">{score}</span>
+            <span className="tom-score-ring__val">{displayed}</span>
         </div>
     );
 };
@@ -161,6 +240,7 @@ const ScoreRing = ({ score, size = 52 }) => {
    ═══════════════════════════════════════════════════ */
 const TenderOffersManagement = ({ companyId }) => {
     /* ─── State ─── */
+    const { setActiveViewingTeklifId } = useAuth() || {};
     const [searchParams, setSearchParams] = useSearchParams();
     // Enes Doğanay | 2 Mayıs 2026: İhaleler sayfasındaki 4-adımlı forma yönlendirmek için
     const navigate = useNavigate();
@@ -191,7 +271,9 @@ const TenderOffersManagement = ({ companyId }) => {
     const [expandedOfferId, setExpandedOfferId] = useState(null);
     const [showScorePanel, setShowScorePanel] = useState(false);
     const [showTenderInfo, setShowTenderInfo] = useState(true);
+    // Enes Doğanay | 4 Mayıs 2026: Denge kaydırıcısı — price + delivery = 100 her zaman
     const [weights, setWeights] = useState({ price: 55, delivery: 45 });
+    const handleBalanceChange = (val) => setWeights({ price: val, delivery: 100 - val });
     const [statusUpdating, setStatusUpdating] = useState(null);
 
     /* Enes Doğanay | 13 Nisan 2026: Bildirim'den gelen highlight state */
@@ -238,6 +320,8 @@ const TenderOffersManagement = ({ companyId }) => {
 
     /* Enes Doğanay | 1 Mayıs 2026: Yeni ihale yayınlama başarı modalı + link */
     const [createPublishSuccess, setCreatePublishSuccess] = useState(null); // null veya yeni ihale id
+    // Enes Doğanay | 4 Mayıs 2026: Düzenleme başarı popup
+    const [editSaveSuccess, setEditSaveSuccess] = useState(false);
     const [createPublishedLinkCopied, setCreatePublishedLinkCopied] = useState(false);
 
     /* Enes Doğanay | 15 Nisan 2026: Yeni ihale oluşturma — Ihaleler sayfasındaki 4 adımlı stepper modal */
@@ -249,6 +333,8 @@ const TenderOffersManagement = ({ companyId }) => {
     ];
     const CREATE_EMPTY_FORM = { baslik: '', aciklama: '', ihale_tipi: 'Açık İhale', kdv_durumu: 'haric', yayin_tarihi: '', son_basvuru_tarihi: '', teslim_suresi: '', durum: 'canli', referans_no: '', teslim_il: '', teslim_ilce: '', gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [] };
     const [showCreateModal, setShowCreateModal] = useState(false);
+    // Enes Doğanay | 4 Mayıs 2026: Düzenleme modu — null=yeni oluştur, id=mevcut ihale düzenle
+    const [editTenderId, setEditTenderId] = useState(null);
     const [createForm, setCreateForm] = useState(CREATE_EMPTY_FORM);
     const [createFormError, setCreateFormError] = useState('');
     const [createFormSaving, setCreateFormSaving] = useState(false);
@@ -272,13 +358,28 @@ const TenderOffersManagement = ({ companyId }) => {
         try { return JSON.parse(localStorage.getItem('tedport_shortlist_offer_ids') || '[]'); }
         catch { return []; }
     });
-    const [notes, setNotes] = useState(() => {
-        try { return JSON.parse(localStorage.getItem('tedport_offer_notes') || '{}'); }
-        catch { return {}; }
-    });
+    // Enes Doğanay | 4 Mayıs 2026: Not alanı — DB'den yüklenir (alici_notu kolonu), debounce ile otomatik kaydedilir
+    const [notes, setNotes] = useState({});
+    const notesSaveTimers = useRef({});
 
     useEffect(() => { localStorage.setItem('tedport_shortlist_offer_ids', JSON.stringify(shortlist)); }, [shortlist]);
-    useEffect(() => { localStorage.setItem('tedport_offer_notes', JSON.stringify(notes)); }, [notes]);
+    // Enes Doğanay | 4 Mayıs 2026: Not’ları offersByTender'dan yükle (alici_notu kolonu)
+    useEffect(() => {
+        const all = {};
+        Object.values(offersByTender).flat().forEach(o => {
+            if (o.alici_notu) all[String(o.id)] = o.alici_notu;
+        });
+        setNotes(all);
+    }, [offersByTender]);
+
+    // Enes Doğanay | 4 Mayıs 2026: Not değişiğinde debounce ile DB'ye kaydet (800ms)
+    const handleNoteChange = useCallback((offerId, value) => {
+        setNotes(prev => ({ ...prev, [String(offerId)]: value }));
+        if (notesSaveTimers.current[offerId]) clearTimeout(notesSaveTimers.current[offerId]);
+        notesSaveTimers.current[offerId] = setTimeout(async () => {
+            await supabase.from('ihale_teklifleri').update({ alici_notu: value || null }).eq('id', offerId);
+        }, 800);
+    }, []);
 
     /* Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajlaşma state — teklif_mesajlari'ndan bağımsız yeni tablo */
     const [activeTenderChat, setActiveTenderChat] = useState(null); // { offer, tenderTitle }
@@ -290,7 +391,9 @@ const TenderOffersManagement = ({ companyId }) => {
     const tenderChatEndRef = useRef(null);
     /* Enes Doğanay | 2 Mayıs 2026: Okunmamış ihale teklif mesajı olan offer id seti */
     const [unreadTenderChatIds, setUnreadTenderChatIds] = useState(() => new Set());
-    // Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet state'leri
+    // Enes Doğanay | 4 Mayıs 2026: offer id → okunmamış sayısı (firma tarafı)
+    const [unreadTenderChatCounts, setUnreadTenderChatCounts] = useState({});
+    const unreadBroadcastChannelRef = useRef(null);
     const [reportModal, setReportModal] = useState(null); // { mesajId, mesajIcerik }
     const [reportSending, setReportSending] = useState(false);
     const [reportNeden, setReportNeden] = useState('spam');
@@ -324,7 +427,8 @@ const TenderOffersManagement = ({ companyId }) => {
                 .select('*')
                 .eq('teklif_id', offer.id)
                 .order('created_at', { ascending: true });
-            setTenderChatMessages(data || []);
+            const enriched = await enrichMessagesWithSender(data || [], supabase);
+            setTenderChatMessages(enriched);
             scrollTenderChatToBottom(false);
 
             // Firma olarak okunmamışları okundu işaretle
@@ -334,7 +438,8 @@ const TenderOffersManagement = ({ companyId }) => {
                     .update({ okundu_firma: true })
                     .in('id', unread.map(m => m.id))
                     .then(() => {});
-                setUnreadTenderChatIds(prev => { const s = new Set(prev); s.delete(offer.id); return s; });
+        setUnreadTenderChatIds(prev => { const s = new Set(prev); s.delete(offer.id); return s; });
+                setUnreadTenderChatCounts(prev => { const n = { ...prev }; delete n[offer.id]; return n; });
             }
         } catch (err) {
             if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
@@ -342,9 +447,9 @@ const TenderOffersManagement = ({ companyId }) => {
             setTenderChatLoading(false);
         }
 
-        // Realtime subscribe
+        // Enes Doğanay | 4 Mayıs 2026: Kanal ismi bidder tarafıyla aynı olmalı — tender-chat-{id}
         const channel = supabase
-            .channel(`tender-chat-company-${offer.id}`)
+            .channel(`tender-chat-${offer.id}`)
             .on('broadcast', { event: 'new-tender-message' }, ({ payload }) => {
                 setTenderChatMessages(prev => {
                     if (prev.some(m => m.id === payload.id)) return prev;
@@ -366,6 +471,8 @@ const TenderOffersManagement = ({ companyId }) => {
             supabase.removeChannel(tenderChatChannelRef.current);
             tenderChatChannelRef.current = null;
         }
+        // Enes Doğanay | 4 Mayıs 2026: Pop-up kapanınca toast bastirmayi kaldır
+        setActiveViewingTeklifId?.(null);
         setActiveTenderChat(null);
         setTenderChatMessages([]);
         setTenderChatInput('');
@@ -419,7 +526,9 @@ const TenderOffersManagement = ({ companyId }) => {
             .single();
 
         if (!error && data) {
-            setTenderChatMessages(prev => [...prev, data]);
+            // Enes Doğanay | 4 Mayıs 2026: Gönderilen mesajı enrichment ile ekle — 'Firma' fallbackı önle
+            const [enriched] = await enrichMessagesWithSender([data], supabase);
+            setTenderChatMessages(prev => [...prev, enriched || data]);
             setTenderChatInput('');
             if (tenderChatChannelRef.current) {
                 await tenderChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data });
@@ -500,6 +609,27 @@ const TenderOffersManagement = ({ companyId }) => {
                     if (prev && rows.some(t => String(t.id) === String(prev))) return prev;
                     return rows[0]?.id || null;
                 });
+
+                // Enes Doğanay | 4 Mayıs 2026: Okunmamış teklif mesajlarını yükle (bidder'dan gelip firma okumamış)
+                const allOfferIds = Object.values(grouped).flat().map(o => o.id);
+                if (allOfferIds.length > 0) {
+                    const { data: unreadMsgs } = await supabase
+                        .from('ihale_teklif_mesajlari')
+                        .select('teklif_id')
+                        .in('teklif_id', allOfferIds)
+                        .eq('sender_role', 'bidder')
+                        .eq('okundu_firma', false);
+                    if (unreadMsgs && unreadMsgs.length > 0) {
+                        const counts = {};
+                        const ids = new Set();
+                        unreadMsgs.forEach(m => {
+                            counts[m.teklif_id] = (counts[m.teklif_id] || 0) + 1;
+                            ids.add(m.teklif_id);
+                        });
+                        setUnreadTenderChatCounts(counts);
+                        setUnreadTenderChatIds(ids);
+                    }
+                }
             } catch (err) {
                 console.error('İhale yönetimi yüklenemedi:', err);
                 setError('Veriler yüklenirken bir hata oluştu.');
@@ -597,6 +727,28 @@ const TenderOffersManagement = ({ companyId }) => {
         }
     }, [loading, tenders, offersByTender]);
 
+    // Enes Doğanay | 4 Mayıs 2026: Realtime — tüm teklifleri dinle, yeni bidder mesajı gelince badge güncelle
+    useEffect(() => {
+        if (loading) return;
+        const allOfferIds = Object.values(offersByTender).flat().map(o => o.id);
+        if (allOfferIds.length === 0) return;
+        if (unreadBroadcastChannelRef.current) supabase.removeChannel(unreadBroadcastChannelRef.current);
+        const channel = supabase.channel('tom-unread-broadcast-watch')
+            .on('postgres_changes', {
+                event: 'INSERT', schema: 'public', table: 'ihale_teklif_mesajlari',
+                filter: 'sender_role=eq.bidder',
+            }, (payload) => {
+                const m = payload.new;
+                if (!allOfferIds.includes(m.teklif_id)) return;
+                // Chat açık değilse sayacı artır
+                setUnreadTenderChatIds(prev => { const s = new Set(prev); s.add(m.teklif_id); return s; });
+                setUnreadTenderChatCounts(prev => ({ ...prev, [m.teklif_id]: (prev[m.teklif_id] || 0) + 1 }));
+            })
+            .subscribe();
+        unreadBroadcastChannelRef.current = channel;
+        return () => { supabase.removeChannel(channel); unreadBroadcastChannelRef.current = null; };
+    }, [loading, offersByTender]);
+
     /* Enes Doğanay | 13 Nisan 2026: Highlight edilen teklif kartına scroll */
     useEffect(() => {
         if (highlightOfferId && highlightRef.current) {
@@ -676,6 +828,93 @@ const TenderOffersManagement = ({ companyId }) => {
             return [...prev, id];
         });
     };
+
+    /* Enes Doğanay | 4 Mayıs 2026: Seçili ihale tekliflerini CSV olarak indir */
+    /* Enes Doğanay | 4 Mayıs 2026: CSV dışa aktarma — detaylı çok bölümlü rapor */
+    const exportOffersCSV = useCallback(() => {
+        if (!selectedTender || displayOffers.length === 0) return;
+        const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const row = (...cells) => cells.map(c => q(c)).join(',');
+        const sep = () => '';
+        const lines = [];
+
+        // ── Başlık Bölümü ──
+        lines.push(row('İHALE TEKLİF RAPORU'));
+        lines.push(row('İhale Başlığı', selectedTender.baslik || ''));
+        lines.push(row('Referans No', selectedTender.referans_no || ''));
+        lines.push(row('İhale Tipi', selectedTender.ihale_tipi || ''));
+        lines.push(row('Son Başvuru', selectedTender.son_basvuru_tarihi ? new Date(selectedTender.son_basvuru_tarihi).toLocaleDateString('tr-TR') : ''));
+        lines.push(row('Rapor Tarihi', new Date().toLocaleDateString('tr-TR')));
+        lines.push(row('Toplam Teklif Sayısı', displayOffers.length));
+        lines.push(sep());
+
+        // ── Özet Tablo ──
+        lines.push(row('ÖZET KARŞILAŞTIRMA'));
+        lines.push(row('Sıra', 'Firma / Ad Soyad', 'E-posta', 'Toplam Tutar', 'Para Birimi', 'KDV', 'Teslim Süresi (gün)', 'Durum', 'Genel Puan', 'Fiyat Puanı', 'Teslim Puanı', 'Teklif Tarihi'));
+        displayOffers.forEach((o, i) => {
+            lines.push(row(
+                `#${i + 1}`,
+                o.gonderen_firma_adi || o.gonderen_ad_soyad || '',
+                o.gonderen_email || '',
+                o.toplam_tutar || '',
+                o.para_birimi || 'TRY',
+                o.kdv_dahil === true ? 'Dahil' : o.kdv_dahil === false ? 'Hariç' : '',
+                o.teslim_suresi_gun || '',
+                getOfferStatus(o.durum).label,
+                o._score?.overall ?? '',
+                o._score?.price ?? '',
+                o._score?.delivery ?? '',
+                o.created_at ? new Date(o.created_at).toLocaleDateString('tr-TR') : '',
+            ));
+        });
+        lines.push(sep());
+
+        // ── Teklif Detayları (her teklif için ayrı blok) ──
+        lines.push(row('TEKLİF DETAYLARI'));
+        displayOffers.forEach((o, i) => {
+            lines.push(sep());
+            lines.push(row(`─── Teklif #${i + 1}: ${o.gonderen_firma_adi || o.gonderen_ad_soyad || o.gonderen_email} ───`));
+            lines.push(row('E-posta', o.gonderen_email || ''));
+            lines.push(row('Toplam Tutar', `${o.toplam_tutar || ''} ${o.para_birimi || 'TRY'}`));
+            lines.push(row('KDV Durumu', o.kdv_dahil === true ? 'Dahil' : o.kdv_dahil === false ? 'Hariç' : ''));
+            lines.push(row('Teslim Süresi', o.teslim_suresi_gun ? `${o.teslim_suresi_gun} gün` : ''));
+            if (o.teslim_aciklamasi) lines.push(row('Teslim Açıklaması', o.teslim_aciklamasi));
+            if (o.not_field) lines.push(row('Tedarikçi Notu', o.not_field));
+            lines.push(row('Durum', getOfferStatus(o.durum).label));
+            lines.push(row('Genel Puan', o._score?.overall ?? ''));
+            lines.push(row('  → Fiyat Puanı', o._score?.price ?? ''));
+            lines.push(row('  → Teslim Puanı', o._score?.delivery ?? ''));
+            // Kalemler
+            const kalemler = Array.isArray(o.kalemler) ? o.kalemler : [];
+            if (kalemler.length > 0) {
+                lines.push(row('  Kalem', 'Miktar', 'Birim Fiyat', 'Para Birimi', 'Toplam', 'Açıklama'));
+                kalemler.forEach(k => {
+                    const kCur = k.para_birimi || o.para_birimi || 'TRY';
+                    const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+                    lines.push(row(
+                        `  ${k.madde || ''}`,
+                        k.miktar || '',
+                        k.birim_fiyat || '',
+                        kCur,
+                        kTotal || '',
+                        k.aciklama || k.not || '',
+                    ));
+                });
+            }
+            if (notes[String(o.id)]) lines.push(row('Alıcı Notu', notes[String(o.id)]));
+        });
+
+        const csv = lines.join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `teklifler_${(selectedTender.baslik || selectedTender.id).replace(/[^a-z0-9çğıöşüÇĞİÖŞÜ]/gi, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, [selectedTender, displayOffers, notes]);
 
     /* Enes Doğanay | 15 Nisan 2026: Teklif statüsünü güncelle + bildirim + e-posta gönder */
     const updateStatus = async (offerId, status, redNedeni) => {
@@ -975,31 +1214,70 @@ const TenderOffersManagement = ({ companyId }) => {
         setTenders(rows);
     };
 
-    /* Enes Doğanay | 15 Nisan 2026: İhaleyi tekrarla — kapanan ihaleyi yeni referansla canli olarak kopyalar */
+    /* Enes Doğanay | 4 Mayıs 2026: İhaleyi tekrarla — formu dolu aç, kullanıcı onaylasın */
     const handleRepeatTender = async (tender) => {
-        try {
-            const payload = {
-                baslik: tender.baslik,
-                aciklama: tender.aciklama || '',
-                ihale_tipi: tender.ihale_tipi || 'Açık İhale',
-                kdv_durumu: tender.kdv_durumu || 'haric',
-                yayin_tarihi: new Date().toISOString().split('T')[0],
-                son_basvuru_tarihi: '',
-                teslim_suresi: tender.teslim_suresi || '',
-                teslim_il: tender.teslim_il || '',
-                teslim_ilce: tender.teslim_ilce || '',
-                referans_no: (tender.referans_no || '') + '-R',
-                gereksinimler: tender.gereksinimler || null,
-                davet_emailleri: tender.davet_emailleri || null,
-                davetli_firmalar: tender.davetli_firmalar || null,
-                ek_dosyalar: tender.ek_dosyalar || null,
-                durum: 'canli',
-            };
-            await createTenderApi(payload);
-            await reloadTenders();
-        } catch (err) {
-            setError(err.message || 'İhale tekrarlanamadı.');
-        }
+        const refNo = await generateCreateRefNo();
+        const todayStr = new Date().toISOString().split('T')[0];
+        const thirtyDaysLater = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        setCreateForm({
+            ...CREATE_EMPTY_FORM,
+            baslik: tender.baslik || '',
+            aciklama: tender.aciklama || '',
+            ihale_tipi: tender.ihale_tipi || 'Açık İhale',
+            kdv_durumu: tender.kdv_durumu || 'haric',
+            yayin_tarihi: todayStr,
+            son_basvuru_tarihi: thirtyDaysLater,
+            teslim_suresi: tender.teslim_suresi ? String(tender.teslim_suresi) : '',
+            teslim_il: tender.teslim_il || '',
+            teslim_ilce: tender.teslim_ilce || '',
+            referans_no: refNo,
+            gereksinimler: tender.gereksinimler || [],
+            davet_emailleri: tender.davet_emailleri || [],
+            davetli_firmalar: tender.davetli_firmalar || [],
+            ek_dosyalar: [],
+        });
+        setCreateFormError('');
+        setCreateYeniGereksinimMadde('');
+        setCreateYeniGereksinimAciklama('');
+        setCreateEmailInput('');
+        setCreateEmailStatus(null);
+        setCreateFirmaSearchTerm('');
+        setCreateFirmaSearchResults([]);
+        setCreateStepperStep(0);
+        setShowCreateModal(true);
+    };
+
+    /* Enes Doğanay | 4 Mayıs 2026: Düzenle — mevcut ihaleyi dolu formla aç */
+    /* Enes Doğanay | 4 Mayıs 2026: Düzenle — stepper modal dolu aç */
+    const openEditInCreateModal = async (tender) => {
+        await generateCreateRefNo(); // firma onay durumunu yükle
+        setEditTenderId(tender.id);
+        setCreateForm({
+            baslik: tender.baslik || '',
+            aciklama: tender.aciklama || '',
+            ihale_tipi: tender.ihale_tipi || 'Açık İhale',
+            kdv_durumu: tender.kdv_durumu || 'haric',
+            yayin_tarihi: tender.yayin_tarihi || '',
+            son_basvuru_tarihi: tender.son_basvuru_tarihi || '',
+            teslim_suresi: tender.teslim_suresi ? String(tender.teslim_suresi) : '',
+            durum: tender.durum || 'canli',
+            referans_no: tender.referans_no || '',
+            teslim_il: tender.teslim_il || '',
+            teslim_ilce: tender.teslim_ilce || '',
+            gereksinimler: tender.gereksinimler || [],
+            davet_emailleri: tender.davet_emailleri || [],
+            davetli_firmalar: tender.davetli_firmalar || [],
+            ek_dosyalar: Array.isArray(tender.ek_dosyalar) ? tender.ek_dosyalar.filter(f => f && f.name) : [],
+        });
+        setCreateFormError('');
+        setCreateYeniGereksinimMadde('');
+        setCreateYeniGereksinimAciklama('');
+        setCreateEmailInput('');
+        setCreateEmailStatus(null);
+        setCreateFirmaSearchTerm('');
+        setCreateFirmaSearchResults([]);
+        setCreateStepperStep(0);
+        setShowCreateModal(true);
     };
 
     /* Enes Doğanay | 15 Nisan 2026: Kabul et akışı — kabul sonrası ihaleyi kapat mı sor */
@@ -1188,20 +1466,30 @@ const TenderOffersManagement = ({ companyId }) => {
                 const { data: urlData } = supabase.storage.from('ihale-ekleri').getPublicUrl(filePath);
                 uploadedFiles.push({ name: file.name, path: filePath, size: file.size, url: urlData.publicUrl });
             }
+            // Enes Doğanay | 4 Mayıs 2026: Düzenleme modunda mevcut dosyaları koru
+            const existingFiles = createForm.ek_dosyalar.filter(f => !(f instanceof File));
             const payload = {
                 ...createForm,
                 durum: forceDurum || createForm.durum,
                 il_ilce: [createForm.teslim_il, createForm.teslim_ilce].filter(Boolean).join(' / '),
-                ek_dosyalar: uploadedFiles,
+                ek_dosyalar: editTenderId ? [...existingFiles, ...uploadedFiles] : uploadedFiles,
                 davet_emailleri: finalInviteEmails,
             };
-            const created = await createTenderApi(payload);
-            setShowCreateModal(false);
-            await reloadTenders();
-            // Enes Doğanay | 1 Mayıs 2026: Taslak değilse başarı popup + link göster
-            if ((forceDurum || createForm.durum) !== 'draft' && created?.id) {
-                setCreatePublishedLinkCopied(false);
-                setCreatePublishSuccess(created.id);
+            if (editTenderId) {
+                await updateTender(editTenderId, payload);
+                setEditTenderId(null);
+                setShowCreateModal(false);
+                await reloadTenders();
+                setEditSaveSuccess(true);
+            } else {
+                const created = await createTenderApi(payload);
+                setShowCreateModal(false);
+                await reloadTenders();
+                // Enes Doğanay | 1 Mayıs 2026: Taslak değilse başarı popup + link göster
+                if ((forceDurum || createForm.durum) !== 'draft' && created?.id) {
+                    setCreatePublishedLinkCopied(false);
+                    setCreatePublishSuccess(created.id);
+                }
             }
         } catch (err) {
             setCreateFormError(err.message || 'Kaydedilemedi.');
@@ -1249,16 +1537,16 @@ const TenderOffersManagement = ({ companyId }) => {
                 <div className="tom-hero__stats">
                     <div className="tom-stat">
                         <span className="material-symbols-outlined">description</span>
-                        <div><strong>{tenders.length}</strong><span>Toplam İhale</span></div>
+                        <div><strong><CountUp value={tenders.length} /></strong><span>Toplam İhale</span></div>
                     </div>
                     <div className="tom-stat tom-stat--green">
                         <span className="material-symbols-outlined">radio_button_checked</span>
-                        <div><strong>{activeTenders}</strong><span>Aktif</span></div>
+                        <div><strong><CountUp value={activeTenders} /></strong><span>Aktif</span></div>
                     </div>
                     {/* Enes Doğanay | 15 Nisan 2026: Bekleyen stat kaldırıldı */}
                     <div className="tom-stat">
                         <span className="material-symbols-outlined">mail</span>
-                        <div><strong>{totalOffers}</strong><span>Gelen Teklif</span></div>
+                        <div><strong><CountUp value={totalOffers} /></strong><span>Gelen Teklif</span></div>
                     </div>
                 </div>
             </div>
@@ -1347,7 +1635,8 @@ const TenderOffersManagement = ({ companyId }) => {
                                                 </span>
                                             </div>
                                             <div className="tom-tender-card__meta">
-                                                <span className="tom-tender-card__offers">
+                                                {/* Enes Doğanay | 4 Mayıs 2026: Heat renk — 0 kırmızı, 1-3 amber, 4+ yeşil */}
+                                                <span className={`tom-tender-card__offers tom-offer-count--${cnt === 0 ? 'zero' : cnt <= 3 ? 'amber' : 'green'}`}>
                                                     <span className="material-symbols-outlined">mail</span>
                                                     {cnt} teklif
                                                 </span>
@@ -1392,6 +1681,24 @@ const TenderOffersManagement = ({ companyId }) => {
 
                                 {showTenderInfo && (
                                     <div className="tom-info-card__body">
+                                        {/* Enes Doğanay | 4 Mayıs 2026: Kapalı/iptal ihale CTA uyarısı */}
+                                        {(() => {
+                                            const tone = getTenderStatus(selectedTender.durum).tone;
+                                            if (tone !== 'closed' && tone !== 'cancelled') return null;
+                                            return (
+                                                <div className="tom-closed-cta">
+                                                    <span className="material-symbols-outlined">lock</span>
+                                                    <div>
+                                                        <strong>Bu ihale kapandı</strong>
+                                                        <span>Benzer içerikle yeniden yayınlamak ister misiniz?</span>
+                                                    </div>
+                                                    <button className="tom-btn tom-btn--repeat tom-btn--repeat-sm" onClick={() => handleRepeatTender(selectedTender)}>
+                                                        <span className="material-symbols-outlined">replay</span>
+                                                        İhaleyi Tekrarla
+                                                    </button>
+                                                </div>
+                                            );
+                                        })()}
                                         <p className="tom-info-card__desc">{selectedTender.aciklama || 'Bu ihale için açıklama girilmemiş.'}</p>
                                         <div className="tom-info-card__grid">
                                             <div className="tom-info-cell">
@@ -1483,18 +1790,12 @@ const TenderOffersManagement = ({ companyId }) => {
                                                 const isClosed = tenderTone === 'closed' || tenderTone === 'cancelled';
                                                 return (
                                                     <>
-                                                        {/* Enes Doğanay | 2 Mayıs 2026: İhaleler sayfasındaki 4-adımlı form — URL param ile aç */}
-                                                        <button className="tom-btn tom-btn--edit" onClick={() => navigate(`/ihaleler?duzenle=${selectedTender.id}`)} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
+                                                        {/* Enes Doğanay | 4 Mayıs 2026: Düzenle — stepper modal dolu aç */}
+                                                        <button className="tom-btn tom-btn--edit" onClick={() => openEditInCreateModal(selectedTender)} disabled={isClosed} title={isClosed ? 'Kapanan ihale düzenlenemez' : 'Düzenle'}>
                                                             <span className="material-symbols-outlined">edit</span>
                                                             Düzenle
                                                         </button>
-                                                        {/* Enes Doğanay | 15 Nisan 2026: Kapanan ihaleyi tekrarla butonu */}
-                                                        {isClosed && (
-                                                            <button className="tom-btn tom-btn--repeat" onClick={() => handleRepeatTender(selectedTender)}>
-                                                                <span className="material-symbols-outlined">replay</span>
-                                                                İhaleyi Tekrarla
-                                                            </button>
-                                                        )}
+
                                                     </>
                                                 );
                                             })()}
@@ -1545,6 +1846,16 @@ const TenderOffersManagement = ({ companyId }) => {
                                         </h3>
                                     </div>
                                     <div className="tom-offers-toolbar__right">
+                                        {/* Enes Doğanay | 4 Mayıs 2026: CSV dışa aktar butonu */}
+                                        {displayOffers.length > 0 && (
+                                            <button
+                                                className="tom-btn-icon"
+                                                onClick={exportOffersCSV}
+                                                title="Teklifleri CSV olarak indir"
+                                            >
+                                                <span className="material-symbols-outlined">download</span>
+                                            </button>
+                                        )}
                                         <button
                                             className={`tom-btn-icon${showScorePanel ? ' tom-btn-icon--active' : ''}`}
                                             onClick={() => setShowScorePanel(p => !p)}
@@ -1624,26 +1935,40 @@ const TenderOffersManagement = ({ companyId }) => {
                                             <h4><span className="material-symbols-outlined">tune</span> Akıllı Puanlama Ağırlıkları</h4>
                                             <p>Kriterlerin ağırlığını kaydırarak teklifleri kendi önceliklerinize göre sıralayın.</p>
                                         </div>
-                                        <div className="tom-score-panel__sliders">
-                                            {[
-                                                { key: 'price', label: 'Fiyat Önceliği', icon: 'payments', color: '#059669' },
-                                                { key: 'delivery', label: 'Teslim Hızı', icon: 'local_shipping', color: '#d97706' },
-                                            ].map(s => (
-                                                <div key={s.key} className="tom-slider-row">
-                                                    <div className="tom-slider-row__label">
-                                                        <span className="material-symbols-outlined" style={{ color: s.color }}>{s.icon}</span>
-                                                        <span>{s.label}</span>
-                                                        <strong style={{ color: s.color }}>{weights[s.key]}%</strong>
-                                                    </div>
-                                                    <input
-                                                        type="range"
-                                                        min="0" max="100"
-                                                        value={weights[s.key]}
-                                                        onChange={e => setWeights(p => ({ ...p, [s.key]: Number(e.target.value) }))}
-                                                        style={{ accentColor: s.color }}
-                                                    />
-                                                </div>
-                                            ))}
+                                        {/* Enes Doğanay | 4 Mayıs 2026: Tek denge kaydırıcısı — her iki kriter toplam %100 */}
+                                        <div className="tom-balance-slider">
+                                            <div className="tom-balance-slider__labels">
+                                                <span className="tom-balance-slider__side tom-balance-slider__side--left">
+                                                    <span className="material-symbols-outlined">payments</span>
+                                                    Fiyat
+                                                </span>
+                                                <span className="tom-balance-slider__side tom-balance-slider__side--right">
+                                                    Teslim
+                                                    <span className="material-symbols-outlined">local_shipping</span>
+                                                </span>
+                                            </div>
+                                            <div className="tom-balance-slider__track-wrap" style={{ '--thumb-pos': `${weights.price}%` }}>
+                                                <div
+                                                    className="tom-balance-slider__fill-left"
+                                                    style={{ width: `${weights.price}%` }}
+                                                />
+                                                <div
+                                                    className="tom-balance-slider__fill-right"
+                                                    style={{ width: `${weights.delivery}%` }}
+                                                />
+                                                <input
+                                                    type="range"
+                                                    min="0" max="100"
+                                                    value={weights.price}
+                                                    onChange={e => handleBalanceChange(Number(e.target.value))}
+                                                    className="tom-balance-slider__input"
+                                                />
+                                            </div>
+                                            <div className="tom-balance-slider__readout">
+                                                <span style={{ color: '#059669', fontWeight: 800 }}>{weights.price}%</span>
+                                                <span className="tom-balance-slider__divider">·</span>
+                                                <span style={{ color: '#d97706', fontWeight: 800 }}>{weights.delivery}%</span>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -1693,18 +2018,31 @@ const TenderOffersManagement = ({ companyId }) => {
                                             const kalemler = Array.isArray(offer.kalemler) ? offer.kalemler : [];
                                             const isUpdating = statusUpdating === offer.id;
                                             const isHighlighted = highlightOfferId === offer.id;
+                                            // Enes Doğanay | 4 Mayıs 2026: En yüksek puanlı teklif — 2+ teklif olduğunda özel glow badge
+                                            const isBest = idx === 0 && offerSort === 'score' && displayOffers.length >= 2;
 
                                             return (
                                                 <div
                                                     key={offer.id}
                                                     ref={isHighlighted ? highlightRef : null}
-                                                    className={`tom-offer-card${isExpanded ? ' tom-offer-card--expanded' : ''}${isCompare ? ' tom-offer-card--compare' : ''}${isHighlighted ? ' tom-offer-card--highlight' : ''}`}
+                                                    className={`tom-offer-card${isExpanded ? ' tom-offer-card--expanded' : ''}${isCompare ? ' tom-offer-card--compare' : ''}${isHighlighted ? ' tom-offer-card--highlight' : ''}${isBest ? ' tom-offer-card--best' : ''}`}
                                                 >
+                                                    {/* Enes Doğanay | 4 Mayıs 2026: Sol durum barı — ihale kartıyla tutarlı */}
+                                                    <div className={`tom-offer-card__bar tom-offer-card__bar--${st.tone}`} />
                                                     {/* Sıralama rozeti — ilk 3 teklif (puan sıralamasında) */}
                                                     {idx < 3 && offerSort === 'score' && (
                                                         <div className={`tom-rank tom-rank--${idx + 1}`}>#{idx + 1}</div>
                                                     )}
+                                                    {/* Enes Doğanay | 4 Mayıs 2026: En iyi teklif badge'i — sağ üst köşe */}
+                                                    {isBest && (
+                                                        <div className="tom-best-badge">
+                                                            <span className="material-symbols-outlined">emoji_events</span>
+                                                            En İyi Teklif
+                                                        </div>
+                                                    )}
 
+                                                    {/* Enes Doğanay | 4 Mayıs 2026: body wrapper — bar dışı tüm içerik column layout */}
+                                                    <div className="tom-offer-card__body">
                                                     {/* Ana satır */}
                                                     <div className="tom-offer-card__main" onClick={() => setExpandedOfferId(isExpanded ? null : offer.id)}>
                                                         <ScoreRing score={offer._score.overall} />
@@ -1811,7 +2149,6 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                                     <th>Madde</th>
                                                                                     <th>Miktar</th>
                                                                                     <th>Birim Fiyat</th>
-                                                                                    <th>Para Birimi</th>
                                                                                     <th>Toplam</th>
                                                                                     <th>Açıklama</th>
                                                                                 </tr>
@@ -1825,7 +2162,6 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                                             <td><strong>{k.madde || '—'}</strong></td>
                                                                                             <td>{k.miktar || '—'}</td>
                                                                                             <td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td>
-                                                                                            <td>{kCur}</td>
                                                                                             <td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td>
                                                                                             <td>{k.aciklama || k.not || '—'}</td>
                                                                                         </tr>
@@ -1874,7 +2210,11 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                 >
                                                                     <span className="material-symbols-outlined">forum</span>
                                                                     Mesaj Gönder
-                                                                    {unreadTenderChatIds.has(offer.id) && <span className="tom-chat-unread-dot" />}
+                                                                    {unreadTenderChatIds.has(offer.id) && (
+                                                                        <span className="tom-chat-unread-badge">
+                                                                            {unreadTenderChatCounts[offer.id] || ''}
+                                                                        </span>
+                                                                    )}
                                                                 </button>
                                                                 {/* Enes Doğanay | 15 Nisan 2026: Kabul edilen teklif → iletişime geç + statü değiştir */}
                                                                 {String(offer.durum || '').toLowerCase() === 'kabul' && (
@@ -1948,8 +2288,22 @@ const TenderOffersManagement = ({ companyId }) => {
                                                                 </div>
                                                                 )}
                                                             </div>
+                                                            {/* Enes Doğanay | 4 Mayıs 2026: Hızlı not alanı — localStorage'a otomatik kaydedilir */}
+                                                            <div className="tom-my-note">
+                                                                <label>
+                                                                    <span className="material-symbols-outlined">edit_note</span>
+                                                                    Notum
+                                                                </label>
+                                                                <textarea
+                                                                    placeholder="Bu teklif için özel notunuzu yazın..."
+                                                                    value={notes[String(offer.id)] || ''}
+                                                                    onChange={e => handleNoteChange(offer.id, e.target.value)}
+                                                                    rows={3}
+                                                                />
+                                                            </div>
                                                         </div>
                                                     )}
+                                                    </div>
                                                 </div>
                                             );
                                         })}
@@ -1957,59 +2311,82 @@ const TenderOffersManagement = ({ companyId }) => {
                                 )}
 
                                 {/* ── Karşılaştırma Modu ── */}
-                                {compareList.length >= 2 && (
-                                    <div className="tom-compare">
-                                        <div className="tom-compare__head">
-                                            <h3>
-                                                <span className="material-symbols-outlined">compare_arrows</span>
-                                                Karşılaştırma ({compareList.length} teklif)
-                                            </h3>
-                                            <button className="tom-btn-text" onClick={() => setCompareIds([])}>
-                                                <span className="material-symbols-outlined">close</span> Temizle
-                                            </button>
-                                        </div>
-                                        <div className="tom-compare__grid">
-                                            {compareList.map(offer => {
-                                                const bestPrice = compareList.reduce((b, c) => c._score.price > b._score.price ? c : b).id === offer.id;
-                                                const bestDel = compareList.reduce((b, c) => c._score.delivery > b._score.delivery ? c : b).id === offer.id;
-                                                const bestScore = compareList.reduce((b, c) => c._score.overall > b._score.overall ? c : b).id === offer.id;
-
-                                                return (
-                                                    <div key={offer.id} className={`tom-compare-card${bestScore ? ' tom-compare-card--best' : ''}`}>
-                                                        {bestScore && (
-                                                            <div className="tom-compare-card__crown">
-                                                                <span className="material-symbols-outlined">emoji_events</span>
-                                                                En İyi Teklif
+                                {/* Enes Doğanay | 4 Mayıs 2026: Tablo düzeni — kazanan sütun vurgulu, "En iyi" chip */}
+                                {compareList.length >= 2 && (() => {
+                                    const cmpMetrics = [
+                                        { key: 'price',    label: 'Fiyat',       icon: 'payments',       cls: 'green', getVal: o => renderOfferAmount(o),                                       getScore: o => o._score.price },
+                                        { key: 'delivery', label: 'Teslim',      icon: 'local_shipping', cls: 'amber', getVal: o => o.teslim_suresi_gun ? `${o.teslim_suresi_gun} gün` : '—',   getScore: o => o._score.delivery },
+                                        { key: 'overall',  label: 'Genel Puan',  icon: 'star',           cls: 'blue',  getVal: o => o._score.overall,                                            getScore: o => o._score.overall,
+                                          sublabel: `F ${weights.price}% · T ${weights.delivery}%` },
+                                    ];
+                                    const bestOverallId = compareList.reduce((b, c) => c._score.overall > b._score.overall ? c : b).id;
+                                    return (
+                                        <div className="tom-compare">
+                                            <div className="tom-compare__head">
+                                                <h3>
+                                                    <span className="material-symbols-outlined">compare_arrows</span>
+                                                    Karşılaştırma ({compareList.length} teklif)
+                                                </h3>
+                                                <button className="tom-btn-text" onClick={() => setCompareIds([])}>
+                                                    <span className="material-symbols-outlined">close</span> Temizle
+                                                </button>
+                                            </div>
+                                            <div className="tom-compare__tbl" style={{ '--cmp-cols': compareList.length }}>
+                                                {/* İsim / skor header satırı */}
+                                                <div className="tom-compare__tbl-row tom-compare__tbl-row--header">
+                                                    <div className="tom-compare__tbl-metric" />
+                                                    {compareList.map(offer => {
+                                                        const isBest = offer.id === bestOverallId;
+                                                        return (
+                                                            <div key={offer.id} className={`tom-compare__tbl-name${isBest ? ' tom-compare__tbl-name--best' : ''}`}>
+                                                                {isBest && (
+                                                                    <div className="tom-compare-card__crown">
+                                                                        <span className="material-symbols-outlined">emoji_events</span>
+                                                                        Kazanan
+                                                                    </div>
+                                                                )}
+                                                                <span className="tom-compare__tbl-person">{offer.gonderen_firma_adi || offer.gonderen_ad_soyad}</span>
+                                                                <ScoreRing score={offer._score.overall} size={58} />
                                                             </div>
-                                                        )}
-                                                        <h4>{offer.gonderen_firma_adi || offer.gonderen_ad_soyad}</h4>
-                                                        <div className="tom-compare-card__score">
-                                                            <ScoreRing score={offer._score.overall} size={68} />
-                                                        </div>
-                                                        <div className="tom-compare-card__rows">
-                                                            {[
-                                                                { label: 'Fiyat', val: renderOfferAmount(offer), score: offer._score.price, cls: 'green', best: bestPrice },
-                                                                { label: 'Teslim', val: offer.teslim_suresi_gun ? `${offer.teslim_suresi_gun} gün` : '—', score: offer._score.delivery, cls: 'amber', best: bestDel },
-                                                                { label: 'Genel Puan', val: offer._score.overall, score: offer._score.overall, cls: 'blue', best: bestScore },
-                                                            ].map(r => (
-                                                                <div key={r.label} className={`tom-compare-row${r.best ? ' tom-compare-row--best' : ''}`}>
-                                                                    <div className="tom-compare-row__label">
-                                                                        <span>{r.label}</span>
-                                                                        {r.best && <span className="material-symbols-outlined tom-trophy">emoji_events</span>}
-                                                                    </div>
-                                                                    <div className="tom-bar tom-bar--sm">
-                                                                        <div className={`tom-bar__fill tom-bar__fill--${r.cls}`} style={{ width: `${r.score}%` }} />
-                                                                    </div>
-                                                                    <strong>{r.val}</strong>
+                                                        );
+                                                    })}
+                                                </div>
+                                                {/* Metrik satırları */}
+                                                {cmpMetrics.map((metric, mIdx) => {
+                                                    const bestId = compareList.reduce((b, c) => metric.getScore(c) > metric.getScore(b) ? c : b).id;
+                                                    return (
+                                                        <div key={metric.key} className={`tom-compare__tbl-row${mIdx % 2 === 1 ? ' tom-compare__tbl-row--alt' : ''}`}>
+                                                            <div className="tom-compare__tbl-metric">
+                                                                <div className={`tom-compare__metric-icon tom-compare__metric-icon--${metric.cls}`}>
+                                                                    <span className="material-symbols-outlined">{metric.icon}</span>
                                                                 </div>
-                                                            ))}
+                                                                <span className="tom-compare__metric-label-wrap">
+                                                                    <span>{metric.label}</span>
+                                                                    {metric.sublabel && <span className="tom-compare__weight-hint">{metric.sublabel}</span>}
+                                                                </span>
+                                                            </div>
+                                                            {compareList.map(offer => {
+                                                                const isBest = offer.id === bestId;
+                                                                const isWinner = offer.id === bestOverallId;
+                                                                return (
+                                                                    <div key={offer.id} className={`tom-compare__tbl-cell${isWinner ? ' tom-compare__tbl-cell--winner' : ''}${isBest ? ' tom-compare__tbl-cell--best' : ''}`}>
+                                                                        <div className="tom-compare__tbl-cell-top">
+                                                                            <strong className="tom-compare__tbl-val">{metric.getVal(offer)}</strong>
+                                                                            {isBest && <span className="tom-compare__best-chip">En iyi</span>}
+                                                                        </div>
+                                                                        <div className="tom-bar tom-bar--sm">
+                                                                            <div className={`tom-bar__fill tom-bar__fill--${metric.cls}`} style={{ width: `${metric.getScore(offer)}%` }} />
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    );
+                                })()}
                             </div>
                         </>
                     )}
@@ -2214,7 +2591,18 @@ const TenderOffersManagement = ({ companyId }) => {
                                 tenderChatMessages.map((m) => (
                                     <div key={m.id} className={`tom-tender-chat-bubble ${m.sender_role === 'company' ? 'mine' : 'theirs'}`}>
                                         <div className="tom-tender-chat-bubble__header">
-                                            <strong>{m.sender_role === 'company' ? 'Siz (Firma)' : (activeTenderChat.offer.gonderen_ad_soyad || 'Teklif Veren')}</strong>
+                                            {m.sender_role === 'company' ? (
+                                                <strong>
+                                                    {m._senderName || 'Firma'}
+                                                    {m._senderRole && m._senderRole !== 'owner' && (
+                                                        <span className="tom-chat-role-chip tom-chat-role-chip--company">
+                                                            {m._senderRole === 'admin' ? 'Yönetici' : 'Üye'}
+                                                        </span>
+                                                    )}
+                                                </strong>
+                                            ) : (
+                                                <strong>{activeTenderChat.offer.gonderen_ad_soyad || 'Teklif Veren'}</strong>
+                                            )}
                                             <span>{new Date(m.created_at).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                         <p>{m.mesaj}</p>
@@ -2573,6 +2961,22 @@ const TenderOffersManagement = ({ companyId }) => {
                 </div>
             )}
 
+            {/* Enes Doğanay | 4 Mayıs 2026: İhale düzenleme başarı popup */}
+            {editSaveSuccess && (
+                <div className="teklif-success-overlay" onClick={() => setEditSaveSuccess(false)}>
+                    <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+                        <div className="teklif-success-card__icon">
+                            <span className="material-symbols-outlined">check_circle</span>
+                        </div>
+                        <h3>Değişiklikler Kaydedildi!</h3>
+                        <p>İhaleniz başarıyla güncellendi. Tedarikçiler yeni bilgileri görebilir.</p>
+                        <button className="teklif-success-card__btn" onClick={() => setEditSaveSuccess(false)}>
+                            Tamam
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Enes Doğanay | 1 Mayıs 2026: Yeni ihale yayınlama başarı popup */}
             {createPublishSuccess && (
                 <div className="teklif-success-overlay" onClick={() => setCreatePublishSuccess(null)}>
@@ -2631,8 +3035,8 @@ const TenderOffersManagement = ({ companyId }) => {
                 <div className="ihale-modal-overlay">
                     <div className="ihale-modal ihale-modal--stepper">
                         <div className="ihale-modal__head">
-                            <h3>Yeni İhale Oluştur</h3>
-                            <button type="button" className="ihale-modal__close" onClick={() => setShowCreateModal(false)}>
+                            <h3>{editTenderId ? 'İhaleyi Düzenle' : 'Yeni İhale Oluştur'}</h3>
+                            <button type="button" className="ihale-modal__close" onClick={() => { setEditTenderId(null); setShowCreateModal(false); }}>
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
@@ -3023,13 +3427,15 @@ const TenderOffersManagement = ({ companyId }) => {
                                     {createFormError && <p className="ihale-form-error">{createFormError}</p>}
 
                                     <div className="ihale-modal__footer ihale-modal__footer--preview">
-                                        <button type="button" className="ihale-btn-cancel" onClick={() => setShowCreateModal(false)}>İptal</button>
-                                        <button type="button" className="ihale-btn-draft" disabled={createFormSaving} onClick={() => handleCreateFormSubmit(null, 'draft')}>
-                                            <span className="material-symbols-outlined">save</span>
-                                            {createFormSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}
-                                        </button>
+                                        <button type="button" className="ihale-btn-cancel" onClick={() => { setEditTenderId(null); setShowCreateModal(false); }}>İptal</button>
+                                        {!editTenderId && (
+                                            <button type="button" className="ihale-btn-draft" disabled={createFormSaving} onClick={() => handleCreateFormSubmit(null, 'draft')}>
+                                                <span className="material-symbols-outlined">save</span>
+                                                {createFormSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}
+                                            </button>
+                                        )}
                                         <button type="button" className="ihale-btn-save" disabled={createFormSaving} onClick={() => handleCreateFormSubmit(null, null)}>
-                                            {createFormSaving ? 'Kaydediliyor…' : 'İhaleyi Yayınla'}
+                                            {createFormSaving ? 'Kaydediliyor…' : editTenderId ? 'Değişiklikleri Kaydet' : 'İhaleyi Yayınla'}
                                         </button>
                                     </div>
                                 </div>

@@ -1360,9 +1360,12 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 2px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* Enes Doğanay | 9 Nisan 2026: Uzun isim taşmasını önle */
+/* Enes Doğanay | 4 Mayıs 2026: max-width kaldırıldı — flex shrink ile kontrol edilir */
 .cmp-quote-sender {
     font-size: 0.82rem;
     color: #1e40af;
@@ -1370,7 +1373,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 180px;
+    max-width: 100%;
 }
 
 /* ── Chat view inside Company Panel ─────────────────────────────────────── */

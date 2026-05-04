@@ -45,6 +45,49 @@ const FirmaProfil = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const currentTab = searchParams.get('tab') || 'panel';
+    // Enes Doğanay | 4 Mayıs 2026: iframe embed modu — sidebar ve header gizlenir
+    const isEmbedded = searchParams.get('embedded') === '1';
+
+    // Enes Doğanay | 4 Mayıs 2026: embedded param'ı setSearchParams çağrılarında korur
+    const setTab = (params) => {
+        if (isEmbedded) setSearchParams({ ...params, embedded: '1' });
+        else setSearchParams(params);
+    };
+
+    // Enes Doğanay | 4 Mayıs 2026: embedded modda html/body yatay scroll engellenir
+    useEffect(() => {
+        if (isEmbedded) {
+            document.documentElement.style.overflowX = 'hidden';
+            document.body.style.overflowX = 'hidden';
+        }
+        return () => {
+            document.documentElement.style.overflowX = '';
+            document.body.style.overflowX = '';
+        };
+    }, [isEmbedded]);
+
+    // Enes Doğanay | 4 Mayıs 2026: embedded modda dark mode — üst sayfanın localStorage değişimini dinle
+    useEffect(() => {
+        if (!isEmbedded) return;
+        const applyTheme = () => {
+            const theme = localStorage.getItem('tedport-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        };
+        // Enes Doğanay | 4 Mayıs 2026: postMessage ile anlık tema senkronizasyonu
+        const onMessage = (e) => {
+            if (e.origin !== window.location.origin) return;
+            if (e.data?.type === 'tedport-theme') {
+                document.documentElement.setAttribute('data-theme', e.data.theme);
+            }
+        };
+        applyTheme();
+        window.addEventListener('storage', applyTheme);
+        window.addEventListener('message', onMessage);
+        return () => {
+            window.removeEventListener('storage', applyTheme);
+            window.removeEventListener('message', onMessage);
+        };
+    }, [isEmbedded]);
 
     const [companyId, setCompanyId] = useState(null);
     const [firma, setFirma] = useState(null);
@@ -132,6 +175,20 @@ const FirmaProfil = () => {
     const [pendingDeleteNoteId, setPendingDeleteNoteId] = useState(null);
     const [saveFeedbackFavoriteId, setSaveFeedbackFavoriteId] = useState(null);
 
+    // Enes Doğanay | 4 Mayıs 2026: Ekip yönetimi state'leri
+    const [ekip, setEkip] = useState([]);            // { user_id, role, title, first_name, last_name }
+    const [ekipLoading, setEkipLoading] = useState(false);
+    const [myRole, setMyRole] = useState('owner');   // mevcut kullanıcının rolü
+    const [davetEmail, setDavetEmail] = useState('');
+    const [davetRole, setDavetRole] = useState('member');
+    const [davetTitle, setDavetTitle] = useState('');
+    const [davetSending, setDavetSending] = useState(false);
+    const [davetError, setDavetError] = useState(null);
+    const [davetSuccess, setDavetSuccess] = useState(false);
+    const [bekleyenDavetler, setBekleyenDavetler] = useState([]);
+    const [confirmRemoveMember, setConfirmRemoveMember] = useState(null); // { user_id, name }
+    const [editingMember, setEditingMember] = useState(null); // { user_id, title, role }
+
     // ── İlk yükleme ──
     useEffect(() => {
         const init = async () => {
@@ -204,6 +261,15 @@ const FirmaProfil = () => {
                 setFavorites([]);
             }
             setLoading(false);
+
+            // Enes Doğanay | 4 Mayıs 2026: Kullanıcının firmadaki rolünü çek
+            const { data: roleRow } = await supabase
+                .from('kurumsal_firma_yoneticileri')
+                .select('role')
+                .eq('user_id', userSession.user.id)
+                .eq('firma_id', cid)
+                .maybeSingle();
+            if (roleRow?.role) setMyRole(roleRow.role);
         };
         init();
     }, [navigate]);
@@ -373,7 +439,9 @@ const FirmaProfil = () => {
         }
 
         const { data } = await supabase.from('teklif_mesajlari').select('*').eq('teklif_id', quote.id).order('created_at', { ascending: true });
-        setChatMessages(data || []);
+        // Enes Doğanay | 4 Mayıs 2026: Gönderen bilgilerini ekle (ekip üyeleri için)
+        const enriched = await enrichTeklifMessages(data || []);
+        setChatMessages(enriched);
         setChatLoading(false);
         const isIncoming = incomingQuotes.some(q => q.id === quote.id);
         if (isIncoming && quote.durum === 'pending') handleQuoteStatusChange(quote.id, 'read');
@@ -492,7 +560,9 @@ const FirmaProfil = () => {
             .insert([{ teklif_id: activeQuoteChat.id, sender_id: userId, sender_role: senderRole, mesaj: chatInput.trim() }])
             .select().single();
         if (!error && data) {
-            setChatMessages(prev => [...prev, data]);
+            // Enes Doğanay | 4 Mayıs 2026: Gönderilen mesajı enrichment ile ekle — 'Firma' fallbackı önle
+            const [enriched] = await enrichTeklifMessages([data]);
+            setChatMessages(prev => [...prev, enriched || data]);
             setChatInput('');
             // Enes Doğanay | 9 Nisan 2026: Broadcast ile karşı tarafa mesajı anlık ilet
             if (chatChannelRef.current) {
@@ -624,8 +694,7 @@ const FirmaProfil = () => {
     const navigateToQuoteFromNotification = (notification) => {
         const teklifId = notification.metadata?.teklif_id;
         if (!teklifId) return;
-        setSearchParams({ tab: 'teklifler' });
-        const quote = [...incomingQuotes, ...outgoingQuotes].find(q => q.id === teklifId);
+        setTab({ tab: 'teklifler' });
         if (quote) {
             openQuoteChat(quote);
         }
@@ -740,6 +809,156 @@ const FirmaProfil = () => {
         } catch { alert('Not silinirken bir hata oluştu.'); }
     };
 
+    // Enes Doğanay | 4 Mayıs 2026: Ekip sekmesi açıldığında yükle
+    useEffect(() => {
+        if (currentTab !== 'ekip' || !companyId) return;
+        loadEkip();
+    }, [currentTab, companyId]);
+
+    const loadEkip = async () => {
+        setEkipLoading(true);
+        const [ekipRes, davetRes] = await Promise.all([
+            supabase.from('firma_ekip_public')
+                .select('role, title, joined_at, first_name, last_name')
+                .eq('firma_id', String(companyId)),
+            supabase.from('firma_davetleri')
+                .select('id, invited_email, role, title, status, created_at, expires_at')
+                .eq('firma_id', String(companyId))
+                .eq('status', 'pending')
+        ]);
+        // user_id bilgisi için ayrıca çek
+        const { data: rawEkip } = await supabase
+            .from('kurumsal_firma_yoneticileri')
+            .select('user_id, role, title, created_at')
+            .eq('firma_id', String(companyId));
+        if (rawEkip) {
+            const userIds = rawEkip.map(r => r.user_id);
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name')
+                .in('id', userIds);
+            const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+            setEkip(rawEkip.map(r => ({
+                ...r,
+                first_name: profileMap[r.user_id]?.first_name || '',
+                last_name: profileMap[r.user_id]?.last_name || '',
+            })));
+        }
+        setBekleyenDavetler(davetRes.data || []);
+        setEkipLoading(false);
+    };
+
+    const handleDavetGonder = async () => {
+        setDavetError(null);
+        if (!davetEmail.trim()) { setDavetError('E-posta adresi girin.'); return; }
+        setDavetSending(true);
+        try {
+            // Kullanıcı Tedport'ta kayıtlı mı?
+            const { data: profRes } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('email', davetEmail.trim().toLowerCase())
+                .maybeSingle();
+            if (!profRes) {
+                setDavetError('Bu e-posta adresiyle kayıtlı bir Tedport hesabı bulunamadı. Çalışanınızdan önce Tedport\'a kayıt olmasını isteyin.');
+                setDavetSending(false);
+                return;
+            }
+            // Zaten firmaya bağlı mı?
+            const { data: existingMember } = await supabase
+                .from('kurumsal_firma_yoneticileri')
+                .select('firma_id')
+                .eq('user_id', profRes.id)
+                .maybeSingle();
+            if (existingMember) {
+                setDavetError('Bu kullanıcı zaten bir firmaya bağlı.');
+                setDavetSending(false);
+                return;
+            }
+            // Davet oluştur
+            const { error } = await supabase.from('firma_davetleri').insert({
+                firma_id: String(companyId),
+                invited_email: davetEmail.trim().toLowerCase(),
+                invited_user_id: profRes.id,
+                invited_by: userId,
+                role: davetRole,
+                title: davetTitle.trim() || null,
+            });
+            if (error) throw error;
+            // Kullanıcıya bildirim gönder
+            await supabase.from('bildirimler').insert({
+                user_id: profRes.id,
+                type: 'firma_daveti',
+                title: `${firma?.firma_adi || 'Bir firma'} sizi ekibine davet etti`,
+                message: `${firma?.firma_adi || 'Firma'} tarafından ${davetRole === 'admin' ? 'Yönetici' : 'Üye'} olarak davet edildiniz. Profilinizden daveti kabul edebilirsiniz.`,
+                metadata: { firma_id: String(companyId), davet_id: null },
+                is_read: false,
+            });
+            setDavetSuccess(true);
+            setDavetEmail('');
+            setDavetTitle('');
+            setDavetRole('member');
+            setTimeout(() => setDavetSuccess(false), 3000);
+            loadEkip();
+        } catch (e) {
+            setDavetError('Davet gönderilemedi: ' + (e.message || 'Bilinmeyen hata'));
+        } finally {
+            setDavetSending(false);
+        }
+    };
+
+    const handleDavetIptal = async (davetId) => {
+        await supabase.from('firma_davetleri').update({ status: 'cancelled' }).eq('id', davetId);
+        loadEkip();
+    };
+
+    const handleUyeCikar = async (targetUserId) => {
+        await supabase.from('kurumsal_firma_yoneticileri').delete()
+            .eq('user_id', targetUserId).eq('firma_id', String(companyId));
+        setConfirmRemoveMember(null);
+        loadEkip();
+    };
+
+    const handleRolGuncelle = async (targetUserId, newRole, newTitle) => {
+        await supabase.from('kurumsal_firma_yoneticileri')
+            .update({ role: newRole, title: newTitle || null })
+            .eq('user_id', targetUserId).eq('firma_id', String(companyId));
+        setEditingMember(null);
+        loadEkip();
+    };
+
+    // Enes Doğanay | 4 Mayıs 2026: Teklif mesajlarına gönderen profil bilgisi ekle
+    const enrichTeklifMessages = async (messages) => {
+        if (!messages || messages.length === 0) return messages;
+        const senderIds = [...new Set(messages.map(m => m.sender_id).filter(Boolean))];
+        if (senderIds.length === 0) return messages;
+        const [profRes, memberRes] = await Promise.all([
+            supabase.from('profiles').select('id, first_name, last_name').in('id', senderIds),
+            supabase.from('kurumsal_firma_yoneticileri').select('user_id, role, title, firma_id').in('user_id', senderIds),
+        ]);
+        const profileMap = Object.fromEntries((profRes.data || []).map(p => [p.id, p]));
+        const memberMap = Object.fromEntries((memberRes.data || []).map(m => [m.user_id, m]));
+        // Enes Doğanay | 4 Mayıs 2026: Owner sender'lar için firma adını çek
+        const ownerFirmaIds = [...new Set((memberRes.data || []).filter(m => m.role === 'owner' && m.firma_id).map(m => m.firma_id))];
+        const firmaNameMap = {};
+        if (ownerFirmaIds.length > 0) {
+            const { data: firmalar } = await supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', ownerFirmaIds);
+            (firmalar || []).forEach(f => { firmaNameMap[f.firmaID] = f.firma_adi; });
+        }
+        return messages.map(msg => {
+            const member = memberMap[msg.sender_id];
+            const isOwner = member?.role === 'owner';
+            const firmaAdi = isOwner && member?.firma_id ? firmaNameMap[member.firma_id] : null;
+            return {
+                ...msg,
+                _senderName: firmaAdi || (profileMap[msg.sender_id] ? [profileMap[msg.sender_id].first_name, profileMap[msg.sender_id].last_name].filter(Boolean).join(' ') || null : null),
+                _senderRole: member?.role || null,
+                _senderTitle: member?.title || null,
+                _senderIsFirma: !!firmaAdi,
+            };
+        });
+    };
+
     // ── Çıkış ──
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -793,7 +1012,7 @@ const FirmaProfil = () => {
 
     return (
         <>
-            <SharedHeader
+            {!isEmbedded && <SharedHeader
                 navItems={[
                     { label: 'Anasayfa', href: '/' },
                     { label: 'Firmalar', href: '/firmalar' },
@@ -801,13 +1020,13 @@ const FirmaProfil = () => {
                     { label: 'Hakkımızda', href: '/hakkimizda' },
                     { label: 'İletişim', href: '/iletisim' }
                 ]}
-            />
+            />}
 
             <div className="page">
-                <div className="layout">
+                <div className={`layout${isEmbedded ? ' layout--embedded' : ''}`}>
 
                     {/* ── SIDEBAR ── */}
-                    <aside className="sidebar">
+                    {!isEmbedded && <aside className="sidebar">
                         <div className="sidebar-user-card">
                             {/* Enes Doğanay | 8 Nisan 2026: Sadece firma-logolari bucket'inden yüklenen logolar kullanılır */}
                             {firma?.logo_url?.includes('firma-logolari') ? (
@@ -824,22 +1043,28 @@ const FirmaProfil = () => {
                         </div>
 
                         <nav className="sidebar-nav">
-                            <a className={`nav-item ${currentTab === 'panel' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'panel' })}>
+                            <a className={`nav-item ${currentTab === 'panel' ? 'active' : ''}`} onClick={() => setTab({ tab: 'panel' })}>
                                 <span className="material-symbols-outlined">storefront</span> Firma Paneli
                             </a>
                             {/* Enes Doğanay | 9 Nisan 2026: Sıralama değiştirildi — Favorilerim öne alındı */}
-                            <a className={`nav-item ${currentTab === 'favoriler' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'favoriler' })}>
+                            <a className={`nav-item ${currentTab === 'favoriler' ? 'active' : ''}`} onClick={() => setTab({ tab: 'favoriler' })}>
                                 <span className="material-symbols-outlined">collections_bookmark</span> Favorilerim
                             </a>
-                            <a className={`nav-item ${currentTab === 'teklifler' ? 'active' : ''}`} onClick={() => { setSearchParams({ tab: 'teklifler' }); setActiveQuoteChat(null); }}>
+                            <a className={`nav-item ${currentTab === 'teklifler' ? 'active' : ''}`} onClick={() => { setTab({ tab: 'teklifler' }); setActiveQuoteChat(null); }}>
                                 <span className="material-symbols-outlined">request_quote</span> Teklif Yönetimi
                                 {pendingCount > 0 && <span className="nav-item-badge">{pendingCount}</span>}
                             </a>
                             {/* Enes Doğanay | 13 Nisan 2026: İhale Yönetimi — İhalelerim + Katıldığım İhaleler birleştirildi */}
-                            <a className={`nav-item ${currentTab === 'ihale-yonetimi' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'ihale-yonetimi' })}>
+                            <a className={`nav-item ${currentTab === 'ihale-yonetimi' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ihale-yonetimi' })}>
                                 <span className="material-symbols-outlined">gavel</span> İhale Yönetimi
                             </a>
-                            <a className={`nav-item ${currentTab === 'bildirimler' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'bildirimler' })}>
+                            {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi sekmesi — sadece owner görür */}
+                            {myRole === 'owner' && (
+                                <a className={`nav-item ${currentTab === 'ekip' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ekip' })}>
+                                    <span className="material-symbols-outlined">group</span> Ekip Yönetimi
+                                </a>
+                            )}
+                            <a className={`nav-item ${currentTab === 'bildirimler' ? 'active' : ''}`} onClick={() => setTab({ tab: 'bildirimler' })}>
                                 <span className="material-symbols-outlined">notifications</span> Bildirimler
                                 {unreadNotifCount > 0 && <span className="nav-item-badge">{unreadNotifCount}</span>}
                             </a>
@@ -896,7 +1121,7 @@ const FirmaProfil = () => {
                             <div className="sidebar-stats-value">{favorites.length}</div>
                         </div>
                         )}
-                    </aside>
+                    </aside>}
 
                     {/* ── CONTENT ── */}
                     <main className="content">
@@ -1014,7 +1239,18 @@ const FirmaProfil = () => {
                                                     chatMessages.map((m) => (
                                                         <div key={m.id} className={`quote-chat-bubble ${m.sender_role === 'company' ? (isIncoming ? 'mine' : 'theirs') : (isIncoming ? 'theirs' : 'mine')}`}>
                                                             <div className="quote-chat-bubble-header">
-                                                                <strong>{m.sender_role === 'company' ? (isIncoming ? 'Siz (Firma)' : 'Firma') : (isIncoming ? q.ad_soyad : 'Siz')}</strong>
+                                                                {m.sender_role === 'company' && isIncoming ? (
+                                                                    <strong>
+                                                                        {m._senderName || 'Firma'}
+                                                                        {m._senderRole && m._senderRole !== 'owner' && (
+                                                                            <span className="tom-chat-role-chip tom-chat-role-chip--company">
+                                                                                {m._senderRole === 'admin' ? 'Yönetici' : 'Üye'}
+                                                                            </span>
+                                                                        )}
+                                                                    </strong>
+                                                                ) : (
+                                                                    <strong>{m.sender_role === 'company' ? (isIncoming ? 'Siz (Firma)' : 'Firma') : (isIncoming ? q.ad_soyad : 'Siz')}</strong>
+                                                                )}
                                                                 <span>{new Date(m.created_at).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                                                             </div>
                                                             <p>{m.mesaj}</p>
@@ -1198,17 +1434,17 @@ const FirmaProfil = () => {
                         {currentTab === 'ihale-yonetimi' && (
                             <div className="firma-profil-section">
                                 <div className="cmp-quotes-tabs" style={{ marginBottom: '16px' }}>
-                                    <button className={`cmp-quotes-tab ${(searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'ihale-yonetimi', subtab: 'ihalelerim' })}>
+                                    <button className={`cmp-quotes-tab ${(searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ihale-yonetimi', subtab: 'ihalelerim' })}>
                                         <span className="material-symbols-outlined">gavel</span> İhalelerim
                                     </button>
-                                    <button className={`cmp-quotes-tab ${searchParams.get('subtab') === 'katildigim' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'ihale-yonetimi', subtab: 'katildigim' })}>
+                                    <button className={`cmp-quotes-tab ${searchParams.get('subtab') === 'katildigim' ? 'active' : ''}`} onClick={() => setTab({ tab: 'ihale-yonetimi', subtab: 'katildigim' })}>
                                         <span className="material-symbols-outlined">assignment_turned_in</span> Katıldığım İhaleler
                                     </button>
                                 </div>
                                 {(searchParams.get('subtab') || 'ihalelerim') === 'ihalelerim' ? (
                                     <TenderOffersManagement companyId={companyId} />
                                 ) : (
-                                    <MyOffersPanel />
+                                    <MyOffersPanel companyId={companyId} />
                                 )}
                             </div>
                         )}
@@ -1330,14 +1566,14 @@ const FirmaProfil = () => {
                                                                 const params = { tab: 'ihale-yonetimi' };
                                                                 if (notification.metadata?.ihale_id) params.ihale = notification.metadata.ihale_id;
                                                                 if (notification.metadata?.teklif_user_id) params.teklif_user = notification.metadata.teklif_user_id;
-                                                                setSearchParams(params);
+                                                                setTab(params);
                                                                 if (!notification.is_read) handleMarkNotificationRead(notification.id);
                                                             } else if (notification.type === 'tender_offer_status') {
                                                                 /* Enes Doğanay | 13 Nisan 2026: Teklif durumu bildirimi — İhale Yönetimi > Katıldığım İhaleler */
                                                                 if (notification.metadata?.ihale_id) {
                                                                     sessionStorage.setItem('mop_highlight_ihale', String(notification.metadata.ihale_id));
                                                                 }
-                                                                setSearchParams({ tab: 'ihale-yonetimi', subtab: 'katildigim' });
+                                                                setTab({ tab: 'ihale-yonetimi', subtab: 'katildigim' });
                                                                 if (!notification.is_read) handleMarkNotificationRead(notification.id);
                                                             } else if (notification.type === 'tender_updated' || notification.type === 'tender_closed' || notification.type === 'tender_cancelled') {
                                                                 /* Enes Doğanay | 13 Nisan 2026: İhale durumu değişiklik bildirimleri — ilgili ihaleye navigate */
@@ -1351,7 +1587,7 @@ const FirmaProfil = () => {
                                                                 if (notification.metadata?.teklif_id) {
                                                                     sessionStorage.setItem('tom_open_teklif_chat', String(notification.metadata.teklif_id));
                                                                 }
-                                                                setSearchParams({ tab: 'ihale-yonetimi' });
+                                                                setTab({ tab: 'ihale-yonetimi' });
                                                             } else if (notification.metadata?.teklif_id) {
                                                                 navigateToQuoteFromNotification(notification);
                                                             }
@@ -1494,6 +1730,159 @@ const FirmaProfil = () => {
                             </div>
                             );
                         })()}
+
+                        {/* Enes Doğanay | 4 Mayıs 2026: Tab → Ekip Yönetimi */}
+                        {currentTab === 'ekip' && myRole === 'owner' && (
+                            <div className="ekip-panel">
+                                <div className="ekip-panel__header">
+                                    <h2><span className="material-symbols-outlined">group</span> Ekip Yönetimi</h2>
+                                    <p>Firmanıza çalışan ekleyebilir, rollerini ve unvanlarını yönetebilirsiniz.</p>
+                                </div>
+
+                                {/* Davet formu */}
+                                <div className="ekip-invite-card">
+                                    <h3><span className="material-symbols-outlined">person_add</span> Yeni Üye Davet Et</h3>
+                                    <div className="ekip-invite-form">
+                                        <div className="ekip-invite-row">
+                                            <input
+                                                type="email"
+                                                className="ekip-input"
+                                                placeholder="E-posta adresi"
+                                                value={davetEmail}
+                                                onChange={e => setDavetEmail(e.target.value)}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="ekip-input ekip-input--title"
+                                                placeholder="Unvan (opsiyonel)"
+                                                value={davetTitle}
+                                                onChange={e => setDavetTitle(e.target.value)}
+                                            />
+                                            <select className="ekip-select" value={davetRole} onChange={e => setDavetRole(e.target.value)}>
+                                                <option value="admin">Yönetici (Admin)</option>
+                                                <option value="member">Üye (Member)</option>
+                                            </select>
+                                            <button
+                                                className="ekip-invite-btn"
+                                                onClick={handleDavetGonder}
+                                                disabled={davetSending}
+                                            >
+                                                {davetSending ? 'Gönderiliyor…' : 'Davet Gönder'}
+                                            </button>
+                                        </div>
+                                        {davetError && <p className="ekip-msg ekip-msg--error"><span className="material-symbols-outlined">error</span>{davetError}</p>}
+                                        {davetSuccess && <p className="ekip-msg ekip-msg--success"><span className="material-symbols-outlined">check_circle</span>Davet başarıyla gönderildi!</p>}
+                                    </div>
+                                    {/* Yetki matrisi ipucu */}
+                                    <div className="ekip-role-hint">
+                                        <div className="ekip-role-hint__row">
+                                            <span className="ekip-role-badge ekip-role-badge--admin">Yönetici</span>
+                                            <span>Teklif ve ihaleleri görüntüleyebilir, mesaj yazabilir, firma adına teklif gönderebilir.</span>
+                                        </div>
+                                        <div className="ekip-role-hint__row">
+                                            <span className="ekip-role-badge ekip-role-badge--member">Üye</span>
+                                            <span>Teklif ve ihaleleri sadece görüntüleyebilir. Mesaj yazamaz.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Bekleyen davetler */}
+                                {bekleyenDavetler.length > 0 && (
+                                    <div className="ekip-section">
+                                        <h3 className="ekip-section__title"><span className="material-symbols-outlined">schedule</span> Bekleyen Davetler</h3>
+                                        <div className="ekip-list">
+                                            {bekleyenDavetler.map(d => (
+                                                <div key={d.id} className="ekip-card ekip-card--pending">
+                                                    <div className="ekip-card__info">
+                                                        <span className="material-symbols-outlined ekip-card__avatar-icon">mail</span>
+                                                        <div>
+                                                            <strong>{d.invited_email}</strong>
+                                                            <span className="ekip-card__meta">
+                                                                <span className={`ekip-role-badge ekip-role-badge--${d.role}`}>{d.role === 'admin' ? 'Yönetici' : 'Üye'}</span>
+                                                                {d.title && <span className="ekip-card__title-tag">{d.title}</span>}
+                                                                · Davet {new Date(d.expires_at) < new Date() ? 'süresi doldu' : `${Math.ceil((new Date(d.expires_at) - Date.now()) / 86400000)} gün geçerli`}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <button className="ekip-remove-btn" onClick={() => handleDavetIptal(d.id)} title="Daveti iptal et">
+                                                        <span className="material-symbols-outlined">close</span>
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Mevcut ekip */}
+                                <div className="ekip-section">
+                                    <h3 className="ekip-section__title"><span className="material-symbols-outlined">people</span> Ekip Üyeleri</h3>
+                                    {ekipLoading ? (
+                                        <div className="ekip-loading">Yükleniyor…</div>
+                                    ) : (
+                                        <div className="ekip-list">
+                                            {ekip.map(m => {
+                                                const isMe = m.user_id === userId;
+                                                const isOwner = m.role === 'owner';
+                                                const fullName = [m.first_name, m.last_name].filter(Boolean).join(' ') || 'İsimsiz';
+                                                const initials = ((m.first_name?.[0] || '') + (m.last_name?.[0] || '')).toUpperCase() || '?';
+                                                return (
+                                                    <div key={m.user_id} className={`ekip-card${isMe ? ' ekip-card--me' : ''}`}>
+                                                        <div className="ekip-card__info">
+                                                            <div className="ekip-card__avatar">{initials}</div>
+                                                            <div>
+                                                                <strong>{fullName}{isMe && <span className="ekip-me-chip">Siz</span>}</strong>
+                                                                <span className="ekip-card__meta">
+                                                                    <span className={`ekip-role-badge ekip-role-badge--${m.role}`}>
+                                                                        {m.role === 'owner' ? 'Sahip' : m.role === 'admin' ? 'Yönetici' : 'Üye'}
+                                                                    </span>
+                                                                    {m.title && <span className="ekip-card__title-tag">{m.title}</span>}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        {!isOwner && (
+                                                            <div className="ekip-card__actions">
+                                                                {editingMember?.user_id === m.user_id ? (
+                                                                    <div className="ekip-edit-inline">
+                                                                        <input className="ekip-input ekip-input--sm" value={editingMember.title} onChange={e => setEditingMember(p => ({ ...p, title: e.target.value }))} placeholder="Unvan" />
+                                                                        <select className="ekip-select ekip-select--sm" value={editingMember.role} onChange={e => setEditingMember(p => ({ ...p, role: e.target.value }))}>
+                                                                            <option value="admin">Yönetici</option>
+                                                                            <option value="member">Üye</option>
+                                                                        </select>
+                                                                        <button className="ekip-save-btn" onClick={() => handleRolGuncelle(m.user_id, editingMember.role, editingMember.title)}>
+                                                                            <span className="material-symbols-outlined">check</span>
+                                                                        </button>
+                                                                        <button className="ekip-cancel-btn" onClick={() => setEditingMember(null)}>
+                                                                            <span className="material-symbols-outlined">close</span>
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <>
+                                                                        <button className="ekip-edit-btn" onClick={() => setEditingMember({ user_id: m.user_id, role: m.role, title: m.title || '' })} title="Düzenle">
+                                                                            <span className="material-symbols-outlined">edit</span>
+                                                                        </button>
+                                                                        {confirmRemoveMember?.user_id === m.user_id ? (
+                                                                            <span className="ekip-confirm-remove">
+                                                                                <span>Çıkarılsın mı?</span>
+                                                                                <button className="ekip-confirm-yes" onClick={() => handleUyeCikar(m.user_id)}>Evet</button>
+                                                                                <button className="ekip-confirm-no" onClick={() => setConfirmRemoveMember(null)}>Hayır</button>
+                                                                            </span>
+                                                                        ) : (
+                                                                            <button className="ekip-remove-btn" onClick={() => setConfirmRemoveMember({ user_id: m.user_id, name: fullName })} title="Ekipten çıkar">
+                                                                                <span className="material-symbols-outlined">person_remove</span>
+                                                                            </button>
+                                                                        )}
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Enes Doğanay | 8 Nisan 2026: Tab → Favoriler (bireysel profildeki yapının kurumsal kopyası) */}
                         {currentTab === 'favoriler' && (

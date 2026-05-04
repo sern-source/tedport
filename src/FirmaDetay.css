@@ -561,20 +561,68 @@ body {
 .tenders-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
 }
 
+/* Enes Doğanay | 4 Mayıs 2026: Kompakt tek satır ihale kartı */
 .tender-item {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 11px 16px;
   background: var(--bg-white);
-  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
 }
+.tender-item:last-child { border-bottom: none; }
 
-.tender-item:hover {
-  border-color: var(--primary);
-  box-shadow: 0 4px 12px rgba(19, 127, 236, 0.15);
+.tender-item:hover { background: var(--bg-hover, #f8fafc); }
+
+.tender-item--clickable { cursor: pointer; }
+.tender-item--clickable:hover .tender-item-title { color: var(--primary, #137fec); }
+
+.tender-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tender-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.tender-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tender-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.tender-item-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.tender-item-date .material-symbols-outlined { font-size: 0.9rem; }
+.tender-item-desc {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tender-header {
@@ -587,11 +635,12 @@ body {
 
 .tender-status {
   display: inline-flex;
-  padding: 4px 12px;
+  padding: 2px 9px;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 700;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Enes Doğanay | 6 Nisan 2026: Türkçe karakterler ASCII'ye dönüştürüldü (canlı→canli, yaklaşan→yaklasan, kapalı→kapali) */
@@ -965,6 +1014,32 @@ body {
   color: var(--text-muted);
   line-height: 1.7;
 }
+
+/* Enes Doğanay | 4 Mayıs 2026: İhale listesi genişlet/daralt butonu */
+.tenders-show-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  border: 1.5px dashed var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tenders-show-more-btn:hover {
+  background: var(--bg-hover, #f8fafc);
+  color: var(--primary, #2563eb);
+  border-color: var(--primary, #2563eb);
+}
+.tenders-show-more-btn .material-symbols-outlined { font-size: 1.1rem; }
+[data-theme="dark"] .tenders-show-more-btn:hover { background: rgba(255,255,255,0.05); }
 
 .tenders-list-loading {
   display: flex;
@@ -2433,6 +2508,9 @@ body {
 }
 
 /* Tender skeleton */
+[data-theme="dark"] .tender-item { background: var(--bg-white); }
+[data-theme="dark"] .tender-item:hover { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .tender-item-title { color: #e2e8f0; }
 [data-theme="dark"] .tender-item-skeleton {
   background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
   background-size: 200% 100%;
@@ -2706,3 +2784,46 @@ body {
   background: rgba(180, 130, 55, 0.12);
   color: #c4832a;
 }
+
+/* Enes Dog�anay | 4 Mayis 2026: Firma ekip bolumu � public gorunum */
+.fd-ekip-section { margin-top: 32px; }
+.fd-ekip-section .section-title { margin-bottom: 16px; }
+.fd-ekip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.fd-ekip-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-white);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+}
+.fd-ekip-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+  color: #94a3b8;
+}
+.fd-ekip-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fd-ekip-avatar .material-symbols-outlined { font-size: 1.4rem; }
+.fd-ekip-info { display: flex; flex-direction: column; gap: 3px; }
+.fd-ekip-info strong { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
+.fd-ekip-title { font-size: 0.76rem; color: var(--text-muted); }
+
+/* Role badges (shared � used in FirmaDetay + Profile) */
+.ekip-role-badge { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 99px; font-size: 0.68rem; font-weight: 700; }
+.ekip-role-badge--owner  { background: #fef3c7; color: #92400e; }
+.ekip-role-badge--admin  { background: #ede9fe; color: #5b21b6; }
+.ekip-role-badge--member { background: #f0fdf4; color: #166534; }
+
+[data-theme="dark"] .fd-ekip-card { background: var(--bg-white); border-color: var(--border); }
+[data-theme="dark"] .fd-ekip-avatar { background: #1e293b; }
+[data-theme="dark"] .ekip-role-badge--owner  { background: rgba(245,158,11,0.15); color: #fcd34d; }
+[data-theme="dark"] .ekip-role-badge--admin  { background: rgba(124,58,237,0.15); color: #c4b5fd; }
+[data-theme="dark"] .ekip-role-badge--member { background: rgba(22,163,74,0.12); color: #86efac; }

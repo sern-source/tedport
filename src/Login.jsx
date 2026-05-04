@@ -29,10 +29,12 @@ const LoginPage = () => {
   // Enes Doğanay | 13 Nisan 2026: Ortak yönlendirme mantığı — login ve session kontrolü için tek fonksiyon
   const redirectAfterAuth = async (userId) => {
     const redirectTo = searchParams.get('redirect');
+    // Enes Doğanay | 4 Mayıs 2026: Sadece owner /firma-profil'e yönlenir; admin/member kendi profiliyle kalır
     const { data: companyData } = await supabase
       .from('kurumsal_firma_yoneticileri')
       .select('firma_id')
       .eq('user_id', userId)
+      .eq('role', 'owner')
       .maybeSingle();
     const managedCompanyId = companyData?.firma_id || null;
     if (managedCompanyId) {
@@ -103,10 +105,12 @@ const LoginPage = () => {
     }
 
     // Enes Doğanay | 15 Nisan 2026: Bireysel/Kurumsal sekme kontrolü — yanlış sekmeden giriş engellenir
+    // Enes Doğanay | 4 Mayıs 2026: Sadece owner kurumsal hesap sayılır; admin/member bireysel hesaptır
     const { data: companyCheck } = await supabase
       .from('kurumsal_firma_yoneticileri')
-      .select('firma_id')
+      .select('firma_id, role')
       .eq('user_id', data.user.id)
+      .eq('role', 'owner')
       .maybeSingle();
 
     const isCorporateUser = !!companyCheck?.firma_id;

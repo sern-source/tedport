@@ -11,6 +11,8 @@ import { useAuth } from './AuthContext';
 import PageLoader from './PageLoader';
 /* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler paneli */
 import MyOffersPanel from './MyOffersPanel';
+// Enes Doğanay | 4 Mayıs 2026: dark mode senkronizasyonu için
+import { useTheme } from './useTheme';
 
 // Enes Doğanay | 6 Nisan 2026: Deterministik renk üretimi (firma_id hash)
 const hashColor = (str) => {
@@ -106,6 +108,18 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  // Enes Doğanay | 4 Mayıs 2026: iframe dark mode senkronizasyonu
+  const sirketimIframeRef = useRef(null);
+  const { theme } = useTheme();
+
+  // Enes Doğanay | 4 Mayıs 2026: theme değişince iframe'e bildir
+  useEffect(() => {
+    if (!sirketimIframeRef.current?.contentWindow) return;
+    sirketimIframeRef.current.contentWindow.postMessage(
+      { type: 'tedport-theme', theme },
+      window.location.origin
+    );
+  }, [theme]);
 
   const [myLists, setMyLists] = useState([]);
   const [favorites, setFavorites] = useState([]);
@@ -175,6 +189,14 @@ const ProfilePage = () => {
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [marketingConsentSaving, setMarketingConsentSaving] = useState(false);
 
+  // Enes Doğanay | 4 Mayıs 2026: Şirketim sekmesi state'leri
+  const [myCompany, setMyCompany] = useState(null);    // { firma_id, role, title }
+  const [myCompanyFirma, setMyCompanyFirma] = useState(null); // firma kaydı
+  const [pendingInvites, setPendingInvites] = useState([]); // bekleyen davetler
+
+  // Enes Doğanay | 4 Mayıs 2026: Şirketim inline sub-panel state'leri
+  const [sirketimSubPanel, setSirketimSubPanel] = useState(null); // null | 'teklifler' | 'ihaleler'
+
   /* Enes Doğanay | 17 Nisan 2026: Bildirim tercihleri state'i */
   /* Enes Doğanay | 2 Mayıs 2026: ihale_teklif_mesajlari tercihi eklendi */
   const [notifPrefs, setNotifPrefs] = useState({
@@ -209,12 +231,13 @@ const ProfilePage = () => {
         const currentUser = session.user;
 
         // Enes Doğanay | 10 Nisan 2026: direkt sorgu — fazladan getUser() çağrısı AbortError yaratıyordu
+        // Enes Doğanay | 4 Mayıs 2026: Sadece owner firma-profil'e yönlenir; admin/member kendi profilinde kalır
         const { data: companyData } = await supabase
           .from('kurumsal_firma_yoneticileri')
-          .select('firma_id')
+          .select('firma_id, role')
           .eq('user_id', currentUser.id)
           .maybeSingle();
-        if (companyData?.firma_id) {
+        if (companyData?.firma_id && companyData.role === 'owner') {
           if (!cancelled) { setLoading(false); navigate('/firma-profil'); }
           return;
         }
@@ -223,6 +246,27 @@ const ProfilePage = () => {
         setUser(currentUser);
         // Enes Doğanay | 11 Nisan 2026: Supabase'den bekleyen e-posta değişikliğini oku
         if (currentUser.new_email) setPendingEmail(currentUser.new_email);
+
+        // Enes Doğanay | 4 Mayıs 2026: Admin/member üyeliği varsa state'e kaydet
+        // Enes Doğanay | 4 Mayıs 2026: Davetleri her kullanıcı için çek — firma üyesi olmayanlar da kabul edebilmeli
+        if (companyData?.firma_id) {
+          setMyCompany({ firma_id: companyData.firma_id, role: companyData.role, title: companyData.title || null });
+          const { data: firmaRes } = await supabase.from('firmalar').select('firmaID, firma_adi, ana_sektor, il_ilce').eq('firmaID', companyData.firma_id).maybeSingle();
+          if (firmaRes) setMyCompanyFirma(firmaRes);
+        }
+
+        // Tüm kullanıcılar için bekleyen davetleri çek (user_id üzerinden)
+        const { data: rawInvites } = await supabase
+          .from('firma_davetleri')
+          .select('*')
+          .eq('invited_user_id', currentUser.id)
+          .eq('status', 'pending');
+        if (rawInvites && rawInvites.length > 0) {
+          const davetFirmaIds = [...new Set(rawInvites.map(d => d.firma_id))];
+          const { data: davetFirmalar } = await supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', davetFirmaIds);
+          const dfMap = Object.fromEntries((davetFirmalar || []).map(f => [f.firmaID, f.firma_adi]));
+          setPendingInvites(rawInvites.map(d => ({ ...d, _firma_adi: dfMap[d.firma_id] || null })));
+        }
 
         const [profileResult, cityResult, listsResult, favsResult, notificationsResult, remindersResult, quotesResult] = await Promise.all([
           supabase.from("profiles").select("id, first_name, last_name, company_name, phone, location, avatar, email, marketing_consent").eq("id", currentUser.id).single(),
@@ -1066,6 +1110,27 @@ const ProfilePage = () => {
 
   const handleLogout = async () => { await supabase.auth.signOut(); navigate("/"); };
 
+  // Enes Doğanay | 4 Mayıs 2026: Firma davetini kabul et
+  const handleDavetKabul = async (davetId) => {
+    const { error } = await supabase.rpc('accept_firma_daveti', { p_davet_id: davetId });
+    if (error) { console.error('Davet kabul hatası:', error); return; }
+    const accepted = pendingInvites.find(d => d.id === davetId);
+    if (accepted) {
+      setMyCompany({ firma_id: accepted.firma_id, role: accepted.role, title: accepted.title || null });
+      const { data: firmaRes } = await supabase.from('firmalar').select('firmaID, firma_adi, ana_sektor, il_ilce').eq('firmaID', accepted.firma_id).maybeSingle();
+      if (firmaRes) setMyCompanyFirma(firmaRes);
+    }
+    setPendingInvites(prev => prev.filter(d => d.id !== davetId));
+  };
+
+  // Enes Doğanay | 4 Mayıs 2026: Firma davetini reddet
+  const handleDavetRed = async (davetId) => {
+    await supabase.from('firma_davetleri').update({ status: 'rejected' }).eq('id', davetId);
+    setPendingInvites(prev => prev.filter(d => d.id !== davetId));
+  };
+
+
+
   const handleAvatarUpload = async (event) => {
     try {
       setUploading(true);
@@ -1279,6 +1344,13 @@ const ProfilePage = () => {
               <a className={`nav-item ${currentTab === 'my-offers' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'my-offers' })}>
                 <span className="material-symbols-outlined">assignment_turned_in</span> İhale Tekliflerim
               </a>
+              {/* Enes Doğanay | 4 Mayıs 2026: Şirketim sekmesi — admin/member olan kullanıcılar için */}
+              {(myCompany || pendingInvites.length > 0) && (
+                <a className={`nav-item ${currentTab === 'sirketim' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'sirketim' })}>
+                  <span className="material-symbols-outlined">corporate_fare</span> Şirketim
+                  {pendingInvites.length > 0 && <span className="nav-item-badge">{pendingInvites.length}</span>}
+                </a>
+              )}
               <a className={`nav-item ${currentTab === 'notifications' ? 'active' : ''}`} onClick={() => setSearchParams({ tab: 'notifications' })}>
                 <span className="material-symbols-outlined">notifications</span> Bildirimler
                 {unreadNotificationsCount > 0 && <span className="nav-item-badge">{unreadNotificationsCount}</span>}
@@ -1909,6 +1981,109 @@ const ProfilePage = () => {
               <MyOffersPanel />
             )}
 
+            {/* Enes Doğanay | 4 Mayıs 2026: Şirketim sekmesi — ekip üyesi profil paneli */}
+            {currentTab === 'sirketim' && (
+              <div className="sirketim-panel">
+                <div className="sirketim-header">
+                  <h2>Şirketim</h2>
+                  <p>Bağlı olduğunuz firma bilgileri ve gelen davetler.</p>
+                </div>
+
+                {pendingInvites.length > 0 && (
+                  <div className="sirketim-invites-card">
+                    <h3><span className="material-symbols-outlined">mail</span> Bekleyen Davetler</h3>
+                    {pendingInvites.map(inv => (
+                      <div key={inv.id} className="sirketim-invite-row">
+                        <div className="sirketim-invite-info">
+                          <span className="sirketim-invite-firma">{inv._firma_adi || inv.firma_id}</span>
+                          <span className={`ekip-role-badge ekip-role-badge--${inv.role}`}>{inv.role === 'admin' ? 'Yönetici' : 'Üye'}</span>
+                          {inv.title && <span className="sirketim-invite-title">{inv.title}</span>}
+                        </div>
+                        <div className="sirketim-invite-actions">
+                          <button className="sirketim-btn-accept" onClick={() => handleDavetKabul(inv.id)}>
+                            <span className="material-symbols-outlined">check</span> Kabul Et
+                          </button>
+                          <button className="sirketim-btn-reject" onClick={() => handleDavetRed(inv.id)}>
+                            <span className="material-symbols-outlined">close</span> Reddet
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {myCompany && myCompanyFirma && (
+                  <div className="sirketim-firma-card">
+                    <div className="sirketim-firma-top">
+                      <span className="material-symbols-outlined sirketim-firma-icon">business</span>
+                      <div>
+                        <h3>{myCompanyFirma.firma_adi}</h3>
+                        {myCompanyFirma.ana_sektor && <p className="sirketim-firma-sektor">{myCompanyFirma.ana_sektor}</p>}
+                        {myCompanyFirma.il_ilce && <p className="sirketim-firma-sehir"><span className="material-symbols-outlined">location_on</span>{myCompanyFirma.il_ilce}</p>}
+                      </div>
+                    </div>
+                    <div className="sirketim-my-role-row">
+                      <span>Rolünüz:</span>
+                      <span className={`ekip-role-badge ekip-role-badge--${myCompany.role}`}>
+                        {myCompany.role === 'admin' ? 'Yönetici' : 'Üye'}
+                      </span>
+                      {myCompany.title && <span className="sirketim-my-title">{myCompany.title}</span>}
+                    </div>
+                    {/* Enes Doğanay | 4 Mayıs 2026: Admin/üye — owner ile aynı sayfaya yönlendir */}
+                    <div className="sirketim-panel-actions">
+                      <button
+                        className={`sirketim-panel-btn${sirketimSubPanel === 'teklifler' ? ' active' : ''}`}
+                        onClick={() => setSirketimSubPanel(p => p === 'teklifler' ? null : 'teklifler')}
+                      >
+                        <span className="material-symbols-outlined">request_quote</span>
+                        Teklif Yönetimi
+                        <span className="material-symbols-outlined sirketim-panel-btn-arrow">
+                          {sirketimSubPanel === 'teklifler' ? 'expand_less' : 'expand_more'}
+                        </span>
+                      </button>
+                      <button
+                        className={`sirketim-panel-btn${sirketimSubPanel === 'ihaleler' ? ' active' : ''}`}
+                        onClick={() => setSirketimSubPanel(p => p === 'ihaleler' ? null : 'ihaleler')}
+                      >
+                        <span className="material-symbols-outlined">gavel</span>
+                        İhale Yönetimi
+                        <span className="material-symbols-outlined sirketim-panel-btn-arrow">
+                          {sirketimSubPanel === 'ihaleler' ? 'expand_less' : 'expand_more'}
+                        </span>
+                      </button>
+                    </div>
+
+                    {/* Enes Doğanay | 4 Mayıs 2026: iframe ile tam sayfa gömme — aynı origin, aynı session */}
+                    {sirketimSubPanel && (
+                      <div className="sirketim-iframe-wrap">
+                        <iframe
+                          key={sirketimSubPanel}
+                          ref={sirketimIframeRef}
+                          src={`/firma-profil?tab=${sirketimSubPanel === 'teklifler' ? 'teklifler' : 'ihale-yonetimi'}&embedded=1`}
+                          className="sirketim-iframe"
+                          title={sirketimSubPanel === 'teklifler' ? 'Teklif Yönetimi' : 'İhale Yönetimi'}
+                          onLoad={() => {
+                            // Enes Doğanay | 4 Mayıs 2026: iframe yüklenince mevcut temayı gönder
+                            sirketimIframeRef.current?.contentWindow?.postMessage(
+                              { type: 'tedport-theme', theme },
+                              window.location.origin
+                            );
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!myCompany && pendingInvites.length === 0 && (
+                  <div className="sirketim-empty">
+                    <span className="material-symbols-outlined">corporate_fare</span>
+                    <p>Henüz bir firmaya bağlı değilsiniz.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {currentTab === 'notifications' && (
               <div className="notifications-section">
                 <div className="notifications-hero">
@@ -2056,6 +2231,10 @@ const ProfilePage = () => {
                                   sessionStorage.setItem('mop_open_teklif_chat', String(notification.metadata.teklif_id));
                                 }
                                 navigate('/profile?tab=my-offers');
+                              } else if (notification.type === 'firma_daveti') {
+                                // Enes Doğanay | 4 Mayıs 2026: Firma daveti bildirimi — Şirketim sekmesine yönlendir
+                                if (!notification.is_read) handleMarkNotificationRead(notification.id);
+                                navigate('/profile?tab=sirketim');
                               } else if (notification.metadata?.teklif_id) {
                                 navigateToQuoteChat(notification);
                               } else if (notification.firma_id) {
@@ -2063,12 +2242,12 @@ const ProfilePage = () => {
                                 navigate(`/firmadetay/${notification.firma_id}`);
                               }
                             }}
-                            style={{ cursor: notification.metadata?.teklif_id || notification.firma_id || notification.type?.startsWith('tender_') ? 'pointer' : 'default' }}
+                            style={{ cursor: notification.metadata?.teklif_id || notification.firma_id || notification.type?.startsWith('tender_') || notification.type === 'firma_daveti' ? 'pointer' : 'default' }}
                           >
                             <div className="notification-feed-top">
                               <div>
                                 {/* Enes Doğanay | 14 Haziran 2025: İhale teklif bildirim tipleri eklendi */}
-                              <span className="notification-feed-type">{notification.type === 'reminder' ? '⏰ Hatırlatma' : notification.type === 'quote_received' ? '📩 Yeni Teklif' : notification.type === 'quote_reply' ? '💬 Yanıt Geldi' : notification.type === 'quote_message' ? '✉️ Yeni Mesaj' : notification.type === 'tender_new_offer' ? '📋 Yeni İhale Teklifi' : notification.type === 'tender_offer_updated' ? '✏️ Teklif Güncellendi' : notification.type === 'tender_offer_status' ? '📊 Teklif Durumu' : notification.type === 'tender_updated' ? '📝 İhale Güncellendi' : notification.type === 'tender_closed' ? '🔒 İhale Kapandı' : notification.type === 'tender_cancelled' ? '❌ İhale İptal' : notification.type === 'tender_offer_withdrawn' ? '↩️ Teklif Geri Çekildi' : notification.type === 'tender_offer_message' ? '💬 İhale Teklif Mesajı' : '🔔 Bildirim'}</span>
+                              <span className="notification-feed-type">{notification.type === 'reminder' ? '⏰ Hatırlatma' : notification.type === 'quote_received' ? '📩 Yeni Teklif' : notification.type === 'quote_reply' ? '💬 Yanıt Geldi' : notification.type === 'quote_message' ? '✉️ Yeni Mesaj' : notification.type === 'tender_new_offer' ? '📋 Yeni İhale Teklifi' : notification.type === 'tender_offer_updated' ? '✏️ Teklif Güncellendi' : notification.type === 'tender_offer_status' ? '📊 Teklif Durumu' : notification.type === 'tender_updated' ? '📝 İhale Güncellendi' : notification.type === 'tender_closed' ? '🔒 İhale Kapandı' : notification.type === 'tender_cancelled' ? '❌ İhale İptal' : notification.type === 'tender_offer_withdrawn' ? '↩️ Teklif Geri Çekildi' : notification.type === 'tender_offer_message' ? '💬 İhale Teklif Mesajı' : notification.type === 'firma_daveti' ? '🏢 Firma Daveti' : '🔔 Bildirim'}</span>
                                 <h4>{notification.title}</h4>
                               </div>
                               <span className="notification-feed-time">{formatRelativeNotificationTime(notification.created_at)}</span>

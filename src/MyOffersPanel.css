@@ -715,6 +715,22 @@
     box-shadow: 0 4px 12px rgba(99,102,241,0.18);
 }
 .mop-btn--chat-unread { background: #e0e7ff; border-color: #4f46e5; }
+/* Enes Doğanay | 4 Mayıs 2026: Okunmamış mesaj sayı badge */
+.mop-chat-unread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 99px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-left: 2px;
+}
 .mop-chat-unread-dot {
     position: absolute;
     top: 6px;

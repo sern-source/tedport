@@ -65,16 +65,19 @@ export function AuthProvider({ children }) {
   // Enes Doğanay | 2 Mayıs 2026: Sekme doğrulaması sürerken SIGNED_IN → loadUserData'yı engelle
   const validatingLoginRef = useRef(false);
 
+  // Enes Doğanay | 4 Mayıs 2026: Retry sayacı — timeout'ta sonsuz döngü yerine max 4 deneme
+  const loadUserDataRetryRef = useRef(0);
+
   // Enes Doğanay | 13 Nisan 2026: useCallback ile sarıldı — stabil referans, gereksiz yeniden oluşturma önlenir
   const loadUserData = useCallback(async () => {
     // Enes Doğanay | 10 Nisan 2026: Logout sırasında session tekrar yüklenmesin
     if (isLoggingOutRef.current) return;
     try {
-      // Enes Doğanay | 2 Mayıs 2026: getSession'a 5sn timeout — Supabase paused/yavaş olursa
-      // network refresh isteği asılı kalır; timeout fırlatırsa catch→finally devreye girer, authChecked=true olur
+      // Enes Doğanay | 4 Mayıs 2026: getSession'a 12sn timeout — Supabase token refresh network isteği yavaşsa
+      // 5sn yetmiyordu, sürekli clearAuthState→CLOSED döngüsüne giriyordu; 12sn çoğu durumda yeterli
       const sessionPromise = supabase.auth.getSession();
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('getSession timeout')), 5000)
+        setTimeout(() => reject(new Error('getSession timeout')), 12000)
       );
       const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
 
@@ -87,12 +90,15 @@ export function AuthProvider({ children }) {
       if (session.access_token) {
         supabase.realtime.setAuth(session.access_token);
       }
+      // Enes Doğanay | 4 Mayıs 2026: Başarıyla oturuma ulaşıldı — retry sayacını sıfırla
+      loadUserDataRetryRef.current = 0;
       setRealtimeUserId(session.user.id);
 
       // Enes Doğanay | 10 Nisan 2026: Veri yükleme — hata olursa session temizle (stale token tespiti)
       const [adminResult, companyResult, profileResult, notifResult, prefsResult] = await Promise.all([
         resolveIsAdminUser(session.user.email, isAdminEmail),
-        supabase.from('kurumsal_firma_yoneticileri').select('firma_id').eq('user_id', session.user.id).maybeSingle(),
+        // Enes Doğanay | 4 Mayıs 2026: Sadece owner kurumsal panel alır; admin/member bireysel kullanıcıdır
+        supabase.from('kurumsal_firma_yoneticileri').select('firma_id').eq('user_id', session.user.id).eq('role', 'owner').maybeSingle(),
         supabase.from('profiles').select('first_name, last_name').eq('id', session.user.id).single(),
         /* Enes Doğanay | 17 Nisan 2026: type dahil çek — tercih filtresi için */
         supabase.from('bildirimler').select('id, type').eq('user_id', session.user.id).eq('is_read', false),
@@ -179,6 +185,19 @@ export function AuthProvider({ children }) {
       // Enes Doğanay | 10 Nisan 2026: AbortError = race condition, state'i temizleme — onAuthStateChange tekrar tetikleyecek
       // Enes Doğanay | 16 Nisan 2026: name kontrolü eklendi — DOMException AbortError'ları da yakala
       if (err?.name === 'AbortError' || err?.message?.includes('abort')) return;
+      // Enes Doğanay | 4 Mayıs 2026: Timeout hatası gelince clearAuthState çağırma — onAuthStateChange zaten
+      // kendi network isteği tamamlanınca SIGNED_IN verecek; clearAuthState→CLOSED döngüsünü önler
+      if (err?.message === 'getSession timeout') {
+        if (loadUserDataRetryRef.current < 4) {
+          loadUserDataRetryRef.current += 1;
+          const retryDelay = loadUserDataRetryRef.current * 5000; // 5s, 10s, 15s, 20s
+          console.warn(`[Auth] getSession yavaş, ${retryDelay / 1000}sn sonra tekrar denenecek... (deneme ${loadUserDataRetryRef.current}/4)`);
+          setTimeout(() => loadUserData().catch(() => {}), retryDelay);
+        } else {
+          console.warn('[Auth] getSession 4 denemede de başarısız — sayfa yenileme gerekebilir.');
+        }
+        return;
+      }
       console.error('Auth hatası:', err);
       clearAuthState();
     } finally {
@@ -326,9 +345,10 @@ export function AuthProvider({ children }) {
         if (prefKey && prefs[prefKey] === false) return;
       }
 
-      const isQuoteNotif = (n.type === 'quote_reply' || n.type === 'quote_message' || n.type === 'quote_received');
+      // Enes Doğanay | 4 Mayıs 2026: tender_offer_message türü de eklendi — TOM/MOP popup açıkken bastır
+      const isChatNotif = (n.type === 'quote_reply' || n.type === 'quote_message' || n.type === 'quote_received' || n.type === 'tender_offer_message');
       const notifTeklifId = n.metadata?.teklif_id;
-      const isViewingThisChat = isQuoteNotif && notifTeklifId && activeViewingTeklifIdRef.current === notifTeklifId;
+      const isViewingThisChat = isChatNotif && notifTeklifId && String(activeViewingTeklifIdRef.current) === String(notifTeklifId);
 
       if (!isViewingThisChat) {
         /* Enes Doğanay | 17 Nisan 2026: Anlık bildirimler (pop-up) tercihi kapalıysa toast gösterme */

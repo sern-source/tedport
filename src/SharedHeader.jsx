@@ -87,14 +87,18 @@ const SharedHeader = ({
     };
 
     // Default navigation items
+    // Enes Doğanay | 4 Mayıs 2026: Anasayfa eklendi; mevcut sayfa nav'dan gizlenir
     const defaultNavItems = [
+        { label: 'Anasayfa', href: '/' },
         { label: 'Firmalar', href: '/firmalar' },
         { label: 'İhaleler', href: '/ihaleler' },
         { label: 'Hakkımızda', href: '/hakkimizda' },
         { label: 'İletişim', href: '/iletisim' }
     ];
 
-    const items = navItems || defaultNavItems;
+    const allItems = navItems || defaultNavItems;
+    // Enes Doğanay | 4 Mayıs 2026: Bulunduğumuz sayfanın linki nav'da gizlenir
+    const items = allItems.filter(item => item.href !== location.pathname);
 
     {/* Enes Doğanay | 16 Nisan 2026: Ana sayfa dışında tüm sayfalarda geri butonu */}
     const isHomePage = location.pathname === '/';
@@ -237,7 +241,7 @@ const SharedHeader = ({
                                     {item.label}
                                 </Link>
                             ))}
-                            {authChecked && !userProfile && <Link to="/login">Giriş Yap</Link>}
+                            {authChecked && !userProfile && location.pathname !== '/login' && <Link to="/login">Giriş Yap</Link>}
                         </div>
 
                     {/* User Actions */}
@@ -327,6 +331,22 @@ const SharedHeader = ({
                                                 </span>
                                                 <span className="shared-user-menu-label">
                                                     İhale Yönetimi
+                                                </span>
+                                            </button>
+                                            {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi dropdown — sadece owner (managedCompanyId) */}
+                                            <button
+                                                type="button"
+                                                className="shared-user-menu-item"
+                                                onClick={() => {
+                                                    setIsDropdownOpen(false);
+                                                    navigate('/firma-profil?tab=ekip');
+                                                }}
+                                            >
+                                                <span className="material-symbols-outlined shared-user-menu-icon">
+                                                    group
+                                                </span>
+                                                <span className="shared-user-menu-label">
+                                                    Ekip Yönetimi
                                                 </span>
                                             </button>
                                             <button
@@ -526,6 +546,23 @@ const SharedHeader = ({
                                                     </span>
                                                 </button>
 
+                                                {/* Enes Doğanay | 4 Mayıs 2026: Şirketim menü girişi — bireysel */}
+                                                <button
+                                                    type="button"
+                                                    className="shared-user-menu-item"
+                                                    onClick={() => {
+                                                        setIsDropdownOpen(false);
+                                                        navigate('/profile?tab=sirketim');
+                                                    }}
+                                                >
+                                                    <span className="material-symbols-outlined shared-user-menu-icon">
+                                                        domain
+                                                    </span>
+                                                    <span className="shared-user-menu-label">
+                                                        Şirketim
+                                                    </span>
+                                                </button>
+
                                                 <button
                                                     type="button"
                                                     className="shared-user-menu-item"
@@ -597,7 +634,7 @@ const SharedHeader = ({
                             {item.label}
                         </Link>
                     ))}
-                    {authChecked && !userProfile && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Giriş Yap</Link>}
+                    {authChecked && !userProfile && location.pathname !== '/login' && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Giriş Yap</Link>}
                     {authChecked && !userProfile && <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="shared-mobile-register">Kayıt Ol</Link>}
                     {userProfile && (
                         <>
@@ -621,6 +658,11 @@ const SharedHeader = ({
                                     <Link to="/firma-profil?tab=ihale-yonetimi" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">gavel</span>
                                         İhale Yönetimi
+                                    </Link>
+                                    {/* Enes Doğanay | 4 Mayıs 2026: Ekip Yönetimi mobil menü — sadece owner */}
+                                    <Link to="/firma-profil?tab=ekip" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">group</span>
+                                        Ekip Yönetimi
                                     </Link>
                                     <Link to="/firma-profil?tab=bildirimler" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>
@@ -648,6 +690,11 @@ const SharedHeader = ({
                                     <Link to="/profile?tab=my-offers" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">assignment_turned_in</span>
                                         İhale Tekliflerim
+                                    </Link>
+                                    {/* Enes Doğanay | 4 Mayıs 2026: Şirketim mobil menü — bireysel */}
+                                    <Link to="/profile?tab=sirketim" onClick={() => setIsMobileMenuOpen(false)}>
+                                        <span className="material-symbols-outlined shared-mobile-menu-icon">domain</span>
+                                        Şirketim
                                     </Link>
                                     <Link to="/profile?tab=notifications" onClick={() => setIsMobileMenuOpen(false)}>
                                         <span className="material-symbols-outlined shared-mobile-menu-icon">notifications</span>
