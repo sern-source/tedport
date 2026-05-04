@@ -575,8 +575,9 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
     }, []);
 
     /* ─── Veri Çekme ─── */
+    // Enes Doğanay | 4 Mayıs 2026: companyId yoksa loading'i kapat — authChecked timeout'unda null gelirse sayfa takılmasın
     useEffect(() => {
-        if (!companyId) return;
+        if (!companyId) { setLoading(false); return; }
         const load = async () => {
             setLoading(true);
             setError('');
