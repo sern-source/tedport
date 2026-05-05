@@ -102,7 +102,20 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentTab = searchParams.get('tab') || 'profile';
+  // Enes Doğanay | 5 Mayıs 2026: open_mop_chat URL param — toast tıklamasından gelir, chat'i tetikle
+  useEffect(() => {
+    const chatId = searchParams.get('open_mop_chat');
+    if (!chatId) return;
+    setMopChatTrigger(chatId);
+    // URL'den param'ı temizle (geri/ileri navigasyonda tekrar tetiklenmesin)
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.delete('open_mop_chat');
+      return next;
+    }, { replace: true });
+  }, [searchParams]);
 
+  // Enes Doğanay | 5 Mayıs 2026: user state — oturum açan kullanıcı
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [cities, setCities] = useState([]);
@@ -206,6 +219,8 @@ const ProfilePage = () => {
   const [myCompany, setMyCompany] = useState(null);    // { firma_id, role, title, page_permissions }
   const [myCompanyFirma, setMyCompanyFirma] = useState(null); // firma kaydı
   const [pendingInvites, setPendingInvites] = useState([]); // bekleyen davetler
+  // Enes Doğanay | 5 Mayıs 2026: Bildirim tıklamasıyla MOP chat tetikleme — display:none/block için sessionStorage çalışmıyor
+  const [mopChatTrigger, setMopChatTrigger] = useState(null);
 
   // Enes Doğanay | 4 Mayıs 2026: Şirketim inline sub-panel state'leri
   const [sirketimSubPanel, setSirketimSubPanel] = useState(null); // null | 'teklifler' | 'ihaleler'
@@ -2097,7 +2112,11 @@ const ProfilePage = () => {
 
             {/* Enes Doğanay | 22 Mayıs 2026: Verdiğim Teklifler — display:none ile kalıcı mount; tab geçişinde unmount olmaz */}
             <div style={{ display: currentTab === 'my-offers' ? 'block' : 'none' }}>
-              <MyOffersPanel onUnreadCountChange={setMyOffersUnreadCount} />
+              <MyOffersPanel
+                onUnreadCountChange={setMyOffersUnreadCount}
+                openChatTeklifId={mopChatTrigger}
+                onChatOpened={() => setMopChatTrigger(null)}
+              />
             </div>
 
             {/* Enes Doğanay | 4 Mayıs 2026: Şirketim sekmesi — ekip üyesi profil paneli */}
@@ -2382,12 +2401,15 @@ const ProfilePage = () => {
                                 if (!notification.is_read) handleMarkNotificationRead(notification.id);
                                 if (notification.metadata?.ihale_id) navigate(`/ihaleler?ihale=${notification.metadata.ihale_id}`);
                               } else if (notification.type === 'tender_offer_message') {
-                                // Enes Doğanay | 2 Mayıs 2026: İhale teklif mesajı bildirimi — teklif chatini aç
+                                // Enes Doğanay | 5 Mayıs 2026: İhale teklif mesajı bildirimi — teklif chatini aç
                                 if (!notification.is_read) handleMarkNotificationRead(notification.id);
                                 if (notification.metadata?.teklif_id) {
+                                  // sessionStorage: sayfa navigate edilecekse (farklı sayfa)
                                   sessionStorage.setItem('mop_open_teklif_chat', String(notification.metadata.teklif_id));
+                                  // prop: aynı sayfa içindeyse (tab geçişi, display:none çalışmıyor)
+                                  setMopChatTrigger(String(notification.metadata.teklif_id));
                                 }
-                                navigate('/profile?tab=my-offers');
+                                setSearchParams({ tab: 'my-offers' });
                               } else if (notification.type === 'firma_daveti') {
                                 // Enes Doğanay | 4 Mayıs 2026: Firma daveti bildirimi — Şirketim sekmesine yönlendir
                                 if (!notification.is_read) handleMarkNotificationRead(notification.id);

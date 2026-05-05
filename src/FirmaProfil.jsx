@@ -345,6 +345,22 @@ const FirmaProfil = () => {
         });
     }, [companyId]);
 
+    // Enes Doğanay | 5 Mayıs 2026: URL teklif_id param — aynı sayfadayken toast tıklamasından chat aç
+    // init() tek seferlik çalışır; bu effect searchParams değişince tekrar tetiklenir
+    useEffect(() => {
+        const urlTeklifId = searchParams.get('teklif_id');
+        if (!urlTeklifId || quotesLoading) return;
+        const tid = parseInt(urlTeklifId, 10);
+        if (isNaN(tid)) return;
+        const allQuotes = [...incomingQuotes, ...outgoingQuotes];
+        const targetQuote = allQuotes.find(q => q.id === tid);
+        if (!targetQuote) return;
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('teklif_id');
+        setSearchParams(newParams, { replace: true });
+        setTimeout(() => openQuoteChat(targetQuote), 200);
+    }, [searchParams, quotesLoading, incomingQuotes, outgoingQuotes]);
+
     // Enes Doğanay | 9 Nisan 2026: Polling — 5 sn'de bir teklif listesini DB'den taze çek
     // Enes Doğanay | 9 Nisan 2026: Son mesajın sender_role'üne göre _displayStatus hesapla
     useEffect(() => {

@@ -422,6 +422,8 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
             tenderChatChannelRef.current = null;
         }
         setActiveTenderChat({ offer, tenderTitle, tenderDurum });
+        // Enes Doğanay | 5 Mayıs 2026: Sohbet açıkken aynı teklife ait toast bastır
+        setActiveViewingTeklifId?.(offer.id);
         setTenderChatLoading(true);
         setTenderChatError(false);
         setTenderChatInput('');
@@ -699,11 +701,30 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
     }, [companyId, tenders]);
 
     /* Enes Doğanay | 13 Nisan 2026: URL params → highlight specific offer (bildirim navigasyonu) */
+    /* Enes Doğanay | 5 Mayıs 2026: open_tender_chat param eklendi — toast tıklamasından chat aç */
     useEffect(() => {
         if (loading || tenders.length === 0) return;
         const ihaleParam = searchParams.get('ihale');
         const teklifUserParam = searchParams.get('teklif_user');
-        if (!ihaleParam) return;
+        const openTenderChatParam = searchParams.get('open_tender_chat');
+        if (!ihaleParam && !openTenderChatParam) return;
+
+        /* open_tender_chat: teklif id'sine göre doğrudan chat aç */
+        if (openTenderChatParam) {
+            const allOffers = Object.values(offersByTender).flat();
+            const targetOffer = allOffers.find(o => String(o.id) === String(openTenderChatParam));
+            if (targetOffer) {
+                const tender = tenders.find(t => String(t.id) === String(targetOffer.ihale_id));
+                setSelectedId(targetOffer.ihale_id);
+                openTenderChat(targetOffer, tender?.baslik, tender?.durum);
+            }
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('open_tender_chat');
+            newParams.delete('ihale');
+            newParams.delete('teklif_user');
+            setSearchParams(newParams, { replace: true });
+            return;
+        }
 
         /* İhaleyi seç */
         const targetTender = tenders.find(t => String(t.id) === String(ihaleParam));
@@ -730,7 +751,7 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
         newParams.delete('ihale');
         newParams.delete('teklif_user');
         setSearchParams(newParams, { replace: true });
-    }, [loading, tenders, offersByTender]);
+    }, [loading, tenders, offersByTender, searchParams]);
 
     /* Enes Doğanay | 2 Mayıs 2026: Bildirimden yönlendirme — sessionStorage tom_open_teklif_chat ile chat aç */
     useEffect(() => {
@@ -759,9 +780,14 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
             }, (payload) => {
                 const m = payload.new;
                 if (!allOfferIds.includes(m.teklif_id)) return;
-                // Chat açık değilse sayacı artır
-                setUnreadTenderChatIds(prev => { const s = new Set(prev); s.add(m.teklif_id); return s; });
-                setUnreadTenderChatCounts(prev => ({ ...prev, [m.teklif_id]: (prev[m.teklif_id] || 0) + 1 }));
+                // Chat açık değilse sayacı artır (açıksa kullanıcı zaten görüyordur)
+                setActiveTenderChat(currentChat => {
+                    if (currentChat?.offer?.id !== m.teklif_id) {
+                        setUnreadTenderChatIds(prev => { const s = new Set(prev); s.add(m.teklif_id); return s; });
+                        setUnreadTenderChatCounts(prev => ({ ...prev, [m.teklif_id]: (prev[m.teklif_id] || 0) + 1 }));
+                    }
+                    return currentChat;
+                });
             })
             .subscribe();
         unreadBroadcastChannelRef.current = channel;

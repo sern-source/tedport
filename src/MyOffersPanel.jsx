@@ -120,7 +120,7 @@ const timeAgo = (iso) => {
     return formatDate(iso);
 };
 
-const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
+const MyOffersPanel = ({ companyId, onUnreadCountChange, openChatTeklifId, onChatOpened } = {}) => {
     const navigate = useNavigate();
     const { getUserId, userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName, setActiveViewingTeklifId, refreshCounts } = useAuth() || {};
     const [loading, setLoading] = useState(true);
@@ -497,6 +497,19 @@ const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
             openMopChat(targetOffer, tender.baslik, firmaAdi, tender.anonim);
         }
     }, [loading, offers]);
+
+    // Enes Doğanay | 5 Mayıs 2026: openChatTeklifId prop — Profile.jsx'ten doğrudan tetikleme
+    // (bildirime tıklanınca tab zaten açıksa sessionStorage useEffect tetiklenmiyor, bu çözer)
+    useEffect(() => {
+        if (!openChatTeklifId || loading || offers.length === 0) return;
+        const targetOffer = offers.find(o => String(o.id) === String(openChatTeklifId));
+        if (targetOffer) {
+            const tender = tenderMap[String(targetOffer.ihale_id)] || {};
+            const firmaAdi = tender.anonim ? 'Anonim Firma' : (firmaMap[String(tender.firma_id)] || 'Firma');
+            openMopChat(targetOffer, tender.baslik, firmaAdi, tender.anonim);
+        }
+        onChatOpened?.();
+    }, [openChatTeklifId, loading, offers]);
 
     /* Enes Doğanay | 13 Nisan 2026: Filtreleme ve arama */
     const filtered = useMemo(() => {
