@@ -240,7 +240,7 @@ const ScoreRing = ({ score, size = 52 }) => {
    ═══════════════════════════════════════════════════ */
 const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
     /* ─── State ─── */
-    const { setActiveViewingTeklifId, refreshCounts } = useAuth() || {};
+    const { getUserId, userProfile: tomUserProfile, setActiveViewingTeklifId, refreshCounts } = useAuth() || {};
     const [searchParams, setSearchParams] = useSearchParams();
     // Enes Doğanay | 2 Mayıs 2026: İhaleler sayfasındaki 4-adımlı forma yönlendirmek için
     const navigate = useNavigate();
@@ -388,6 +388,8 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
     const [activeTenderChat, setActiveTenderChat] = useState(null); // { offer, tenderTitle }
     const [tenderChatMessages, setTenderChatMessages] = useState([]);
     const [tenderChatLoading, setTenderChatLoading] = useState(false);
+    // Enes Doğanay | 5 Mayıs 2026: Chat yükleme hata state'i — timeout/network hatası için retry butonu
+    const [tenderChatError, setTenderChatError] = useState(false);
     const [tenderChatInput, setTenderChatInput] = useState('');
     const [tenderChatSending, setTenderChatSending] = useState(false);
     const tenderChatChannelRef = useRef(null);
@@ -421,10 +423,12 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
         }
         setActiveTenderChat({ offer, tenderTitle, tenderDurum });
         setTenderChatLoading(true);
+        setTenderChatError(false);
         setTenderChatInput('');
         setTenderChatMessages([]);
 
         try {
+            // Enes Doğanay | 5 Mayıs 2026: Doğrudan sorgu — 15s manual timeout kaldırıldı (global 10s fetch timeout zaten yeterli)
             const { data } = await supabase
                 .from('ihale_teklif_mesajlari')
                 .select('*')
@@ -453,6 +457,8 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
                 .then(() => { refreshCounts?.(); });
         } catch (err) {
             if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
+            // Enes Doğanay | 5 Mayıs 2026: Timeout veya network hatası — hata state'i set et, retry butonu göster
+            setTenderChatError(true);
         } finally {
             setTenderChatLoading(false);
         }
@@ -492,8 +498,9 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
     const submitReport = useCallback(async () => {
         if (!reportModal || reportSending) return;
         setReportSending(true);
-        const { data: authData } = await supabase.auth.getUser();
-        const reporterId = authData?.user?.id;
+        // Enes Doğanay | 5 Mayıs 2026: getUser() → getSession() — local cache, ağ isteği yok
+        const { data: { session: rSession } } = await supabase.auth.getSession();
+        const reporterId = rSession?.user?.id;
         if (!reporterId) { setReportSending(false); return; }
         const { error } = await supabase.from('mesaj_sikayetleri').insert([{
             reporter_id: reporterId,
@@ -513,57 +520,58 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
         }
     }, [reportModal, reportSending, reportNeden, reportAciklama]);
 
-    /* Enes Doğanay | 2 Mayıs 2026: Firma olarak mesaj gönder */
+    /* Enes Doğanay | 5 Mayıs 2026: Firma olarak mesaj gönder — Supabase docs pattern:
+     * insert → anında state güncelle → spinner serbest → enrichment + broadcast background'da */
     const sendTenderChatMessage = useCallback(async () => {
         if (!tenderChatInput.trim() || !activeTenderChat) return;
-        // Kapalı ihalede mesaj gönderilemesin
         if (activeTenderChat.tenderDurum === 'kapali') return;
+        const senderId = getUserId?.();
+        if (!senderId) return;
+        const messageText = tenderChatInput.trim();
         setTenderChatSending(true);
-        const { data: authData } = await supabase.auth.getUser();
-        const senderId = authData?.user?.id;
-        if (!senderId) { setTenderChatSending(false); return; }
-
-        const { data, error } = await supabase
-            .from('ihale_teklif_mesajlari')
-            .insert([{
-                teklif_id: activeTenderChat.offer.id,
-                sender_id: senderId,
-                sender_role: 'company',
-                mesaj: tenderChatInput.trim(),
-                okundu_firma: true,
-            }])
-            .select()
-            .single();
-
-        if (!error && data) {
-            // Enes Doğanay | 4 Mayıs 2026: Gönderilen mesajı enrichment ile ekle — 'Firma' fallbackı önle
-            const [enriched] = await enrichMessagesWithSender([data], supabase);
-            setTenderChatMessages(prev => [...prev, enriched || data]);
+        try {
+            const { data, error } = await supabase
+                .from('ihale_teklif_mesajlari')
+                .insert([{
+                    teklif_id: activeTenderChat.offer.id,
+                    sender_id: senderId,
+                    sender_role: 'company',
+                    mesaj: messageText,
+                    okundu_firma: true,
+                }])
+                .select()
+                .single();
+            if (error) throw error;
+            // Enes Doğanay | 5 Mayıs 2026: Anında göster (ham data) — spinner hemen serbest kalır
+            setTenderChatMessages(prev => [...prev, data]);
             setTenderChatInput('');
-            if (tenderChatChannelRef.current) {
-                await tenderChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data });
-            }
+            setTenderChatSending(false); // ← spinner hemen serbest
             scrollTenderChatToBottom();
-            // Teklif veren kullanıcıya bildirim gönder
-            try {
-                if (activeTenderChat.offer.user_id) {
-                    await supabase.from('bildirimler').insert([{
-                        user_id: activeTenderChat.offer.user_id,
-                        type: 'tender_offer_message',
-                        title: 'İhale teklifine yeni mesaj',
-                        message: `"${activeTenderChat.tenderTitle || 'İhale'}" teklifinize firma yanıt verdi.`,
-                        is_read: false,
-                        metadata: {
-                            ihale_id: activeTenderChat.offer.ihale_id,
-                            teklif_id: activeTenderChat.offer.id,
-                            ihale_baslik: activeTenderChat.tenderTitle,
-                        },
-                    }]);
-                }
-            } catch { /* bildirim başarısız olsa bile mesaj gitti */ }
+            // Background enrichment — mesajı bekletmiyor, gelince günceller
+            enrichMessagesWithSender([data], supabase).then(([enriched]) => {
+                if (enriched) setTenderChatMessages(prev => prev.map(m => m.id === enriched.id ? enriched : m));
+            }).catch(() => {});
+            // Fire-and-forget broadcast
+            if (tenderChatChannelRef.current) {
+                tenderChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data }).catch(() => {});
+            }
+            // Fire-and-forget bildirim
+            if (activeTenderChat.offer.user_id) {
+                supabase.from('bildirimler').insert([{
+                    user_id: activeTenderChat.offer.user_id,
+                    type: 'tender_offer_message',
+                    title: 'İhale teklifine yeni mesaj',
+                    message: `"${activeTenderChat.tenderTitle || 'İhale'}" teklifinize firma yanıt verdi.`,
+                    is_read: false,
+                    metadata: { ihale_id: activeTenderChat.offer.ihale_id, teklif_id: activeTenderChat.offer.id, ihale_baslik: activeTenderChat.tenderTitle },
+                }]).then(() => {}).catch(() => {});
+            }
+        } catch {
+            // Hata durumunda input'u geri yükle ve spinner'ı serbest bırak
+            setTenderChatInput(messageText);
+            setTenderChatSending(false);
         }
-        setTenderChatSending(false);
-    }, [tenderChatInput, activeTenderChat, scrollTenderChatToBottom]);
+    }, [tenderChatInput, activeTenderChat, scrollTenderChatToBottom, getUserId]);
 
     /* Enes Doğanay | 2 Mayıs 2026: Bileşen unmount → kanalı temizle */
     useEffect(() => {
@@ -582,8 +590,8 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
             setLoading(true);
             setError('');
 
-            /* Enes Doğanay | 13 Nisan 2026: Supabase client init tamamlanmasını bekle */
-            await supabase.auth.getSession();
+            // Enes Doğanay | 5 Mayıs 2026: getSession() kaldırıldı — auth başka sekmedeki token refresh'i
+            // tetikleyip localStorage'ı overwrite edebiliyordu; artık gerekmiyor (authStorage tab-izole)
 
             try {
                 /* Enes Doğanay | 2 Mayıs 2026: Edge Function üzerinden çek — direkt Supabase sorgusu RLS nedeniyle
@@ -2661,6 +2669,20 @@ const TenderOffersManagement = ({ companyId, onUnreadCountChange }) => {
                                 <div className="tom-tender-chat-empty">
                                     <div className="tom-tender-chat-spinner" />
                                     <p>Mesajlar yükleniyor...</p>
+                                </div>
+                            ) : tenderChatError ? (
+                                <div className="tom-tender-chat-empty">
+                                    <span className="material-symbols-outlined" style={{ color: '#ef4444', fontSize: '2rem' }}>wifi_off</span>
+                                    <p style={{ color: '#ef4444', fontWeight: 500 }}>Mesajlar yüklenemedi.</p>
+                                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>Bağlantı sorunu olabilir.</p>
+                                    {/* Enes Doğanay | 5 Mayıs 2026: Retry butonu */}
+                                    <button
+                                        className="mop-chat-retry-btn"
+                                        onClick={() => openTenderChat(activeTenderChat.offer, activeTenderChat.tenderTitle, activeTenderChat.tenderDurum)}
+                                    >
+                                        <span className="material-symbols-outlined">refresh</span>
+                                        Tekrar Dene
+                                    </button>
                                 </div>
                             ) : tenderChatMessages.length === 0 ? (
                                 <div className="tom-tender-chat-empty">

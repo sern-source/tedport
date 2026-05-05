@@ -904,6 +904,26 @@
     animation: mop-spin 0.7s linear infinite;
 }
 @keyframes mop-spin { to { transform: rotate(360deg); } }
+/* Enes Doğanay | 5 Mayıs 2026: Chat yükleme hata retry butonu */
+.mop-chat-retry-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 6px 14px;
+    border: 1.5px solid #4f46e5;
+    border-radius: 8px;
+    background: transparent;
+    color: #4f46e5;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.mop-chat-retry-btn .material-symbols-outlined { font-size: 1rem; }
+.mop-chat-retry-btn:hover { background: #4f46e5; color: #fff; }
+[data-theme="dark"] .mop-chat-retry-btn { border-color: #818cf8; color: #818cf8; }
+[data-theme="dark"] .mop-chat-retry-btn:hover { background: #4f46e5; color: #fff; }
 .mop-chat-bubble {
     max-width: 78%;
     border-radius: 12px;

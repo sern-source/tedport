@@ -29,28 +29,32 @@ const authStorage = {
   getItem(key) {
     if (!isBrowser) return null;
 
-    const sessionMode = window.sessionStorage.getItem(authStorageModeKey);
-    if (sessionMode === 'session') {
-      return window.sessionStorage.getItem(key);
-    }
+    // Enes Doğanay | 5 Mayıs 2026: sessionStorage HER ZAMAN önce okunur — TAB İZOLASYONU.
+    // Problem: iki farklı hesap aynı browsera giriş yaparsa, biri token refresh yaptığında
+    // localStorage'daki token'ı overwrite eder. Supabase JS storage event alır, iç session'ını
+    // diğer kullanıcıya günceller → tüm DB sorguları yanlış JWT'yle gider → RLS patlıyor.
+    // Çözüm: localStorage'dan ilk okumada sessionStorage'a kopyala (tab-specific isolation).
+    // Supabase JS, storage event'te kendi getItem()'ımızı çağırır → sessionStorage döner → bypass.
+    const sessionValue = window.sessionStorage.getItem(key);
+    if (sessionValue) return sessionValue;
 
-    const localMode = window.localStorage.getItem(authStorageModeKey);
-    if (localMode === 'local') {
-      return window.localStorage.getItem(key);
+    // localStorage'dan ilk okuma — bu tab'ın kendi sessionStorage'ına kopyala
+    const localValue = window.localStorage.getItem(key);
+    if (localValue) {
+      window.sessionStorage.setItem(key, localValue); // tab izolasyonu başlıyor
     }
-
-    return window.localStorage.getItem(key) ?? window.sessionStorage.getItem(key);
+    return localValue;
   },
   setItem(key, value) {
     if (!isBrowser) return;
 
-    const activeStorage = getActiveStorage();
-    if (!activeStorage) return;
+    // Her zaman sessionStorage'a yaz — tab'a özel, cross-tab overwrite'a karşı bağışık
+    window.sessionStorage.setItem(key, value);
 
-    activeStorage.setItem(key, value);
-
-    if (activeStorage === window.localStorage) {
-      window.sessionStorage.removeItem(key);
+    // "Beni Hatırla" modunda localStorage'a da yaz (yeni sekme açılınca restore için)
+    const mode = window.sessionStorage.getItem(authStorageModeKey) || window.localStorage.getItem(authStorageModeKey);
+    if (mode === 'local') {
+      window.localStorage.setItem(key, value);
     } else {
       window.localStorage.removeItem(key);
     }
@@ -94,6 +98,26 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true
+    },
+    /* Enes Doğanay | 5 Mayıs 2026: Global fetch timeout — token refresh veya DB sorgusu asılı kalırsa
+     * AbortError fırlatarak sayfaların loading'de kalmasını önler.
+     * Auth istekleri (token refresh) 30s — genuinely yavaş olabilir.
+     * REST API (DB sorguları) 10s — daha hızlı feedback, kullanıcı donma yaşamaz. */
+    global: {
+      fetch: (url, options = {}) => {
+        const controller = new AbortController();
+        // Enes Doğanay | 5 Mayıs 2026: Supabase kendi abort signal'i gönderirse bizimkini de tetikle
+        const originalSignal = options.signal;
+        if (originalSignal) {
+          originalSignal.addEventListener('abort', () => controller.abort(), { once: true });
+        }
+        // Enes Doğanay | 5 Mayıs 2026: Auth istekleri 30s, REST sorguları 10s — farklı kritiklik
+        const isAuthRequest = typeof url === 'string' && url.includes('/auth/v1/');
+        const timeoutMs = isAuthRequest ? 30000 : 10000;
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
+        return fetch(url, { ...options, signal: controller.signal })
+          .finally(() => clearTimeout(timeout));
+      }
     },
     // Enes Doğanay | 9 Nisan 2026: Realtime bağlantısı için gerekli config — RLS filtreleme ve broadcast
     realtime: {

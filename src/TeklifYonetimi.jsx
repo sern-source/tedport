@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { getManagedCompanyId } from './companyManagementApi';
 import { useAuth } from './AuthContext';
+import { runSupabaseQueryWithTimeout } from './supabaseRecovery';
 import './CompanyManagementPanel.css';
 
 const TeklifYonetimi = ({ onUnreadCountChange } = {}) => {
@@ -276,40 +277,52 @@ const TeklifYonetimi = ({ onUnreadCountChange } = {}) => {
         setChatLoading(true);
         setChatInput('');
 
-        /* Enes Doğanay | 9 Nisan 2026: Teklif açıldığında ilgili okunmamış bildirimleri okundu yap */
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-            const { data: unreadNotifs } = await supabase.from('bildirimler')
-                .select('id')
-                .eq('user_id', session.user.id)
-                .eq('is_read', false)
-                .in('type', ['quote_reply', 'quote_message', 'quote_received'])
-                .contains('metadata', { teklif_id: quote.id });
-            if (unreadNotifs && unreadNotifs.length > 0) {
-                const ids = unreadNotifs.map(n => n.id);
-                supabase.from('bildirimler').update({ is_read: true }).in('id', ids).then(() => refreshCounts());
-                setUnreadQuoteIds(prev => {
-                    const next = new Set(prev);
-                    next.delete(quote.id);
-                    return next;
-                });
-            }
-        }
+        try {
+            /* Enes Doğanay | 9 Nisan 2026: Teklif açıldığında ilgili okunmamış bildirimleri okundu yap */
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    const { data: unreadNotifs } = await supabase.from('bildirimler')
+                        .select('id')
+                        .eq('user_id', session.user.id)
+                        .eq('is_read', false)
+                        .in('type', ['quote_reply', 'quote_message', 'quote_received'])
+                        .contains('metadata', { teklif_id: quote.id });
+                    if (unreadNotifs && unreadNotifs.length > 0) {
+                        const ids = unreadNotifs.map(n => n.id);
+                        supabase.from('bildirimler').update({ is_read: true }).in('id', ids).then(() => refreshCounts());
+                        setUnreadQuoteIds(prev => {
+                            const next = new Set(prev);
+                            next.delete(quote.id);
+                            return next;
+                        });
+                    }
+                }
+            } catch { /* bildirim okundu fallback */ }
 
-        const { data } = await supabase.from('teklif_mesajlari').select('*').eq('teklif_id', quote.id).order('created_at', { ascending: true });
-        setChatMessages(data || []);
-        setChatLoading(false);
-        const isIncoming = incomingQuotes.some(q => q.id === quote.id);
-        if (isIncoming && quote.durum === 'pending') handleQuoteStatusChange(quote.id, 'read');
-        scrollChatToBottom(false);
+            const { data } = await runSupabaseQueryWithTimeout(
+                supabase.from('teklif_mesajlari').select('*').eq('teklif_id', quote.id).order('created_at', { ascending: true }),
+                'teklif yonetimi quote chat',
+                15000
+            );
+            setChatMessages(data || []);
+            const isIncoming = incomingQuotes.some(q => q.id === quote.id);
+            if (isIncoming && quote.durum === 'pending') handleQuoteStatusChange(quote.id, 'read');
+            scrollChatToBottom(false);
+        } catch (err) {
+            console.error('Teklif mesajlari yuklenemedi:', err);
+        } finally {
+            // Enes Doğanay | 5 Mayıs 2026: Timeout/reject olsa bile loading serbest kalsın
+            setChatLoading(false);
+        }
     };
 
     // Enes Doğanay | 7 Nisan 2026: Firma tarafından chat mesajı gönder
     const sendCompanyChatMessage = async () => {
         if (!chatInput.trim() || !activeQuoteChat) return;
         setChatSending(true);
-        const { data: userData } = await supabase.auth.getUser();
-        const senderId = userData?.user?.id;
+        const { data: { session: chatSession } } = await supabase.auth.getSession();
+        const senderId = chatSession?.user?.id;
         if (!senderId) { setChatSending(false); return; }
 
         const isIncoming = incomingQuotes.some(q => q.id === activeQuoteChat.id);

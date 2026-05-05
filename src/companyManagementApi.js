@@ -6,25 +6,29 @@ const getFunctionsErrorMessage = (error, fallbackMessage) => {
 };
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal hesap sahibi kullanicinin yonettigi firma id'si tek noktadan okunur
-// Enes Doğanay | 10 Nisan 2026: getUser() → getSession() — network çağrısı yerine localStorage okuma, AbortError önlenir
+// Enes Doğanay | 5 Mayıs 2026: try/catch eklendi — getSession() timeout/abort fırlatırsa null döner, sayfayı kilitlemez
 export const getManagedCompanyId = async () => {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-    if (sessionError || !session?.user?.id) {
+        if (sessionError || !session?.user?.id) {
+            return null;
+        }
+
+        const { data, error } = await supabase
+            .from('kurumsal_firma_yoneticileri')
+            .select('firma_id')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+
+        if (error) {
+            return null;
+        }
+
+        return data?.firma_id || null;
+    } catch {
         return null;
     }
-
-    const { data, error } = await supabase
-        .from('kurumsal_firma_yoneticileri')
-        .select('firma_id')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
-
-    if (error) {
-        return null;
-    }
-
-    return data?.firma_id || null;
 };
 
 // Enes Doğanay | 6 Nisan 2026: Firma yonetim ekranlari aktif kullanicinin sahip oldugu firmayi Edge Function uzerinden ceker

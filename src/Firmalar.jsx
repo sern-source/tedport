@@ -14,7 +14,7 @@
  * - Adaptive company cards layout
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Firmalar.css';
 import SharedHeader from './SharedHeader';
 import './SharedHeader.css';
@@ -1077,14 +1077,18 @@ function App() {
   }, [debouncedSearch, addToHistory]);
 
   useEffect(() => {
-    fetchSuppliers();
+    // Enes Doğanay | 5 Mayıs 2026: 12sn fallback timer — fetchSuppliers takılırsa loading serbest bırakılır
+    const fallbackTimer = setTimeout(() => setLoading(false), 12000);
+    fetchSuppliers().finally(() => clearTimeout(fallbackTimer));
+    return () => clearTimeout(fallbackTimer);
   }, [page, debouncedSearch, filters, sortMode]);
 
 
   const fetchSuppliers = async () => {
     setLoading(true);
-
-    const from = (page - 1) * PAGE_SIZE;
+    // Enes Doğanay | 5 Mayıs 2026: try/finally — herhangi bir await hata fırlatsa da loading serbest kalır
+    try {
+    const from = (page - 1) * PAGE_SIZE; // Enes Doğanay | 5 Mayıs 2026: try bloğuna taşındı
     const to = from + PAGE_SIZE - 1;
 
     /* Enes Doğanay | 6 Nisan 2026: Sadece kullanılan sütunlar çekiliyor (performans) */
@@ -1216,8 +1220,15 @@ function App() {
       setTotalCount(0);
       setDidYouMean(null);
     }
-
-    setLoading(false);
+    } catch (err) {
+      // Enes Doğanay | 5 Mayıs 2026: Network/timeout hatası — boş liste göster, loading kapat
+      if (!err?.message?.includes('abort')) console.error('Firmalar yüklenemedi:', err);
+      setSuppliers([]);
+      setTotalCount(0);
+    } finally {
+      // Enes Doğanay | 5 Mayıs 2026: Her koşulda loading serbest bırak — donma önlenir
+      setLoading(false);
+    }
   };
 
   // Enes Doğanay | 28 Nisan 2026: Arama/filtre/sıralama değişirse ve sayfa 1 değilse, sadece page'i 1 yap (URL güncellemesi page effect'inde)

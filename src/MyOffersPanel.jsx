@@ -122,7 +122,7 @@ const timeAgo = (iso) => {
 
 const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
     const navigate = useNavigate();
-    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName, setActiveViewingTeklifId, refreshCounts } = useAuth() || {};
+    const { getUserId, userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName, setActiveViewingTeklifId, refreshCounts } = useAuth() || {};
     const [loading, setLoading] = useState(true);
     const [offers, setOffers] = useState([]);
     const [tenderMap, setTenderMap] = useState({});
@@ -155,6 +155,8 @@ const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
     const [activeMopChat, setActiveMopChat] = useState(null); // { offer, tenderTitle, firmaAdi }
     const [mopChatMessages, setMopChatMessages] = useState([]);
     const [mopChatLoading, setMopChatLoading] = useState(false);
+    // Enes Doğanay | 5 Mayıs 2026: Mesaj yükleme hata state'i — timeout/network hatası için retry butonu
+    const [mopChatError, setMopChatError] = useState(false);
     const [mopChatInput, setMopChatInput] = useState('');
     const [mopChatSending, setMopChatSending] = useState(false);
     const mopChatChannelRef = useRef(null);
@@ -185,12 +187,14 @@ const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
         }
         setActiveMopChat({ offer, tenderTitle, firmaAdi, anonim });
         setMopChatLoading(true);
+        setMopChatError(false);
         setMopChatInput('');
         setMopChatMessages([]);
         // Enes Doğanay | 4 Mayıs 2026: Toast bastirma — pop-up açıkken aynı teklif için toast gösterme
         setActiveViewingTeklifId?.(String(offer.id));
 
         try {
+            // Enes Doğanay | 5 Mayıs 2026: Doğrudan sorgu — 15s manual timeout kaldırıldı (global 10s fetch timeout zaten yeterli)
             const { data } = await supabase
                 .from('ihale_teklif_mesajlari')
                 .select('*')
@@ -218,6 +222,8 @@ const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
                 .then(() => { refreshCounts?.(); });
         } catch (err) {
             if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
+            // Enes Doğanay | 5 Mayıs 2026: Timeout veya network hatası — hata state'i set et, retry butonu göster
+            setMopChatError(true);
         } finally {
             setMopChatLoading(false);
         }
@@ -256,8 +262,9 @@ const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
     const submitReport = async () => {
         if (!reportModal || reportSending) return;
         setReportSending(true);
-        const { data: authData } = await supabase.auth.getUser();
-        const reporterId = authData?.user?.id;
+        // Enes Doğanay | 5 Mayıs 2026: getUser() → getSession() — local cache, ağ isteği yok
+        const { data: { session: rSession } } = await supabase.auth.getSession();
+        const reporterId = rSession?.user?.id;
         if (!reporterId) { setReportSending(false); return; }
         const { error } = await supabase.from('mesaj_sikayetleri').insert([{
             reporter_id: reporterId,
@@ -277,62 +284,57 @@ const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
         }
     };
 
-    /* Enes Doğanay | 2 Mayıs 2026: Bidder olarak mesaj gönder */
+    /* Enes Doğanay | 5 Mayıs 2026: Bidder olarak mesaj gönder — insert → anında state → spinner serbest → background */
     const sendMopChatMessage = useCallback(async () => {
         if (!mopChatInput.trim() || !activeMopChat) return;
-        // Kapalı ihalede mesaj gönderilemesin
         const _mopTender = tenderMap[String(activeMopChat.offer.ihale_id)];
         if (getTenderStatus(_mopTender?.durum).tone === 'closed') return;
+        const senderId = getUserId?.();
+        if (!senderId) return;
+        const messageText = mopChatInput.trim();
         setMopChatSending(true);
-        const { data: authData } = await supabase.auth.getUser();
-        const senderId = authData?.user?.id;
-        if (!senderId) { setMopChatSending(false); return; }
-
-        const { data, error } = await supabase
-            .from('ihale_teklif_mesajlari')
-            .insert([{
-                teklif_id: activeMopChat.offer.id,
-                sender_id: senderId,
-                sender_role: 'bidder',
-                mesaj: mopChatInput.trim(),
-                okundu_bidder: true,
-            }])
-            .select()
-            .single();
-
-        if (!error && data) {
+        try {
+            const { data, error } = await supabase
+                .from('ihale_teklif_mesajlari')
+                .insert([{
+                    teklif_id: activeMopChat.offer.id,
+                    sender_id: senderId,
+                    sender_role: 'bidder',
+                    mesaj: messageText,
+                    okundu_bidder: true,
+                }])
+                .select()
+                .single();
+            if (error) throw error;
+            // Enes Doğanay | 5 Mayıs 2026: Anında göster — spinner hemen serbest kalır
             setMopChatMessages(prev => [...prev, data]);
             setMopChatInput('');
-            if (mopChatChannelRef.current) {
-                await mopChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data });
-            }
+            setMopChatSending(false); // ← spinner hemen serbest
             scrollMopChatToBottom();
-            // Firma yöneticilerine bildirim gönder
-            try {
-                const tender = tenderMap[String(activeMopChat.offer.ihale_id)];
-                if (tender?.firma_id) {
-                    const { data: managers } = await supabase.from('kurumsal_firma_yoneticileri').select('user_id').eq('firma_id', String(tender.firma_id));
-                    if (managers?.length) {
+            // Fire-and-forget broadcast
+            if (mopChatChannelRef.current) {
+                mopChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data }).catch(() => {});
+            }
+            // Fire-and-forget bildirim
+            const tender = tenderMap[String(activeMopChat.offer.ihale_id)];
+            if (tender?.firma_id) {
+                supabase.from('kurumsal_firma_yoneticileri').select('user_id').eq('firma_id', String(tender.firma_id))
+                    .then(({ data: managers }) => {
+                        if (!managers?.length) return;
                         const userName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || senderId;
-                        const notifRows = managers.map(m => ({
-                            user_id: m.user_id,
-                            type: 'tender_offer_message',
-                            title: 'İhale teklifinden mesaj',
+                        const notifRows = managers.filter(m => m.user_id !== senderId).map(m => ({
+                            user_id: m.user_id, type: 'tender_offer_message', title: 'İhale teklifinden mesaj',
                             message: `"${activeMopChat.tenderTitle || 'İhale'}" teklifine ${userName} mesaj gönderdi.`,
-                            is_read: false,
-                            metadata: {
-                                ihale_id: activeMopChat.offer.ihale_id,
-                                teklif_id: activeMopChat.offer.id,
-                                ihale_baslik: activeMopChat.tenderTitle,
-                            },
+                            is_read: false, metadata: { ihale_id: activeMopChat.offer.ihale_id, teklif_id: activeMopChat.offer.id, ihale_baslik: activeMopChat.tenderTitle },
                         }));
-                        supabase.from('bildirimler').insert(notifRows).then(() => {});
-                    }
-                }
-            } catch { /* bildirim başarısız olsa bile mesaj gitti */ }
+                        if (notifRows.length > 0) supabase.from('bildirimler').insert(notifRows).then(() => {}).catch(() => {});
+                    }).catch(() => {});
+            }
+        } catch {
+            setMopChatInput(messageText);
+            setMopChatSending(false);
         }
-        setMopChatSending(false);
-    }, [mopChatInput, activeMopChat, tenderMap, userProfile, scrollMopChatToBottom]);
+    }, [mopChatInput, activeMopChat, tenderMap, userProfile, scrollMopChatToBottom, getUserId]);
 
     /* Enes Doğanay | 2 Mayıs 2026: Unmount → kanalı temizle */
     useEffect(() => {
@@ -1146,6 +1148,20 @@ const MyOffersPanel = ({ companyId, onUnreadCountChange } = {}) => {
                                 <div className="mop-chat-empty">
                                     <div className="mop-chat-spinner" />
                                     <p>Mesajlar yükleniyor...</p>
+                                </div>
+                            ) : mopChatError ? (
+                                <div className="mop-chat-empty">
+                                    <span className="material-symbols-outlined" style={{ color: '#ef4444', fontSize: '2rem' }}>wifi_off</span>
+                                    <p style={{ color: '#ef4444', fontWeight: 500 }}>Mesajlar yüklenemedi.</p>
+                                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2 }}>Bağlantı sorunu olabilir.</p>
+                                    {/* Enes Doğanay | 5 Mayıs 2026: Retry butonu */}
+                                    <button
+                                        className="mop-chat-retry-btn"
+                                        onClick={() => openMopChat(activeMopChat.offer, activeMopChat.tenderTitle, activeMopChat.firmaAdi, activeMopChat.anonim)}
+                                    >
+                                        <span className="material-symbols-outlined">refresh</span>
+                                        Tekrar Dene
+                                    </button>
                                 </div>
                             ) : mopChatMessages.length === 0 ? (
                                 <div className="mop-chat-empty">

@@ -303,11 +303,11 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                 setApprovedTags(tags);
                 setTagFeedback({ type: 'ok', msg: 'Etiketler kaydedildi.' });
             } else {
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { session } } = await supabase.auth.getSession();
                 const { error } = await supabase.from('etiket_talepleri').insert({
                     firma_id: company.firmaID,
                     firma_adi: company.firma_adi,
-                    talep_eden_user: user?.id,
+                    talep_eden_user: session?.user?.id,
                     etiketler: tags,
                     durum: 'bekliyor',
                 });

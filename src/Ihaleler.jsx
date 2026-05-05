@@ -776,9 +776,13 @@ const IhalelerPage = () => {
         }
     }, [firmaFilter]);
 
-    /* Enes Doğanay | 13 Nisan 2026: Supabase client init tamamlanmadan query atılmasını engelle */
+    /* Enes Doğanay | 5 Mayıs 2026: getSession() gate kaldırıldı — token refresh sırasında getSession() tüm
+     * sorguları bloke ediyordu; doğrudan fetchPublicTenders çağrısı + 12sn fallback timer yeter.
+     * Firma ihaleleri public data, auth gerekmez. */
     useEffect(() => {
-        supabase.auth.getSession().then(() => { fetchPublicTenders(); });
+        const fallbackTimer = setTimeout(() => setLoading(false), 12000);
+        fetchPublicTenders().finally(() => clearTimeout(fallbackTimer));
+        return () => clearTimeout(fallbackTimer);
     }, [fetchPublicTenders]);
 
     /* Enes Doğanay | 13 Nisan 2026: Bildirimden ?ihale= ile gelindiğinde ilgili ihaleyi bul ve detay modal aç */

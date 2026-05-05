@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import CitySelect from './CitySelect';
 import { useAuth } from './AuthContext';
 import PageLoader from './PageLoader';
+import { onSupabaseConnectionEvent } from './supabaseRecovery';
 /* Enes Doğanay | 13 Nisan 2026: Verdiğim Teklifler paneli */
 import MyOffersPanel from './MyOffersPanel';
 // Enes Doğanay | 4 Mayıs 2026: dark mode senkronizasyonu için
@@ -540,9 +541,8 @@ const ProfilePage = () => {
     return () => clearInterval(pollInterval);
   }, [user]);
 
-  // Enes Doğanay | 9 Nisan 2026: Broadcast + Polling fallback
-  // Broadcast anlık iletim sağlar; polling 3 sn'de bir DB'den yeni mesajları kontrol eder.
-  // RLS veya Realtime sorunlarından tamamen bağımsız, %100 garanti çalışır.
+  // Enes Doğanay | 5 Mayıs 2026: Yeniden yazıldı — postgres_changes (anlık) + broadcast (hız) + polling (güvenlik)
+  // Kanal adı FirmaProfil ile eşleştirildi: teklif-chat-${id} (önceki -bc- suffix yüzünden broadcast çalışmıyordu)
   const quoteChatChannelRef = useRef(null);
   useEffect(() => {
     if (!activeQuoteId) {
@@ -550,30 +550,29 @@ const ProfilePage = () => {
       return;
     }
     const addMessage = (msg) => {
-      if (!msg) return;
+      if (!msg?.id) return;
       setQuoteChatMessages(prev => {
         if (prev.some(m => m.id === msg.id)) return prev;
+        scrollChatToBottom();
         return [...prev, msg];
       });
-      scrollChatToBottom();
     };
-    // Broadcast kanal — RLS'den bağımsız anlık iletim
-    const bcChannel = supabase
-      .channel(`teklif-chat-bc-${activeQuoteId}`, { config: { broadcast: { ack: true } } })
-      .on('broadcast', { event: 'new-message' }, ({ payload }) => {
-        addMessage(payload);
-      })
+    // Enes Doğanay | 5 Mayıs 2026: SADECE broadcast — postgres_changes kaldırıldı.
+    // postgres_changes her mesajda JWT doğrulaması yapıyor → token refresh tetikliyor →
+    // global 10s AbortController abort frlatıyor → WebSocket kopuyor → tüm sayfa çöküyor.
+    // Broadcast-only + 10s polling = Supabase docs pattern, stabil.
+    const channel = supabase
+      .channel(`teklif-chat-${activeQuoteId}`)
+      .on('broadcast', { event: 'new-message' }, ({ payload }) => { addMessage(payload); })
       .subscribe();
-    quoteChatChannelRef.current = bcChannel;
-    // Enes Doğanay | 9 Nisan 2026: Polling — her 3 saniyede DB'den tüm mesajları çek ve state'i güncelle
-    // Append değil full-replace: RLS/Realtime sorunlarından bağımsız, kesin çalışır
+    quoteChatChannelRef.current = channel;
+    // Enes Doğanay | 5 Mayıs 2026: 10s polling — broadcast'i kaçıran mesajlar için güvenlik ağı (5s'den azaltıldı)
     const pollInterval = setInterval(async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('teklif_mesajlari')
         .select('*')
         .eq('teklif_id', activeQuoteId)
         .order('created_at', { ascending: true });
-      if (error) { console.error('[Polling] teklif_mesajlari hata:', error); return; }
       if (data) {
         setQuoteChatMessages(prev => {
           if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev;
@@ -581,10 +580,10 @@ const ProfilePage = () => {
           return data;
         });
       }
-    }, 3000);
+    }, 10000);
     return () => {
       clearInterval(pollInterval);
-      supabase.removeChannel(bcChannel);
+      supabase.removeChannel(channel);
       quoteChatChannelRef.current = null;
     };
   }, [activeQuoteId]);
@@ -899,23 +898,39 @@ const ProfilePage = () => {
         });
     }
 
-    const { data, error } = await supabase.from('teklif_mesajlari')
-      .select('*')
-      .eq('teklif_id', quoteId)
-      .order('created_at', { ascending: true });
+    // Enes Doğanay | 5 Mayıs 2026: Düz sorgu — timeout wrapper kaldırıldı (auth stall'da 15s takılıyordu)
+    try {
+      const { data, error } = await supabase
+        .from('teklif_mesajlari')
+        .select('*')
+        .eq('teklif_id', quoteId)
+        .order('created_at', { ascending: true });
 
-    if (!error) setQuoteChatMessages(data || []);
-    setQuoteChatLoading(false);
-    /* Enes Doğanay | 9 Nisan 2026: Chat açıldığında mesaj container'ını en alta kaydır (sayfa kaymaz) */
-    scrollChatToBottom(false);
+      if (error) throw error;
+      setQuoteChatMessages(data || []);
+      scrollChatToBottom(false);
+    } catch (err) {
+      console.error('Teklif mesajları yüklenemedi:', err);
+      setQuoteChatMessages([]);
+    } finally {
+      setQuoteChatLoading(false);
+    }
   };
+
+  useEffect(() => {
+    // Enes Doğanay | 5 Mayıs 2026: Bağlantı geri gelince açık teklif chat'ini otomatik yenile
+    if (!activeQuoteId) return undefined;
+    return onSupabaseConnectionEvent(({ status }) => {
+      if (status !== 'restored') return;
+      openQuoteChat(activeQuoteId).catch(() => {});
+    });
+  }, [activeQuoteId]);
 
   // Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet gönder
   const submitReport = async () => {
     if (!reportModal || reportSending) return;
     setReportSending(true);
-    const { data: authData } = await supabase.auth.getUser();
-    const reporterId = authData?.user?.id;
+    const reporterId = user?.id;
     if (!reporterId) { setReportSending(false); return; }
     const { error } = await supabase.from('mesaj_sikayetleri').insert([{
       reporter_id: reporterId,
@@ -938,25 +953,29 @@ const ProfilePage = () => {
   // Enes Doğanay | 7 Nisan 2026: Teklif chatine mesaj gönder (kullanıcı tarafı)
   const sendQuoteChatMessage = async () => {
     if (!quoteChatInput.trim() || !activeQuoteId || !user) return;
+    const messageText = quoteChatInput.trim();
     setQuoteChatSending(true);
-
-    const { data, error } = await supabase.from('teklif_mesajlari')
-      .insert([{ teklif_id: activeQuoteId, sender_id: user.id, sender_role: 'user', mesaj: quoteChatInput.trim() }])
-      .select()
-      .single();
-
-    if (!error && data) {
+    // Enes Doğanay | 5 Mayıs 2026: insert → anında state → spinner serbest → fire-and-forget (TOM/MOP ile aynı pattern)
+    try {
+      const { data, error } = await supabase.from('teklif_mesajlari')
+        .insert([{ teklif_id: activeQuoteId, sender_id: user.id, sender_role: 'user', mesaj: messageText }])
+        .select()
+        .single();
+      if (error) throw error;
+      // Anında göster — spinner hemen serbest
       setQuoteChatMessages(prev => [...prev, data]);
       setQuoteChatInput('');
-      // Enes Doğanay | 9 Nisan 2026: Broadcast ile karşı tarafa mesajı anlık ilet (await ile güvenilir gönderim)
+      setQuoteChatSending(false);
+      // fire-and-forget broadcast
       if (quoteChatChannelRef.current) {
-        await quoteChatChannelRef.current.send({ type: 'broadcast', event: 'new-message', payload: data });
+        quoteChatChannelRef.current.send({ type: 'broadcast', event: 'new-message', payload: data }).catch(() => {});
       }
-      // Enes Doğanay | 9 Nisan 2026: Anlık UI güncellemesi — son mesajı biz attık → Yanıt Bekleniyor
       setMyQuotes(prev => prev.map(q => q.id === activeQuoteId ? { ...q, _displayStatus: 'awaiting_reply' } : q));
       scrollChatToBottom();
+    } catch {
+      setQuoteChatInput(messageText);
+      setQuoteChatSending(false);
     }
-    setQuoteChatSending(false);
   };
 
   // Enes Doğanay | 9 Nisan 2026: Teklif talebini sil (ek dosya + DB kaydı)

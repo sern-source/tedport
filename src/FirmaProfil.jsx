@@ -207,15 +207,22 @@ const FirmaProfil = () => {
     const [showEkipPublic, setShowEkipPublic] = useState(true);
     const [ekipVisibilitySaving, setEkipVisibilitySaving] = useState(false);
 
-    // ── İlk yükleme ──
+    // ── İlk yükleme ── Enes Doğanay | 5 Mayıs 2026: fallback timer — init() hata fırlatırsa 12s sonra loading kapanır
     useEffect(() => {
         const init = async () => {
+          try {
             const cid = await getManagedCompanyId();
             if (!cid) { navigate('/'); return; }
             setCompanyId(cid);
 
             // Enes Doğanay | 10 Nisan 2026: getUser() → getSession() — AuthContext ile yarış önlenir (AbortError)
-            const { data: { session: userSession } } = await supabase.auth.getSession();
+            let userSession;
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                userSession = session;
+            } catch {
+                navigate('/login'); return;
+            }
             if (!userSession?.user) { navigate('/login'); return; }
             setUserId(userSession.user.id);
 
@@ -290,8 +297,15 @@ const FirmaProfil = () => {
                 .eq('firma_id', cid)
                 .maybeSingle();
             if (roleRow?.role) setMyRole(roleRow.role);
+          } catch (err) {
+            // Enes Doğanay | 5 Mayıs 2026: Herhangi bir await hata fırlatırsa loading'i kapat (sonsuz Yükleniyor önlenir)
+            if (!err?.message?.includes('abort')) console.error('FirmaProfil init error:', err);
+            setLoading(false);
+          }
         };
-        init();
+        const fallbackTimer = setTimeout(() => setLoading(false), 12000);
+        init().finally(() => clearTimeout(fallbackTimer));
+        return () => clearTimeout(fallbackTimer);
     }, [navigate]);
 
     // ── Teklifleri çek ──
@@ -474,14 +488,22 @@ const FirmaProfil = () => {
             setNotifications(prev => prev.map(n => ids.includes(n.id) ? { ...n, is_read: true } : n));
         }
 
-        const { data } = await supabase.from('teklif_mesajlari').select('*').eq('teklif_id', quote.id).order('created_at', { ascending: true });
-        // Enes Doğanay | 4 Mayıs 2026: Gönderen bilgilerini ekle (ekip üyeleri için)
-        const enriched = await enrichTeklifMessages(data || []);
-        setChatMessages(enriched);
-        setChatLoading(false);
-        const isIncoming = incomingQuotes.some(q => q.id === quote.id);
-        if (isIncoming && quote.durum === 'pending') handleQuoteStatusChange(quote.id, 'read');
-        scrollChatToBottom(false);
+        // Enes Doğanay | 5 Mayıs 2026: try/finally — herhangi bir await hata fırlatsa da loading spinner serbest kalır
+        try {
+            const { data } = await supabase.from('teklif_mesajlari').select('*').eq('teklif_id', quote.id).order('created_at', { ascending: true });
+            // Enes Doğanay | 4 Mayıs 2026: Gönderen bilgilerini ekle (ekip üyeleri için)
+            let enriched;
+            try { enriched = await enrichTeklifMessages(data || []); } catch { enriched = data || []; }
+            setChatMessages(enriched);
+            const isIncoming = incomingQuotes.some(q => q.id === quote.id);
+            if (isIncoming && quote.durum === 'pending') handleQuoteStatusChange(quote.id, 'read');
+            scrollChatToBottom(false);
+        } catch (err) {
+            console.error('Teklif mesajları yüklenemedi:', err);
+        } finally {
+            // Enes Doğanay | 5 Mayıs 2026: Her koşulda loading'i kapat — donma önlenir
+            setChatLoading(false);
+        }
     };
 
     /* Enes Doğanay | 2 Mayıs 2026: Gelen teklif sahibinin profilini popup olarak aç */
@@ -503,7 +525,8 @@ const FirmaProfil = () => {
         setQuoteContactPopup(info);
     };
 
-    // Enes Doğanay | 9 Nisan 2026: Broadcast + Polling fallback — kurumsal chat anlık mesajlaşma
+    // Enes Doğanay | 9 Nisan 2026: Broadcast — kurumsal chat anlık mesajlaşma
+    // Enes Doğanay | 5 Mayıs 2026: Yeniden yazıldı — postgres_changes (anlık) + broadcast (hız) + polling (güvenlik)
     const chatChannelRef = useRef(null);
     useEffect(() => {
         if (!activeQuoteChat) {
@@ -511,27 +534,28 @@ const FirmaProfil = () => {
             return;
         }
         const teklifId = activeQuoteChat.id;
-        // Broadcast kanal — RLS'den bağımsız anlık iletim
-        const bcChannel = supabase
-            .channel(`teklif-chat-bc-${teklifId}`, { config: { broadcast: { ack: true } } })
-            .on('broadcast', { event: 'new-message' }, ({ payload }) => {
-                if (!payload) return;
-                setChatMessages(prev => {
-                    if (prev.some(m => m.id === payload.id)) return prev;
-                    scrollChatToBottom();
-                    return [...prev, payload];
-                });
-            })
+        const addMessage = (msg) => {
+            if (!msg?.id) return;
+            setChatMessages(prev => {
+                if (prev.some(m => m.id === msg.id)) return prev;
+                scrollChatToBottom();
+                return [...prev, msg];
+            });
+        };
+        // Enes Doğanay | 5 Mayıs 2026: SADECE broadcast — postgres_changes kaldırıldı.
+        // postgres_changes her mesajda JWT doğrulaması → token refresh → AbortController abort → WebSocket kopuyor.
+        const channel = supabase
+            .channel(`teklif-chat-${teklifId}`)
+            .on('broadcast', { event: 'new-message' }, ({ payload }) => { addMessage(payload); })
             .subscribe();
-        chatChannelRef.current = bcChannel;
-        // Polling — her 3 saniyede DB'den tüm mesajları çek (full-replace)
+        chatChannelRef.current = channel;
+        // Enes Doğanay | 5 Mayıs 2026: 10s polling — broadcast kaçıran mesajlar için güvenlik ağı (5s'den azaltıldı)
         const pollInterval = setInterval(async () => {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('teklif_mesajlari')
                 .select('*')
                 .eq('teklif_id', teklifId)
                 .order('created_at', { ascending: true });
-            if (error) { console.error('[Polling] teklif_mesajlari hata:', error); return; }
             if (data) {
                 setChatMessages(prev => {
                     if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev;
@@ -539,11 +563,13 @@ const FirmaProfil = () => {
                     return data;
                 });
             }
-        }, 3000);
+        }, 10000);
         return () => {
             clearInterval(pollInterval);
-            supabase.removeChannel(bcChannel);
-            chatChannelRef.current = null;
+            if (chatChannelRef.current) {
+                supabase.removeChannel(chatChannelRef.current);
+                chatChannelRef.current = null;
+            }
         };
     }, [activeQuoteChat?.id]);
 
@@ -590,33 +616,41 @@ const FirmaProfil = () => {
     const sendChatMessage = async () => {
         if (!chatInput.trim() || !activeQuoteChat) return;
         setChatSending(true);
-        const isIncoming = incomingQuotes.some(q => q.id === activeQuoteChat.id);
-        const senderRole = isIncoming ? 'company' : 'user';
-        const { data, error } = await supabase.from('teklif_mesajlari')
-            .insert([{ teklif_id: activeQuoteChat.id, sender_id: userId, sender_role: senderRole, mesaj: chatInput.trim() }])
-            .select().single();
-        if (!error && data) {
-            // Enes Doğanay | 4 Mayıs 2026: Gönderilen mesajı enrichment ile ekle — 'Firma' fallbackı önle
-            const [enriched] = await enrichTeklifMessages([data]);
-            setChatMessages(prev => [...prev, enriched || data]);
-            setChatInput('');
-            // Enes Doğanay | 9 Nisan 2026: Broadcast ile karşı tarafa mesajı anlık ilet
-            if (chatChannelRef.current) {
-                await chatChannelRef.current.send({ type: 'broadcast', event: 'new-message', payload: data });
+        // Enes Doğanay | 5 Mayıs 2026: try/finally — herhangi bir await hata fırlatsa da spinner serbest kalır
+        try {
+            const isIncoming = incomingQuotes.some(q => q.id === activeQuoteChat.id);
+            const senderRole = isIncoming ? 'company' : 'user';
+            const { data, error } = await supabase.from('teklif_mesajlari')
+                .insert([{ teklif_id: activeQuoteChat.id, sender_id: userId, sender_role: senderRole, mesaj: chatInput.trim() }])
+                .select().single();
+            if (!error && data) {
+                // Enes Doğanay | 5 Mayıs 2026: Anında göster (ham data) — enrichment background'da
+                setChatMessages(prev => [...prev, data]);
+                setChatInput('');
+                setChatSending(false);
+                // fire-and-forget broadcast — await kaldırıldı, WebSocket yavaşlayunca UI bloke olmaz
+                // Enes Doğanay | 5 Mayıs 2026: broadcast fail → inner catch — mesaj DB'ye gitti, polling yakalar
+                if (chatChannelRef.current) {
+                    chatChannelRef.current.send({ type: 'broadcast', event: 'new-message', payload: data }).catch(() => {});
+                }
+                // Background enrichment — isim güncelleme, UI'yı bekletmez
+                enrichTeklifMessages([data]).then(([enriched]) => {
+                    if (enriched) setChatMessages(prev => prev.map(m => m.id === enriched.id ? enriched : m));
+                }).catch(() => {});
+                // Enes Doğanay | 9 Nisan 2026: Anlık UI güncellemesi — son mesajı biz attık
+                if (isIncoming) {
+                    setIncomingQuotes(prev => prev.map(q => q.id === activeQuoteChat.id ? { ...q, _displayStatus: 'replied' } : q));
+                    setActiveQuoteChat(prev => prev ? { ...prev, _displayStatus: 'replied' } : null);
+                } else {
+                    setOutgoingQuotes(prev => prev.map(q => q.id === activeQuoteChat.id ? { ...q, _displayStatus: 'awaiting_reply' } : q));
+                    setActiveQuoteChat(prev => prev ? { ...prev, _displayStatus: 'awaiting_reply' } : null);
+                }
+                scrollChatToBottom();
             }
-            // Enes Doğanay | 9 Nisan 2026: Anlık UI güncellemesi — son mesajı biz attık
-            if (isIncoming) {
-                // Gelen teklifte biz (firma) cevap attık → Yanıtlandı
-                setIncomingQuotes(prev => prev.map(q => q.id === activeQuoteChat.id ? { ...q, _displayStatus: 'replied' } : q));
-                setActiveQuoteChat(prev => prev ? { ...prev, _displayStatus: 'replied' } : null);
-            } else {
-                // Giden teklifte biz yazdık → Yanıt Bekleniyor
-                setOutgoingQuotes(prev => prev.map(q => q.id === activeQuoteChat.id ? { ...q, _displayStatus: 'awaiting_reply' } : q));
-                setActiveQuoteChat(prev => prev ? { ...prev, _displayStatus: 'awaiting_reply' } : null);
-            }
-            scrollChatToBottom();
+        } finally {
+            // Enes Doğanay | 5 Mayıs 2026: Her koşulda spinner'ı serbest bırak — donma önlenir
+            setChatSending(false);
         }
-        setChatSending(false);
     };
 
     // Enes Doğanay | 9 Nisan 2026: Teklif talebini sil (ek dosya + DB kaydı)
@@ -731,8 +765,10 @@ const FirmaProfil = () => {
         const teklifId = notification.metadata?.teklif_id;
         if (!teklifId) return;
         setTab({ tab: 'teklifler' });
-        if (quote) {
-            openQuoteChat(quote);
+        // Enes Doğanay | 5 Mayıs 2026: quote undefined hatası düzeltildi — state'den bul
+        const foundQuote = [...incomingQuotes, ...outgoingQuotes].find(q => q.id === teklifId);
+        if (foundQuote) {
+            setTimeout(() => openQuoteChat(foundQuote), 200);
         }
         if (!notification.is_read) handleMarkNotificationRead(notification.id);
     };
@@ -894,7 +930,7 @@ const FirmaProfil = () => {
 
     const loadEkip = async () => {
         setEkipLoading(true);
-        const [ekipRes, davetRes] = await Promise.all([
+        const [, davetRes] = await Promise.all([
             supabase.from('firma_ekip_public')
                 .select('role, title, joined_at, first_name, last_name')
                 .eq('firma_id', String(companyId)),

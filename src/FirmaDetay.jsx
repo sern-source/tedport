@@ -150,7 +150,7 @@ const parseNotePayload = (rawNoteText) => {
                 body: parsed.body || ''
             };
         }
-    } catch (error) {
+    } catch {
         // Eski düz metin notlar için sessizce fallback yapılır.
     }
     return { title: '', tag: '', body: rawNoteText };
@@ -814,7 +814,6 @@ const SupplierProfile = () => {
 
     const adresText = firma.adres || firma.il_ilce;
     const encodedAddress = encodeURIComponent(adresText);
-    const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodedAddress}&zoom=14&size=600x300&markers=color:red|${encodedAddress}&key=YOUR_GOOGLE_MAPS_API_KEY`.replace(/\s/g, '');
     const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
     const isCurrentUserCompanyManager = Boolean(userProfile && managedCompanyId && String(managedCompanyId) === String(id));
     // Enes Doğanay | 6 Nisan 2026: Favorinin kayitli oldugu liste adini aktif durumda gostermek icin hesaplanir

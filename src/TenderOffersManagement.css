@@ -1849,6 +1849,7 @@
     border-radius: 50%;
     animation: tom-spin 0.7s linear infinite;
 }
+/* Enes Doğanay | 5 Mayıs 2026: TOM chat retry butonu — MyOffersPanel ile aynı stil, mop-chat-retry-btn class'ı shared */
 .tom-tender-chat-bubble {
     max-width: 78%;
     border-radius: 12px;
