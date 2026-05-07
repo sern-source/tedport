@@ -1,0 +1,466 @@
+﻿/* Enes Doğanay | 7 Mayıs 2026: SharedChatModal — ortak modern chat overlay */
+
+/* ══ OVERLAY ══════════════════════════════════════════════════════ */
+.scm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-top-modal);
+    /* Enes Doğanay | 7 Mayıs 2026: ihale-modal-overlay ile eşleştirildi — hafif karartma, blur yok */
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: scmFadeIn 0.18s ease;
+}
+
+@keyframes scmFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ══ MODAL ════════════════════════════════════════════════════════ */
+.scm-modal {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow:
+        0 32px 80px rgba(10, 18, 35, 0.22),
+        0 2px 8px rgba(10, 18, 35, 0.08),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+    width: 100%;
+    max-width: 520px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: scmSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Enes Doğanay | 7 Mayıs 2026: scroll butonu absolute konumlanması için */
+    position: relative;
+}
+
+@keyframes scmSlideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* ══ INLINE MODE ═══════════════════════════════════════════════════
+   Enes Doğanay | 7 Mayıs 2026: inline prop ile overlay olmadan render
+   QuoteChatView ve TeklifChatView'de header kartın altında kullanılır
+   ═══════════════════════════════════════════════════════════════ */
+.scm-inline {
+    display: contents;
+}
+
+.scm-modal--inline {
+    position: static;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 12px;
+    box-shadow: none;
+    border: 1px solid var(--border, #e2e8f0);
+    animation: none;
+}
+
+.scm-modal--inline .scm-messages {
+    max-height: 380px;
+    background: #f8fafc;
+    border-radius: 12px 12px 0 0;
+}
+
+.scm-modal--inline .scm-input-row {
+    border-radius: 0 0 12px 12px;
+    border-top: 1px solid var(--border, #e2e8f0);
+}
+
+.scm-modal--inline .scm-closed {
+    border-radius: 0 0 12px 12px;
+}
+
+[data-theme="dark"] .scm-modal--inline {
+    border-color: var(--border, #334155);
+}
+
+[data-theme="dark"] .scm-modal--inline .scm-messages {
+    background: #0f172a;
+}
+
+@media (max-width: 768px) {
+    .scm-modal--inline .scm-messages { max-height: 300px; }
+}
+
+/* ══ HEADER ═══════════════════════════════════════════════════════ */
+.scm-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    background: linear-gradient(135deg, #f8faff 0%, #eef2ff 100%);
+    flex-shrink: 0;
+}
+
+/* ── Avatar ── */
+.scm-avatar {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: contain — logo görselleri kırpılmasın */
+.scm-avatar img {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: #f8fafc;
+    border: 1.5px solid var(--border, rgba(99,102,241,0.18));
+}
+
+.scm-avatar__initial {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: -0.02em;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.25);
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Yeşil ring — resmin üstüne binmez, dışında çerçeve olarak gösterilir */
+.scm-avatar--online img,
+.scm-avatar--online .scm-avatar__initial {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4.5px #22c55e;
+}
+
+/* ── Info ── */
+.scm-header__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.scm-header__name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scm-header__sub {
+    font-size: 0.74rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scm-header__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6366f1;
+    background: #eef2ff;
+    border-radius: 6px;
+    padding: 2px 7px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: fit-content;
+}
+
+.scm-header__tag .material-symbols-outlined { font-size: 12px; }
+
+/* ── Actions ── */
+.scm-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.scm-btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.14s, color 0.14s, border-color 0.14s, transform 0.14s;
+}
+
+.scm-btn-icon .material-symbols-outlined { font-size: 17px; }
+
+.scm-btn-icon:hover {
+    background: #eef2ff;
+    color: #6366f1;
+    border-color: #c7d2fe;
+    transform: translateY(-1px);
+}
+
+.scm-btn-icon--close:hover {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+/* ══ MESAJ LİSTESİ ════════════════════════════════════════════════ */
+.scm-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background: #f8fafc;
+    min-height: 180px;
+    max-height: 360px;
+}
+
+.scm-messages::-webkit-scrollbar { width: 4px; }
+.scm-messages::-webkit-scrollbar-track { background: transparent; }
+.scm-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+
+/* ── Empty / Loading / Error state ── */
+.scm-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 36px 16px;
+    color: #94a3b8;
+    text-align: center;
+    margin: auto;
+}
+
+.scm-state .material-symbols-outlined { font-size: 38px; }
+.scm-state__emoji { font-size: 36px; line-height: 1; }
+
+.scm-state p {
+    font-size: 0.83rem;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 240px;
+}
+
+.scm-state p span {
+    color: #64748b;
+}
+
+.scm-state--error .material-symbols-outlined { color: #ef4444; }
+.scm-state--error p { color: #ef4444; font-weight: 600; }
+
+/* ── Spinner ── */
+.scm-spinner {
+    width: 26px;
+    height: 26px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: scmSpin 0.7s linear infinite;
+}
+
+@keyframes scmSpin { to { transform: rotate(360deg); } }
+
+/* ══ MESAJ BALONLARI ══════════════════════════════════════════════ */
+.scm-bubble {
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    animation: scmBubbleIn 0.18s ease;
+}
+
+@keyframes scmBubbleIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.scm-bubble__meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 2px;
+}
+
+.scm-bubble__meta strong {
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.scm-bubble__meta span {
+    font-size: 0.67rem;
+    color: #94a3b8;
+}
+
+.scm-bubble__text {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    padding: 9px 13px;
+    border-radius: 14px;
+    word-break: break-word;
+}
+
+/* Mine (kendi mesajım) */
+.scm-bubble.mine {
+    align-self: flex-end;
+}
+
+.scm-bubble.mine .scm-bubble__meta {
+    justify-content: flex-end;
+}
+
+.scm-bubble.mine .scm-bubble__meta strong {
+    color: #6366f1;
+}
+
+.scm-bubble.mine .scm-bubble__text {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 10px rgba(99,102,241,0.3);
+}
+
+/* Theirs (karşı taraf) */
+.scm-bubble.theirs {
+    align-self: flex-start;
+}
+
+.scm-bubble.theirs .scm-bubble__meta strong {
+    color: #0f172a;
+}
+
+.scm-bubble.theirs .scm-bubble__text {
+    background: #fff;
+    color: #1e293b;
+    border: 1px solid #e8ecf4;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.05);
+}
+
+/* ── Şikayet butonu ── */
+.scm-report-btn {
+    background: none;
+    border: none;
+    padding: 1px 3px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    align-self: flex-start;
+    margin-top: -2px;
+    margin-left: 2px;
+}
+
+.scm-report-btn .material-symbols-outlined { font-size: 13px; }
+.scm-report-btn:hover { color: #ef4444; background: #fee2e2; opacity: 1 !important; }
+.scm-bubble.theirs:hover .scm-report-btn { opacity: 0.6; }
+
+/* ══ FOOTER ═══════════════════════════════════════════════════════ */
+
+/* Kapalı banner */
+.scm-closed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 13px 16px;
+    border-top: 1px solid #fca5a5;
+    background: linear-gradient(135deg, #fff7f7, #fef2f2);
+    color: #b91c1c;
+    font-size: 0.82rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.scm-closed .material-symbols-outlined { font-size: 17px; }
+
+/* Input row */
+.scm-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid #f1f5f9;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.scm-input {
+    flex: 1;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 9px 14px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    background: #f8fafc;
+}
+
+.scm-input:focus {
+    border-color: #818cf8;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+
+.scm-send-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.35);
+}
+
+.scm-send-btn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+}
+
+.scm-send-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+}
+
+.scm-send-btn .material-symbols-outlined { font-size: 19px; }
+
+/* Spin animasyonu (gönderiliyor) */
+.scm-spin {
+    animation: scmSpin 0.7s linear infinite;
+    display: block;
+}
+
+/* ══ DARK MODE ════════════════════════════════════════════════════ */

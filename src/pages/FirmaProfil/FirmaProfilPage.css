@@ -1,0 +1,17 @@
+/* Enes Doğanay | 6 Mayıs 2026: FirmaProfilPage — kurumsal özel stiller */
+
+/* Enes Doğanay | 6 Mayıs 2026: İhale yönetimi wrapper + bildirimler wrapper */
+.firma-profil-section {
+  padding: 0;
+  min-height: 200px;
+}
+
+[data-theme="dark"] .firma-profil-section {
+  /* inherits */
+}
+
+@media (max-width: 768px) {
+  .firma-profil-section {
+    padding: 0;
+  }
+}

@@ -1,0 +1,106 @@
+﻿// Enes Doghanay | 6 Mayis 2026: Ihaleler sayfasi — koordinator, tum mantighi hook ve alt bilesenlere delege eder
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import "./components/IhalelerPage.css";
+import "../../components/SharedHeader.css";
+import SharedHeader from "../../components/SharedHeader";
+import SEO from "../../components/SEO";
+import { useAuth } from "../../AuthContext";
+import useIhaleler from "./hooks/useIhaleler";
+import useMyTenders from "./hooks/useMyTenders";
+import useIhaleForm from "./hooks/useIhaleForm";
+import useTeklifForm from "./hooks/useTeklifForm";
+import IhaleToast from "./components/IhaleToast";
+import TendersHero from "./components/TendersHero";
+import TendersToolbar from "./components/TendersToolbar";
+import TendersContent from "./components/TendersContent";
+import IhalelerModals from "./components/IhalelerModals";
+
+const IhalelerPage = () => {
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const firmaFilter = searchParams.get("firma") || "";
+    const ihaleParam = searchParams.get("ihale") || "";
+    const teklifParam = searchParams.get("teklif") || "";
+    const yeniIhaleParam = searchParams.get("yeniIhale") || "";
+    const duzenleParam = searchParams.get("duzenle") || "";
+    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
+
+    const ihaleler = useIhaleler(firmaFilter);
+    const myTendersHook = useMyTenders({ fetchPublicTenders: ihaleler.fetchPublicTenders });
+    const ihaleFormHook = useIhaleForm({
+        managedFirmaId: myTendersHook.managedFirmaId,
+        generateReferansNo: myTendersHook.generateReferansNo,
+        fetchMyTenders: myTendersHook.fetchMyTenders,
+        fetchPublicTenders: ihaleler.fetchPublicTenders,
+        yeniIhaleParam, duzenleParam, searchParams, setSearchParams,
+        myTenders: myTendersHook.myTenders,
+    });
+    const teklifHook = useTeklifForm({ userProfile, authManagedCompanyId, managedCompanyName });
+
+    const [detailTender, setDetailTender] = useState(null);
+    const highlightTenderRef = useRef(null);
+    const [highlightTenderId, setHighlightTenderId] = useState(null);
+
+    useEffect(() => {
+        if (!ihaleParam || ihaleler.loading || ihaleler.tenders.length === 0) return;
+        const target = ihaleler.tenders.find(t => String(t.id) === ihaleParam);
+        if (target) {
+            if (teklifParam) teklifHook.openTeklifPopup(target);
+            else setDetailTender(target);
+            setHighlightTenderId(target.id);
+            setTimeout(() => setHighlightTenderId(null), 3000);
+        }
+        const params = new URLSearchParams(searchParams);
+        params.delete("ihale"); params.delete("teklif");
+        setSearchParams(params, { replace: true });
+    }, [ihaleParam, ihaleler.loading, ihaleler.tenders]); // eslint-disable-line
+
+    useEffect(() => {
+        if (highlightTenderId && highlightTenderRef.current)
+            highlightTenderRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, [highlightTenderId]);
+
+    return (
+        <div className="tenders-page">
+            {myTendersHook.ihToast && <IhaleToast ihToast={myTendersHook.ihToast} onClose={() => myTendersHook.setIhToast(null)} />}
+            <SEO title="Ihaleler" description="Canli ihaleleri kesffedin, teklif verin. Turkiye genelinde B2B ihale platformu." path="/ihaleler" />
+            <SharedHeader />
+            <main className="tenders-page-main">
+                <IhalelerModals
+                    ihaleler={ihaleler} myTendersHook={myTendersHook} ihaleFormHook={ihaleFormHook} teklifHook={teklifHook}
+                    detailTender={detailTender} setDetailTender={setDetailTender}
+                    authManagedCompanyId={authManagedCompanyId} userProfile={userProfile} navigate={navigate}
+                />
+                <TendersHero
+                    selectedFirmaName={ihaleler.selectedFirmaName}
+                    liveCount={ihaleler.liveCount} upcomingCount={ihaleler.upcomingCount} closedCount={ihaleler.closedCount}
+                />
+                <TendersToolbar
+                    searchTerm={ihaleler.searchTerm} setSearchTerm={ihaleler.setSearchTerm}
+                    viewMode={ihaleler.viewMode} toggleViewMode={ihaleler.toggleViewMode}
+                    statusFilter={ihaleler.statusFilter} setStatusFilter={ihaleler.setStatusFilter}
+                    sortBy={ihaleler.sortBy} setSortBy={ihaleler.setSortBy}
+                    sortDropdownOpen={ihaleler.sortDropdownOpen} setSortDropdownOpen={ihaleler.setSortDropdownOpen}
+                    sortDropdownRef={ihaleler.sortDropdownRef}
+                    page={ihaleler.page} setPage={ihaleler.setPage} totalPages={ihaleler.totalPages}
+                />
+                <TendersContent
+                    tableMissing={ihaleler.tableMissing} loading={ihaleler.loading}
+                    filteredTenders={ihaleler.filteredTenders} paginatedTenders={ihaleler.paginatedTenders}
+                    userProfile={userProfile} searchTerm={ihaleler.searchTerm} statusFilter={ihaleler.statusFilter}
+                    viewMode={ihaleler.viewMode} highlightTenderId={highlightTenderId} highlightTenderRef={highlightTenderRef}
+                    authManagedCompanyId={authManagedCompanyId} userOffers={teklifHook.userOffers}
+                    page={ihaleler.page} setPage={ihaleler.setPage} totalPages={ihaleler.totalPages} smartPages={ihaleler.smartPages}
+                    onDetail={setDetailTender} onEdit={ihaleFormHook.openEdit}
+                    onTeklif={teklifHook.openTeklifPopup} onContact={teklifHook.openFirmaContact}
+                    onNavigateFirma={(t) => navigate("/firmadetay/" + t.firma_id)}
+                    onLoginRedirect={() => navigate("/login?redirect=/ihaleler")}
+                    onRegisterRedirect={() => navigate("/register")}
+                />
+            </main>
+        </div>
+    );
+};
+
+export default IhalelerPage;

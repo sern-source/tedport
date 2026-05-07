@@ -1,0 +1,427 @@
+/* Enes Doğanay | 7 Mayıs 2026: NotificationsTab — banner + compact redesign */
+.notifications-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Hero banner — teal gradient, diğer sayfalarla aynı sistem */
+.notif-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #0d3d3d 60%, #0d9488 100%);
+  border-radius: 14px;
+  padding: 14px 20px;
+}
+
+.notif-hero__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.notif-hero__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notif-hero__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-hero__icon .material-symbols-outlined { font-size: 22px; color: #fff; }
+.notif-hero__title h2 { font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 2px; }
+.notif-hero__title p { font-size: 0.76rem; color: rgba(255, 255, 255, 0.6); margin: 0; }
+
+.notif-hero__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.notif-kpis {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notif-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 7px 13px;
+  min-width: 58px;
+}
+
+.notif-kpi__value {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.notif-kpi__label {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: KPI pill renk varyantları */
+.notif-kpi--notif .notif-kpi__value { color: #a5f3fc; }
+.notif-kpi--unread .notif-kpi__value { color: #7dd3fc; }
+.notif-kpi--reminder .notif-kpi__value { color: #fde68a; }
+
+.notif-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Okundu/Temizle butonları */
+.notifications-mark-all,
+.notifications-delete-all {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 11px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+}
+
+.notifications-mark-all .material-symbols-outlined,
+.notifications-delete-all .material-symbols-outlined { font-size: 15px; }
+
+.notifications-mark-all {
+  color: #7dd3fc;
+  background: rgba(125, 211, 252, 0.12);
+}
+
+.notifications-mark-all:hover { background: rgba(125, 211, 252, 0.22); }
+
+.notifications-delete-all {
+  color: #fca5a5;
+  background: rgba(252, 165, 165, 0.12);
+}
+
+.notifications-delete-all:hover { background: rgba(252, 165, 165, 0.22); }
+
+.notifications-mark-all:disabled,
+.notifications-delete-all:disabled { opacity: 0.35; cursor: not-allowed; }
+
+
+/* Enes Doğanay | 7 Mayıs 2026: Scroll container — kapalıda sabit yükseklik, açıkta max-height + scroll */
+.notif-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.notif-scroll-list--open {
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+.notif-scroll-list--open::-webkit-scrollbar { width: 4px; }
+.notif-scroll-list--open::-webkit-scrollbar-track { background: transparent; }
+.notif-scroll-list--open::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+/* Enes Doğanay | 7 Mayıs 2026: Tümünü Göster / Daha Az Göster butonu */
+.notif-show-more-btn {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  padding: 7px 9px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #4f73f8;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.notif-show-more-btn:hover { background: #f0f4ff; border-color: #c7d2fe; }
+
+[data-theme="dark"] .notif-scroll-list--open { scrollbar-color: #334155 transparent; }
+[data-theme="dark"] .notif-scroll-list--open::-webkit-scrollbar-thumb { background: #334155; }
+[data-theme="dark"] .notif-show-more-btn { border-color: #334155; color: #93c5fd; }
+[data-theme="dark"] .notif-show-more-btn:hover { background: rgba(147, 197, 253, 0.08); border-color: #4f73f8; }
+
+/* Enes Doğanay | 7 Mayıs 2026: .notification-stat-card / .notifications-stats-grid → kaldırıldı, KPIs hero'ya taşındı */
+
+/* Enes Do─şanay | 17 Nisan 2026: Bildirim Tercihleri paneli */
+.notif-prefs-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.03);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.notif-prefs-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.notif-prefs-toggle:hover {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+.notif-prefs-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notif-prefs-toggle-left .material-symbols-outlined {
+  font-size: 20px;
+  color: #475569;
+}
+
+.notif-prefs-toggle-left strong {
+  font-size: 0.92rem;
+  color: #0f172a;
+}
+
+/* Enes Do─şanay | 17 Nisan 2026: Kaydedildi feedback badge */
+.notif-pref-saved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #16a34a;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  animation: notifSavedFade 1.5s ease-out forwards;
+}
+
+.notif-pref-saved-badge .material-symbols-outlined {
+  font-size: 14px;
+}
+
+@keyframes notifSavedFade {
+  0% { opacity: 0; transform: translateY(-2px); }
+  15% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.notif-prefs-chevron {
+  font-size: 22px;
+  color: #94a3b8;
+  transition: transform 0.25s ease;
+}
+
+.notif-prefs-chevron.open {
+  transform: rotate(180deg);
+}
+
+.notif-prefs-list {
+  border-top: 1px solid rgba(226, 232, 240, 0.6);
+  padding: 6px 0;
+}
+
+.notif-pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  gap: 12px;
+  transition: background 0.15s;
+}
+
+.notif-pref-row:hover {
+  background: rgba(241, 245, 249, 0.5);
+}
+
+.notif-pref-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.notif-pref-icon {
+  font-size: 20px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.notif-pref-info div {
+  min-width: 0;
+}
+
+.notif-pref-info strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.notif-pref-info p {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+/* Enes Do─şanay | 17 Nisan 2026: Toggle switch */
+.notif-pref-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
+  background: #cbd5e1;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.25s ease;
+}
+
+.notif-pref-switch.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.notif-pref-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease;
+}
+
+.notif-pref-switch.active .notif-pref-switch-knob {
+  transform: translateX(20px);
+}
+
+/* Enes Do─şanay | 9 Nisan 2026: Bildirimler (sol) geni┼ş, Hat─▒rlatmalar (sa─ş) dar ÔÇö stat kartlar─▒yla hizal─▒ */
+/* Enes Do─şanay | 12 Nisan 2026: Kompakt grid + panel tasar─▒m─▒ */
+.notifications-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.notifications-panel {
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.notifications-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.notifications-panel-header h3 {
+  margin: 0 0 2px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.notifications-panel-header p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.notifications-panel-subheader {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fff8ec 0%, #fffdf8 100%);
+  border: 1px solid rgba(237, 201, 125, 0.52);
+}
+
+.notifications-panel-subheader h4 {
+  margin: 0 0 2px;
+  font-size: 0.82rem;
+  color: #8a5d16;
+}
+
+.notifications-panel-subheader p {
+  margin: 0;
+  color: #8b7355;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.notifications-empty-state {
+  min-height: 90px;
+  border: 1px dashed rgba(203, 213, 225, 0.9);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 5px;
+  color: #64748b;
+  padding: 12px;
+}
+
+.notifications-empty-state .material-symbols-outlined {
+  font-size: 24px;
+  color: #94a3b8;
+}
+
+.upcoming-reminders-list,
+.notifications-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+

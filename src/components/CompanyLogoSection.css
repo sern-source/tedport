@@ -1,0 +1,143 @@
+/* Enes Doğanay | 6 Mayıs 2026: Logo yükleme bölümü stilleri — CompanyLogoSection bileşenine ait */
+
+/* ── LOGO UPLOAD ─────────────────────────────────────────────────────────── */
+.cmp-logo-upload {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg, 12px);
+    background: #f9fafb;
+    transition: border-color 0.2s;
+}
+
+.cmp-logo-upload:hover {
+    border-color: var(--primary);
+}
+
+.cmp-logo-upload__preview {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cmp-logo-upload__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cmp-logo-upload__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #cbd5e1;
+}
+
+.cmp-logo-upload__placeholder .material-symbols-outlined {
+    font-size: 36px;
+}
+
+.cmp-logo-upload__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cmp-logo-upload__info strong {
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.cmp-logo-upload__info p {
+    font-size: 12px;
+    color: var(--text-gray);
+    margin: 0;
+}
+
+.cmp-logo-upload__btn {
+    margin-top: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cmp-logo-upload__btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Logo pending badge */
+.cmp-logo-pending-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+}
+.cmp-logo-pending-badge .material-symbols-outlined { font-size: 15px; }
+.cmp-logo-pending-hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+/* Enes Doğanay | 2 Mayıs 2026: Logo red bildirimi — admin logo reddedince firma panelinde gösterilir */
+.cmp-logo-red-badge {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 5px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+.cmp-logo-red-badge .material-symbols-outlined { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+@media (max-width: 768px) {
+    .cmp-logo-upload {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* ── DARK MODE ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] .cmp-logo-upload {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .cmp-logo-upload__preview {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .cmp-logo-pending-badge {
+    background: rgba(146, 64, 14, 0.25);
+    border-color: rgba(180, 120, 20, 0.4);
+    color: #fcd34d;
+}
+
+[data-theme="dark"] .cmp-logo-red-badge {
+    background: rgba(153, 27, 27, 0.2);
+    border-color: rgba(220, 38, 38, 0.35);
+    color: #fca5a5;
+}

@@ -1,0 +1,376 @@
+﻿/* Enes Doğanay | 6 Mayıs 2026: FirmaDetayPage - Layout + Shared Stiller */
+/**
+ * FirmaDetay.css - Company Detail/Profile Page Styles
+ * 
+ * Mobile Responsive Design & Hamburger Menu Implementation
+ * Date: April 4, 2026
+ * Author: Enes Doğanay
+ * 
+ * Responsive Breakpoints:
+ * - Mobile: Default (< 1024px) - Single column layout, hamburger menu visible
+ * - Tablet: 540px - 1023px - Progressive layout adjustments
+ * - Desktop: >= 1024px - Two-column layout, sidebar visible, full navigation
+ * 
+ * Key Features:
+ * - Hamburger menu for mobile navigation
+ * - Accordion (a├ğ─▒l─▒r/kapal─▒r) ├╝r├╝n kategorileri stili
+ * - ─░hale/Tender (Calls) b├Âl├╝m├╝ stili
+ * - Responsive grid and flexbox layouts
+ * - Animate slide-down efekti accordion i├ğeriği i├ğin
+ * - Sticky sidebar on desktop, static on mobile
+ */
+
+/* Deği┼şkenler ve Temel Ayarlar */
+/* 
+  ===== F─░RMA DETAY SAYFASI CSS =====
+  G├╝ncelleme: Enes Doğanay | Tarih: 4 Nisan 2026
+  G├╝ncelleme: Enes Doğanay | 6 Nisan 2026: :root deği┼şkenleri index.css'e ta┼ş─▒nd─▒
+*/
+
+/* Layout Reset */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.supplier-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Eski header CSS'leri silindi (~120 sat─▒r) ÔÇö SharedHeader kendi stillerini y├Ânetiyor */
+
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 540px) {
+  .container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 2.5rem;
+  }
+}
+
+/* Butonlar */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .btn-group {
+    flex-direction: row;
+  }
+}
+
+.btn {
+  padding: 0 1.25rem;
+  height: 36px;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: 0.2s;
+  width: 100%;
+  font-size: 0.84rem;
+}
+
+@media (min-width: 768px) {
+  .btn {
+    width: auto;
+  }
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(19, 127, 236, 0.2);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-outline {
+  background: var(--bg-white);
+  border-color: var(--border);
+  color: var(--text-dark);
+}
+
+.btn-outline:hover {
+  background: var(--bg-light);
+}
+
+/* Tab Navigasyon */
+.tab-nav-wrapper {
+  position: sticky;
+  top: 64px;
+  z-index: 40;
+  background: rgba(var(--bg-white-rgb, 255,255,255), 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-list {
+  display: flex;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tab-item {
+  padding: 0.75rem 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-gray);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-item.active {
+  color: var(--text-dark);
+  border-bottom-color: var(--primary);
+}
+
+/* Grid ─░├ğerik */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+  padding: 1rem 0;
+}
+
+@media (min-width: 768px) {
+  .content-grid {
+    gap: 1.25rem;
+    padding: 1.25rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+/* Enes Doğanay | 4 Nisan 2026: Mobil cihazlarda sidebar'─▒ main content'in alt─▒na ta┼ş─▒ (responsive layout) */
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sticky-sidebar {
+    position: static;
+    top: auto;
+  }
+}
+
+.card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 1.25rem;
+  }
+}
+
+/* ├£r├╝n Kartlar─▒ */
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.product-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-white);
+}
+
+.product-thumb {
+  aspect-ratio: 4/3;
+  background-size: cover;
+  background-position: center;
+}
+
+.product-details {
+  padding: 1rem;
+}
+
+/* Sidebar */
+.sticky-sidebar {
+  position: static;
+  top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .sticky-sidebar {
+    position: sticky;
+    top: 140px;
+  }
+}
+
+.map {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-size: cover;
+  border-radius: var(--radius-lg);
+  position: relative;
+  margin-top: 1rem;
+}
+
+.map-label {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: var(--bg-white);
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
+/* Enes Doğanay | 4 Nisan 2026: Mobil cihazlarda (< 768px) tek s├╝tun layout ve ayarlamalar */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  .hero-flex {
+    gap: 1rem;
+  }
+
+  .tender-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .accordion-button {
+    padding: 0.875rem;
+    font-size: 0.95rem;
+  }
+
+  .accordion-content {
+    padding: 0 0.875rem 0.875rem 0.875rem;
+  }
+
+  .tender-item {
+    padding: 1rem;
+  }
+}
+
+/* ========== Enes Doğanay | 6 Nisan 2026: Inline style'lar CSS class'lar─▒na ta┼ş─▒nd─▒ ========== */
+
+/* Page Status (Loading / Error) */
+.page-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 20px;
+  font-size: 1.1rem;
+  color: var(--text-gray);
+}
+
+.page-status-error {
+  color: #ef4444;
+}
+
+.page-status-icon {
+  font-size: 28px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Section Headings */
+.section-title {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-heading-icon {
+  color: var(--primary);
+}
+
+.card-about {
+  margin-bottom: 1.25rem;
+}
+
+.about-text {
+  line-height: 1.65;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.sidebar-card {
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-heading {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  letter-spacing: -0.02em;
+}
+.btn-full {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Teklif iste butonu ana CTA olarak buyutuldu */
+/* -- Dark Mode -- */
+/* ÔöÇÔöÇ Dark Mode ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */
+/* Enes Doğanay | 2 May─▒s 2026: Faz 7 ÔÇö FirmaDetay.css dark mode override'lar─▒ */
+
+/* Tab navigasyon ÔÇö sticky glassmorphism dark rengi */
+[data-theme="dark"] .tab-nav-wrapper {
+  background: rgba(30, 41, 59, 0.95);
+}
+

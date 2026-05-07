@@ -1,0 +1,418 @@
+/* Enes Doğanay | 6 Mayıs 2026: Teklif yönetimi sekmesi ek stilleri */
+
+/* Enes Doğanay | 7 Mayıs 2026: quotes-hero → tv-hero'ya taşındı (TeklifYonetimiTab.hero.css) */
+
+/* Enes Doğanay | 6 Mayıs 2026: firma-profil-section — sekme içerik wrapper */
+.firma-profil-section {
+  padding: 0;
+  min-height: 200px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 6 Mayıs 2026: Teklif kartları ve chat stilleri
+   CompanyManagementPanel.css'den taşındı
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── QUOTES CARD ─────────────────────────────────────────────────────────── */
+/* Enes Doğanay | 7 Nisan 2026: Teklif Talepleri paneli stilleri */
+.cmp-quotes-card {
+    margin-bottom: 1.5rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 14px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: cmp-quotes-header compact */
+.cmp-quotes-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.875rem 1.125rem;
+    user-select: none;
+    transition: background 0.15s;
+}
+
+.cmp-quotes-header:hover {
+    background: #f9fafb;
+}
+
+.cmp-quotes-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cmp-quotes-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #137fec, #1d4ed8);
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 1px 4px rgba(19, 127, 236, 0.3);
+}
+
+.cmp-quotes-chevron {
+    transition: transform 0.25s;
+    color: #9ca3af;
+}
+
+.cmp-quotes-chevron.expanded {
+    transform: rotate(180deg);
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: cmp-quotes-body padding azaltıldı */
+.cmp-quotes-body {
+    border-top: 1px solid #f3f4f6;
+    padding: 0.75rem 1.125rem 1.125rem;
+}
+
+.cmp-quotes-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.cmp-quotes-empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #9ca3af;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.cmp-quotes-empty-state .material-symbols-outlined {
+    font-size: 40px;
+    color: #d1d5db;
+}
+
+.cmp-quotes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ── QUOTE CARD ──────────────────────────────────────────────────────────── */
+/* Enes Doğanay | 9 Nisan 2026: Teklif kartlarına renk ve modernlik katıldı */
+.cmp-quote-card {
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+    max-width: 100%;
+    background: #fff;
+    border-left: 4px solid #e5e7eb;
+    position: relative;
+}
+
+.cmp-quote-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+    border-color: #d1d5db;
+}
+
+.cmp-quote-card.expanded {
+    border-color: #137fec;
+    border-left-color: #137fec;
+    box-shadow: 0 4px 20px rgba(19, 127, 236, 0.1);
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Okunmamış bildirimi olan teklif kartı vurgusu */
+.cmp-quote-card--new {
+    border-color: #2563eb;
+    border-left-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18), 0 4px 16px rgba(37, 99, 235, 0.12);
+    background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+}
+
+.cmp-quote-new-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-radius: 999px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    animation: cmp-new-pulse 2s ease-in-out infinite;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+@keyframes cmp-new-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Enes Doğanay | 9 Nisan 2026: overflow hidden ile kart taşması engellendi */
+.cmp-quote-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    gap: 12px;
+    transition: background 0.15s;
+    overflow: hidden;
+}
+
+.cmp-quote-top:hover {
+    background: linear-gradient(90deg, #f8fafc, #f1f5f9);
+}
+
+.cmp-quote-top-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.cmp-quote-subject {
+    font-size: 0.9rem;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cmp-quote-date {
+    font-size: 0.78rem;
+    color: #6b7280;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.cmp-quote-status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Durum badge renkleri + kart sol kenarlık renk eşleştirmesi */
+.cmp-quote-status--pending { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+.cmp-quote-status--read { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1e40af; }
+.cmp-quote-status--replied { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+.cmp-quote-status--rejected { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
+.cmp-quote-status--closed { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #6b7280; }
+.cmp-quote-status--awaiting_reply { background: linear-gradient(135deg, #fde8e8, #fecaca); color: #c53030; }
+
+/* Kart sol kenar rengi duruma göre */
+.cmp-quote-card:has(.cmp-quote-status--pending) { border-left-color: #f59e0b; }
+.cmp-quote-card:has(.cmp-quote-status--read) { border-left-color: #3b82f6; }
+.cmp-quote-card:has(.cmp-quote-status--replied) { border-left-color: #10b981; }
+.cmp-quote-card:has(.cmp-quote-status--rejected) { border-left-color: #ef4444; }
+.cmp-quote-card:has(.cmp-quote-status--closed) { border-left-color: #9ca3af; }
+.cmp-quote-card:has(.cmp-quote-status--awaiting_reply) { border-left-color: #f87171; }
+
+/* Enes Doğanay | 9 Nisan 2026: Durum filtre butonları — renkli ve modern */
+.cmp-quotes-status-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.cmp-quotes-status-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.cmp-quotes-status-filter-btn:hover {
+    border-color: #137fec;
+    color: #137fec;
+    background: #eff6ff;
+}
+
+.cmp-quotes-status-filter-btn.active {
+    background: linear-gradient(135deg, #137fec, #1d4ed8);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(19, 127, 236, 0.25);
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Teklif silme butonları */
+.cmp-quote-delete-trigger {
+    background: none;
+    border: none;
+    color: #d1d5db;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.cmp-quote-delete-trigger:hover {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.cmp-quote-delete-trigger .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Enes Doğanay | 9 Nisan 2026: Mesaj ön izleme metni */
+.cmp-quote-preview {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0 16px 12px 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 8px;
+}
+
+.cmp-quote-delete-confirm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #fef2f2;
+    border-top: 1px solid #fee2e2;
+    font-size: 0.8rem;
+    color: #991b1b;
+}
+
+.cmp-quote-delete-btn {
+    border: none;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.cmp-quote-delete-btn--yes {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.cmp-quote-delete-btn--yes:hover { background: #fecaca; }
+
+.cmp-quote-delete-btn--no {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.cmp-quote-delete-btn--no:hover { background: #e5e7eb; }
+
+.cmp-quote-details {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: quoteDetailIn 0.2s ease;
+}
+
+@keyframes quoteDetailIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cmp-quote-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.cmp-quote-meta-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.cmp-quote-meta-item .material-symbols-outlined {
+    font-size: 18px;
+    color: #137fec;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.cmp-quote-meta-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cmp-quote-meta-item small {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+}
+
+.cmp-quote-meta-item span,
+.cmp-quote-meta-item a {
+    font-size: 0.85rem;
+    color: #111827;
+}
+
+.cmp-quote-meta-item a {
+    color: #137fec;
+    text-decoration: none;
+}
+
+.cmp-quote-meta-item a:hover { text-decoration: underline; }
+
+.cmp-quote-message {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.cmp-quote-message small {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.cmp-quote-message p {
+    font-size: 0.88rem;
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.cmp-quote-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+

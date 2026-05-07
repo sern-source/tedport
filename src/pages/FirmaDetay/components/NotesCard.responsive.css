@@ -1,0 +1,54 @@
+﻿@media (max-width: 480px) {
+  .reminder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-header {
+    align-items: stretch;
+  }
+
+  .notes-count-badge {
+    margin-left: 54px;
+  }
+
+  .saved-note-top {
+    align-items: flex-start;
+  }
+}
+
+.notes-login-prompt {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.notes-lock-icon {
+  color: var(--border);
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.notes-login-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 15px;
+}
+
+.notes-login-btn {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  color: var(--text-dark);
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.notes-login-btn:hover {
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+
+/* -- Dark Mode -- */
+/* Enes Do─şanay | 2 May─▒s 2026: Notes kart─▒ dark amber temas─▒ ÔÇö tam rafine */

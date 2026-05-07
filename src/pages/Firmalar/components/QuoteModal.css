@@ -1,0 +1,152 @@
+/* Enes Doğanay | 6 Mayıs 2026: Teklif talebi modal stilleri — overlay, form, dark mode */
+
+.quote-modal-overlay {
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+
+.quote-modal {
+  background: var(--bg-white);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+  width: 100%; max-width: 500px;
+  max-height: 90vh; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+
+/* ── Modal header ─────────────────────────────────────────────────────── */
+.quote-modal-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.quote-modal-header h3 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+
+.quote-modal-subtitle {
+  font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0;
+}
+
+.quote-modal-close {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--bg-light); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted); flex-shrink: 0;
+  transition: background 0.15s;
+}
+.quote-modal-close:hover { background: var(--border); }
+.quote-modal-close .material-symbols-outlined { font-size: 17px; }
+
+/* ── Modal body ───────────────────────────────────────────────────────── */
+.quote-modal-body {
+  padding: 1.25rem 1.5rem;
+  display: flex; flex-direction: column; gap: 1rem;
+  flex: 1;
+}
+
+.quote-form-group { display: flex; flex-direction: column; gap: 5px; }
+.quote-form-group label { font-size: 0.78rem; font-weight: 600; color: var(--text-dark); }
+
+.quote-form-group input,
+.quote-form-group textarea {
+  background: var(--bg-light); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 12px; font-size: 0.84rem; color: var(--text-dark); font-family: inherit;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.quote-form-group input:focus,
+.quote-form-group textarea:focus { outline: none; border-color: var(--primary); }
+
+.quote-form-group textarea { resize: vertical; min-height: 90px; }
+
+.quote-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+@media (max-width: 480px) { .quote-form-row { grid-template-columns: 1fr; } }
+
+.quote-form-info {
+  display: flex; align-items: flex-start; gap: 7px;
+  font-size: 0.75rem; color: var(--text-muted); background: var(--bg-light);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+}
+
+.quote-form-info .material-symbols-outlined { font-size: 15px; color: var(--text-muted); flex-shrink: 0; margin-top: 1px; }
+
+/* ── File upload ──────────────────────────────────────────────────────── */
+.quote-file-optional { font-weight: 400; color: var(--text-muted); }
+
+.quote-file-upload { display: flex; align-items: center; gap: 8px; }
+
+.quote-file-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: 1.5px dashed var(--border); border-radius: 8px;
+  font-size: 0.78rem; font-weight: 500; color: var(--text-muted); cursor: pointer;
+  background: var(--bg-light); transition: border-color 0.15s, color 0.15s;
+}
+
+.quote-file-btn:hover { border-color: var(--primary); color: var(--primary); }
+.quote-file-btn .material-symbols-outlined { font-size: 17px; }
+
+.quote-file-remove {
+  width: 24px; height: 24px; border-radius: 50%; background: #fef2f2; border: 1px solid #fca5a5;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.quote-file-remove .material-symbols-outlined { font-size: 14px; color: #ef4444; }
+
+/* ── Modal footer ─────────────────────────────────────────────────────── */
+.quote-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+
+.quote-btn-cancel, .quote-btn-send {
+  height: 36px; padding: 0 16px; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit;
+  border: none; transition: all 0.2s;
+}
+
+.quote-btn-cancel { background: var(--bg-light); border: 1px solid var(--border); color: var(--text-dark); }
+.quote-btn-cancel:hover { background: var(--border); }
+
+.quote-btn-send { background: var(--primary); color: #fff; }
+.quote-btn-send:hover:not(:disabled) {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+.quote-btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Başarı durumu ────────────────────────────────────────────────────── */
+.quote-modal-success {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 3rem 2rem; text-align: center;
+}
+
+.quote-success-icon { font-size: 3rem; color: #16a34a; }
+.quote-modal-success h3 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.quote-modal-success p { font-size: 0.84rem; color: var(--text-muted); margin: 0; }
+
+/* ── Mobile ───────────────────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .quote-modal { max-width: 95vw; border-radius: 10px; }
+  .quote-modal-footer { flex-direction: column-reverse; }
+  .quote-btn-cancel, .quote-btn-send { width: 100%; height: 40px; }
+}
+
+/* ── Dark mode ────────────────────────────────────────────────────────── */
+[data-theme="dark"] .quote-modal { background: var(--bg-card, #1e293b); }
+
+[data-theme="dark"] .quote-form-group input,
+[data-theme="dark"] .quote-form-group textarea {
+  background: var(--bg-dark, #0f172a); border-color: var(--border);
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .quote-file-btn { background: var(--bg-dark, #0f172a); }
+[data-theme="dark"] .quote-btn-cancel { background: var(--bg-dark, #0f172a); color: var(--text-dark); }
+[data-theme="dark"] .quote-form-info { background: var(--bg-dark, #0f172a); }
+[data-theme="dark"] .quote-modal-close { background: var(--bg-dark, #0f172a); }

@@ -1,0 +1,172 @@
+/* Enes Dogranay | 6 Mayis 2026: SuppliersSection — ornek tedarikciler */
+.supplier-connect-wrapper .sc-suppliers {
+    padding: 22px 0;
+    background: var(--bg-white);
+    border-top: 1px solid var(--border-color);
+}
+
+@media (min-width: 540px) {
+    .supplier-connect-wrapper .sc-suppliers {
+        padding: 28px 0;
+    }
+}
+
+.supplier-connect-wrapper .sc-sup-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+@media (min-width: 500px) {
+    .supplier-connect-wrapper .sc-sup-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .supplier-connect-wrapper .sc-sup-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.supplier-connect-wrapper .sc-sup-card {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.supplier-connect-wrapper .sc-sup-card:hover {
+    box-shadow: 0 6px 18px rgba(19, 127, 236, 0.1);
+    border-color: rgba(19, 127, 236, 0.25);
+    transform: translateY(-1px);
+}
+
+.supplier-connect-wrapper .sc-sup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.supplier-connect-wrapper .sc-sup-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Enes Doğanay | 11 Nisan 2026: Mavi onaylı firma badge'i */
+.supplier-connect-wrapper .sc-sup-verified {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: #eff6ff;
+    color: #137fec;
+    border: 1px solid #bfdbfe;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.supplier-connect-wrapper .sc-sup-name {
+    font-weight: 700;
+    font-size: 13px;
+    margin: 0 0 3px 0;
+}
+
+.supplier-connect-wrapper .sc-sup-name:hover {
+    color: var(--primary);
+}
+
+.supplier-connect-wrapper .sc-sup-location {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* Enes Doğanay | 5 Nisan 2026: Yıldız/puan derecelendirme stilleri kaldırıldı
+ * (.sc-sup-rating, .sc-stars, .sc-rating-num, .sc-rating-count silindi) */
+
+.supplier-connect-wrapper .sc-sup-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.supplier-connect-wrapper .sc-tag {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: compact cool outline-fill Profili Gör */
+.supplier-connect-wrapper .sc-btn-outline {
+    width: 100%;
+    padding: 7px 10px;
+    margin-top: auto;
+    border: 1.5px solid #bfdbfe;
+    color: #2563eb;
+    background: #eff6ff;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.supplier-connect-wrapper .sc-btn-outline:hover {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(37,99,235,0.2);
+}
+
+/* CTA Section */
+/* Enes Doğanay | 4 Mayıs 2026: compact CTA */
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-sup-card {
+    background: var(--bg-white);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-tag {
+    background: #1e293b;
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-sup-verified {
+    background: #1e2d4a;
+    color: #60a5fa;
+    border-color: #1e40af;
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-btn-outline {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #1e40af;
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-btn-outline:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}

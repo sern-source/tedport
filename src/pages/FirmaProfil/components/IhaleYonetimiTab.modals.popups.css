@@ -1,0 +1,463 @@
+
+/* ═══════════════════════════════════════════════════
+   PUANLAMA BİLGİLENDİRME POPUP
+   ═══════════════════════════════════════════════════ */
+.tom-scoring-info-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 32px 28px 28px;
+    width: 480px;
+    max-width: 92vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(15,23,42,0.25);
+    text-align: center;
+    position: relative;
+    animation: tomSlideUp 0.3s ease;
+}
+
+.tom-scoring-info-card__icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.3);
+}
+
+.tom-scoring-info-card__icon .material-symbols-outlined { font-size: 28px; }
+
+.tom-scoring-info-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.tom-scoring-info-card__body { text-align: left; margin-top: 16px; }
+
+.tom-scoring-info-card__body > p {
+    margin: 0 0 16px;
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.tom-scoring-info-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1.5px solid #f1f5f9;
+    margin-bottom: 10px;
+    transition: background 0.15s;
+}
+
+.tom-scoring-info-item:hover { background: #f0f7ff; border-color: #dbeafe; }
+
+.tom-scoring-info-item > .material-symbols-outlined {
+    font-size: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.tom-scoring-info-item strong {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+.tom-scoring-info-item p { margin: 0; font-size: 0.82rem; color: #64748b; line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════════
+   RED NEDENİ POPUP
+   ═══════════════════════════════════════════════════ */
+.tom-reject-note-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 32px 28px 28px;
+    width: 430px;
+    max-width: 92vw;
+    box-shadow: 0 30px 80px rgba(15,23,42,0.25);
+    text-align: center;
+    position: relative;
+    animation: tomSlideUp 0.3s ease;
+}
+
+.tom-reject-note-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+
+.tom-reject-note-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: #0f172a;
+    resize: vertical;
+    min-height: 64px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #f8fafc;
+}
+
+.tom-reject-note-textarea:focus {
+    outline: none;
+    border-color: #f87171;
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+    background: #fff;
+}
+
+.tom-reject-note-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+/* ═══════════════════════════════════════════════════
+   KABUL → KAPAT & GÖRÜNÜRlük POPUP
+   ═══════════════════════════════════════════════════ */
+.tom-accept-close-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 32px 28px 28px;
+    width: 450px;
+    max-width: 92vw;
+    box-shadow: 0 30px 80px rgba(15,23,42,0.25);
+    text-align: center;
+    position: relative;
+    animation: tomSlideUp 0.3s ease;
+}
+
+.tom-accept-close-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+
+.tom-accept-close-actions { display: flex; flex-direction: column; gap: 10px; }
+.tom-accept-close-actions .tom-btn { width: 100%; justify-content: center; }
+
+/* ═══════════════════════════════════════════════════
+   STATÜ DEĞİŞTİRME DROPDOWN
+   ═══════════════════════════════════════════════════ */
+.tom-status-dropdown-wrap { position: relative; display: inline-flex; }
+
+.tom-btn--status-change {
+    background: #f8fafc;
+    color: #475569;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+}
+
+.tom-btn--status-change:hover {
+    background: #f0f7ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+}
+
+.tom-status-dropdown {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 6px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(15,23,42,0.12);
+    min-width: 185px;
+    z-index: var(--z-dropdown);
+    overflow: hidden;
+    animation: tomSlideIn 0.15s ease;
+}
+
+.tom-status-dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    transition: background 0.15s;
+}
+
+.tom-status-dropdown button:hover { background: #f8fafc; }
+.tom-status-dropdown button .material-symbols-outlined { font-size: 18px; }
+
+/* ═══════════════════════════════════════════════════
+   YENİ İHALE OLUŞTUR BUTONU
+   ═══════════════════════════════════════════════════ */
+.tom-btn--create-tender {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
+    letter-spacing: 0.01em;
+}
+
+.tom-btn--create-tender:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    box-shadow: 0 5px 18px rgba(37,99,235,0.4);
+    transform: translateY(-1px);
+}
+
+.tom-btn--create-tender .material-symbols-outlined { font-size: 18px; }
+
+.tom-btn--repeat {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s;
+    box-shadow: 0 3px 12px rgba(5,150,105,0.25);
+}
+
+.tom-btn--repeat:hover {
+    background: linear-gradient(135deg, #047857, #059669);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(5,150,105,0.35);
+}
+
+.tom-btn--repeat .material-symbols-outlined { font-size: 18px; }
+
+/* Enes Doğanay | 7 Mayıs 2026: Küçük tekrar butonu (CTA banner içi) */
+.tom-btn--repeat-sm {
+    padding: 7px 14px;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+}
+
+.tom-btn-icon--add {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
+}
+
+.tom-btn-icon--add:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    box-shadow: 0 5px 16px rgba(37,99,235,0.4);
+    border-color: transparent;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.tom-confirm-inline--danger {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+@media (max-width: 600px) {
+    .tom-btn--create-tender span:last-child { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBİL & TABLET RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+    .tom-body {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .tom-sidebar { max-height: none; }
+
+    .tom-sidebar__list {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 12px 18px 18px;
+        gap: 10px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .tom-sidebar__list::-webkit-scrollbar { height: 4px; }
+    .tom-sidebar__list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 99px; }
+
+    .tom-sidebar__list .tom-tender-card {
+        min-width: 240px;
+        max-width: 280px;
+        flex-shrink: 0;
+        scroll-snap-align: start;
+    }
+
+    .tom-sidebar__list .tom-empty-mini { min-width: 100%; }
+}
+
+@media (max-width: 768px) {
+    .tom-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px 18px;
+        border-radius: 18px;
+        gap: 16px;
+    }
+
+    .tom-hero__text h1 { font-size: 1.2rem; }
+    .tom-hero__text p  { font-size: 0.82rem; margin-top: 4px; }
+    .tom-hero__stats   { width: 100%; gap: 8px; }
+
+    .tom-stat {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .tom-stat strong { font-size: 1.2rem; }
+    .tom-stat span:last-child { font-size: 0.65rem; }
+
+    .tom-sidebar { border-radius: 16px; }
+    .tom-sidebar__head { padding: 14px 16px 0; }
+    .tom-sidebar__head h2 { font-size: 0.92rem; }
+    .tom-sidebar__search { margin: 10px 16px 0; height: 40px; }
+    .tom-sidebar__filters { padding: 8px 16px 0; }
+    .tom-sidebar__list { padding: 10px 16px 14px; }
+    .tom-sidebar__list .tom-tender-card { min-width: 200px; max-width: 240px; }
+
+    .tom-offer-card__main { flex-wrap: wrap; gap: 10px; }
+    .tom-offer-card__info { flex-basis: calc(100% - 72px); }
+    .tom-offer-card__actions {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 4px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .tom-offers-toolbar { flex-direction: column; align-items: stretch; }
+    .tom-offers-toolbar__right { justify-content: flex-end; }
+
+    .tom-info-card__grid  { grid-template-columns: 1fr; }
+    .tom-compare__grid    { grid-template-columns: 1fr; }
+    .tom-info-card__toggle { padding: 14px 18px; }
+    .tom-info-card__title-row h2 { font-size: 1.05rem; }
+    .tom-info-card__body  { padding: 0 18px 18px; }
+    .tom-tender-actions   { gap: 8px; }
+
+    .tom-offers-section { border-radius: 16px; padding: 16px 18px; }
+
+    .tom-offers-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+    }
+
+    .tom-offers-filters::-webkit-scrollbar { height: 0; }
+    .tom-chip { white-space: nowrap; flex-shrink: 0; }
+}
+
+@media (max-width: 480px) {
+    .tom-hero { padding: 16px 14px; border-radius: 16px; gap: 12px; }
+    .tom-hero__text h1 { font-size: 1.05rem; gap: 8px; }
+    .tom-hero__text h1 .material-symbols-outlined { font-size: 22px; }
+    .tom-hero__text p { font-size: 0.75rem; }
+    .tom-hero__stats { gap: 6px; }
+
+    .tom-stat { padding: 8px 10px; gap: 6px; border-radius: 12px; }
+    .tom-stat strong { font-size: 1rem; }
+    .tom-stat .material-symbols-outlined { font-size: 18px; }
+
+    .tom-body { gap: 12px; }
+
+    .tom-sidebar__list .tom-tender-card { min-width: 180px; max-width: 220px; }
+    .tom-tender-card__body { padding: 8px 11px; }
+    .tom-tender-card__top h3 { font-size: 0.83rem; }
+    .tom-badge { font-size: 0.62rem; padding: 2px 7px; }
+    .tom-tender-card__meta { gap: 8px; font-size: 0.7rem; }
+
+    .tom-offer-card__metrics { gap: 6px; }
+
+    .tom-offer-card__footer { flex-direction: column; align-items: stretch; }
+    .tom-offer-card__footer-right { margin-left: 0; }
+    .tom-btn { justify-content: center; width: 100%; }
+
+    .tom-info-card__toggle { padding: 13px 16px; }
+    .tom-info-card__title-row h2 { font-size: 0.95rem; }
+    .tom-info-card__tags { gap: 4px; }
+    .tom-tag { font-size: 0.65rem; padding: 3px 7px; }
+}
+
+/* Enes Doganay | 2 Mayis 2026: Sikayet basari toasty */
+.msg-report-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #16a34a;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  z-index: var(--z-toast);
+  animation: toast-in 0.25s ease;
+  white-space: nowrap;
+}
+.msg-report-toast .material-symbols-outlined { font-size: 20px; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+

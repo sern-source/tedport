@@ -1,0 +1,155 @@
+/* Enes Dogranay | 6 Mayis 2026: AppBanner — mobil uygulama tanitim banner */
+.sc-app-banner {
+    padding: 32px 0;
+    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+}
+
+.sc-app-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--bg-white);
+    border-radius: 14px;
+    padding: 22px 28px;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+.sc-app-banner-inner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4f46e5, #7c3aed, #06b6d4);
+    border-radius: 14px 14px 0 0;
+}
+
+.sc-app-banner-icon {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    border-radius: 12px;
+    border: 1px solid #c7d2fe;
+}
+
+.sc-app-banner-icon .material-symbols-outlined {
+    font-size: 26px;
+    color: #4f46e5;
+}
+
+.sc-app-banner-content h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0 0 4px;
+    line-height: 1.3;
+}
+
+.sc-app-banner-content p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.sc-app-banner-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+}
+
+.sc-app-banner-stores {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.sc-store-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #fff;
+    cursor: default;
+    min-width: 140px;
+    transition: transform 0.18s;
+}
+
+.sc-store-btn:hover {
+    transform: translateY(-1px);
+}
+
+.sc-store-btn svg { flex-shrink: 0; opacity: 0.9; }
+.sc-store-btn div { display: flex; flex-direction: column; }
+.sc-store-label { font-size: 9px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
+.sc-store-name { font-size: 13px; font-weight: 700; line-height: 1.3; }
+
+@media (max-width: 768px) {
+    .sc-app-banner { padding: 24px 0; }
+    .sc-app-banner-inner {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 18px;
+        gap: 14px;
+    }
+    .sc-app-banner-content h3 { font-size: 14px; }
+    .sc-app-banner-stores {
+        flex-direction: row;
+        justify-content: center;
+    }
+    .sc-store-btn { min-width: 130px; padding: 8px 12px; }
+}
+
+@media (max-width: 420px) {
+    .sc-app-banner-stores { flex-direction: column; width: 100%; }
+    .sc-store-btn { width: 100%; justify-content: center; }
+}
+
+@media (min-width: 640px) {
+    .supplier-connect-wrapper .sc-cta-buttons {
+        flex-direction: row;
+    }
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-cta p {
+        font-size: 18px;
+        margin: 0 auto 32px auto;
+    }
+}
+
+
+[data-theme="dark"] .sc-app-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+[data-theme="dark"] .sc-app-banner-inner {
+    background: var(--bg-white);
+    border-color: var(--border);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sc-app-banner-icon {
+    background: linear-gradient(135deg, #1e2d4a, #1e293b);
+    border-color: #1e40af;
+}

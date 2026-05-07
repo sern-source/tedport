@@ -1,0 +1,441 @@
+/* ═══════════════════════════════════════════════════
+   İLETİŞİME GEÇ
+   ═══════════════════════════════════════════════════ */
+.tom-icon-btn--contact {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+}
+
+.tom-icon-btn--contact:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+    color: #1d4ed8;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Mesaj şikayet butonu + modal */
+.msg-report-btn {
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    align-self: flex-end;
+}
+.msg-report-btn .material-symbols-outlined { font-size: 15px; }
+.msg-report-btn:hover { color: #ef4444; background: #fee2e2; opacity: 1 !important; }
+.tom-tender-chat-bubble:hover .msg-report-btn,
+.tom-tender-chat-bubble.theirs .msg-report-btn { opacity: 1; }
+.tom-tender-chat-bubble.mine .msg-report-btn { display: none; }
+.msg-report-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-top-modal);
+    padding: 16px;
+}
+.msg-report-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 440px;
+    overflow: hidden;
+}
+.msg-report-modal__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.msg-report-modal__header .material-symbols-outlined { color: #ef4444; font-size: 22px; }
+.msg-report-modal__header h3 { flex: 1; font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0; }
+.msg-report-close { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 6px; color: #94a3b8; display: flex; }
+.msg-report-close:hover { background: #f1f5f9; color: #475569; }
+.msg-report-modal__body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.msg-report-preview {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #475569;
+    max-height: 80px;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+.msg-report-label { margin: 0; font-size: 0.82rem; font-weight: 600; color: #374151; }
+.msg-report-label span { font-weight: 400; color: #9ca3af; }
+.msg-report-reasons { display: flex; flex-direction: column; gap: 6px; }
+.msg-report-reason {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #374151;
+    transition: border-color 0.15s, background 0.15s;
+}
+.msg-report-reason.selected { border-color: #ef4444; background: #fff7f7; color: #b91c1c; }
+.msg-report-reason input { accent-color: #ef4444; }
+.msg-report-textarea {
+    width: 100%;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+.msg-report-textarea:focus { border-color: #ef4444; }
+.msg-report-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px 18px;
+    border-top: 1px solid #f1f5f9;
+}
+.msg-report-cancel {
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+}
+.msg-report-cancel:hover:not(:disabled) { background: #e2e8f0; }
+.msg-report-submit {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.3);
+}
+.msg-report-submit:hover:not(:disabled) { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.msg-report-submit:disabled { opacity: 0.6; cursor: default; }
+.msg-report-submit .material-symbols-outlined { font-size: 16px; animation: tom-spin 1s linear infinite; }
+@keyframes tom-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.tom-contact-overlay {
+    position: fixed;
+    inset: 0;
+    /* Enes Doğanay | 7 Mayıs 2026: scm-overlay (10000) üzerinde olmalı — chat açıkken contact popup görünsün */
+    z-index: var(--z-contact);
+    background: rgba(15,23,42,0.5);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: tomFadeIn 0.2s ease;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Profil kartı — tam yeniden tasarım */
+.tom-contact-card {
+    background: #fff;
+    border-radius: 22px;
+    width: 400px;
+    max-width: 94vw;
+    box-shadow: 0 30px 80px rgba(15,23,42,0.22), 0 8px 24px rgba(15,23,42,0.08);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: tomSlideUp 0.28s ease;
+}
+
+@keyframes tomSlideUp {
+    from { opacity: 0; transform: translateY(28px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes tomFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Gradient banner */
+.tom-contact-card__banner {
+    height: 110px;
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+    position: relative;
+}
+.tom-contact-card__banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='200' height='110' viewBox='0 0 200 110' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='160' cy='20' r='55' fill='rgba(255,255,255,0.06)'/%3E%3Ccircle cx='30' cy='80' r='40' fill='rgba(255,255,255,0.05)'/%3E%3C/svg%3E") no-repeat center/cover;
+}
+
+.tom-contact-card__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255,255,255,0.25);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 10px;
+    transition: all 0.15s;
+    display: flex;
+    z-index: var(--z-above);
+}
+.tom-contact-card__close:hover { background: rgba(255,255,255,0.4); }
+
+/* Avatar — banner’ı üstüne biner */
+.tom-contact-card__avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -42px auto 0;
+    position: relative;
+    z-index: var(--z-base);
+    border: 4px solid #fff;
+    box-shadow: 0 8px 24px rgba(37,99,235,0.28);
+    overflow: hidden;
+}
+.tom-contact-card__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.tom-contact-card__initials {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    color: #fff;
+}
+
+/* Identity block */
+.tom-contact-card__identity {
+    padding: 14px 28px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.tom-contact-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.tom-contact-card__firma {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.tom-contact-card__firma .material-symbols-outlined { font-size: 15px; }
+
+/* Kayıtlı Üye badge */
+.tom-contact-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #059669;
+    background: #d1fae5;
+    border-radius: 20px;
+    padding: 3px 10px;
+    margin-top: 4px;
+    letter-spacing: 0.2px;
+}
+.tom-contact-card__badge .material-symbols-outlined { font-size: 14px; color: #059669; }
+
+/* Contact rows */
+.tom-contact-card__rows {
+    display: grid;
+    gap: 8px;
+    text-align: left;
+    padding: 18px 20px 24px;
+}
+
+.tom-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1.5px solid #f1f5f9;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+}
+
+.tom-contact-row:hover {
+    background: #f0f7ff;
+    border-color: #93c5fd;
+    transform: translateY(-1px);
+}
+
+.tom-contact-row > .material-symbols-outlined {
+    font-size: 22px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.tom-contact-row__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.tom-contact-row__body small {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tom-contact-row__body span {
+    font-size: 0.9rem;
+    color: #1e293b;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+/* Email row — sağda aksiyon butonları */
+.tom-contact-row--email {
+    cursor: default;
+}
+.tom-contact-row--email:hover {
+    background: #f8fafc;
+    border-color: #f1f5f9;
+    transform: none;
+}
+
+.tom-contact-row__actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.tom-contact-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    border: none;
+    color: #475569;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+.tom-contact-icon-btn:hover {
+    background: #2563eb;
+    color: #fff;
+}
+.tom-contact-icon-btn .material-symbols-outlined { font-size: 17px; }
+
+/* Ara badge — telefon satırı sağında */
+.tom-contact-row__call-badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #2563eb;
+    background: #dbeafe;
+    border-radius: 20px;
+    padding: 3px 10px;
+    letter-spacing: 0.2px;
+    flex-shrink: 0;
+}
+
+/* Eski profil etiket — artık kullanılmıyor ama kalışın */
+.tom-contact-card__profile-label {
+    display: none;
+}
+
+.tom-contact-card__empty {
+    margin: 0 20px 20px;
+    font-size: 0.88rem;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Chat header’nda profil görüntüle butonu */
+.tom-tender-chat-profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+.tom-tender-chat-profile-btn:hover { background: rgba(255,255,255,0.3); }
+.tom-tender-chat-profile-btn .material-symbols-outlined { font-size: 20px; }
+
+.tom-trophy { font-size: 14px !important; color: #f59e0b; }
+
+.tom-compare-row strong {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.tom-compare-row--best strong { color: #059669; font-weight: 800; }
+.tom-winner { color: #059669 !important; }
+
+/* Enes Doğanay | 7 Mayıs 2026: IhaleYonetimiTab.compare.css responsive */
+@media (max-width: 768px) {
+    .tom-compare__grid { grid-template-columns: 1fr; }
+    .tom-compare-hint { flex-direction: column; gap: 10px; }
+}
+@media (max-width: 480px) {
+    .tom-compare__tbl th,
+    .tom-compare__tbl td { padding: 6px 8px; font-size: 0.73rem; }
+}
+

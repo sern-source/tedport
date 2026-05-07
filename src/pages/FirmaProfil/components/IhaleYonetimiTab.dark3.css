@@ -1,0 +1,445 @@
+/* ══════════════════════════════════════════════════
+   DARK MODE — KARŞILAŞTIRMA (compare.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-compare-hint {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(109,40,217,0.08));
+    border-color: rgba(167,139,250,0.3);
+    box-shadow: none;
+}
+[data-theme="dark"] .tom-compare-hint__content strong { color: #c4b5fd; }
+[data-theme="dark"] .tom-compare-hint__content p      { color: #a78bfa; opacity: 1; }
+[data-theme="dark"] .tom-compare-hint__never          { color: #a78bfa; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — AKSİYONLAR (actions.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-empty .material-symbols-outlined { background: #1e293b; color: #475569; }
+[data-theme="dark"] .tom-empty h3 { color: #e2e8f0; }
+[data-theme="dark"] .tom-empty p  { color: #64748b; }
+[data-theme="dark"] .tom-empty-mini { color: #64748b; }
+
+[data-theme="dark"] .tom-loading__spinner { border-color: #334155; border-top-color: #3b9eff; }
+[data-theme="dark"] .tom-loading p        { color: #64748b; }
+
+[data-theme="dark"] .tom-error-state h3 { color: #fca5a5; }
+[data-theme="dark"] .tom-error-state p  { color: #f87171; }
+
+[data-theme="dark"] .tom-share-link-row {
+    background: linear-gradient(135deg, #1a2744, #1e293b);
+    border-color: #334155;
+}
+[data-theme="dark"] .tom-share-link-row__input { color: #93c5fd; }
+
+[data-theme="dark"] .tom-confirm-inline {
+    background: rgba(180,83,9,0.15);
+    border-color: rgba(253,230,138,0.25);
+    color: #fde68a;
+}
+[data-theme="dark"] .tom-btn--cancel-sm {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+[data-theme="dark"] .tom-btn--cancel-sm:hover { background: #253347; color: #e2e8f0; border-color: #475569; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — TOAST (IhaleYonetimiTab.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-toast {
+    background: rgba(153,27,27,0.15);
+    border-color: rgba(252,165,165,0.2);
+    color: #fca5a5;
+}
+[data-theme="dark"] .tom-toast button { color: #fca5a5; }
+[data-theme="dark"] .tom-toast button:hover { background: rgba(153,27,27,0.2); }
+[data-theme="dark"] .tom-toast--green {
+    background: rgba(20,83,45,0.2);
+    border-color: rgba(134,239,172,0.2);
+    color: #86efac;
+}
+[data-theme="dark"] .tom-toast--green button { color: #86efac; }
+[data-theme="dark"] .tom-toast--amber {
+    background: rgba(69,26,3,0.2);
+    border-color: rgba(253,230,138,0.2);
+    color: #fde68a;
+}
+[data-theme="dark"] .tom-toast--amber button { color: #fde68a; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — MODALler (modals.css)
+   ══════════════════════════════════════════════════ */
+/* Düzenleme modali */
+[data-theme="dark"] .tom-edit-modal {
+    background: #1e293b;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+[data-theme="dark"] .tom-edit-modal__header {
+    background: linear-gradient(135deg, #0f172a, #1a2744);
+    border-bottom-color: #334155;
+}
+[data-theme="dark"] .tom-edit-modal__header h2 { color: #e2e8f0; }
+[data-theme="dark"] .tom-edit-modal__header h2 .material-symbols-outlined {
+    background: #1e3a5f;
+    color: #93c5fd;
+}
+[data-theme="dark"] .tom-edit-modal__close { background: #334155; color: #94a3b8; }
+[data-theme="dark"] .tom-edit-modal__close:hover { background: #475569; color: #e2e8f0; }
+[data-theme="dark"] .tom-edit-modal__body { background: #1e293b; }
+[data-theme="dark"] .tom-edit-error {
+    background: rgba(220,38,38,0.1);
+    border-color: rgba(252,165,165,0.2);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .tom-edit-section h3 { color: #64748b; border-bottom-color: #334155; }
+[data-theme="dark"] .tom-edit-field label { color: #64748b; }
+[data-theme="dark"] .tom-edit-field input,
+[data-theme="dark"] .tom-edit-field select,
+[data-theme="dark"] .tom-edit-field textarea {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+[data-theme="dark"] .tom-edit-field input:focus,
+[data-theme="dark"] .tom-edit-field select:focus,
+[data-theme="dark"] .tom-edit-field textarea:focus {
+    border-color: #3b9eff;
+    background: #0f172a;
+    box-shadow: 0 0 0 3px rgba(59,158,255,0.1);
+}
+
+[data-theme="dark"] .tom-edit-req-input input { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .tom-edit-req-input input:focus { border-color: #3b9eff; background: #0f172a; }
+[data-theme="dark"] .tom-edit-req-row { background: #0f172a; border-color: #334155; }
+[data-theme="dark"] .tom-edit-req-row:hover { border-color: #1e3a5f; }
+[data-theme="dark"] .tom-edit-req-num { background: linear-gradient(135deg, #1e3a5f, #1e293b); color: #93c5fd; }
+[data-theme="dark"] .tom-edit-req-madde    { color: #e2e8f0; }
+[data-theme="dark"] .tom-edit-req-aciklama { color: #94a3b8; }
+
+[data-theme="dark"] .tom-edit-modal__footer { background: #0f172a; border-top-color: #334155; }
+[data-theme="dark"] .tom-btn--cancel {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+[data-theme="dark"] .tom-btn--cancel:hover { background: #253347; color: #e2e8f0; border-color: #475569; }
+
+/* Puanlama popup */
+[data-theme="dark"] .tom-scoring-info-card {
+    background: #1e293b;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+[data-theme="dark"] .tom-scoring-info-card h3 { color: var(--text-dark); }
+[data-theme="dark"] .tom-scoring-info-card__body > p { color: #94a3b8; }
+[data-theme="dark"] .tom-scoring-info-item {
+    background: #0f172a;
+    border-color: #334155;
+}
+[data-theme="dark"] .tom-scoring-info-item:hover { background: #1a2f4e; border-color: #1e3a5f; }
+[data-theme="dark"] .tom-scoring-info-item strong { color: #e2e8f0; }
+[data-theme="dark"] .tom-scoring-info-item p      { color: #94a3b8; }
+
+/* Red nedeni popup */
+[data-theme="dark"] .tom-reject-note-card {
+    background: #1e293b;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+[data-theme="dark"] .tom-reject-note-card h3 { color: #e2e8f0; }
+[data-theme="dark"] .tom-reject-note-textarea {
+    background: #0f172a;
+    border-color: #334155;
+    color: var(--text-dark);
+}
+[data-theme="dark"] .tom-reject-note-textarea:focus { border-color: #f87171; background: #0f172a; }
+
+/* Kabul → kapat popup */
+[data-theme="dark"] .tom-accept-close-card {
+    background: #1e293b;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+[data-theme="dark"] .tom-accept-close-card h3 { color: #e2e8f0; }
+
+/* Statü dropdown */
+[data-theme="dark"] .tom-btn--status-change {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+[data-theme="dark"] .tom-btn--status-change:hover {
+    background: #253347;
+    border-color: #3b9eff;
+    color: #93c5fd;
+}
+[data-theme="dark"] .tom-status-dropdown {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+}
+[data-theme="dark"] .tom-status-dropdown button { color: #94a3b8; }
+[data-theme="dark"] .tom-status-dropdown button:hover { background: #253347; color: #e2e8f0; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — OKUNMAMIŞ MESAJ GÖSTERGELERİ
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-tender-card--has-unread {
+    border-color: #6366f1;
+    box-shadow: inset 3px 0 0 #6366f1, 0 2px 8px rgba(99,102,241,0.15);
+}
+[data-theme="dark"] .tom-tender-card__unread-pill {
+    background: rgba(99,102,241,0.2);
+    color: #c7d2fe;
+    border-color: rgba(99,102,241,0.35);
+}
+[data-theme="dark"] .tom-offer-card__main--has-unread {
+    border-left-color: #6366f1;
+    background: rgba(99,102,241,0.08);
+}
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — KARŞILAŞTIRMA TABLOSU (compare.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-compare {
+    background: #1e293b;
+    border-color: rgba(139,92,246,0.2);
+    box-shadow: none;
+}
+[data-theme="dark"] .tom-compare__head {
+    background: linear-gradient(135deg, #1a1035, #1e293b);
+    border-bottom-color: rgba(139,92,246,0.15);
+}
+[data-theme="dark"] .tom-compare__head h3 { color: #c4b5fd; }
+
+[data-theme="dark"] .tom-compare__tbl-row { border-bottom-color: #253347; }
+[data-theme="dark"] .tom-compare__tbl-row--header { background: #0f172a; border-bottom-color: #334155; }
+[data-theme="dark"] .tom-compare__tbl-row--alt { background: transparent; }
+
+[data-theme="dark"] .tom-compare__tbl-name { border-left-color: #253347; }
+[data-theme="dark"] .tom-compare__tbl-name--best {
+    border-top-color: #7c3aed;
+    border-left-color: rgba(124,58,237,0.15);
+    background: rgba(124,58,237,0.06);
+}
+[data-theme="dark"] .tom-compare__tbl-person { color: #e2e8f0; }
+
+[data-theme="dark"] .tom-compare__tbl-metric { background: #0f172a; border-right-color: #253347; color: #64748b; }
+
+[data-theme="dark"] .tom-compare__tbl-cell { border-left-color: #253347; }
+[data-theme="dark"] .tom-compare__tbl-cell--winner {
+    border-left-color: rgba(124,58,237,0.15);
+    background: rgba(124,58,237,0.05);
+}
+[data-theme="dark"] .tom-compare__tbl-cell--best { background: rgba(22,101,52,0.15); }
+[data-theme="dark"] .tom-compare__tbl-cell--winner.tom-compare__tbl-cell--best { background: rgba(22,101,52,0.2); }
+
+[data-theme="dark"] .tom-compare__tbl-val { color: #f1f5f9; }
+[data-theme="dark"] .tom-compare__best-chip { background: rgba(22,101,52,0.2); color: #86efac; }
+
+[data-theme="dark"] .tom-compare__metric-icon--green { background: rgba(22,101,52,0.2); }
+[data-theme="dark"] .tom-compare__metric-icon--green .material-symbols-outlined { color: #86efac; }
+[data-theme="dark"] .tom-compare__metric-icon--amber { background: rgba(180,83,9,0.2); }
+[data-theme="dark"] .tom-compare__metric-icon--amber .material-symbols-outlined { color: #fbbf24; }
+[data-theme="dark"] .tom-compare__metric-icon--blue { background: rgba(124,58,237,0.15); }
+[data-theme="dark"] .tom-compare__metric-icon--blue .material-symbols-outlined { color: #c4b5fd; }
+
+[data-theme="dark"] .tom-compare-nudge {
+    background: rgba(180,83,9,0.12);
+    border-color: rgba(253,230,138,0.2);
+    color: #fde68a;
+}
+[data-theme="dark"] .tom-compare-nudge .material-symbols-outlined { color: #fbbf24; }
+
+[data-theme="dark"] .tom-compare-card__crown { background: linear-gradient(135deg, #92400e, #b45309); color: #fef3c7; }
+
+[data-theme="dark"] .tom-icon-btn--contact { background: #1e293b; border-color: #334155; color: #93c5fd; }
+[data-theme="dark"] .tom-icon-btn--contact:hover { background: #1e3a5f; border-color: #60a5fa; color: #93c5fd; }
+
+/* Contact card */
+[data-theme="dark"] .tom-contact-card { background: #1e293b; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
+[data-theme="dark"] .tom-contact-card h3 { color: #f1f5f9; }
+[data-theme="dark"] .tom-contact-card__firma { color: #64748b; }
+[data-theme="dark"] .tom-contact-row { background: #0f172a; border-color: #334155; }
+[data-theme="dark"] .tom-contact-row:hover { background: #1a2f4e; border-color: #1e3a5f; }
+[data-theme="dark"] .tom-contact-row__body small { color: #64748b; }
+[data-theme="dark"] .tom-contact-row__body span { color: #e2e8f0; }
+[data-theme="dark"] .tom-contact-row--email:hover { background: #0f172a; border-color: #334155; }
+[data-theme="dark"] .tom-contact-icon-btn { background: #334155; color: #94a3b8; }
+[data-theme="dark"] .tom-contact-icon-btn:hover { background: #2563eb; color: #fff; }
+[data-theme="dark"] .tom-contact-row__call-badge { background: rgba(37,99,235,0.15); color: #93c5fd; }
+
+/* msg-report modal */
+[data-theme="dark"] .tom-msg-report-modal,
+[data-theme="dark"] .msg-report-modal { background: #1e293b; }
+[data-theme="dark"] .msg-report-modal__header { border-bottom-color: #334155; }
+[data-theme="dark"] .msg-report-modal__header h3 { color: #e2e8f0; }
+[data-theme="dark"] .msg-report-close:hover { background: #334155; color: #e2e8f0; }
+[data-theme="dark"] .msg-report-preview { background: #0f172a; border-color: #334155; color: #94a3b8; }
+[data-theme="dark"] .msg-report-label { color: #cbd5e1; }
+[data-theme="dark"] .msg-report-reason { background: #0f172a; border-color: #334155; color: #cbd5e1; }
+[data-theme="dark"] .msg-report-reason.selected { background: rgba(220,38,38,0.1); border-color: #f87171; color: #fca5a5; }
+[data-theme="dark"] .msg-report-textarea { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .msg-report-textarea:focus { border-color: #f87171; background: #0f172a; }
+[data-theme="dark"] .msg-report-modal__footer { border-top-color: #334155; }
+[data-theme="dark"] .msg-report-cancel { background: #334155; color: #94a3b8; }
+[data-theme="dark"] .msg-report-cancel:hover:not(:disabled) { background: #475569; color: #e2e8f0; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — TEKLIF KARTLARI EKSİK (cards.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-offer-card--best {
+    border-color: #059669;
+    box-shadow: 0 0 0 2px rgba(5,150,105,0.2), 0 8px 32px rgba(5,150,105,0.1);
+}
+[data-theme="dark"] .tom-best-badge { background: linear-gradient(135deg, #065f46, #047857); }
+[data-theme="dark"] .tom-rank--2 { background: linear-gradient(135deg, #334155, #475569); color: #cbd5e1; }
+
+[data-theme="dark"] .tom-balance-slider__side { color: #cbd5e1; }
+[data-theme="dark"] .tom-balance-slider__track-wrap { background: #334155; }
+[data-theme="dark"] .tom-balance-slider__track-wrap::after { background: #1e293b; border-color: #a78bfa; }
+[data-theme="dark"] .tom-balance-slider__divider { color: #475569; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — DETAY EKSİK (detail.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-tender-chat-modal { background: #1e293b; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
+[data-theme="dark"] .tom-tender-chat-header {
+    background: linear-gradient(135deg, #1a1b4b, #1e1b4b);
+    border-bottom-color: #334155;
+}
+[data-theme="dark"] .tom-tender-chat-header__info .material-symbols-outlined { background: #1e1b4b; color: #a5b4fc; }
+[data-theme="dark"] .tom-tender-chat-header__info strong { color: #e2e8f0; }
+[data-theme="dark"] .tom-tender-chat-header__info span { color: #64748b; }
+[data-theme="dark"] .tom-tender-chat-ihale-tag { background: #1e1b4b; color: #a5b4fc; }
+
+[data-theme="dark"] .tom-tender-chat-empty { color: #475569; }
+[data-theme="dark"] .tom-tender-chat-spinner { border-color: #334155; border-top-color: #6366f1; }
+
+[data-theme="dark"] .tom-chat-unread-badge { background: #dc2626; }
+[data-theme="dark"] .tom-btn--chat-unread { border-color: #4338ca; background: #1e1b4b; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — AKSİYON EKSİK (actions.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-tender-actions { border-top-color: #334155; }
+
+[data-theme="dark"] .tom-share-link-row__copy {
+    background: linear-gradient(135deg, #1e3a5f, #1d4ed8);
+}
+[data-theme="dark"] .tom-share-link-row__copy:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+[data-theme="dark"] .tom-share-link-row__copy--done {
+    background: linear-gradient(135deg, #065f46, #047857) !important;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Outline action butonlar dark */
+[data-theme="dark"] .tom-btn--edit {
+    background: rgba(37, 99, 235, 0.12);
+    border-color: #3b82f6;
+    color: #60a5fa;
+}
+[data-theme="dark"] .tom-btn--edit:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
+}
+[data-theme="dark"] .tom-btn--edit:disabled {
+    background: #1e293b;
+    border-color: #334155;
+    color: #475569;
+}
+[data-theme="dark"] .tom-btn--close-tender {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: #d97706;
+    color: #fbbf24;
+}
+[data-theme="dark"] .tom-btn--close-tender:hover {
+    background: #d97706;
+    border-color: #d97706;
+    color: #fff;
+}
+[data-theme="dark"] .tom-btn--delete-tender {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    color: #f87171;
+}
+[data-theme="dark"] .tom-btn--delete-tender:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+}
+/* Enes Doğanay | 7 Mayıs 2026: Kabul Et / Reddet outline dark */
+[data-theme="dark"] .tom-btn--accept {
+    background: rgba(5,150,105,0.12);
+    border-color: #059669;
+    color: #34d399;
+}
+[data-theme="dark"] .tom-btn--accept:hover {
+    background: #059669;
+    border-color: #059669;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(5,150,105,0.3);
+}
+[data-theme="dark"] .tom-btn--reject {
+    background: rgba(220,38,38,0.1);
+    border-color: #ef4444;
+    color: #f87171;
+}
+[data-theme="dark"] .tom-btn--reject:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(239,68,68,0.25);
+}
+[data-theme="dark"] .tom-btn--chat {
+    background: rgba(99,102,241,0.12);
+    border-color: #6366f1;
+    color: #a5b4fc;
+}
+[data-theme="dark"] .tom-btn--chat:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(99,102,241,0.3);
+}
+/* ══════════════════════════════════════════════════
+   DARK MODE — MODAL EKSİK (modals.css)
+   ══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-btn--create-tender { box-shadow: 0 3px 10px rgba(37,99,235,0.18); }
+[data-theme="dark"] .tom-btn--repeat { box-shadow: 0 3px 12px rgba(5,150,105,0.18); }
+
+[data-theme="dark"] .tom-edit-req-remove { background: rgba(239,68,68,0.15); color: #f87171; }
+[data-theme="dark"] .tom-edit-req-remove:hover { background: rgba(239,68,68,0.25); }
+
+[data-theme="dark"] .tom-confirm-inline--danger {
+    background: rgba(153,27,27,0.15);
+    border-color: rgba(252,165,165,0.2);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .msg-report-toast { background: #065f46; color: #d1fae5; }
+
+/* Enes Doğanay | 7 Mayıs 2026: İhale kart başlığı dark modda görünmüyor fix */
+[data-theme="dark"] .tom-tender-card__top h3 {
+    color: #e2e8f0;
+}
+[data-theme="dark"] .tom-tender-card--active .tom-tender-card__top h3 {
+    color: #93c5fd;
+}
+[data-theme="dark"] .tom-tender-card__meta {
+    color: #64748b;
+}
+[data-theme="dark"] .tom-tender-card__meta .material-symbols-outlined {
+    color: #64748b;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: "Gelen Teklifler" başlığı dark modda görünmüyor fix */
+[data-theme="dark"] .tom-offers-toolbar__left h3 {
+    color: #e2e8f0;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Durum rozetleri dark mod */
+[data-theme="dark"] .tom-badge--active { background: rgba(21,128,61,0.2); color: #4ade80; }
+[data-theme="dark"] .tom-badge--closed { background: rgba(185,28,28,0.2); color: #f87171; }
+[data-theme="dark"] .tom-badge--draft { background: rgba(71,85,105,0.2); color: #94a3b8; }

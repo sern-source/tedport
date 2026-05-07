@@ -1,0 +1,513 @@
+/* Enes Doğanay | 6 Mayıs 2026: SirketimTab bileşen stilleri */
+
+/* ═══════════════════════════════════════
+   Enes Doğanay | 4 Mayıs 2026: EKİP YÖNETİMİ
+   ═══════════════════════════════════════ */
+.ekip-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 4px 0;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Hero banner — gradient + KPI pills */
+.ekip-hero {
+  padding: 14px 20px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, #1a0533 0%, #3b0764 45%, #7c3aed 100%);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.22);
+}
+
+.ekip-hero__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ekip-hero__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ekip-hero__title > .material-symbols-outlined {
+  font-size: 20px;
+  opacity: 0.85;
+  background: rgba(255,255,255,0.13);
+  border-radius: 8px;
+  padding: 6px;
+  flex-shrink: 0;
+}
+
+.ekip-hero__title h1 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.ekip-hero__title p {
+  margin: 3px 0 0;
+  font-size: 0.74rem;
+  opacity: 0.65;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ekip-kpis {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ekip-kpi {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 7px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+  backdrop-filter: blur(6px);
+}
+
+.ekip-kpi strong {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ekip-kpi span {
+  font-size: 0.62rem;
+  opacity: 0.65;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.ekip-kpi--pending { border-color: rgba(252,211,77,0.35); }
+.ekip-kpi--pending strong { color: #fcd34d; }
+
+/* Eski header — geriye dönüş için saklansın */
+.ekip-panel__header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.ekip-panel__header h2 .material-symbols-outlined { font-size: 22px; color: #7c3aed; }
+.ekip-panel__header p { font-size: 0.85rem; color: #64748b; margin: 0; }
+
+/* Davet kartı */
+.ekip-invite-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ekip-invite-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ekip-invite-card h3 .material-symbols-outlined { font-size: 17px; color: #7c3aed; }
+
+.ekip-invite-form { display: flex; flex-direction: column; gap: 10px; }
+.ekip-invite-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.ekip-input {
+  flex: 1;
+  min-width: 180px;
+  padding: 9px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.ekip-input:focus { border-color: #a78bfa; background: #fff; }
+.ekip-input--title { flex: 0.7; min-width: 130px; }
+.ekip-input--sm { flex: 1; min-width: 100px; padding: 6px 10px; font-size: 0.8rem; }
+
+.ekip-select {
+  padding: 9px 10px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  color: #0f172a;
+  background: #f8fafc;
+  cursor: pointer;
+  outline: none;
+}
+
+.ekip-select:focus { border-color: #a78bfa; }
+.ekip-select--sm { padding: 6px 8px; font-size: 0.8rem; }
+
+.ekip-invite-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.25);
+}
+
+.ekip-invite-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6d28d9, #5b21b6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124,58,237,0.35);
+}
+.ekip-invite-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ekip-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.ekip-msg .material-symbols-outlined { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.ekip-msg--error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.ekip-msg--success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+
+/* Rol hint */
+.ekip-role-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.ekip-role-hint__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* Rol badge */
+.ekip-role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+}
+
+.ekip-role-badge--owner  { background: #ede9fe; color: #5b21b6; }
+.ekip-role-badge--admin  { background: #fef3c7; color: #92400e; }
+.ekip-role-badge--member { background: #f1f5f9; color: #475569; }
+
+.ekip-section__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 10px;
+}
+
+.ekip-section__title .material-symbols-outlined { font-size: 17px; }
+
+.ekip-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ekip-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 11px;
+  gap: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ekip-card:hover { border-color: #c4b5fd; box-shadow: 0 2px 8px rgba(124,58,237,0.06); }
+.ekip-card--me { border-color: rgba(124,58,237,0.3); border-left: 3px solid #7c3aed; background: rgba(124,58,237,0.02); }
+.ekip-card--me:hover { border-color: rgba(124,58,237,0.5); box-shadow: 0 2px 10px rgba(124,58,237,0.1); }
+.ekip-card--pending { border-style: dashed; background: #fafafa; }
+
+.ekip-card__info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+.ekip-card__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #5b21b6;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ekip-card__avatar-icon { font-size: 26px; color: #94a3b8; }
+.ekip-card__info strong { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: #0f172a; }
+.ekip-card__meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+
+.ekip-card__title-tag {
+  font-size: 0.72rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 1px 7px;
+  border-radius: 99px;
+}
+
+.ekip-me-chip {
+  font-size: 0.65rem;
+  background: #ede9fe;
+  color: #5b21b6;
+  padding: 1px 7px;
+  border-radius: 99px;
+  font-weight: 700;
+}
+
+.ekip-card__actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.ekip-edit-btn, .ekip-remove-btn, .ekip-save-btn, .ekip-cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ekip-edit-btn .material-symbols-outlined,
+.ekip-remove-btn .material-symbols-outlined,
+.ekip-save-btn .material-symbols-outlined,
+.ekip-cancel-btn .material-symbols-outlined { font-size: 16px; }
+
+.ekip-edit-btn:hover { border-color: #a78bfa; color: #7c3aed; }
+.ekip-remove-btn { border-color: #fecaca; }
+.ekip-remove-btn:hover { background: #fef2f2; color: #dc2626; }
+.ekip-save-btn { border-color: #bbf7d0; color: #15803d; }
+.ekip-save-btn:hover { background: #f0fdf4; }
+.ekip-cancel-btn:hover { background: #f8fafc; }
+
+.ekip-edit-inline { display: flex; align-items: center; gap: 6px; }
+
+.ekip-confirm-remove {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #b91c1c;
+}
+
+.ekip-confirm-yes, .ekip-confirm-no {
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1.5px solid;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ekip-confirm-yes { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+.ekip-confirm-no  { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+
+.ekip-loading { padding: 24px; text-align: center; color: #94a3b8; font-size: 0.85rem; }
+
+/* Enes Doğanay | 4 Mayıs 2026: Firma geneli ekip görünürlük kartı */
+.ekip-global-visibility-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+  border: 1.5px solid rgba(167,139,250,0.35);
+  border-left: 3px solid #7c3aed;
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.ekip-global-visibility-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ekip-global-visibility-info > .material-symbols-outlined {
+  font-size: 1.1rem;
+  color: #7c3aed;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ekip-global-visibility-info strong { font-size: 0.86rem; font-weight: 700; color: #1e293b; display: block; }
+.ekip-global-visibility-info p { font-size: 0.74rem; color: #6d28d9; margin: 2px 0 0; opacity: 0.8; }
+
+/* Toggle switch */
+.ekip-global-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 99px;
+  background: #cbd5e1;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  padding: 0;
+}
+
+.ekip-global-toggle--on { background: var(--primary); }
+.ekip-global-toggle:disabled { opacity: 0.6; cursor: default; }
+
+.ekip-global-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  display: block;
+}
+
+.ekip-global-toggle--on .ekip-global-toggle-knob { transform: translateX(20px); }
+
+/* Görünürlük toggle butonu */
+.ekip-visibility-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #bbf7d0;
+  background: #fff;
+  color: #15803d;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ekip-visibility-btn .material-symbols-outlined { font-size: 16px; }
+.ekip-visibility-btn:hover { background: #f0fdf4; }
+.ekip-visibility-btn--hidden { border-color: #e2e8f0; color: #94a3b8; }
+.ekip-visibility-btn--hidden:hover { background: #f8fafc; color: #64748b; }
+
+.ekip-card--hidden { opacity: 0.65; }
+
+.ekip-hidden-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 99px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+
+/* Ekip üyesi sayfa izin matrisi */
+.ekip-permissions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.ekip-permissions-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 7px;
+}
+
+.ekip-permissions-label .material-symbols-outlined { font-size: 13px; }
+
+.ekip-permissions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.ekip-perm-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #94a3b8;
+  padding: 5px 9px;
+  border-radius: 7px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.ekip-perm-item input[type="checkbox"] { display: none; }
+.ekip-perm-item .material-symbols-outlined { font-size: 13px; }
+
+.ekip-perm-item:hover:not(.ekip-perm-item--on) {
+  border-color: #c4b5fd;
+  color: #5b21b6;
+  background: #faf5ff;
+}
+
+.ekip-perm-item--on {
+  color: #2563eb;
+  background: #eff6ff;
+  border-color: #93c5fd;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(37,99,235,0.08);
+}
+
+.ekip-perm-item--on .material-symbols-outlined { color: #2563eb; }
+

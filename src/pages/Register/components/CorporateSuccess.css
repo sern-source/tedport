@@ -1,0 +1,93 @@
+/* Enes Doğanay | 6 Mayıs 2026: Kurumsal başvuru başarı durumu */
+.corporate-success-state {
+  margin: 12px 24px 0;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid #dbeafe;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  text-align: center;
+}
+
+.corporate-success-badge {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: radial-gradient(circle at top, rgba(37, 99, 235, 0.22), rgba(37, 99, 235, 0.08));
+  color: #1d4ed8;
+}
+
+.corporate-success-badge .material-symbols-outlined { font-size: 28px; }
+
+.corporate-success-state h2 {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: 1.25rem;
+}
+
+.corporate-success-state p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.corporate-success-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.corporate-success-step {
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.corporate-success-step strong {
+  color: #1d4ed8;
+  font-size: 1.2rem;
+}
+
+.corporate-success-step span {
+  color: #475569;
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+
+.corporate-success-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* ── Mobil ────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .corporate-success-state { margin-left: 16px; margin-right: 16px; }
+  .corporate-success-steps { grid-template-columns: 1fr; }
+}
+
+/* ── Dark mode ────────────────────────────────────────────────────────── */
+[data-theme="dark"] .corporate-success-state {
+  background: linear-gradient(180deg, #1e293b 0%, #162033 100%);
+  border-color: #1e3a5f;
+}
+
+[data-theme="dark"] .corporate-success-state h2 { color: #f1f5f9; }
+[data-theme="dark"] .corporate-success-state p { color: #94a3b8; }
+
+[data-theme="dark"] .corporate-success-step {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .corporate-success-step span { color: #94a3b8; }

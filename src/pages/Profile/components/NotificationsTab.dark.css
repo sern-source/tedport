@@ -1,0 +1,181 @@
+﻿/* Enes Doğanay | 7 Mayıs 2026: notif-hero dark — hero zaten koyu gradient, sadece action buton renkleri */
+[data-theme="dark"] .notif-hero { filter: brightness(0.92); }
+
+[data-theme="dark"] .notifications-panel {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(51, 65, 85, 0.8);
+}
+
+[data-theme="dark"] .notifications-panel-header h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .notifications-panel-header p {
+  color: #64748b;
+}
+
+[data-theme="dark"] .notifications-panel-subheader {
+  background: linear-gradient(180deg, rgba(120, 88, 0, 0.15) 0%, rgba(92, 64, 0, 0.1) 100%);
+  border-color: rgba(120, 88, 0, 0.3);
+}
+
+[data-theme="dark"] .notifications-panel-subheader h4 {
+  color: #f0d590;
+}
+
+[data-theme="dark"] .notifications-panel-subheader p {
+  color: #a0895a;
+}
+
+[data-theme="dark"] .notifications-empty-state {
+  border-color: rgba(51, 65, 85, 0.9);
+  background: linear-gradient(180deg, #1e293b 0%, #162033 100%);
+  color: #475569;
+}
+
+[data-theme="dark"] .notifications-empty-state .material-symbols-outlined {
+  color: #334155;
+}
+
+[data-theme="dark"] .upcoming-reminder-card {
+  background: linear-gradient(180deg, #1e293b 0%, #1c2333 100%);
+  border-color: rgba(245, 158, 11, 0.18);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .upcoming-reminder-card.overdue {
+  background: linear-gradient(180deg, #1e293b 0%, #221a1a 100%);
+  border-color: rgba(239, 68, 68, 0.18);
+}
+
+[data-theme="dark"] .upcoming-reminder-card h4 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .upcoming-reminder-card p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .upcoming-reminder-time {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .upcoming-reminder-badge {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .upcoming-reminder-time.overdue {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+[data-theme="dark"] .upcoming-reminder-badge.overdue {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+[data-theme="dark"] .upcoming-reminder-link {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .upcoming-reminder-card.overdue .upcoming-reminder-link {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme="dark"] .notification-feed-card {
+  background: linear-gradient(180deg, #1e293b 0%, #162033 100%);
+  border-color: rgba(51, 65, 85, 0.9);
+}
+
+[data-theme="dark"] .notification-feed-card h4 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .notification-feed-card p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .notification-feed-card.unread {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: linear-gradient(180deg, rgba(30, 58, 95, 0.3) 0%, rgba(15, 23, 42, 0.4) 100%);
+}
+
+[data-theme="dark"] .notification-feed-card.unread h4 {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .notification-feed-type {
+  background: rgba(29, 78, 216, 0.2);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .notification-feed-time {
+  background: #1e293b;
+  color: #475569;
+}
+
+[data-theme="dark"] .reminder-inline-confirm-cancel,
+[data-theme="dark"] .reminder-inline-confirm-yes {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .notif-prefs-panel {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(51, 65, 85, 0.8);
+}
+
+[data-theme="dark"] .notif-prefs-toggle:hover {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+[data-theme="dark"] .notif-prefs-toggle-left .material-symbols-outlined {
+  color: #64748b;
+}
+
+[data-theme="dark"] .notif-prefs-toggle-left strong {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .notif-prefs-list {
+  border-top-color: rgba(51, 65, 85, 0.6);
+}
+
+[data-theme="dark"] .notif-pref-row:hover {
+  background: rgba(15, 23, 42, 0.3);
+}
+
+[data-theme="dark"] .notif-pref-info strong {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .notif-pref-info p {
+  color: #475569;
+}
+
+[data-theme="dark"] .notif-pref-switch {
+  background: #1e293b;
+  border: 1.5px solid #334155;
+}
+
+[data-theme="dark"] .notif-pref-switch.active {
+  background: linear-gradient(135deg, #3b9eff, #2563eb);
+  border-color: transparent;
+}
+
+[data-theme="dark"] .notif-pref-switch-knob {
+  background: #cbd5e1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .notif-pref-switch.active .notif-pref-switch-knob {
+  background: #fff;
+}

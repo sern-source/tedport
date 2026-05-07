@@ -1,0 +1,514 @@
+﻿/* Enes Doğanay | 6 Nisan 2026: Firma yönetim paneli CSS — FirmaDetay site değişkenleri ve accordion/pill stilleriyle uyumlu */
+
+/* ── WORKSPACE ───────────────────────────────────────────────────────────── */
+.cmp-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+/* ── HERO BANNER — Enes Doğanay | 7 Mayıs 2026: diğer tab sayfalarıyla aynı sistem ── */
+.cmp-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #064e3b 60%, #059669 100%);
+    border-radius: var(--radius-xl);
+    padding: 14px 20px;
+}
+
+.cmp-hero__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cmp-hero__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cmp-hero__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cmp-hero__icon .material-symbols-outlined { font-size: 22px; color: #fff; }
+.cmp-hero__title h2 { font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 2px; }
+.cmp-hero__title p { font-size: 0.76rem; color: rgba(255, 255, 255, 0.6); margin: 0; }
+
+.cmp-hero__kpis {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cmp-hero__kpi {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 7px 13px;
+    min-width: 52px;
+}
+
+.cmp-hero__kpi-value { font-size: 0.92rem; font-weight: 800; color: #fff; line-height: 1; }
+.cmp-hero__kpi-label { font-size: 0.65rem; color: rgba(255, 255, 255, 0.55); margin-top: 3px; white-space: nowrap; }
+.cmp-hero__kpi--catalog .cmp-hero__kpi-value { color: #6ee7b7; }
+.cmp-hero__kpi--sub .cmp-hero__kpi-value { color: #a5f3fc; }
+.cmp-hero__kpi--product .cmp-hero__kpi-value { color: #fde68a; }
+
+/* ── FORM WRAPPER ────────────────────────────────────────────────────────── */
+.cmp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ── CARD ─────────────────────────────────────────────────────────────────── */
+/* Enes Doğanay | 7 Mayıs 2026: cmp-card compact+cool */
+.cmp-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cmp-card__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.cmp-card__head .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 20px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.cmp-card__head h3 {
+    margin: 0 0 2px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.cmp-card__head p {
+    margin: 0;
+    font-size: 0.72rem;
+    color: var(--text-gray);
+    line-height: 1.45;
+}
+
+/* Push the "Kategori Ekle" button to the right inside the head */
+.cmp-card__head>.cmp-btn--add-category {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ── GRID ────────────────────────────────────────────────────────────────── */
+.cmp-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.cmp-grid--3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* ── FIELD ───────────────────────────────────────────────────────────────── */
+.cmp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cmp-field--span2 {
+    grid-column: span 2;
+}
+
+.cmp-field span {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.cmp-field input,
+.cmp-field textarea,
+.cmp-field select {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 0.84rem;
+    color: var(--text-dark);
+    background: #fafbfd;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.cmp-field input:focus,
+.cmp-field textarea:focus,
+.cmp-field select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.12);
+    background: #fff;
+}
+
+.cmp-field textarea {
+    resize: vertical;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Web sitesi inputu yanında açma linki */
+.cmp-field-web {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.cmp-field-web input {
+    flex: 1;
+    min-width: 0;
+}
+
+.cmp-field-web__link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: #f8fafc;
+    color: var(--primary);
+    text-decoration: none;
+    transition: all .15s;
+    flex-shrink: 0;
+}
+
+.cmp-field-web__link:hover {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.cmp-field-web__link .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────────────────────── */
+.cmp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    color: var(--text-dark);
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.cmp-btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.cmp-btn--sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.cmp-btn--icon {
+    padding: 5px 8px;
+}
+
+.cmp-btn--ghost {
+    background: #f0f6fd;
+    border-color: #bfdbfe;
+    color: var(--primary);
+}
+
+.cmp-btn--ghost:hover {
+    background: #dbeafe;
+    border-color: var(--primary);
+}
+
+.cmp-btn--danger {
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #e11d48;
+}
+
+.cmp-btn--danger:hover {
+    background: #ffe4e6;
+    border-color: #fca5a5;
+}
+
+.cmp-btn--add-category {
+    background: #f0f6fd;
+    border-color: #bfdbfe;
+    color: var(--primary);
+}
+
+.cmp-btn--add-category:hover {
+    background: #dbeafe;
+    border-color: var(--primary);
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: cmp-btn--save compact */
+.cmp-btn--save {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 20px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(19, 127, 236, 0.3);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.cmp-btn--save:hover:not(:disabled) {
+    background: var(--primary-hover);
+    box-shadow: 0 5px 14px rgba(19, 127, 236, 0.38);
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Deaktif butonda not-allowed cursor */
+.cmp-btn--save:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* ── FEEDBACK ────────────────────────────────────────────────────────────── */
+.cmp-feedback {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 18px;
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cmp-feedback .material-symbols-outlined {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.cmp-feedback--ok {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.cmp-feedback--err {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+/* ── ACTIONS BAR ─────────────────────────────────────────────────────────── */
+/* Enes Doğanay | 4 Mayıs 2026: cmp-actions compact */
+.cmp-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background: rgba(248, 250, 252, 0.96);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    bottom: 12px;
+    z-index: 10;
+    box-shadow: 0 -2px 10px rgba(15, 23, 42, 0.06);
+}
+
+.cmp-actions__hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-gray);
+    line-height: 1.5;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .cmp-grid--3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cmp-hero__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cmp-grid--3 {
+        grid-template-columns: 1fr;
+    }
+
+    .cmp-field--span2 {
+        grid-column: 1;
+    }
+
+    .cmp-hero {
+        padding: 12px 14px;
+    }
+
+    .cmp-card {
+        padding: 12px 14px;
+    }
+
+    .cmp-card__head {
+        flex-wrap: wrap;
+    }
+
+    .cmp-card__head>.cmp-btn--add-category {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cmp-cat-header {
+        flex-wrap: wrap;
+    }
+
+    .cmp-cat-header__btns {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .cmp-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cmp-btn--save {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ── Logo, Tag, Quotes — moved to co-located CSS files ─────────────────── */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Enes Doğanay | 2 Mayıs 2026: Firma Paneli dark mode — form alanları ve butonlar
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .cmp-field input,
+[data-theme="dark"] .cmp-field textarea,
+[data-theme="dark"] .cmp-field select {
+    background: #0f172a;
+    color: #f1f5f9;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .cmp-field input:focus,
+[data-theme="dark"] .cmp-field textarea:focus,
+[data-theme="dark"] .cmp-field select:focus {
+    background: #1e293b;
+    border-color: #3b9eff;
+}
+
+[data-theme="dark"] .cmp-field input::placeholder,
+[data-theme="dark"] .cmp-field textarea::placeholder {
+    color: #475569;
+}
+
+[data-theme="dark"] .cmp-field-web__link {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .cmp-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .cmp-btn:hover {
+    background: #273549;
+    border-color: #475569;
+}
+
+[data-theme="dark"] .cmp-btn--ghost,
+[data-theme="dark"] .cmp-btn--add-category {
+    background: rgba(30, 64, 175, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .cmp-btn--ghost:hover,
+[data-theme="dark"] .cmp-btn--add-category:hover {
+    background: rgba(30, 64, 175, 0.28);
+    border-color: rgba(96, 165, 250, 0.5);
+}
+
+[data-theme="dark"] .cmp-btn--danger {
+    background: rgba(153, 27, 27, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .cmp-btn--danger:hover {
+    background: rgba(153, 27, 27, 0.28);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+[data-theme="dark"] .cmp-feedback--err {
+    background: rgba(153, 27, 27, 0.2);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .cmp-actions {
+    background: rgba(15, 23, 42, 0.92);
+    border-color: #334155;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: cmp-hero dark mode */
+[data-theme="dark"] .cmp-hero { filter: brightness(0.9); }
+
+[data-theme="dark"] .cmp-card {
+    background: rgba(15, 23, 42, 0.95);
+    border-color: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .cmp-card__head {
+    border-bottom-color: #1e293b;
+}
+
+[data-theme="dark"] .cmp-field input,
+[data-theme="dark"] .cmp-field textarea {
+    background: #0c1626;
+}

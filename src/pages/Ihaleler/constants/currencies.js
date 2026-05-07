@@ -1,0 +1,67 @@
+// Enes Doğanay | 14 Nisan 2026: Kalem bazlı para birimi — 5 ana + diğer seçeneği
+// Enes Doğanay | 5 Mayıs 2026: Ihaleler.jsx'ten ayrı constants modülüne taşındı
+export const MAIN_CURRENCIES = [
+    { code: 'TRY', symbol: '₺', name: 'Türk Lirası' },
+    { code: 'USD', symbol: '$', name: 'Amerikan Doları' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'İngiliz Sterlini' },
+    { code: 'CHF', symbol: 'CHF', name: 'İsviçre Frangı' },
+];
+
+export const ALL_CURRENCIES = [
+    { code: 'TRY', symbol: '₺', name: 'Türk Lirası' },
+    { code: 'USD', symbol: '$', name: 'Amerikan Doları' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'İngiliz Sterlini' },
+    { code: 'CHF', symbol: 'CHF', name: 'İsviçre Frangı' },
+    { code: 'JPY', symbol: '¥', name: 'Japon Yeni' },
+    { code: 'CNY', symbol: '¥', name: 'Çin Yuanı' },
+    { code: 'RUB', symbol: '₽', name: 'Rus Rublesi' },
+    { code: 'SAR', symbol: 'SR', name: 'Suudi Riyali' },
+    { code: 'AED', symbol: 'د.إ', name: 'BAE Dirhemi' },
+    { code: 'AUD', symbol: 'A$', name: 'Avustralya Doları' },
+    { code: 'CAD', symbol: 'C$', name: 'Kanada Doları' },
+    { code: 'SEK', symbol: 'kr', name: 'İsveç Kronu' },
+    { code: 'NOK', symbol: 'kr', name: 'Norveç Kronu' },
+    { code: 'DKK', symbol: 'kr', name: 'Danimarka Kronu' },
+    { code: 'PLN', symbol: 'zł', name: 'Polonya Zlotisi' },
+    { code: 'CZK', symbol: 'Kč', name: 'Çek Korunası' },
+    { code: 'HUF', symbol: 'Ft', name: 'Macar Forinti' },
+    { code: 'RON', symbol: 'lei', name: 'Romen Leyi' },
+    { code: 'BGN', symbol: 'лв', name: 'Bulgar Levası' },
+    { code: 'INR', symbol: '₹', name: 'Hint Rupisi' },
+    { code: 'KRW', symbol: '₩', name: 'Güney Kore Wonu' },
+    { code: 'BRL', symbol: 'R$', name: 'Brezilya Reali' },
+    { code: 'MXN', symbol: 'Mex$', name: 'Meksika Pesosu' },
+    { code: 'ZAR', symbol: 'R', name: 'Güney Afrika Randı' },
+    { code: 'SGD', symbol: 'S$', name: 'Singapur Doları' },
+    { code: 'HKD', symbol: 'HK$', name: 'Hong Kong Doları' },
+    { code: 'NZD', symbol: 'NZ$', name: 'Yeni Zelanda Doları' },
+    { code: 'ILS', symbol: '₪', name: 'İsrail Şekeli' },
+    { code: 'QAR', symbol: 'QR', name: 'Katar Riyali' },
+    { code: 'KWD', symbol: 'د.ك', name: 'Kuveyt Dinarı' },
+    { code: 'BHD', symbol: 'BD', name: 'Bahreyn Dinarı' },
+    { code: 'OMR', symbol: 'OMR', name: 'Umman Riyali' },
+    { code: 'EGP', symbol: 'E£', name: 'Mısır Lirası' },
+    { code: 'GEL', symbol: '₾', name: 'Gürcistan Larisi' },
+    { code: 'UAH', symbol: '₴', name: 'Ukrayna Grivnası' },
+    { code: 'KZT', symbol: '₸', name: 'Kazakistan Tengesi' },
+    { code: 'AZN', symbol: '₼', name: 'Azerbaycan Manatı' },
+    { code: 'THB', symbol: '฿', name: 'Tayland Bahtı' },
+    { code: 'MYR', symbol: 'RM', name: 'Malezya Ringgiti' },
+    { code: 'IDR', symbol: 'Rp', name: 'Endonezya Rupisi' },
+    { code: 'PKR', symbol: 'Rs', name: 'Pakistan Rupisi' },
+    { code: 'NGN', symbol: '₦', name: 'Nijerya Nairası' },
+    { code: 'MAD', symbol: 'MAD', name: 'Fas Dirhemi' },
+    { code: 'TND', symbol: 'DT', name: 'Tunus Dinarı' },
+    { code: 'JOD', symbol: 'JD', name: 'Ürdün Dinarı' },
+    { code: 'IQD', symbol: 'IQD', name: 'Irak Dinarı' },
+    { code: 'IRR', symbol: 'IRR', name: 'İran Riyali' },
+    { code: 'LYD', symbol: 'LYD', name: 'Libya Dinarı' },
+    { code: 'DZD', symbol: 'DA', name: 'Cezayir Dinarı' },
+];
+
+export const getCurrencySymbol = (code) => {
+    const c = ALL_CURRENCIES.find(cur => cur.code === code);
+    return c ? c.symbol : code;
+};

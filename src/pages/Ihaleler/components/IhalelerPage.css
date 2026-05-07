@@ -1,0 +1,18 @@
+/* Enes Dogranay | 5 Mayis 2026: IhalelerPage — sayfa kapsayicisi stilleri */
+/* Enes Doğanay | 11 Nisan 2026: Sayfa kapsayıcısı */
+.tenders-page {
+    min-height: 100vh;
+    background: var(--bg-light);
+}
+
+.tenders-page-main {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px 20px 56px;
+}
+
+@media (max-width: 768px) {
+    .tenders-page-main {
+        padding: 20px 14px 40px;
+    }
+}

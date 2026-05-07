@@ -1,0 +1,308 @@
+/* ═══════════════════════════════════════════════════
+   KARŞILAŞTIRMA İPUCU & NUDGE
+   ═══════════════════════════════════════════════════ */
+.tom-compare-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+    border: 1.5px solid #ddd6fe;
+    border-radius: 16px;
+    animation: tomSlideIn 0.3s ease;
+    box-shadow: 0 2px 12px rgba(124,58,237,0.08);
+}
+
+.tom-compare-hint__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(124,58,237,0.3);
+}
+
+.tom-compare-hint__icon .material-symbols-outlined { font-size: 22px; }
+
+.tom-compare-hint__content { flex: 1; }
+
+.tom-compare-hint__content strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #5b21b6;
+    margin-bottom: 3px;
+    font-weight: 700;
+}
+
+.tom-compare-hint__content p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #6d28d9;
+    line-height: 1.55;
+    opacity: 0.85;
+}
+
+.tom-compare-hint__never {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.78rem;
+    color: #7c3aed;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tom-compare-hint__never input {
+    accent-color: #7c3aed;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.tom-compare-hint__dismiss {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border: none;
+    background: transparent;
+    color: #a78bfa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tom-compare-hint__dismiss:hover { background: #ede9fe; color: #7c3aed; }
+.tom-compare-hint__dismiss .material-symbols-outlined { font-size: 18px; }
+
+.tom-compare-nudge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 10px 16px;
+    background: #fffbeb;
+    border: 1.5px solid #fde68a;
+    border-radius: 12px;
+    font-size: 0.84rem;
+    color: #92400e;
+    animation: tomSlideIn 0.25s ease;
+}
+
+.tom-compare-nudge .material-symbols-outlined { font-size: 18px; color: #d97706; }
+
+/* ═══════════════════════════════════════════════════
+   KARŞILAŞTIRMA MODU
+   ═══════════════════════════════════════════════════ */
+/* Enes Doğanay | 4 Mayıs 2026: Karşılaştırma kart — yeniden tasarım */
+.tom-compare {
+    margin-top: 12px;
+    border: 1.5px solid rgba(139,92,246,0.25);
+    border-radius: 14px;
+    background: #ffffff;
+    overflow: hidden;
+    animation: tomSlideIn 0.3s ease;
+    box-shadow: 0 3px 16px rgba(124,58,237,0.08), 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.tom-compare__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(167,139,250,0.18);
+    background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+}
+
+.tom-compare__head h3 {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #5b21b6;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    letter-spacing: -0.01em;
+}
+
+.tom-compare__head h3 .material-symbols-outlined { font-size: 18px; }
+
+/* Enes Doğanay | 4 Mayıs 2026: Karşılaştırma tablosu — yeniden tasarım */
+.tom-compare__tbl {
+    padding: 0;
+}
+
+.tom-compare__tbl-row {
+    display: grid;
+    grid-template-columns: 100px repeat(var(--cmp-cols, 2), 1fr);
+    align-items: stretch;
+    border-bottom: 1px solid #f1f5f9;
+}
+.tom-compare__tbl-row:last-child { border-bottom: none; }
+.tom-compare__tbl-row--alt { background: transparent; }
+
+/* Header satırı */
+.tom-compare__tbl-row--header {
+    background: #fafafa;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* İsim + skor hücresi */
+.tom-compare__tbl-name {
+    padding: 12px 12px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border-left: 1px solid #f1f5f9;
+    border-top: 3px solid transparent;
+    transition: background 0.2s;
+}
+.tom-compare__tbl-name--best {
+    border-top: 3px solid #7c3aed;
+    border-left-color: rgba(124,58,237,0.12);
+    background: rgba(124,58,237,0.04);
+}
+
+.tom-compare__tbl-person {
+    font-size: 0.77rem;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Metrik label sütunu */
+.tom-compare__tbl-metric {
+    padding: 10px 8px 10px 10px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #64748b;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    border-right: 1px solid #eef2f7;
+}
+
+.tom-compare__metric-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.tom-compare__metric-icon .material-symbols-outlined { font-size: 13px; }
+.tom-compare__metric-icon--green { background: #dcfce7; }
+.tom-compare__metric-icon--green .material-symbols-outlined { color: #16a34a; }
+.tom-compare__metric-icon--amber { background: #fef3c7; }
+.tom-compare__metric-icon--amber .material-symbols-outlined { color: #d97706; }
+.tom-compare__metric-icon--blue { background: #ede9fe; }
+.tom-compare__metric-icon--blue .material-symbols-outlined { color: #7c3aed; }
+
+/* Enes Doğanay | 4 Mayıs 2026: Metrik label sarıcı — icon + label + hint alt satırda */
+.tom-compare__metric-label-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    line-height: 1.2;
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: Ağırlık hint — Genel Puan altında küçük muted bilgi */
+.tom-compare__weight-hint {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: #a78bfa;
+    opacity: 0.8;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+[data-theme="dark"] .tom-compare__weight-hint { color: #c4b5fd; opacity: 0.7; }
+
+/* Veri hücresi */
+.tom-compare__tbl-cell {
+    padding: 10px 12px;
+    border-left: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+}
+/* Kazanan sütunu — sürekli mor tint */
+.tom-compare__tbl-cell--winner {
+    border-left: 1px solid rgba(124,58,237,0.12);
+    background: rgba(124,58,237,0.035);
+}
+/* En iyi değer hücresi */
+.tom-compare__tbl-cell--best {
+    background: rgba(220,252,231,0.6);
+}
+.tom-compare__tbl-cell--winner.tom-compare__tbl-cell--best {
+    background: rgba(220,252,231,0.75);
+}
+
+/* Değer + "En iyi" chip aynı satırda */
+.tom-compare__tbl-cell-top {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.tom-compare__tbl-val {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+}
+
+/* "En iyi" yeşil chip */
+.tom-compare__best-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 99px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+
+/* Bar daha ince */
+.tom-compare__tbl-cell .tom-bar { height: 6px; border-radius: 99px; }
+
+/* Kazanan badge */
+.tom-compare-card__crown {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #78350f;
+    font-size: 0.62rem;
+    font-weight: 800;
+    box-shadow: 0 2px 6px rgba(245,158,11,0.22);
+}
+.tom-compare-card__crown .material-symbols-outlined { font-size: 12px; }
+
+/* eski grid/duel artık kullanılmıyor */
+.tom-compare__grid, .tom-compare__duel { display: none; }
+

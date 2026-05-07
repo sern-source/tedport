@@ -1,0 +1,182 @@
+/* Enes Doğanay | 4 Mayıs 2026: footer compact */
+.contact-page-wrapper .contact-footer {
+  background-color: white;
+  border-top: 1px solid var(--border);
+  padding: 1.75rem 0 0 0;
+}
+
+@media (min-width: 768px) {
+  .contact-page-wrapper .contact-footer {
+    padding: 2.5rem 0 0 0;
+  }
+}
+
+.contact-page-wrapper .contact-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .contact-page-wrapper .contact-footer-grid {
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .contact-page-wrapper .contact-footer-grid {
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 2rem;
+  }
+}
+
+.contact-page-wrapper .contact-footer-brand h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.contact-page-wrapper .contact-footer-brand p {
+  color: var(--text-gray);
+  font-size: 0.875rem;
+  margin: 1rem 0 0 0;
+}
+
+.contact-page-wrapper .contact-footer-links h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.contact-page-wrapper .contact-footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-page-wrapper .contact-footer-links a {
+  color: var(--text-gray);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.contact-page-wrapper .contact-footer-links a:hover {
+  color: var(--primary);
+}
+
+.contact-page-wrapper .contact-socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.contact-page-wrapper .contact-socials a {
+  color: var(--text-light);
+  transition: color 0.2s;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.contact-page-wrapper .contact-socials a:hover {
+  color: var(--primary);
+}
+
+.contact-page-wrapper .contact-footer-bottom {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .contact-page-wrapper .contact-footer-bottom {
+    padding: 2rem 0;
+  }
+}
+
+.contact-page-wrapper .contact-footer-bottom p {
+  color: var(--text-light);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Utilities */
+@media (max-width: 768px) {
+  .contact-page-wrapper .hidden-mobile {
+    display: none !important;
+  }
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Alert mesajları, footer-logo, entrance animation */
+.contact-alert {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: alertSlideIn 0.3s ease-out;
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.contact-alert .material-symbols-outlined {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.contact-alert-success {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #166534;
+  border: 1px solid rgba(22, 163, 74, 0.15);
+}
+
+.contact-alert-error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.contact-page-wrapper .contact-footer-logo {
+  display: flex;
+  align-items: center;
+}
+
+.contact-page-wrapper .contact-footer-logo img {
+  height: 50px;
+  object-fit: contain;
+}
+
+/* Content entrance animation */
+.contact-page-wrapper .contact-section {
+  animation: contactFadeIn 0.5s ease-out;
+}
+
+@keyframes contactFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

@@ -1,0 +1,243 @@
+/* Enes Dogranay | 6 Mayis 2026: HomePage — sayfa kapsayicisi temel stilleri */
+/**
+ * Home.css - Home Page / Landing Page Styles
+ * 
+ * Mobile Responsive Design & Hamburger Menu Implementation
+ * Date: April 4, 2026
+ * Author: Enes Doğanay
+ * 
+ * Responsive Breakpoints:
+ * - Mobile: Default (< 540px)
+ * - Tablet: >= 540px, >= 640px, >= 768px
+ * - Desktop: >= 1024px
+ * 
+ * Key Features:
+ * - Hamburger menu for mobile navigation (< 1024px)
+ * - Full navigation bar for desktop (>= 1024px)
+ * - Adaptive typography and spacing
+ * - User authentication dropdown integration
+ */
+
+/* İkonlar ve Fontlar (Google Fonts & Material Symbols) */
+/* Enes Doğanay | 6 Nisan 2026: Duplicate font @import kaldırıldı, zaten SharedHeader.css'de yükleniyor */
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap'); */
+/* @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap'); */
+
+/* Enes Doğanay | 2 Mayıs 2026: Faz 1 — scoped değişkenler kaldırıldı, index.css global değişkenleri kullanılıyor */
+.supplier-connect-wrapper {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Material Icons Ayarları */
+.supplier-connect-wrapper .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+
+.supplier-connect-wrapper .icon-filled {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Ortak Sınıflar */
+.supplier-connect-wrapper .container {
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 0 12px;
+}
+
+@media (min-width: 540px) {
+    .supplier-connect-wrapper .container {
+        padding: 0 24px;
+    }
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .container {
+        padding: 0 40px;
+    }
+}
+
+.supplier-connect-wrapper a {
+    text-decoration: none;
+}
+
+.supplier-connect-wrapper ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Header */
+.supplier-connect-wrapper .sc-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 0;
+}
+
+.supplier-connect-wrapper .sc-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.supplier-connect-wrapper .sc-logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.supplier-connect-wrapper .sc-logo-icon {
+    color: var(--primary);
+    font-size: 28px;
+}
+
+.supplier-connect-wrapper .sc-logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Mobile Hamburger Menu Button
+ * Responsive: Visible on mobile/tablet (< 1024px), hidden on desktop
+ * Three-line hamburger icon created with flexbox and span elements
+ * Smooth transitions for animation effects
+ * Author: Enes Doğanay | Date: April 4, 2026
+ */
+.supplier-connect-wrapper .sc-hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+}
+
+.supplier-connect-wrapper .sc-hamburger span {
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-dark);
+    transition: 0.3s;
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-hamburger {
+        display: none;
+    }
+}
+
+.supplier-connect-wrapper .sc-nav {
+    display: none;
+    align-items: center;
+    gap: 32px;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-nav {
+        display: flex;
+    }
+}
+
+/* Mobile Navigation Menu Styles
+ * Conditional display: Only visible when hamburger menu is opened (isMobileMenuOpen = true)
+ * Positioning: Absolute positioning below header for overlay effect
+ * Responsive: Displayed at all breakpoints where hamburger is visible (< 1024px)
+ * Contains: Navigation links, authentication actions, and user profile options
+ * Author: Enes Doğanay | Date: April 4, 2026
+ */
+.supplier-connect-wrapper .sc-mobile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-white);
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: column;
+    padding: 12px 16px;
+    gap: 8px;
+    z-index: 40;
+}
+
+.supplier-connect-wrapper .sc-mobile-menu a {
+    display: block;
+    color: var(--text-muted);
+    padding: 12px 0;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.supplier-connect-wrapper .sc-mobile-menu a:hover {
+    color: var(--primary);
+}
+
+.supplier-connect-wrapper .sc-mobile-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 12px 0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.supplier-connect-wrapper .sc-mobile-menu.active {
+    display: flex;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-mobile-menu {
+        display: none !important;
+    }
+}
+
+.supplier-connect-wrapper .sc-nav-links {
+    display: flex;
+    gap: 24px;
+}
+
+.supplier-connect-wrapper .sc-nav-links a {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.supplier-connect-wrapper .sc-nav-links a:hover {
+    color: var(--primary);
+}
+
+.supplier-connect-wrapper .sc-btn-primary {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0 16px;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.supplier-connect-wrapper .sc-btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Hero Section */
+/* Enes Doğanay | 4 Mayıs 2026: compact cool hero box */

@@ -1,0 +1,107 @@
+﻿/* Enes Doğanay | 6 Mayıs 2026: EkipModal bileşen stilleri */
+/* Enes Doğanay | 4 Mayıs 2026: Firma ekip bölümü — public görünüm */
+.fd-ekip-section { margin-top: 32px; }
+.fd-ekip-section .section-title { margin-bottom: 16px; }
+.fd-ekip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.fd-ekip-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-white);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+}
+.fd-ekip-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+  color: #94a3b8;
+}
+.fd-ekip-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fd-ekip-avatar .material-symbols-outlined { font-size: 1.4rem; }
+.fd-ekip-info { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+.fd-ekip-info strong { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
+.fd-ekip-title { font-size: 0.76rem; color: var(--text-muted); }
+
+/* Role badges (shared ´┐¢ used in FirmaDetay + Profile) */
+.ekip-role-badge { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 99px; font-size: 0.68rem; font-weight: 700; }
+.ekip-role-badge--owner  { background: #fef3c7; color: #92400e; }
+.ekip-role-badge--admin  { background: #ede9fe; color: #5b21b6; }
+.ekip-role-badge--member { background: #f0fdf4; color: #166534; }
+
+[data-theme="dark"] .fd-ekip-card { background: var(--bg-white); border-color: var(--border); }
+[data-theme="dark"] .fd-ekip-avatar { background: #1e293b; }
+[data-theme="dark"] .ekip-role-badge--owner  { background: rgba(245,158,11,0.15); color: #fcd34d; }
+[data-theme="dark"] .ekip-role-badge--admin  { background: rgba(124,58,237,0.15); color: #c4b5fd; }
+[data-theme="dark"] .ekip-role-badge--member { background: rgba(22,163,74,0.12); color: #86efac; }
+
+/* Enes Do─şanay | 4 May─▒s 2026: Ekip modal ÔÇö overlay + kart */
+.ekip-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.ekip-modal {
+  background: var(--bg-white);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.ekip-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.ekip-modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.ekip-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.ekip-modal-close:hover { background: var(--bg-light); }
+.ekip-modal-close .material-symbols-outlined { font-size: 1.25rem; }
+
+.ekip-modal-body {
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+[data-theme="dark"] .ekip-modal { background: var(--bg-white); }

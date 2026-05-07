@@ -1,0 +1,541 @@
+﻿/* Enes Dogˆanay | 6 Mayis 2026: FavoritesTab - orijinal Profile.css'den tasindi */
+.favorites-section {
+  min-height: 100%;
+  border-radius: 16px;
+}
+.mobile-fav-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .mobile-fav-panel {
+    display: none;
+  }
+}
+
+.mobile-fav-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(29, 78, 216, 0.25);
+}
+
+.mobile-fav-stats>.material-symbols-outlined {
+  font-size: 20px;
+  opacity: 0.85;
+}
+
+.mobile-fav-stats-value {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.mobile-fav-stats-label {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.mobile-fav-lists {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mobile-fav-lists::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-fav-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.mobile-fav-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.mobile-fav-chip.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+}
+
+.mobile-fav-chip.active .chip-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.chip-count {
+  background: #f1f5f9;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-gray);
+  transition: all 0.2s;
+}
+
+.mobile-fav-chip.add-chip {
+  border-style: dashed;
+  color: var(--text-light);
+}
+
+.mobile-fav-chip.add-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.mobile-fav-chip.add-chip .material-symbols-outlined {
+  font-size: 16px;
+}
+
+/* Enes Do─şanay | 6 Nisan 2026: Mobil chip icinde liste adi ve silme aksiyonu ayrildi */
+.mobile-fav-chip-label {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-fav-chip-delete {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.14);
+  color: currentColor;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.mobile-fav-chip-delete:hover {
+  background: rgba(239, 68, 68, 0.16);
+  transform: scale(1.05);
+}
+
+.mobile-fav-chip-delete .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.mobile-fav-chip.active .mobile-fav-chip-delete {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mobile-create-list {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mobile-create-list input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.mobile-create-list input:focus {
+  border-color: var(--primary);
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Favoriler hero banner — İhale Tekliflerim ile aynı sistematik */
+.fav-hero {
+  padding: 16px 22px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #0f172a 0%, #1a3a5c 55%, #0284c7 100%);
+  color: #fff;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.2);
+}
+
+.fav-hero__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.fav-hero__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.fav-hero__title > .material-symbols-outlined {
+  font-size: 22px;
+  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px;
+  flex-shrink: 0;
+}
+
+.fav-hero__title h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.fav-hero__title p {
+  margin: 2px 0 0;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fav-kpis {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.fav-kpi {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 7px 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 58px;
+  backdrop-filter: blur(6px);
+}
+
+.fav-kpi__value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.fav-kpi__label {
+  font-size: 0.62rem;
+  opacity: 0.6;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.fav-kpi--lists { border-color: rgba(253, 230, 138, 0.25); }
+.fav-kpi--lists .fav-kpi__value { color: #fde68a; }
+
+.fav-kpi--shown { border-color: rgba(134, 239, 172, 0.25); }
+.fav-kpi--shown .fav-kpi__value { color: #86efac; }
+
+@media (max-width: 768px) {
+  .fav-hero { padding: 13px 14px; }
+  .fav-hero__title p { display: none; }
+  .fav-kpi { min-width: 46px; padding: 5px 8px; }
+  .fav-kpi__value { font-size: 0.95rem; }
+}
+
+@media (max-width: 480px) {
+  .fav-hero__inner { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .fav-kpis { width: 100%; justify-content: space-between; }
+  .fav-kpi { flex: 1; }
+}
+
+[data-theme="dark"] .fav-hero { background: linear-gradient(120deg, #020617 0%, #0c2340 55%, #0369a1 100%); }
+
+/* Enes Doğanay | 4 Mayıs 2026: compact cool favorites-header */
+.favorites-header {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.favorites-header h1 {
+  font-size: 1.05rem;
+  color: #0f172a;
+  margin: 0 0 2px 0;
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.favorites-header p {
+  color: var(--text-gray);
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.favorites-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  border: 2px dashed rgba(203, 213, 225, 0.6);
+}
+
+.favorites-empty .material-symbols-outlined {
+  font-size: 56px;
+  color: #cbd5e1;
+  display: block;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.favorites-empty p {
+  color: var(--text-gray);
+  font-size: 15px;
+}
+
+.favorites-empty button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.favorites-empty button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 78, 216, 0.4);
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+@media (min-width: 640px) {
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .favorites-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.favorites-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.fav-search-wrapper {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 7px 11px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fav-search-wrapper:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(19, 127, 236, 0.1);
+}
+
+.fav-search-wrapper>.material-symbols-outlined {
+  color: var(--text-light);
+  font-size: 16px;
+}
+
+.fav-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-dark);
+  font-family: inherit;
+}
+
+.fav-search-input::placeholder {
+  color: var(--text-light);
+}
+
+.fav-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  color: var(--text-light);
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+}
+
+.fav-search-clear:hover {
+  color: var(--text-dark);
+  background: #f1f5f9;
+}
+
+.fav-search-clear .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* Enes Do─şanay | 4 May─▒s 2026: compact cool sort group */
+.fav-sort-group {
+  display: flex;
+  gap: 0;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.fav-sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-gray);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s;
+  white-space: nowrap;
+  border-right: 1px solid var(--border);
+}
+
+.fav-sort-btn:last-child {
+  border-right: none;
+}
+
+.fav-sort-btn .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.fav-sort-btn:hover {
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+
+.fav-sort-btn.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.fav-sort-btn.active .material-symbols-outlined {
+  color: #2563eb;
+}
+
+/* Enes Do─şanay | 4 May─▒s 2026: compact cool card menu */
+[data-theme="dark"] .favorites-header h1 {
+  background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .favorites-empty {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(51, 65, 85, 0.6);
+}
+
+[data-theme="dark"] .fav-search-wrapper {
+  background: var(--bg-light);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .fav-search-wrapper:focus-within {
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 2px rgba(59, 158, 255, 0.1);
+}
+
+[data-theme="dark"] .fav-sort-group {
+  background: var(--bg-light);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .fav-sort-btn {
+  border-right-color: var(--border);
+}
+
+[data-theme="dark"] .fav-sort-btn:hover {
+  background: var(--bg-white);
+}
+
+[data-theme="dark"] .fav-sort-btn.active {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .fav-sort-btn.active .material-symbols-outlined {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .mobile-fav-chip {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(51, 65, 85, 0.6);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .chip-count {
+  background: #334155;
+  color: #94a3b8;
+}
+
+/* ÔöÇÔöÇ B─░LD─░R─░MLER ÔöÇÔöÇ */

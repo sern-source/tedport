@@ -1,0 +1,336 @@
+﻿/* ═══════════════════════════════════════════════════
+   BOŞ DURUMLAR ve YÜKLEME
+   ═══════════════════════════════════════════════════ */
+.tom-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 24px;
+    text-align: center;
+}
+
+.tom-empty .material-symbols-outlined {
+    font-size: 52px;
+    color: #cbd5e1;
+    margin-bottom: 14px;
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 12px;
+    box-sizing: content-box;
+}
+
+.tom-empty h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #334155;
+    letter-spacing: -0.01em;
+}
+
+.tom-empty p {
+    margin: 6px 0 0;
+    font-size: 0.88rem;
+    color: #94a3b8;
+    max-width: 340px;
+    line-height: 1.55;
+}
+
+.tom-empty-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.tom-empty-mini .material-symbols-outlined { font-size: 36px; margin-bottom: 8px; }
+.tom-empty-mini p { margin: 0; font-size: 0.85rem; }
+
+/* Yükleme */
+.tom-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+    gap: 16px;
+}
+
+.tom-loading__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: tomSpin 0.8s linear infinite;
+}
+
+.tom-loading p { margin: 0; font-size: 0.9rem; color: #64748b; }
+
+.tom-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+}
+
+.tom-error-state .material-symbols-outlined {
+    font-size: 48px;
+    color: #f87171;
+    margin-bottom: 12px;
+}
+
+.tom-error-state h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #991b1b; }
+.tom-error-state p  { margin: 6px 0 0; font-size: 0.88rem; color: #dc2626; }
+
+/* ═══════════════════════════════════════════════════
+   ANİMASYONLAR
+   ═══════════════════════════════════════════════════ */
+@keyframes tomSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tomSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes tomPulse {
+    0%, 100% { opacity: 1; }
+    50%  { opacity: 0.5; }
+}
+
+/* ═══════════════════════════════════════════════════
+   PAYLAŞILABILIR İHALE LİNKİ
+   ═══════════════════════════════════════════════════ */
+.tom-share-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 14px;
+    background: linear-gradient(135deg, #f0f7ff, #e8f2ff);
+    border: 1.5px solid #bfdbfe;
+    border-radius: 12px;
+    margin-bottom: 14px;
+}
+
+.tom-share-link-row__icon { font-size: 18px; color: #3b82f6; flex-shrink: 0; }
+
+.tom-share-link-row__input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    font-family: 'Inter', monospace;
+    color: #1e40af;
+    outline: none;
+    cursor: text;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tom-share-link-row__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    padding: 6px 13px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+}
+
+.tom-share-link-row__copy:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+}
+
+.tom-share-link-row__copy--done {
+    background: linear-gradient(135deg, #059669, #10b981) !important;
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(5,150,105,0.25) !important;
+}
+
+.tom-share-link-row__copy .material-symbols-outlined { font-size: 15px; }
+
+/* ═══════════════════════════════════════════════════
+   İHALE AKSİYON BUTONLARI
+   ═══════════════════════════════════════════════════ */
+.tom-tender-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Compact outline action butonları */
+.tom-btn--edit {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 9px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+    font-family: inherit;
+}
+
+.tom-btn--edit:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(37,99,235,0.25);
+}
+
+.tom-btn--edit:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.tom-btn--edit:disabled:hover {
+    background: #f1f5f9;
+    transform: none;
+    box-shadow: none;
+}
+
+.tom-btn--close-tender {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1.5px solid #fde68a;
+    border-radius: 9px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+    font-family: inherit;
+}
+
+.tom-btn--close-tender:hover {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(245,158,11,0.25);
+}
+
+.tom-btn--delete-tender {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
+    border-radius: 9px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+    font-family: inherit;
+}
+
+.tom-btn--delete-tender:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(239,68,68,0.25);
+}
+
+.tom-btn--edit .material-symbols-outlined,
+.tom-btn--close-tender .material-symbols-outlined,
+.tom-btn--delete-tender .material-symbols-outlined { font-size: 16px; }
+
+/* Confirm inline */
+.tom-confirm-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    background: #fef3c7;
+    border: 1.5px solid #fbbf24;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    color: #92400e;
+    font-weight: 500;
+    animation: tomSlideIn 0.2s ease;
+}
+
+.tom-btn--confirm {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tom-btn--confirm:hover { background: linear-gradient(135deg, #d97706, #b45309); }
+
+.tom-btn--confirm-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.tom-btn--confirm-red:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+
+.tom-btn--cancel-sm {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.tom-btn--cancel-sm:hover { background: #e2e8f0; color: #334155; }
+
+/* Enes Doğanay | 7 Mayıs 2026: IhaleYonetimiTab.actions.css responsive */
+@media (max-width: 480px) {
+    .tom-empty { padding: 40px 16px; }
+    .tom-empty .material-symbols-outlined { font-size: 40px; padding: 10px; }
+    .tom-empty h3 { font-size: 0.95rem; }
+    .tom-confirm-inline { flex-wrap: wrap; gap: 6px; font-size: 0.78rem; }
+    .tom-btn--edit,
+    .tom-btn--close-tender,
+    .tom-btn--delete-tender { width: 100%; justify-content: center; }
+}
+

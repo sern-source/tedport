@@ -1,0 +1,507 @@
+/* Enes Dogranay | 5 Mayis 2026: TeklifPopup — teklif ver popup stilleri */
+/* Enes Doğanay | 10 Nisan 2026: Detay drawer — tek buton tam genişlik */
+
+.teklif-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+    z-index: var(--z-popup);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: tpOverlayIn 0.2s ease;
+    padding: 20px;
+}
+
+@keyframes tpOverlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: compact cool teklif popup */
+.teklif-popup {
+    width: 640px;
+    max-width: 100%;
+    max-height: 90vh;
+    background: var(--bg-white);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(15, 23, 42, 0.18);
+    animation: tpSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tpSlideIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Head */
+.teklif-popup__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px 11px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--bg-light), var(--bg-white));
+}
+
+.teklif-popup__head-left {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.teklif-popup__head-icon {
+    font-size: 18px;
+    color: #2563eb;
+    background: #eff6ff;
+    padding: 7px;
+    border-radius: 9px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.teklif-popup__head h2 {
+    margin: 0 0 2px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+.teklif-popup__tender-name {
+    margin: 0 0 2px;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.teklif-popup__tender-firma {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+}
+
+.teklif-popup__tender-firma .material-symbols-outlined { font-size: 13px; }
+.teklif-popup__ref { color: #94a3b8; font-family: monospace; font-size: 0.7rem; }
+
+.teklif-popup__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: var(--bg-light);
+    border-radius: 7px;
+    color: var(--text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.teklif-popup__close:hover { background: var(--border); color: var(--text-dark); }
+.teklif-popup__close .material-symbols-outlined { font-size: 17px; }
+
+/* Body */
+.teklif-popup__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* İhale özet şeridi */
+.teklif-popup__summary-strip {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.teklif-popup__summary-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    flex: 1;
+    min-width: 120px;
+}
+
+.teklif-popup__summary-item .material-symbols-outlined {
+    font-size: 15px;
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.teklif-popup__summary-item strong {
+    display: block;
+    font-size: 0.66rem;
+    color: var(--text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.teklif-popup__summary-item span {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+/* Bölüm */
+.teklif-popup__section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.teklif-popup__section h3 {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Section başlık ikonu — pill arka plan */
+.teklif-popup__section h3 .material-symbols-outlined {
+    font-size: 14px;
+    color: #2563eb;
+    background: rgba(37, 99, 235, 0.1);
+    padding: 4px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.teklif-popup__section h3 small {
+    font-weight: 500;
+    color: #94a3b8;
+    font-size: 0.74rem;
+}
+
+/* Kalem tablosu */
+.teklif-kalem-table {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Grid 6 sütun — para birimi sütunu eklendi */
+.teklif-kalem-table__head {
+    display: grid;
+    grid-template-columns: 28px 1fr 70px 100px 100px 100px;
+    gap: 6px;
+    padding: 7px 12px;
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.67rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    align-items: center;
+}
+
+.teklif-kalem-table__row {
+    display: grid;
+    grid-template-columns: 28px 1fr 70px 100px 100px 100px;
+    gap: 6px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+}
+
+.teklif-kalem-table__row:last-child { border-bottom: none; }
+
+.teklif-kalem-col--no {
+    font-size: 0.73rem;
+    color: #94a3b8;
+    font-weight: 700;
+    text-align: center;
+}
+
+.teklif-kalem-col--madde strong {
+    display: block;
+    font-size: 0.79rem;
+    color: var(--text-dark);
+    margin-bottom: 3px;
+}
+
+.teklif-kalem-input {
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 0.79rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--bg-white);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.teklif-kalem-input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.teklif-kalem-input--note {
+    font-size: 0.78rem;
+    color: #64748b;
+    border-style: dashed;
+}
+
+.teklif-kalem-col--amount {
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 0.8rem;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Kalem tablo footer */
+.teklif-kalem-table__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border-top: 1.5px solid rgba(37, 99, 235, 0.12);
+    border-radius: 0 0 9px 9px;
+}
+
+.teklif-kalem-table__footer span {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.teklif-kalem-table__footer strong {
+    font-size: 0.97rem;
+    color: var(--text-dark);
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Gruplu toplam — birden fazla para birimi */
+.teklif-kalem-table__footer-totals {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.teklif-kalem-table__footer-totals strong {
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Kalem satırındaki para birimi seçici */
+/* Enes Doğanay | 2 Mayıs 2026: Kalem para birimi — compact SimpleSelect override */
+.teklif-kalem-col--currency .simple-select-trigger {
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    border-radius: 8px;
+    gap: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg-white);
+}
+.teklif-kalem-col--currency .simple-select-arrow {
+    font-size: 16px;
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Footer gruplu tutar */
+.teklif-popup__footer-amounts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.teklif-popup__footer-amounts strong {
+    font-size: 1.05rem;
+    color: var(--text-dark);
+}
+
+/* Enes Doğanay | 14 Nisan 2026: Diğer para birimi modal */
+.teklif-currency-modal {
+    background: var(--bg-white);
+    border-radius: 12px;
+    width: 420px;
+    max-width: 95vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+}
+
+.teklif-currency-modal__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.teklif-currency-modal__head h3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.teklif-currency-modal__head button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 4px;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+
+.teklif-currency-modal__head button:hover {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.teklif-currency-modal__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.teklif-currency-modal__search > .material-symbols-outlined {
+    color: #94a3b8;
+    font-size: 20px;
+}
+
+.teklif-currency-modal__search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: transparent;
+}
+
+.teklif-currency-modal__search button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 2px;
+}
+
+.teklif-currency-modal__list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px 16px;
+}
+
+.teklif-currency-modal__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.15s;
+    text-align: left;
+    font-family: inherit;
+}
+
+.teklif-currency-modal__item:hover {
+    background: var(--bg-light);
+}
+
+.teklif-currency-modal__symbol {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    color: #1e40af;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.teklif-currency-modal__code {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    min-width: 42px;
+}
+
+.teklif-currency-modal__name {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+}
+
+.teklif-currency-modal__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 30px;
+    color: #94a3b8;
+}
+
+.teklif-currency-modal__empty .material-symbols-outlined {
+    font-size: 36px;
+}
+
+/* Tek tutar girişi */
+.teklif-popup__single-amount label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.teklif-popup__amount-row {
+    display: flex;
+    gap: 10px;
+}
+
+.teklif-popup__amount-input {
+    flex: 1;
+    padding: 7px 11px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--bg-white);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+

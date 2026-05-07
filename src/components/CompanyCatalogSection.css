@@ -1,0 +1,302 @@
+/* Enes Doğanay | 6 Mayıs 2026: Ürün kataloğu editörü stilleri — CompanyCatalogSection bileşenine ait */
+
+/* ── CATALOG ─────────────────────────────────────────────────────────────── */
+.cmp-catalog {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cmp-catalog__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 40px 24px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-gray);
+    text-align: center;
+}
+
+.cmp-catalog__empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #c7d2fe;
+}
+
+.cmp-catalog__empty strong {
+    color: var(--text-dark);
+}
+
+/* ── CATEGORY CARD — mirrors .accordion-item ─────────────────────────────── */
+.cmp-cat-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: visible;
+    background: var(--bg-white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cmp-cat-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(19, 127, 236, 0.1);
+}
+
+/* mirrors .accordion-button */
+.cmp-cat-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--bg-white);
+}
+
+.cmp-cat-chevron {
+    color: var(--primary);
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.cmp-cat-name {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    padding: 3px 6px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.cmp-cat-name:focus {
+    outline: none;
+    background: #eff6ff;
+}
+
+.cmp-cat-name::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.cmp-cat-header__btns {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.cmp-cat-empty {
+    padding: 10px 14px 14px 34px;
+    font-size: 13px;
+    color: var(--text-gray);
+    font-style: italic;
+}
+
+/* mirrors .accordion-content */
+.cmp-cat-content {
+    padding: 0 14px 16px 14px;
+    background: rgba(239, 242, 255, 0.45);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── SUBCATEGORY — mirrors .subcategory-title ────────────────────────────── */
+.cmp-sub {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 14px;
+}
+
+.cmp-sub-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cmp-sub-bullet {
+    color: var(--primary);
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* mirrors .subcategory-title text */
+.cmp-sub-name {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.cmp-sub-name:focus {
+    outline: none;
+    background: #eff6ff;
+}
+
+.cmp-sub-name::placeholder {
+    color: #93c5fd;
+    font-weight: 400;
+}
+
+/* ── PRODUCTS — mirrors .product-tags-wrap + .product-tag ────────────────── */
+.cmp-products-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: 20px;
+}
+
+/* EXACT match of public .product-tag */
+.cmp-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #eef2ff;
+    color: #4f46e5;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid #c7d2fe;
+    transition: background 0.15s;
+}
+
+.cmp-pill:hover {
+    background: #e0e7ff;
+}
+
+.cmp-pill__x {
+    border: none;
+    background: transparent;
+    color: #818cf8;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    margin-left: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+}
+
+.cmp-pill__x:hover {
+    color: #4f46e5;
+}
+
+/* inline add-product — styled as a dashed pill */
+.cmp-pill-add {
+    display: inline-flex;
+    align-items: center;
+    border: 1px dashed #c7d2fe;
+    border-radius: 16px;
+    background: #fff;
+    overflow: visible;
+    cursor: text;
+    transition: border-color 0.15s;
+}
+
+.cmp-pill-add:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(19, 127, 236, 0.1);
+}
+
+.cmp-pill-add__input {
+    border: none;
+    background: transparent;
+    padding: 4px 10px;
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    width: 160px;
+    min-width: 80px;
+}
+
+.cmp-pill-add__input:focus {
+    outline: none;
+}
+
+.cmp-pill-add__btn {
+    border: none;
+    background: transparent;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 3px 8px;
+    display: flex;
+    align-items: center;
+    transition: background 0.15s;
+    border-left: 1px solid #e0e7ff;
+}
+
+.cmp-pill-add__btn:hover:not(:disabled) {
+    background: #eff6ff;
+}
+
+.cmp-pill-add__btn:disabled {
+    color: #c7d2fe;
+    cursor: default;
+}
+
+.cmp-pill-add__btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .cmp-cat-header {
+        flex-wrap: wrap;
+    }
+
+    .cmp-cat-header__btns {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* ── DARK MODE ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] .cmp-pill {
+    background: rgba(79, 70, 229, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .cmp-pill:hover {
+    background: rgba(79, 70, 229, 0.25);
+}
+
+[data-theme="dark"] .cmp-pill__x {
+    color: #818cf8;
+}
+
+[data-theme="dark"] .cmp-pill-add {
+    background: #1e293b;
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .cmp-pill-add__btn {
+    border-left-color: #334155;
+}
+
+[data-theme="dark"] .cmp-pill-add__btn:hover:not(:disabled) {
+    background: rgba(59, 158, 255, 0.15);
+}
+
+[data-theme="dark"] .cmp-cat-name:focus,
+[data-theme="dark"] .cmp-sub-name:focus {
+    background: rgba(30, 64, 175, 0.15);
+}
+
+[data-theme="dark"] .cmp-cat-content {
+    background: rgba(15, 23, 42, 0.4);
+    border-top-color: #334155;
+}

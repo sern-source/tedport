@@ -9,32 +9,29 @@ const authStorageKey = `sb-${authProjectRef}-auth-token`;
 const authStorageModeKey = 'tedport-auth-storage-mode';
 const isBrowser = typeof window !== 'undefined';
 
-const getActiveStorage = () => {
-  if (!isBrowser) return null;
-
-  const sessionMode = window.sessionStorage.getItem(authStorageModeKey);
-  if (sessionMode === 'session') {
-    return window.sessionStorage;
-  }
-
-  const localMode = window.localStorage.getItem(authStorageModeKey);
-  if (localMode === 'local') {
-    return window.localStorage;
-  }
-
-  return window.localStorage;
-};
+// Enes Doğanay | 7 Mayıs 2026: Supabase cross-tab session corruption düzeltmesi.
+// Supabase JS v2, window'daki 'storage' event'ini dinler ve event.newValue'yi DOĞRUDAN okur
+// (custom storage adapter'ı bypass eder). Farklı sekmede farklı kullanıcı oturum açıkken
+// token refresh veya logout yaptığında localStorage değişir → diğer sekmedeki Supabase
+// farklı/null token görür → _removeSession() çağırır → o sekmenin sessionStorage'ını siler
+// → SIGNED_OUT fırlatır → o kullanıcının girişi kopar.
+// Çözüm: capture phase'de storage event'i yakala, auth key için stopImmediatePropagation()
+// ile Supabase'in bubble-phase listener'ına ulaşmasını engelle.
+// Her sekme zaten kendi sessionStorage'ını yönetiyor (tab izolasyonu), cross-tab sync gerekmez.
+if (isBrowser) {
+  window.addEventListener('storage', (e) => {
+    if (e.key === authStorageKey) e.stopImmediatePropagation();
+  }, true); // capture phase — Supabase'in bubble-phase listener'ından önce çalışır
+}
 
 const authStorage = {
   getItem(key) {
     if (!isBrowser) return null;
 
     // Enes Doğanay | 5 Mayıs 2026: sessionStorage HER ZAMAN önce okunur — TAB İZOLASYONU.
-    // Problem: iki farklı hesap aynı browsera giriş yaparsa, biri token refresh yaptığında
-    // localStorage'daki token'ı overwrite eder. Supabase JS storage event alır, iç session'ını
-    // diğer kullanıcıya günceller → tüm DB sorguları yanlış JWT'yle gider → RLS patlıyor.
-    // Çözüm: localStorage'dan ilk okumada sessionStorage'a kopyala (tab-specific isolation).
-    // Supabase JS, storage event'te kendi getItem()'ımızı çağırır → sessionStorage döner → bypass.
+    // Her sekme kendi sessionStorage'ını tutar. localStorage sadece ilk açılışta (rememberMe)
+    // bootstrap için okunur ve sessionStorage'a kopyalanır. Cross-tab sync yukarıdaki
+    // capture-phase listener tarafından engellendi.
     const sessionValue = window.sessionStorage.getItem(key);
     if (sessionValue) return sessionValue;
 

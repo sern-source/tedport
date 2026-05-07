@@ -1,0 +1,160 @@
+/* Enes Dogranay | 6 Mayis 2026: CategoriesSection — one cikan kategoriler */
+.supplier-connect-wrapper .sc-categories {
+    padding: 22px 0;
+}
+
+@media (min-width: 540px) {
+    .supplier-connect-wrapper .sc-categories {
+        padding: 28px 0;
+    }
+}
+
+.supplier-connect-wrapper .sc-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 14px;
+}
+
+.supplier-connect-wrapper .sc-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.supplier-connect-wrapper .sc-section-desc {
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+@media (min-width: 540px) {
+    .supplier-connect-wrapper .sc-section-title {
+        font-size: 18px;
+    }
+    .supplier-connect-wrapper .sc-section-desc {
+        font-size: 13px;
+    }
+}
+
+.supplier-connect-wrapper .sc-view-all {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 13px;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-view-all {
+        display: flex;
+    }
+}
+
+.supplier-connect-wrapper .sc-cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+@media (min-width: 480px) {
+    .supplier-connect-wrapper .sc-cat-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-cat-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .supplier-connect-wrapper .sc-cat-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: compact cool cat-card */
+.supplier-connect-wrapper .sc-cat-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+@media (min-width: 540px) {
+    .supplier-connect-wrapper .sc-cat-card {
+        padding: 14px;
+        gap: 8px;
+    }
+}
+
+.supplier-connect-wrapper .sc-cat-card:hover {
+    border-color: rgba(19, 127, 236, 0.45);
+    box-shadow: 0 4px 14px rgba(19, 127, 236, 0.1);
+    transform: translateY(-1px);
+}
+
+.supplier-connect-wrapper .sc-cat-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    transition: transform 0.2s;
+}
+
+.supplier-connect-wrapper .sc-cat-icon .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.supplier-connect-wrapper .sc-cat-card:hover .sc-cat-icon {
+    transform: scale(1.08);
+}
+
+.supplier-connect-wrapper .sc-cat-name {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.supplier-connect-wrapper .sc-cat-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+@media (min-width: 540px) {
+    .supplier-connect-wrapper .sc-cat-name {
+        font-size: 13px;
+    }
+    .supplier-connect-wrapper .sc-cat-sub {
+        font-size: 11px;
+    }
+}
+
+/* Suppliers Section */
+/* Enes Doğanay | 4 Mayıs 2026: compact cool suppliers */
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-cat-icon {
+    background: #1e2d4a;
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-cat-card {
+    background: var(--bg-white);
+    border-color: var(--border);
+}
+

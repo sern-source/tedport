@@ -1,0 +1,8 @@
+/* Enes Dogranay | 5 Mayis 2026: IhalePublishSuccess — ihale paylasim linki stilleri */
+
+/* === İhale paylaşım linki === */
+[data-theme="dark"] .ihale-publish-link-row {
+    background: #1e3a5f;
+    border-color: #2563eb;
+}
+[data-theme="dark"] .ihale-publish-link-row__input { color: #93c5fd; background: transparent; }

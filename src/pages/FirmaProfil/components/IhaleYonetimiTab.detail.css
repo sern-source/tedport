@@ -1,0 +1,332 @@
+/* ═══════════════════════════════════════════════════
+   GENİŞLETİLMİŞ TEKLİF DETAYI
+   ═══════════════════════════════════════════════════ */
+.tom-offer-card__detail {
+    padding: 0 14px 14px;
+    border-top: 1px solid #f1f5f9;
+    animation: tomSlideIn 0.25s ease;
+}
+
+/* Puan Detayı */
+.tom-score-breakdown { padding: 10px 0; }
+
+.tom-score-breakdown h4 {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155;
+}
+
+.tom-score-bars { display: grid; gap: 7px; }
+
+.tom-score-bar {
+    display: grid;
+    grid-template-columns: 52px 1fr 30px;
+    align-items: center;
+    gap: 8px;
+}
+
+.tom-score-bar > span {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.tom-score-bar > strong {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #0f172a;
+    text-align: right;
+}
+
+.tom-bar {
+    height: 8px;
+    border-radius: 99px;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+.tom-bar--sm { height: 6px; }
+
+.tom-bar__fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    min-width: 2px;
+}
+
+.tom-bar__fill--green  { background: linear-gradient(90deg, #059669, #34d399); }
+.tom-bar__fill--amber  { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.tom-bar__fill--purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.tom-bar__fill--blue   { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+
+/* Detay satırları */
+.tom-detail-row {
+    display: flex;
+    gap: 10px;
+    padding: 8px 10px;
+    border-top: 1px solid #f8fafc;
+    border-left: 3px solid #bfdbfe;
+    border-radius: 0 6px 6px 0;
+    background: #f8faff;
+    margin: 4px 0;
+}
+
+/* Enes Doğanay | 4 Mayıs 2026: İkon yerine sol border çizgisi — kutu görünüm kaldırıldı */
+.tom-detail-row .material-symbols-outlined {
+    display: none;
+}
+
+.tom-detail-row small {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 2px;
+}
+
+.tom-detail-row p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+/* Teklif Kalemleri */
+.tom-kalemler { padding-top: 10px; border-top: 1px solid #f1f5f9; }
+
+.tom-kalemler h4 {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tom-kalemler h4 .material-symbols-outlined { font-size: 16px; color: #3b82f6; }
+
+.tom-kalemler__wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #f1f5f9;
+}
+
+.tom-kalemler__wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.tom-kalemler__wrap th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    text-align: left;
+    padding: 6px 10px;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.tom-kalemler__wrap td {
+    padding: 7px 10px;
+    color: #334155;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.tom-kalemler__wrap td strong { font-weight: 600; color: #0f172a; }
+.tom-kalemler__wrap tbody tr:hover { background: #fafbfc; }
+
+.tom-kalemler__grouped-total {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+    border-top: 2px solid #e2e8f0;
+    font-size: 0.86rem;
+}
+
+.tom-kalemler__grouped-total strong { color: #334155; font-weight: 600; }
+.tom-kalemler__grouped-total span   { font-weight: 700; color: #0f172a; }
+
+/* Kişisel Not */
+.tom-my-note { padding-top: 10px; border-top: 1px solid #f1f5f9; }
+
+.tom-my-note label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 5px;
+}
+
+.tom-my-note label .material-symbols-outlined { font-size: 16px; color: #3b82f6; }
+
+.tom-my-note textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 9px;
+    border: 1.5px solid #e2e8f0;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    color: #0f172a;
+    resize: none;
+    min-height: 60px;
+    max-height: 180px;
+    overflow-y: auto;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #f8fafc;
+}
+
+.tom-my-note textarea:focus {
+    outline: none;
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    background: #fff;
+}
+
+/* Aksiyon butonları */
+.tom-offer-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.tom-offer-card__footer-right {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Compact outline buton tabanı */
+.tom-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.tom-btn .material-symbols-outlined { font-size: 16px; }
+
+.tom-btn--outline {
+    background: #f8fafc;
+    color: #475569;
+    border: 1.5px solid #e2e8f0;
+}
+
+.tom-btn--outline:hover {
+    border-color: #93c5fd;
+    color: #2563eb;
+    background: #f0f7ff;
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Kabul Et — outline-to-fill */
+.tom-btn--accept {
+    background: #f0fdf4;
+    color: #059669;
+    border: 1.5px solid #6ee7b7;
+}
+
+.tom-btn--accept:hover {
+    background: #059669;
+    border-color: #059669;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(5,150,105,0.25);
+}
+
+.tom-btn--accept:disabled { opacity: 0.5; pointer-events: none; }
+
+/* Enes Doğanay | 7 Mayıs 2026: Reddet — outline-to-fill */
+.tom-btn--reject {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
+}
+
+.tom-btn--reject:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(239,68,68,0.2);
+}
+
+.tom-btn--reject:disabled { opacity: 0.5; pointer-events: none; }
+
+/* Enes Doğanay | 2 Mayıs 2026: Mesajlaş butonu */
+.tom-btn--chat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1.5px solid #6366f1;
+    background: #eef2ff;
+    color: #4f46e5;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    position: relative;
+}
+.tom-btn--chat:hover {
+    background: #e0e7ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.18);
+}
+.tom-btn--chat-unread {
+    border-color: #4f46e5;
+    background: #e0e7ff;
+}
+/* Enes Doğanay | 4 Mayıs 2026: Okunmamış mesaj sayı badge */
+.tom-chat-unread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 99px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-left: 2px;
+}
+.tom-chat-unread-dot {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 1.5px solid #fff;
+}
+

@@ -1,0 +1,296 @@
+/* Enes Doğanay | 7 Mayıs 2026: Ortak şikayet modal stilleri — z-index 10100 (chat overlay üzerinde) */
+
+/* ── OVERLAY ── */
+.srm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-contact);
+    padding: 16px;
+    animation: srmFadeIn 0.15s ease-out;
+}
+
+@keyframes srmFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ── MODAL ── */
+.srm-modal {
+    background: var(--bg-white, #fff);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 440px;
+    overflow: hidden;
+    animation: srmSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes srmSlideIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── HEADER ── */
+.srm-modal__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border, #f1f5f9);
+}
+
+.srm-flag-icon {
+    color: #ef4444;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.srm-modal__header h3 {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark, #1e293b);
+    margin: 0;
+}
+
+.srm-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s, color 0.12s;
+}
+
+.srm-close:hover:not(:disabled) {
+    background: var(--bg-page, #f1f5f9);
+    color: #475569;
+}
+
+.srm-close .material-symbols-outlined { font-size: 1.15rem; }
+
+/* ── MESAJ ÖNİZLEME ── */
+.srm-preview {
+    background: var(--bg-page, #f8fafc);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 8px;
+    margin: 14px 20px 0;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #475569;
+    max-height: 80px;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+
+/* ── NEDEN RADYO LİSTESİ ── */
+.srm-reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 20px 0;
+}
+
+.srm-reason {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border, #e2e8f0);
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-dark, #374151);
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+}
+
+.srm-reason:hover { border-color: #ef4444; background: rgba(239, 68, 68, 0.04); }
+.srm-reason.selected { border-color: #ef4444; background: #fff7f7; color: #b91c1c; font-weight: 600; }
+.srm-reason input { accent-color: #ef4444; flex-shrink: 0; }
+
+/* ── AÇIKLAMA ── */
+.srm-body {
+    padding: 12px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.srm-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-dark, #374151);
+}
+
+.srm-label span {
+    font-weight: 400;
+    color: #9ca3af;
+}
+
+.srm-textarea {
+    width: 100%;
+    border: 1.5px solid var(--border, #e2e8f0);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    background: var(--bg-white, #fff);
+    color: var(--text-dark, #374151);
+}
+
+.srm-textarea:focus { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08); }
+.srm-textarea:disabled { opacity: 0.6; }
+
+/* ── FOOTER ── */
+.srm-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px 18px;
+    border-top: 1px solid var(--border, #f1f5f9);
+    margin-top: 14px;
+}
+
+.srm-cancel {
+    background: var(--bg-page, #f1f5f9);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.srm-cancel:hover:not(:disabled) { background: #e2e8f0; }
+.srm-cancel:disabled { opacity: 0.6; cursor: default; }
+
+.srm-submit {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    transition: background 0.12s;
+}
+
+.srm-submit:hover:not(:disabled) { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.srm-submit:disabled { opacity: 0.6; cursor: default; }
+.srm-submit .material-symbols-outlined { font-size: 16px; }
+.srm-spin { animation: srmSpinAnim 1s linear infinite; }
+
+@keyframes srmSpinAnim {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ── TOAST ── */
+.srm-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+    z-index: var(--z-report-toast);
+    animation: srmToastUp 0.2s ease-out;
+    white-space: nowrap;
+}
+
+@keyframes srmToastUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.srm-toast .material-symbols-outlined { font-size: 16px; color: #4ade80; }
+
+/* ── DARK MODE ── */
+[data-theme="dark"] .srm-overlay { background: rgba(0, 0, 0, 0.65); }
+
+[data-theme="dark"] .srm-modal {
+    background: #1e293b;
+}
+
+[data-theme="dark"] .srm-modal__header { border-bottom-color: #334155; }
+[data-theme="dark"] .srm-modal__header h3 { color: #e2e8f0; }
+
+[data-theme="dark"] .srm-close { color: #64748b; }
+[data-theme="dark"] .srm-close:hover:not(:disabled) { background: #334155; color: #94a3b8; }
+
+[data-theme="dark"] .srm-preview {
+    background: #0f172a;
+    border-color: #334155;
+    color: #475569;
+}
+
+[data-theme="dark"] .srm-reason {
+    border-color: #334155;
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .srm-reason:hover { background: rgba(239, 68, 68, 0.06); }
+[data-theme="dark"] .srm-reason.selected { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+
+[data-theme="dark"] .srm-label { color: #cbd5e1; }
+
+[data-theme="dark"] .srm-textarea {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .srm-footer { border-top-color: #334155; }
+
+[data-theme="dark"] .srm-cancel {
+    background: #334155;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .srm-cancel:hover:not(:disabled) { background: #475569; }
+
+[data-theme="dark"] .srm-toast {
+    background: #0f172a;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+    .srm-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .srm-modal {
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+    }
+}

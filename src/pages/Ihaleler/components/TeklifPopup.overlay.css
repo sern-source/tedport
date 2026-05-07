@@ -1,0 +1,244 @@
+﻿/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 13 Nisan 2026: Teklif başarı mesajı overlay
+   ═══════════════════════════════════════════════════ */
+.teklif-success-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-top-modal);
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: teklif-success-fadeIn 0.25s ease;
+}
+
+@keyframes teklif-success-fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.teklif-success-card {
+    background: var(--bg-white);
+    border-radius: 24px;
+    padding: 40px 36px 32px;
+    width: 400px;
+    max-width: 92vw;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    animation: teklif-success-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes teklif-success-pop {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.teklif-success-card__icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669, #34d399);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    animation: teklif-success-bounce 0.5s 0.3s ease both;
+}
+
+@keyframes teklif-success-bounce {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.teklif-success-card__icon .material-symbols-outlined {
+    font-size: 36px;
+    color: #fff;
+}
+
+.teklif-success-card h3 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #059669;
+}
+
+.teklif-success-card p {
+    margin: 0 0 24px;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.teklif-success-card__btn {
+    background: linear-gradient(135deg, #059669, #34d399);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.teklif-success-card__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
+}
+
+/* Enes Doğanay | 1 Mayıs 2026: İhale yayınlama modalındaki paylaşım linki */
+.ihale-publish-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    background: #f0f7ff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    margin-bottom: 6px;
+}
+
+.ihale-publish-link-row__icon {
+    font-size: 18px;
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+.ihale-publish-link-row__input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 0.78rem;
+    font-family: 'Inter', monospace;
+    color: #1e40af;
+    outline: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: text;
+}
+
+.ihale-publish-link-row__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    padding: 6px 12px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.ihale-publish-link-row__copy:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.ihale-publish-link-row__copy--done {
+    background: #059669 !important;
+    transform: none !important;
+}
+
+.ihale-publish-link-row__copy .material-symbols-outlined {
+    font-size: 15px;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Geri Çek onay modal */
+.teklif-success-card--withdraw-confirm h3 {
+    color: #dc2626;
+    font-size: 1.18rem;
+}
+
+.teklif-success-card__icon--warn {
+    background: linear-gradient(135deg, #f59e0b, #f97316) !important;
+}
+
+.teklif-withdraw-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.teklif-withdraw-modal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.teklif-withdraw-modal-btn--cancel {
+    background: var(--bg-light);
+    color: var(--text-muted);
+}
+
+.teklif-withdraw-modal-btn--cancel:hover {
+    background: var(--border);
+}
+
+.teklif-withdraw-modal-btn--confirm {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+}
+
+.teklif-withdraw-modal-btn--confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+}
+
+.teklif-withdraw-modal-btn--confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.teklif-withdraw-modal-btn--confirm .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Geri çekildi overlay stili */
+.teklif-success-card--withdrawn h3 {
+    color: #ea580c;
+}
+
+.teklif-success-card--withdrawn .teklif-success-card__btn {
+    background: linear-gradient(135deg, #ea580c, #f97316);
+}
+
+.teklif-success-card__icon--withdrawn {
+    background: linear-gradient(135deg, #ea580c, #f97316) !important;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Taslak kaydedildi overlay stili */
+.teklif-success-card--draft h3 {
+    color: #d97706;
+}
+
+.teklif-success-card--draft .teklif-success-card__btn {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.teklif-success-card__icon--draft {
+    background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+}
+
+/* === Dark mode === */
+/* Enes Doğanay | 4 Mayıs 2026: compact cool dark mode teklif popup */

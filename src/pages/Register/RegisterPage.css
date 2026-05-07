@@ -1,0 +1,515 @@
+/* Enes Doğanay | 6 Mayıs 2026: Register sayfası — temel yerleşim, form ortak stilleri */
+
+/* ── Sayfa iskelet ─────────────────────────────────────────────────────── */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: compact */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 14px;
+}
+
+.page-footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 0.75rem;
+  color: var(--text-gray);
+}
+
+/* ── Kayıt kartı ──────────────────────────────────────────────────────── */
+.registration-card {
+  background-color: var(--bg-white);
+  width: 100%;
+  max-width: 512px;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.registration-card-corporate {
+  max-width: 780px;
+}
+
+.card-footer {
+  padding: 4px 20px 14px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-gray);
+}
+
+.footerText {
+  width: 100%;
+  padding-top: 5px;
+}
+
+/* ── Bildirim ─────────────────────────────────────────────────────────── */
+.register-notification {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  margin: 0 20px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: regNotifyIn 0.3s ease-in-out;
+}
+
+.register-notification--success {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.register-notification--error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.register-notification-icon {
+  font-size: 20px;
+}
+
+@keyframes regNotifyIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Butonlar ─────────────────────────────────────────────────────────── */
+.register-btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0 16px;
+  height: 36px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.register-btn-submit {
+  width: 100%;
+  height: 36px;
+  font-size: 0.84rem;
+  margin-top: 4px;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.register-btn-submit:hover {
+  box-shadow: 0 6px 14px -3px rgba(19, 127, 236, 0.3);
+  transform: translateY(-1px);
+}
+
+.register-btn-secondary-soft,
+.register-btn-submit-link {
+  text-decoration: none;
+  min-width: 220px;
+}
+
+.register-btn-secondary-soft {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.register-btn-secondary-soft:hover {
+  background: #dbeafe;
+}
+
+.register-btn-submit-link {
+  height: 40px;
+}
+
+/* ── Form gövdesi ─────────────────────────────────────────────────────── */
+.form-body {
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+@media (min-width: 768px) {
+  .form-row { flex-direction: row; }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* ── Form input ───────────────────────────────────────────────────────── */
+.form-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-white);
+  font-size: 0.83rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.2);
+}
+
+.form-input::placeholder { color: #a0aec0; }
+
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: #111 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.form-input--error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.form-input--matched {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-white);
+  font-size: 0.84rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.18);
+}
+
+/* ── İkon + yardımcı metinler ─────────────────────────────────────────── */
+.input-icon {
+  position: absolute;
+  right: 12px;
+  color: var(--text-gray);
+  pointer-events: none;
+}
+
+.input-icon.clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.input-icon.clickable:hover { color: var(--primary); }
+
+.field-hint {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.field-hint--success { color: #16a34a; }
+
+.field-error-text {
+  color: #ef4444;
+  font-size: 0.78rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.field-optional {
+  font-weight: 400;
+  color: #94a3b8;
+  font-size: 0.82rem;
+}
+
+.required-star {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* ── Checkbox ─────────────────────────────────────────────────────────── */
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  font-size: 0.81rem;
+  color: var(--text-gray);
+  line-height: 1.4;
+}
+
+.checkbox-required {
+  color: inherit;
+  font-weight: 500;
+  margin-left: 2px;
+}
+
+.checkbox-label-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex: 1;
+}
+
+/* ── Pazarlama tooltip ─────────────────────────────────────────────────── */
+.marketing-info-wrap {
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.marketing-info-btn {
+  background: #e0e7ff;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #4338ca;
+  padding: 0;
+  transition: background 0.15s;
+}
+
+.marketing-info-btn:hover { background: #c7d2fe; }
+
+.marketing-info-btn .material-symbols-outlined { font-size: 0.85rem; }
+
+.marketing-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  z-index: 500;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.3);
+  animation: tooltipIn 0.15s ease;
+}
+
+.marketing-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  right: 5px;
+  width: 10px;
+  height: 10px;
+  background: #1e293b;
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+.marketing-tooltip-note {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin: 0 0 10px 0;
+  color: #cbd5e1;
+}
+
+.marketing-tooltip-detail-btn {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+.marketing-tooltip-detail-btn:hover { background: #2563eb; }
+
+@keyframes tooltipIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Link / text ──────────────────────────────────────────────────────── */
+.text-link {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.text-link:hover { text-decoration: underline; }
+
+.text-link-inline {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 500;
+  color: #3b82f6;
+  cursor: pointer;
+  display: inline;
+  text-decoration: underline;
+  text-decoration-color: #bfdbfe;
+  text-underline-offset: 2px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+.text-link-inline:hover {
+  color: #1d4ed8;
+  text-decoration-color: #93c5fd;
+}
+
+.footer-login-link { font-weight: 500; }
+
+/* ── Yardımcı ─────────────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.oauth-consent-note {
+  font-size: 11.5px;
+  color: #94a3b8;
+  text-align: center;
+  margin: -4px 0 4px;
+  line-height: 1.5;
+}
+
+/* ── Mobil ────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main-content { padding: 16px 12px; }
+  .form-body, .card-footer { padding-left: 16px; padding-right: 16px; }
+  .register-notification { margin-left: 16px; margin-right: 16px; }
+}
+
+/* ── Dark mode ────────────────────────────────────────────────────────── */
+[data-theme="dark"] .registration-card {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .form-input {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-input:focus {
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.2);
+}
+
+[data-theme="dark"] .form-input::placeholder { color: #475569; }
+
+[data-theme="dark"] .form-input:-webkit-autofill,
+[data-theme="dark"] .form-input:-webkit-autofill:hover,
+[data-theme="dark"] .form-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .form-textarea {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-textarea:focus {
+  border-color: #3b9eff;
+  box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.18);
+}
+
+[data-theme="dark"] .register-notification--success {
+  background-color: rgba(6, 95, 70, 0.2);
+  color: #4ade80;
+  border-color: #14532d;
+}
+
+[data-theme="dark"] .register-notification--error {
+  background-color: rgba(127, 29, 29, 0.2);
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .marketing-info-btn {
+  background: rgba(67, 56, 202, 0.25);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .marketing-info-btn:hover { background: rgba(67, 56, 202, 0.4); }
+
+[data-theme="dark"] .register-btn-secondary-soft {
+  background: rgba(29, 78, 216, 0.15);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .register-btn-secondary-soft:hover { background: rgba(29, 78, 216, 0.25); }

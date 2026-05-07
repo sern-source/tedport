@@ -2,39 +2,41 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
-import PageLoader from './PageLoader';
+import PageLoader from './components/PageLoader';
 
-/* Enes Doğanay | 11 Nisan 2026: Home2 → Home olarak yeniden adlandırıldı */
-const Home = lazy(() => import('./Home'));
-const Firmalar = lazy(() => import('./Firmalar'));
-const FirmaDetay = lazy(() => import('./FirmaDetay'));
-const Login = lazy(() => import('./Login'));
-const Profile = lazy(() => import('./Profile'));
-const Register = lazy(() => import('./Register'));
-const Hakkimizda = lazy(() => import('./hakkimizda'));
-const Iletisim = lazy(() => import('./iletisim'));
-const Ihaleler = lazy(() => import('./Ihaleler'));
-const EmailConfirm = lazy(() => import('./EmailConfirmation'));
-const ResetPassword = lazy(() => import('./ResetPassword'));
-const AdminCorporateApplications = lazy(() => import('./AdminCorporateApplications'));
+/* Enes Doğanay | 6 Mayıs 2026: Home → pages/Home/HomePage refaktör */
+const Home = lazy(() => import('./pages/Home/HomePage'));
+const Firmalar = lazy(() => import('./pages/Firmalar/FirmalarPage'));
+const FirmaDetay = lazy(() => import('./pages/FirmaDetay/FirmaDetayPage'));
+const Login = lazy(() => import('./pages/Auth/LoginPage'));
+const Profile = lazy(() => import('./pages/Profile/ProfilePage'));
+const Register = lazy(() => import('./pages/Register/RegisterPage'));
+/* Enes Doğanay | 6 Mayıs 2026: Statik sayfalar → pages/StaticPages/ */
+const Hakkimizda = lazy(() => import('./pages/StaticPages/HakkimizdaPage'));
+const Iletisim = lazy(() => import('./pages/StaticPages/IletisimPage'));
+// Enes Doğanay | 5 Mayıs 2026: Ihaleler sayfası yeni mimaride
+const Ihaleler = lazy(() => import('./pages/Ihaleler/IhalelerPage'));
+const EmailConfirm = lazy(() => import('./pages/Auth/EmailConfirmationPage'));
+const ResetPassword = lazy(() => import('./pages/Auth/ResetPasswordPage'));
+const AdminCorporateApplications = lazy(() => import('./pages/Admin/AdminCorporateApplications'));
 /* Enes Doğanay | 13 Nisan 2026: Admin firma düzenleme sayfası */
-const AdminFirmaDuzenle = lazy(() => import('./AdminFirmaDuzenle'));
+const AdminFirmaDuzenle = lazy(() => import('./pages/Admin/AdminFirmaDuzenle'));
 /* Enes Doğanay | 14 Nisan 2026: Admin iletişim mesajları yönetim sayfası */
-const AdminContactMessages = lazy(() => import('./AdminContactMessages'));
-const AdminChatbotTraining = lazy(() => import('./AdminChatbotTraining'));
-const FirmaProfil = lazy(() => import('./FirmaProfil'));
+const AdminContactMessages = lazy(() => import('./pages/Admin/AdminContactMessages'));
+const AdminChatbotTraining = lazy(() => import('./pages/Admin/AdminChatbotTraining'));
+const FirmaProfil = lazy(() => import('./pages/FirmaProfil/FirmaProfilPage'));
 /* Enes Doğanay | 10 Nisan 2026: E-posta değişikliği onay başarı sayfası */
-const EmailChangeSuccess = lazy(() => import('./EmailChangeSuccess'));
+const EmailChangeSuccess = lazy(() => import('./pages/Auth/EmailChangeSuccessPage'));
 /* Enes Doğanay | 16 Nisan 2026: 404 sayfa bulunamadı */
-const NotFound = lazy(() => import('./NotFound'));
-const Kvkk = lazy(() => import('./Kvkk'));
-const HizmetSartlari = lazy(() => import('./HizmetSartlari'));
-const GizlilikPolitikasi = lazy(() => import('./GizlilikPolitikasi'));
-const SSS = lazy(() => import('./SSS'));
+const NotFound = lazy(() => import('./pages/StaticPages/NotFoundPage'));
+const Kvkk = lazy(() => import('./pages/StaticPages/KvkkPage'));
+const HizmetSartlari = lazy(() => import('./pages/StaticPages/HizmetSartlariPage'));
+const GizlilikPolitikasi = lazy(() => import('./pages/StaticPages/GizlilikPolitikasiPage'));
+const SSS = lazy(() => import('./pages/StaticPages/SSSPage'));
 // Enes Doğanay | 2 Mayıs 2026: Admin Onay Merkezi — etiket ve logo onaylama sayfası
-const AdminEtiketOnay = lazy(() => import('./AdminEtiketOnay'));
+const AdminEtiketOnay = lazy(() => import('./pages/Admin/AdminEtiketOnay'));
 // Enes Doğanay | 2 Mayıs 2026: Admin Mesaj Şikayetleri sayfası
-const AdminMesajSikayetleri = lazy(() => import('./AdminMesajSikayetleri'));
+const AdminMesajSikayetleri = lazy(() => import('./pages/Admin/AdminMesajSikayetleri'));
 
 export default function Router() {
   return (

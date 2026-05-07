@@ -1,0 +1,189 @@
+﻿[data-theme="dark"] .about-page-wrapper {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-gray-bg,
+[data-theme="dark"] .about-page-wrapper .about-stats-section {
+  background-color: #1e293b;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-badge {
+  background-color: rgba(59, 158, 255, 0.12);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-value-card {
+  background-color: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-value-icon {
+  background-color: rgba(59, 158, 255, 0.12);
+  color: var(--primary);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-light {
+  background-color: #334155;
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-light:hover {
+  background-color: #475569;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-outline {
+  background-color: #1e293b;
+  color: var(--text-gray);
+  border-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-outline:hover {
+  background-color: #0f172a;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-feature-icon {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-line {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-dot {
+  border-color: #0f172a;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-dot.outline {
+  background-color: #0f172a;
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-timeline-dot.outline div {
+  background-color: var(--primary);
+}
+
+/* Footer */
+/* Enes Doğanay | 4 Mayıs 2026: footer padding azaltıldı */
+.about-page-wrapper .about-footer {
+  background-color: white;
+  border-top: 1px solid var(--border);
+  padding: 3rem 0 1.5rem 0;
+}
+
+.about-page-wrapper .about-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .about-page-wrapper .about-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-page-wrapper .about-footer-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .about-page-wrapper .about-footer-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .about-page-wrapper .about-footer-brand {
+    grid-column: span 2;
+  }
+}
+
+/* Enes Doğanay | 6 Nisan 2026: Inline style → CSS class */
+.about-page-wrapper .about-footer-logo {
+  display: flex;
+  align-items: center;
+}
+
+.about-page-wrapper .about-footer-logo img {
+  height: 50px;
+  object-fit: contain;
+}
+
+.about-page-wrapper .about-footer-brand p {
+  color: var(--text-light);
+  font-size: 0.875rem;
+  max-width: 300px;
+  margin: 1rem 0 1.5rem 0;
+}
+
+.about-page-wrapper .about-socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.about-page-wrapper .about-socials a {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: var(--border);
+  border-radius: 50%;
+}
+
+.about-page-wrapper .about-footer-links h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem 0;
+}
+
+.about-page-wrapper .about-footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.about-page-wrapper .about-footer-links a {
+  text-decoration: none;
+  color: var(--text-gray);
+  font-size: 0.875rem;
+  transition: color 0.2s;
+}
+
+.about-page-wrapper .about-footer-links a:hover {
+  color: var(--primary);
+}
+
+.about-page-wrapper .about-footer-bottom {
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  padding-top: 2rem;
+  text-align: center;
+}
+
+.about-page-wrapper .about-footer-bottom p {
+  color: var(--text-light);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Utility (Gizleme Sınıfları) */
+@media (max-width: 768px) {
+  .about-page-wrapper .hidden-mobile {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .about-page-wrapper .hidden-tablet {
+    display: none !important;
+  }
+}

@@ -1,0 +1,67 @@
+﻿@media (max-width: 600px) {
+    .ihale-modal__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .my-tenders-panel__head {
+        flex-direction: column;
+    }
+
+    .my-tenders-add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ihale-req-input-row {
+        flex-direction: column;
+    }
+
+    .ihale-req-table__header,
+    .ihale-req-table__row {
+        grid-template-columns: 30px 1fr 36px;
+    }
+
+    .ihale-req-table__aciklama {
+        display: none;
+    }
+
+    .ihale-req-table__header span:nth-child(3) {
+        display: none;
+    }
+
+    .ihale-modal__footer {
+        flex-wrap: wrap;
+    }
+
+    .ihale-stepper-label {
+        display: none;
+    }
+
+    .ihale-stepper-bar {
+        padding: 14px 16px 10px;
+    }
+
+    .ihale-stepper-num {
+        width: 32px;
+        height: 32px;
+    }
+
+    .ihale-step-content {
+        padding: 14px 16px 8px;
+    }
+
+    .ihale-stepper-nav {
+        padding: 12px 16px;
+    }
+
+    .ihale-preview__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ihale-preview__card {
+        padding: 16px;
+    }
+}
+
+
+/* === İhale formu modal ek === */

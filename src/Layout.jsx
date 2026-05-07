@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import Chatbot from './Chatbot';
+import Chatbot from './components/Chatbot';
 
 export default function Layout() {
     const location = useLocation();

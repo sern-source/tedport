@@ -6,8 +6,9 @@ import Router from './Router';
 // Enes Doğanay | 8 Nisan 2026: AuthProvider ile auth state uygulama genelinde tek seferlik yüklenir
 import { AuthProvider } from './AuthContext';
 // Enes Doğanay | 8 Nisan 2026: Anlık toast bildirimleri — AuthProvider içinden alınıp render edilir
-import ToastWrapper from './ToastWrapper';
+import ToastWrapper from './components/ToastWrapper';
 import { supabase, supabaseUrl } from './supabaseClient';
+import { fetchProfileEmail, updateProfileEmail } from './services/authService';
 
 // Enes Doğanay | 2 Mayıs 2026: Component unmount sırasında iptal edilen Supabase fetch'leri
 // AbortError fırlatır — bunlar expected, console'u kirletmesin
@@ -33,9 +34,9 @@ if (hash.includes('type=email_change')) {
       if (session?.user) {
         const freshEmail = session.user.email;
         // Profiles tablosundaki e-postayı güncelle
-        const { data: currentProfile } = await supabase.from('profiles').select('email').eq('id', session.user.id).single();
+        const currentProfile = await fetchProfileEmail(session.user.id).catch(() => null);
         if (currentProfile && freshEmail !== currentProfile.email) {
-          await supabase.from('profiles').update({ email: freshEmail }).eq('id', session.user.id);
+          await updateProfileEmail(session.user.id, freshEmail);
         }
         // Session'ı temizle — SPA'yı kirletmesin
         // Enes Doğanay | 10 Nisan 2026: scope: global ile TÜM cihazlardaki refresh token'ları revoke et

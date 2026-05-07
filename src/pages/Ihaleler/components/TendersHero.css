@@ -1,0 +1,102 @@
+/* Enes Doğanay | 5 Mayıs 2026: TendersHero bileşeni stilleri */
+
+/* === Kompakt hero === */
+.tenders-hero-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+    color: #fff;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 18px rgba(30, 58, 138, 0.18);
+}
+
+.tenders-hero-compact__left h1 {
+    margin: 0 0 2px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.tenders-hero-compact__left p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.68);
+    max-width: 480px;
+}
+
+.tenders-hero-compact__stats {
+    display: flex;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+/* === Mini stat rozetleri === */
+.tenders-mini-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.tenders-mini-stat:hover {
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+}
+
+.tenders-mini-stat .material-symbols-outlined {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.tenders-mini-stat strong {
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.tenders-mini-stat span:last-child {
+    font-size: 0.73rem;
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+.tenders-mini-stat--live .material-symbols-outlined { color: #86efac; }
+.tenders-mini-stat--live strong { color: #86efac; }
+.tenders-mini-stat--upcoming .material-symbols-outlined { color: #fde68a; }
+.tenders-mini-stat--upcoming strong { color: #fde68a; }
+.tenders-mini-stat--closed .material-symbols-outlined { color: #cbd5e1; }
+.tenders-mini-stat--closed strong { color: #cbd5e1; }
+
+/* === Responsive === */
+@media (max-width: 1200px) {
+    .tenders-hero-compact {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .tenders-hero-compact__stats {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .tenders-hero-compact__stats {
+        flex-wrap: wrap;
+    }
+
+    .tenders-mini-stat {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+    }
+}

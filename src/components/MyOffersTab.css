@@ -1,0 +1,542 @@
+﻿/* Enes Doğanay | 6 Mayıs 2026: MyOffersTab — ekran kap + hero + toolbar + boş+yükleniyor + delete modal */
+
+/* ═══════════════════════════════════════════════════
+   EKRAN KAP
+   ═══════════════════════════════════════════════════ */
+.mop-screen {
+    font-family: Manrope, 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════ */
+.mop-toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    z-index: var(--z-toast);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+    white-space: nowrap;
+    animation: mopToastIn 0.25s ease;
+}
+
+@keyframes mopToastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.mop-toast .material-symbols-outlined { font-size: 20px; }
+
+.mop-toast--success { background: #16a34a; }
+.mop-toast--error   { background: #dc2626; }
+
+/* ═══════════════════════════════════════════════════
+   HERO BANNER
+   ═══════════════════════════════════════════════════ */
+/* Enes Doğanay | 7 Mayıs 2026: Hero — kompakt slim banner, KPI pill'ler inline */
+.mop-hero {
+    padding: 16px 22px;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
+    color: #fff;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.2);
+}
+
+.mop-hero__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.mop-hero__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.mop-hero__title > .material-symbols-outlined {
+    font-size: 22px;
+    opacity: 0.85;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 6px;
+    flex-shrink: 0;
+}
+
+.mop-hero__title h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.mop-hero__title p {
+    margin: 2px 0 0;
+    font-size: 0.76rem;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mop-kpis {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.mop-kpi {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 7px 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 58px;
+    backdrop-filter: blur(6px);
+}
+
+.mop-kpi__value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.mop-kpi__label {
+    font-size: 0.62rem;
+    opacity: 0.6;
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+.mop-kpi--review { border-color: rgba(147, 197, 253, 0.25); }
+.mop-kpi--review .mop-kpi__value { color: #93c5fd; }
+
+.mop-kpi--accepted { border-color: rgba(52, 211, 153, 0.25); }
+.mop-kpi--accepted .mop-kpi__value { color: #34d399; }
+
+.mop-kpi--rejected { border-color: rgba(248, 113, 113, 0.25); }
+.mop-kpi--rejected .mop-kpi__value { color: #f87171; }
+
+/* ═══════════════════════════════════════════════════
+   TOOLBAR
+   ═══════════════════════════════════════════════════ */
+/* Enes Doğanay | 7 Mayıs 2026: Toolbar — search + filterler tek satırda */
+.mop-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.mop-toolbar__search {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 12px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    transition: border-color 0.15s;
+    height: 36px;
+    flex: 1;
+    min-width: 160px;
+}
+
+.mop-toolbar__search:focus-within {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.07);
+}
+
+.mop-toolbar__search > .material-symbols-outlined {
+    font-size: 17px;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.mop-toolbar__search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.84rem;
+    background: transparent;
+    color: #1e293b;
+}
+
+.mop-toolbar__clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    transition: color 0.15s;
+}
+
+.mop-toolbar__clear:hover { color: #475569; }
+.mop-toolbar__clear .material-symbols-outlined { font-size: 16px; }
+
+.mop-toolbar__filters {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.mop-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.mop-filter-chip:hover {
+    border-color: #93c5fd;
+    color: #2563eb;
+    background: #f0f7ff;
+}
+
+.mop-filter-chip--active {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+}
+
+/* ═══════════════════════════════════════════════════
+   LOADING
+   ═══════════════════════════════════════════════════ */
+.mop-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 60px 20px;
+    color: #64748b;
+}
+
+.mop-loading__spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: #eff6ff;
+    border-radius: 50%;
+}
+
+.mop-loading__spinner .material-symbols-outlined {
+    font-size: 24px;
+    color: #2563eb;
+    animation: mopSpin 1.2s linear infinite;
+}
+
+@keyframes mopSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════════════ */
+.mop-empty {
+    text-align: center;
+    padding: 56px 20px;
+    color: #94a3b8;
+}
+
+.mop-empty > .material-symbols-outlined {
+    font-size: 48px;
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.mop-empty h3 {
+    margin: 0 0 16px;
+    color: #475569;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   KART LİSTESİ KABI
+   ═══════════════════════════════════════════════════ */
+.mop-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ═══════════════════════════════════════════════════
+   SİLME ONAY MODAL
+   ═══════════════════════════════════════════════════ */
+.mop-delete-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-top-modal);
+}
+
+.mop-delete-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    animation: mopModalIn 0.25s ease;
+}
+
+@keyframes mopModalIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.mop-delete-modal__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fef2f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.mop-delete-modal__icon .material-symbols-outlined {
+    font-size: 28px;
+    color: #ef4444;
+}
+
+.mop-delete-modal h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 8px;
+}
+
+.mop-delete-modal p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.mop-delete-modal__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.mop-delete-modal__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    font-family: inherit;
+}
+
+.mop-delete-modal__btn--cancel {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.mop-delete-modal__btn--cancel:hover { background: #e2e8f0; }
+
+.mop-delete-modal__btn--confirm {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.mop-delete-modal__btn--confirm:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+.mop-delete-modal__btn--confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.mop-delete-modal__btn--confirm .material-symbols-outlined { font-size: 18px; }
+
+/* firma-contact-* stilleri TeklifPopup.css dosyasındadır — burada tekrarlanmaz */
+/* firma-contact-overlay, firma-contact-card ve alt sınıfları TeklifPopup.css'de tanımlı */
+
+/* Enes Doğanay | 6 Mayıs 2026: firma-contact stilleri — ProfilePage chunk'ında
+   TeklifPopup.css IhalelerPage chunk'ında yükleniyor, burada tekrar tanımlanır */
+.firma-contact-overlay {
+    position: fixed;
+    inset: 0;
+    /* Enes Doğanay | 7 Mayıs 2026: chat overlay (10000) üzerinde görünsün */
+    z-index: var(--z-contact);
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: firmaContactFadeIn 0.2s ease;
+}
+
+@keyframes firmaContactFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.firma-contact-card {
+    background: var(--bg-white, #fff);
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    width: 400px;
+    max-width: 92vw;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    text-align: center;
+    position: relative;
+    animation: firmaContactSlideUp 0.3s ease;
+}
+
+@keyframes firmaContactSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.firma-contact-card__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.firma-contact-card__close:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.firma-contact-card__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #fff;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: .pagination / .page-btn → index.css global Pagination component */
+
+.firma-contact-card__avatar .material-symbols-outlined { font-size: 28px; }
+
+.firma-contact-card h3 {
+    margin: 0 0 2px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark, #1e293b);
+}
+
+.firma-contact-card__name {
+    margin: 0 0 16px;
+    font-size: 0.85rem;
+    color: var(--text-muted, #64748b);
+}
+
+.firma-contact-card__rows {
+    display: grid;
+    gap: 8px;
+    text-align: left;
+}
+
+.firma-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--bg-light, #f8fafc);
+    border: 1px solid var(--border, #e2e8f0);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+}
+
+.firma-contact-row:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.firma-contact-row .material-symbols-outlined {
+    font-size: 22px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.firma-contact-row div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.firma-contact-row small {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.firma-contact-row span:not(.material-symbols-outlined) {
+    font-size: 0.92rem;
+    color: var(--text-dark, #1e293b);
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.firma-contact-card__empty {
+    margin: 12px 0 0;
+    font-size: 0.88rem;
+    color: #94a3b8;
+}
+

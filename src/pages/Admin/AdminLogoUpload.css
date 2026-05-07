@@ -1,0 +1,530 @@
+/* Enes Doğanay | 13 Nisan 2026: Admin Firma Logo Yükleme sayfası stilleri */
+
+.alu-page {
+    min-height: 100vh;
+    background: #f1f5f9;
+    padding: 100px 24px 48px;
+}
+
+.alu-container {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+/* ── Hero ── */
+.alu-hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 100%);
+    border-radius: 16px;
+    color: #fff;
+}
+
+.alu-hero > .material-symbols-outlined {
+    font-size: 40px;
+    opacity: 0.85;
+}
+
+.alu-hero h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.alu-hero p {
+    font-size: 0.85rem;
+    margin: 0;
+    opacity: 0.8;
+}
+
+/* ── Loading & Denied ── */
+.alu-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 50vh;
+    color: #64748b;
+}
+
+.alu-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #1d4ed8;
+    border-radius: 50%;
+    animation: alu-spin 0.7s linear infinite;
+}
+
+.alu-spinner--sm {
+    width: 18px;
+    height: 18px;
+    border-width: 2px;
+}
+
+@keyframes alu-spin {
+    to { transform: rotate(360deg); }
+}
+
+.alu-denied {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 50vh;
+    text-align: center;
+    color: #64748b;
+}
+
+.alu-denied .material-symbols-outlined {
+    font-size: 48px;
+    color: #ef4444;
+}
+
+.alu-denied h2 {
+    font-size: 1.25rem;
+    color: #1e293b;
+    margin: 0;
+}
+
+.alu-denied p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.alu-denied button {
+    margin-top: 8px;
+    padding: 10px 24px;
+    background: #1d4ed8;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* ── Arama ── */
+.alu-search-section {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+}
+
+.alu-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    transition: border-color 0.2s;
+}
+
+.alu-search-bar:focus-within {
+    border-color: #3b82f6;
+    background: #fff;
+}
+
+.alu-search-bar > .material-symbols-outlined {
+    font-size: 22px;
+    color: #94a3b8;
+}
+
+.alu-search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.95rem;
+    color: #1e293b;
+}
+
+.alu-search-bar input::placeholder {
+    color: #94a3b8;
+}
+
+.alu-search-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: #94a3b8;
+    display: flex;
+}
+
+.alu-search-clear:hover {
+    color: #64748b;
+}
+
+.alu-search-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+/* ── Arama sonuçları ── */
+.alu-results {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.alu-result-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: all 0.15s;
+}
+
+.alu-result-card:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.alu-result-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #475569;
+}
+
+.alu-result-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.alu-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.alu-result-info strong {
+    display: block;
+    font-size: 0.9rem;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.alu-result-info small {
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.alu-result-id {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.alu-result-has-logo {
+    color: #059669;
+    flex-shrink: 0;
+    display: flex;
+}
+
+.alu-result-has-logo .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.alu-no-result,
+.alu-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.alu-no-result .material-symbols-outlined,
+.alu-hint .material-symbols-outlined {
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+.alu-no-result p,
+.alu-hint p {
+    margin: 0;
+}
+
+/* ── Upload Section ── */
+.alu-upload-section {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+}
+
+.alu-selected-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.alu-selected-info h2 {
+    font-size: 1.15rem;
+    color: #1e293b;
+    margin: 0 0 4px;
+}
+
+.alu-selected-info p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+.alu-id {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.alu-upload-area {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Logo önizleme kutusu */
+.alu-preview {
+    width: 180px;
+    height: 180px;
+    border-radius: 14px;
+    border: 2px dashed #cbd5e1;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.alu-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+}
+
+.alu-preview-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: #94a3b8;
+}
+
+.alu-preview-placeholder .material-symbols-outlined {
+    font-size: 40px;
+}
+
+.alu-preview-placeholder span:last-child {
+    font-size: 0.8rem;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Yükleme kontrolleri */
+.alu-upload-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alu-file-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: #475569;
+    padding: 8px 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.alu-file-info .material-symbols-outlined {
+    font-size: 18px;
+    color: #3b82f6;
+}
+
+.alu-file-info small {
+    color: #94a3b8;
+}
+
+.alu-upload-hint {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
+/* ── Butonlar ── */
+.alu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.alu-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.alu-btn--primary {
+    background: #1d4ed8;
+    color: #fff;
+}
+
+.alu-btn--primary:hover {
+    background: #1e40af;
+}
+
+.alu-btn--save {
+    background: #059669;
+    color: #fff;
+}
+
+.alu-btn--save:hover:not(:disabled) {
+    background: #047857;
+}
+
+.alu-btn--save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.alu-btn--danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.alu-btn--danger:hover:not(:disabled) {
+    background: #fecaca;
+}
+
+.alu-btn--danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.alu-btn--ghost {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.alu-btn--ghost:hover {
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+.alu-action-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* ── Feedback ── */
+.alu-feedback {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.alu-feedback .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.alu-feedback--ok {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+.alu-feedback--err {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .alu-page {
+        padding: 90px 12px 32px;
+    }
+
+    .alu-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .alu-selected-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .alu-upload-area {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .alu-preview {
+        width: 140px;
+        height: 140px;
+    }
+
+    .alu-action-row {
+        flex-direction: column;
+    }
+
+    .alu-action-row .alu-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

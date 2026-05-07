@@ -1,0 +1,464 @@
+/* ── Çoklu e-posta tag input ── */
+.ihale-email-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    position: relative;
+}
+
+.ihale-email-input-row input {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: var(--text-dark);
+    background: var(--bg-light);
+    font-family: inherit;
+    transition: border-color 0.15s;
+}
+
+.ihale-email-input-row input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: var(--bg-white);
+}
+
+.ihale-email-input-row--valid input {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.ihale-email-input-row--error input {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.ihale-email-status-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.ihale-email-status-icon--checking {
+    color: #94a3b8;
+    animation: email-spin 0.8s linear infinite;
+}
+
+@keyframes email-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.ihale-email-status-icon--valid {
+    color: #22c55e;
+}
+
+.ihale-email-status-icon--error {
+    color: #ef4444;
+}
+
+.ihale-email-warning {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+.ihale-email-warning__content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.ihale-email-warning .material-symbols-outlined {
+    font-size: 18px;
+    color: #f97316;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.ihale-email-warning a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.ihale-email-invite-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 7px 14px;
+    background: #2563eb;
+    color: #fff !important;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.ihale-email-invite-btn:hover {
+    background: #1d4ed8;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+.ihale-email-invite-btn .material-symbols-outlined {
+    font-size: 16px;
+    color: #fff !important;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.ihale-email-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    background: #3b82f6;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ihale-email-add-btn:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.ihale-email-add-btn:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
+
+.ihale-email-add-btn .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.ihale-email-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ihale-email-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px 5px 12px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+.ihale-email-tag button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: #93c5fd;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ihale-email-tag button:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.ihale-email-tag button .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* ── Davetli firma arama ── */
+.ihale-firma-search {
+    position: relative;
+}
+
+.ihale-firma-search input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: var(--text-dark);
+    background: var(--bg-light);
+    font-family: inherit;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.ihale-firma-search input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: var(--bg-white);
+}
+
+.ihale-firma-search__spinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.ihale-firma-search__results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+    margin-top: 4px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.ihale-firma-search__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+}
+
+.ihale-firma-search__item:last-child {
+    border-bottom: none;
+}
+
+.ihale-firma-search__item--disabled {
+    background: #fffbeb;
+}
+
+.ihale-firma-search__info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ihale-firma-search__info strong {
+    font-size: 13.5px;
+    color: var(--text-dark);
+}
+
+.ihale-firma-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 8px;
+}
+
+.ihale-firma-badge .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.ihale-firma-badge--ok {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+
+.ihale-firma-badge--warn {
+    background: #fffbeb;
+    color: #d97706;
+}
+
+.ihale-firma-add-btn {
+    padding: 5px 14px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.ihale-firma-add-btn:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.ihale-firma-add-btn:disabled {
+    background: #94a3b8;
+    cursor: default;
+}
+
+.ihale-firma-warn-text {
+    font-size: 11.5px;
+    color: #d97706;
+    font-weight: 500;
+    font-style: italic;
+    white-space: normal;
+    line-height: 1.4;
+    max-width: 240px;
+    text-align: right;
+}
+
+.ihale-firma-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ihale-firma-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px 6px 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #15803d;
+    font-weight: 600;
+}
+
+.ihale-firma-tag .material-symbols-outlined {
+    font-size: 16px;
+    color: #22c55e;
+}
+
+.ihale-firma-tag button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    color: #86efac;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ihale-firma-tag button:hover {
+    background: #dcfce7;
+    color: #dc2626;
+}
+
+.ihale-firma-tag button .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* ── Ek doküman yükleme ── */
+.ihale-file-upload {
+    display: flex;
+}
+
+.ihale-file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    background: var(--bg-light);
+    color: var(--text-muted);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    font-family: inherit;
+}
+
+.ihale-file-btn:hover {
+    background: var(--border);
+    border-color: var(--text-light);
+}
+
+.ihale-file-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.ihale-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ihale-file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.ihale-file-item > .material-symbols-outlined {
+    font-size: 18px;
+    color: #3b82f6;
+}
+
+.ihale-file-name {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text-dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ihale-file-size {
+    color: #94a3b8;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.ihale-file-item button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ihale-file-item button:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.ihale-file-item button .material-symbols-outlined {
+    font-size: 16px;
+}
+

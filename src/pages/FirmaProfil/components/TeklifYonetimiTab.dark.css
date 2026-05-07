@@ -1,0 +1,102 @@
+/* ── DARK MODE ───────────────────────────────────────────────────────────── */
+[data-theme="dark"] .cmp-quote-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .cmp-quote-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border-color: #475569;
+}
+
+[data-theme="dark"] .cmp-quote-card.expanded {
+    border-color: #3b9eff;
+    border-left-color: #3b9eff;
+    box-shadow: 0 4px 20px rgba(59, 158, 255, 0.12);
+}
+
+[data-theme="dark"] .cmp-quote-card--new {
+    border-color: #2563eb;
+    border-left-color: #2563eb;
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.5), rgba(30, 41, 59, 0.6));
+}
+
+[data-theme="dark"] .cmp-quote-top:hover { background: linear-gradient(90deg, #0f172a, #1e293b); }
+[data-theme="dark"] .cmp-quote-subject { color: #f1f5f9; }
+[data-theme="dark"] .cmp-quote-date { color: #475569; }
+[data-theme="dark"] .cmp-quote-sender { color: #93c5fd; }
+
+[data-theme="dark"] .cmp-quote-preview {
+    color: #64748b;
+    border-top-color: #1e293b;
+}
+
+[data-theme="dark"] .cmp-quote-status--pending { background: rgba(146, 64, 14, 0.25); color: #fbbf24; }
+[data-theme="dark"] .cmp-quote-status--read { background: rgba(30, 64, 175, 0.25); color: #93c5fd; }
+[data-theme="dark"] .cmp-quote-status--replied { background: rgba(6, 95, 70, 0.25); color: #34d399; }
+[data-theme="dark"] .cmp-quote-status--rejected { background: rgba(153, 27, 27, 0.25); color: #f87171; }
+[data-theme="dark"] .cmp-quote-status--closed { background: rgba(51, 65, 85, 0.5); color: #64748b; }
+[data-theme="dark"] .cmp-quote-status--awaiting_reply { background: rgba(153, 27, 27, 0.2); color: #fca5a5; }
+
+[data-theme="dark"] .cmp-quote-delete-confirm {
+    background: rgba(127, 29, 29, 0.15);
+    border-top-color: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+}
+
+[data-theme="dark"] .cmp-quote-delete-btn--no { background: #334155; color: #94a3b8; }
+[data-theme="dark"] .cmp-quote-delete-btn--no:hover { background: #475569; }
+
+[data-theme="dark"] .cmp-quote-meta-item { background: #0f172a; }
+[data-theme="dark"] .cmp-quote-meta-item small { color: #475569; }
+[data-theme="dark"] .cmp-quote-meta-item span { color: #cbd5e1; }
+
+[data-theme="dark"] .cmp-quote-message { background: #0f172a; }
+[data-theme="dark"] .cmp-quote-message small { color: #475569; }
+[data-theme="dark"] .cmp-quote-message p { color: #94a3b8; }
+
+[data-theme="dark"] .cmp-btn--read { background: rgba(30, 64, 175, 0.15); color: #93c5fd; border-color: rgba(30, 64, 175, 0.3); }
+[data-theme="dark"] .cmp-btn--read:hover { background: rgba(30, 64, 175, 0.25); }
+[data-theme="dark"] .cmp-btn--replied { background: rgba(6, 95, 70, 0.15); color: #34d399; border-color: rgba(6, 95, 70, 0.3); }
+[data-theme="dark"] .cmp-btn--replied:hover { background: rgba(6, 95, 70, 0.25); }
+[data-theme="dark"] .cmp-btn--rejected { background: rgba(153, 27, 27, 0.15); color: #f87171; border-color: rgba(153, 27, 27, 0.3); }
+[data-theme="dark"] .cmp-btn--rejected:hover { background: rgba(153, 27, 27, 0.25); }
+[data-theme="dark"] .cmp-btn--closed { background: #1e293b; color: #64748b; border-color: #334155; }
+[data-theme="dark"] .cmp-btn--closed:hover { background: #0f172a; }
+
+[data-theme="dark"] .cmp-quotes-status-filter-btn { background: #1e293b; border-color: #334155; color: #64748b; }
+[data-theme="dark"] .cmp-quotes-status-filter-btn:hover { border-color: #3b9eff; color: #60a5fa; background: rgba(30, 58, 95, 0.3); }
+
+[data-theme="dark"] .cmp-quotes-tabs { background: #0f172a; }
+[data-theme="dark"] .cmp-quotes-tab { color: #475569; }
+[data-theme="dark"] .cmp-quotes-tab.active { background: #1e293b; color: #93c5fd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+[data-theme="dark"] .cmp-quotes-tab:hover:not(.active) { background: rgba(30, 41, 59, 0.6); color: #64748b; }
+
+[data-theme="dark"] .my-quote-tag { color: #94a3b8; background: #0f172a; border-color: #334155; }
+[data-theme="dark"] .my-quote-tag strong { color: #cbd5e1; }
+
+/* Teklif talepleri kartı */
+[data-theme="dark"] .cmp-quotes-card { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .cmp-quotes-header:hover { background: rgba(255, 255, 255, 0.04); }
+[data-theme="dark"] .cmp-quotes-header h3 { color: #e2e8f0; }
+[data-theme="dark"] .cmp-quotes-body { border-top-color: #334155; }
+
+/* Enes Doğanay | 7 Mayıs 2026: dark mode eksik kurallar */
+[data-theme="dark"] .cmp-quote-delete-btn--yes { background: rgba(153, 27, 27, 0.2); color: #f87171; }
+[data-theme="dark"] .cmp-quote-delete-btn--yes:hover { background: rgba(153, 27, 27, 0.35); }
+
+[data-theme="dark"] .cmp-quote-delete-trigger { color: #475569; }
+[data-theme="dark"] .cmp-quote-delete-trigger:hover { color: #f87171; background: rgba(153, 27, 27, 0.15); }
+
+[data-theme="dark"] .cmp-quotes-empty { color: #475569; }
+[data-theme="dark"] .cmp-quotes-empty-state { color: #475569; }
+[data-theme="dark"] .cmp-quotes-empty-state .material-symbols-outlined { color: #334155; }
+
+/* Teklif Yönetimi ayrı sayfa dark */
+[data-theme="dark"] .teklif-page-header {
+    background: linear-gradient(135deg, #0f1e35, #1e293b);
+    border-color: #334155;
+}
+[data-theme="dark"] .teklif-page-header h1 { color: #e2e8f0; }
+[data-theme="dark"] .teklif-page-header p { color: #64748b; }
+[data-theme="dark"] .teklif-page-loading { color: #475569; }

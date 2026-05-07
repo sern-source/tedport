@@ -1,0 +1,571 @@
+/* Enes Doğanay | 5 Mayıs 2026: TenderCard — kart, chip, aksiyon ve durum stilleri */
+
+/* === Kart === */
+/* Enes Doğanay | 11 Nisan 2026: Yeniden tasarlanan ihale kartı */
+/* Enes Doğanay | 4 Mayıs 2026: compact + cool kart */
+.tender-card {
+    border-radius: 14px;
+    padding: 0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+
+.tender-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+}
+
+/* Sol üst kenar renk şeridi */
+.tender-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+    background: #94a3b8;
+}
+.tender-card--canli::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.tender-card--yaklasan::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.tender-card--kapali::before { background: linear-gradient(90deg, #ef4444, #b91c1c); }
+.tender-card--draft::before { background: linear-gradient(90deg, #94a3b8, #64748b); }
+
+/* Enes Doğanay | 13 Nisan 2026: Bildirimden navigate edilen ihale vurgu efekti */
+.tender-card--highlight {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5), 0 8px 32px rgba(37, 99, 235, 0.15);
+    animation: tenderHighlightPulse 0.6s ease 2;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesini ayırt etmek için farklı arka plan */
+.tender-card--own {
+    background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+    border: 1.5px solid #93c5fd;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.tender-card--own::before {
+    background: linear-gradient(90deg, #2563eb, #3b82f6) !important;
+}
+.tender-card--own .tender-card__header::after {
+    content: 'Sizin İhaleniz';
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-left: auto;
+}
+
+.tender-card-skeleton {
+    min-height: 300px;
+    background: linear-gradient(90deg, #eef2f7 0%, #f8fafc 50%, #eef2f7 100%);
+    background-size: 200% 100%;
+    animation: tenderPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes tenderPulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* === Kart header === */
+.tender-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px 0;
+}
+
+.tender-card__company {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 3px 8px 3px 4px;
+    border-radius: 6px;
+    color: #2563eb;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tender-card__company:hover {
+    background: #eff6ff;
+}
+
+.tender-card__company .material-symbols-outlined {
+    font-size: 14px;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Anonim ihale — firma adı gizleme */
+.tender-card__company--anonim {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px 4px 6px;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-style: italic;
+    cursor: default;
+}
+.tender-card__company--anonim .material-symbols-outlined {
+    font-size: 16px;
+    color: #94a3b8;
+}
+
+/* === Başlık + Açıklama === */
+.tender-card__title {
+    margin: 8px 14px 0;
+    font-size: 0.97rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-dark);
+}
+
+.tender-card__desc {
+    margin: 4px 14px 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+/* === Chip rozetleri === */
+.tender-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 8px 14px 0;
+}
+
+.tender-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.tender-chip .material-symbols-outlined { font-size: 12px; }
+
+.tender-chip--type {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.tender-chip--kdv {
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.tender-chip--location {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* === Bilgi satırları === */
+.tender-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 8px 14px 0;
+    border-radius: 9px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.tender-card__info-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-light);
+    transition: background 0.15s;
+}
+
+.tender-card__info-row:last-child { border-bottom: none; }
+.tender-card__info-row:hover { background: #f1f5f9; }
+
+.tender-card__info-row .material-symbols-outlined {
+    font-size: 13px;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.tender-card__info-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    min-width: 60px;
+}
+
+.tender-card__info-value {
+    color: var(--text-dark);
+    font-weight: 500;
+    margin-left: auto;
+    text-align: right;
+}
+
+/* === Geri sayım bandı === */
+.tender-card__countdown {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 7px 14px 0;
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    font-size: 0.73rem;
+    font-weight: 700;
+    animation: countdownPulse 2s ease-in-out infinite;
+}
+
+.tender-card__countdown .material-symbols-outlined { font-size: 13px; }
+
+@keyframes countdownPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* === Referans no === */
+.tender-card__ref {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 5px 14px 0;
+    font-size: 0.68rem;
+    color: #94a3b8;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.tender-card__ref .material-symbols-outlined { font-size: 12px; }
+
+/* === Aksiyon butonları === */
+/* Enes Doğanay | 15 Nisan 2026: flex-wrap eklendi — 3 buton sığmadığında alt satıra geçsin */
+.tender-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 14px 12px;
+    margin-top: auto;
+}
+
+.tender-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.tender-action .material-symbols-outlined { font-size: 14px; }
+
+.tender-action--firma {
+    background: var(--bg-light);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.tender-action--firma:hover {
+    background: var(--border);
+    color: var(--text-dark);
+    transform: translateY(-1px);
+}
+
+.tender-action--join {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
+}
+
+.tender-action--join:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Kendi ihalesi düzenle butonu */
+.tender-action--own-edit {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
+}
+.tender-action--own-edit:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+    transform: translateY(-1px);
+}
+.tender-action--own-edit:disabled {
+    background: var(--bg-light);
+    color: #94a3b8;
+    border-color: var(--border);
+    cursor: default;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Teklifi Güncelle butonu */
+.tender-action--update {
+    background: linear-gradient(135deg, #059669, #34d399);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.18);
+}
+
+.tender-action--update:hover {
+    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.28);
+    transform: translateY(-1px);
+}
+
+.tender-action--update:disabled {
+    background: #94a3b8;
+    cursor: default;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Enes Doğanay | 15 Temmuz 2025: Taslağı Görüntüle */
+.tender-action--draft {
+    background: linear-gradient(135deg, #d97706, #fbbf24);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.18);
+}
+
+.tender-action--draft:hover {
+    box-shadow: 0 6px 18px rgba(217, 119, 6, 0.28);
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Kabul edilmiş teklif */
+/* Enes Doğanay | 15 Nisan 2026: font-size küçültüldü */
+.tender-action--accepted {
+    background: linear-gradient(135deg, #059669, #34d399);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.18);
+    cursor: default;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 8px 10px;
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Firma iletişim butonu */
+.tender-action--contact {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+    font-weight: 600;
+    font-size: 0.72rem;
+    padding: 8px 10px;
+}
+
+.tender-action--contact:hover {
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 13 Nisan 2026: Reddedilmiş teklif */
+.tender-action--rejected {
+    background: linear-gradient(135deg, #dc2626, #f87171);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.18);
+}
+
+.tender-action--rejected:hover {
+    box-shadow: 0 6px 18px rgba(220, 38, 38, 0.28);
+    transform: translateY(-1px);
+}
+
+.tender-action--detail {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.tender-action--detail:hover {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 10 Nisan 2026: Detay drawer — tek buton tam genişlik */
+.tender-action--full {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 0.92rem;
+}
+
+/* === Login prompt === */
+/* Enes Doğanay | 13 Nisan 2026: Giriş yapmamış kullanıcı için fixed login prompt */
+.tender-login-prompt {
+    position: fixed;
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 14px;
+    text-align: center;
+    background: var(--bg-white);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.08);
+    width: 210px;
+    white-space: normal;
+    animation: loginPromptFadeIn 0.15s ease;
+}
+
+@keyframes loginPromptFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tender-login-prompt__icon {
+    font-size: 28px;
+    color: #94a3b8;
+}
+
+.tender-login-prompt__text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin: 0;
+}
+
+.tender-login-prompt__btn {
+    width: 100%;
+    padding: 8px 16px;
+    background: var(--primary, #1a73e8);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.tender-login-prompt__btn:hover {
+    background: var(--primary-hover, #106ac5);
+}
+
+/* === Durum badge'leri === */
+.tender-card-status {
+    display: inline-flex;
+    align-items: center;
+    height: fit-content;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.tender-card-status-canli {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.tender-card-status-yaklasan {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.tender-card-status-kapali {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.tender-card-status-draft {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+/* === Dark mode === */
+/* Enes Doğanay | 4 Mayıs 2026: compact + cool kart dark */
+[data-theme="dark"] .tender-card__info-row:hover { background: #1e293b; }
+[data-theme="dark"] .tender-card--own {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 50%, #1a2744 100%);
+    border-color: #2563eb;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .tender-card-skeleton {
+    background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+    background-size: 200% 100%;
+}
+[data-theme="dark"] .tender-chip--type { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .tender-chip--kdv { background: #14532d; color: #86efac; }
+[data-theme="dark"] .tender-chip--location { background: #451a03; color: #fde68a; }
+
+[data-theme="dark"] .tender-card-status-canli { background: #14532d; color: #86efac; }
+[data-theme="dark"] .tender-card-status-yaklasan { background: #451a03; color: #fde68a; }
+[data-theme="dark"] .tender-card-status-kapali { background: #450a0a; color: #fca5a5; }
+[data-theme="dark"] .tender-card-status-draft { background: #1e293b; color: var(--text-muted); }
+
+/* Enes Doğanay | 4 Mayıs 2026: outline→fill butonlar dark */
+[data-theme="dark"] .tender-action--join {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #1e40af;
+}
+[data-theme="dark"] .tender-action--join:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+[data-theme="dark"] .tender-action--own-edit {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #1e40af;
+}
+[data-theme="dark"] .tender-action--own-edit:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+[data-theme="dark"] .tender-action--update:disabled { background: #334155; color: var(--text-muted); border-color: #334155; }
+[data-theme="dark"] .tender-action--own-edit:disabled { background: #334155; color: var(--text-muted); border-color: #334155; }
+[data-theme="dark"] .tender-action--firma { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }
+
+/* Enes Doğanay | 7 Mayıs 2026: TenderCard responsive */
+@media (max-width: 480px) {
+    .tender-card__title { font-size: 0.88rem; margin: 6px 12px 0; }
+    .tender-card__desc  { font-size: 0.74rem; margin: 3px 12px 0; }
+    .tender-card__chips { padding: 6px 12px 0; }
+    .tender-card__info  { margin: 6px 12px 0; }
+    .tender-card__actions { padding: 8px 12px 10px; }
+    .tender-card__info-label { min-width: 50px; }
+    .tender-action { font-size: 0.72rem; padding: 5px 10px; }
+}

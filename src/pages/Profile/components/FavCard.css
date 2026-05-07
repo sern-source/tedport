@@ -1,0 +1,414 @@
+/* Enes Dogˆanay | 6 Mayis 2026: FavCard - orijinal Profile.css'den tasindi */
+.fav-card {
+  background: var(--bg-white);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 14px 14px 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s, border-color 0.2s;
+}
+
+.fav-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(19, 127, 236, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-color: rgba(19, 127, 236, 0.2);
+}
+
+.favorites-grid .fav-card {
+  animation: cardFadeIn 0.35s ease-out both;
+}
+
+.favorites-grid .fav-card:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.favorites-grid .fav-card:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.favorites-grid .fav-card:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.favorites-grid .fav-card:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.favorites-grid .fav-card:nth-child(5) {
+  animation-delay: 0.2s;
+}
+
+.favorites-grid .fav-card:nth-child(6) {
+  animation-delay: 0.25s;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fav-menu-wrapper {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+}
+
+.fav-menu-btn {
+  background: var(--bg-light);
+  border: none;
+  border-radius: 7px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  padding: 0;
+}
+
+.fav-menu-btn:hover {
+  background: var(--border);
+}
+
+.fav-menu-btn .material-symbols-outlined {
+  font-size: 17px;
+  color: var(--text-muted);
+}
+
+.fav-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.fav-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 2;
+  min-width: 170px;
+  animation: menuSlideIn 0.15s ease-out;
+}
+
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.fav-menu-dropdown button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  font-size: 0.8rem;
+  color: var(--text-dark);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.fav-menu-dropdown button:hover {
+  background: var(--bg-light);
+}
+
+.fav-menu-dropdown button.danger {
+  color: #ef4444;
+}
+
+.fav-menu-dropdown button.danger:hover {
+  background: #fef2f2;
+}
+
+.fav-menu-dropdown button .material-symbols-outlined {
+  font-size: 16px;
+}
+
+/* Enes Do─şanay | 6 Nisan 2026: List assignment overlay */
+.fav-list-assign {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  animation: assignFadeIn 0.2s ease-out;
+}
+
+@keyframes assignFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fav-list-assign-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.fav-list-assign-header>span {
+  font-weight: 600;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.fav-list-assign-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-gray);
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  transition: background 0.15s;
+}
+
+.fav-list-assign-header button:hover {
+  background: #f1f5f9;
+}
+
+.fav-list-assign-header button .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.fav-list-assign-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.fav-list-assign-options button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: none;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.fav-list-assign-options button:hover {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.fav-list-assign-options button.active {
+  background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+  color: #1d4ed8;
+  font-weight: 600;
+  border-color: rgba(29, 78, 216, 0.15);
+}
+
+.fav-list-assign-options button .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* Enes Do─şanay | 6 Nisan 2026: List badge on card */
+.fav-meta-list {
+  background: #eff6ff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  color: #1d4ed8;
+  font-weight: 500;
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.fav-meta-list .material-symbols-outlined {
+  font-size: 13px;
+  color: #1d4ed8;
+}
+
+.fav-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  margin: 0 auto 10px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s, border-radius 0.2s;
+  position: relative;
+}
+
+.fav-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+}
+
+.fav-card:hover .fav-avatar {
+  transform: scale(1.06) rotate(-2deg);
+  border-radius: 12px;
+}
+
+/* Enes Do─şanay | 2 May─▒s 2026: Logo img fav-avatar i├ğinde */
+.fav-avatar-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.fav-body {
+  flex: 1;
+}
+
+.fav-name {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fav-name-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.fav-meta {
+  color: var(--text-gray);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.fav-meta .material-symbols-outlined {
+  font-size: 13px;
+}
+
+.fav-meta-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* NOTE */
+/* Enes Do─şanay | 4 May─▒s 2026: FirmaDetay compact ile e┼şle┼ştirildi */
+.note-editing,
+.note-display {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fffdf8 0%, #fffaf1 100%);
+  border: 1px solid rgba(232, 220, 192, 0.86);
+  border-radius: 11px;
+  padding: 9px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+/* Enes Do─şanay | 6 Nisan 2026: Profil favori not kutularina firma detayla uyumlu ince vurgu seridi eklendi */
+.note-editing::before,
+.note-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #d4a34d 0%, #f2d08d 42%, rgba(247, 239, 224, 0.12) 100%);
+}
+
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.note-header .material-symbols-outlined {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #b7791f;
+  background: rgba(249, 221, 167, 0.32);
+}
+
+.note-header-label {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  color: #9a6b1f;
+}
+
+.note-display .note-header {
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.note-display .note-header-label {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-display .note-header-label .material-symbols-outlined {
+  font-size: 12px;
+}
+

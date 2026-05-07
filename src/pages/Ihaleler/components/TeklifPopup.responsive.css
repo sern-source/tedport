@@ -1,0 +1,31 @@
+﻿@media (max-width: 720px) {
+    .teklif-popup { border-radius: 20px 20px 0 0; max-height: 95vh; }
+    .teklif-popup__head,
+    .teklif-popup__body,
+    .teklif-popup__footer { padding-left: 18px; padding-right: 18px; }
+    .teklif-popup__summary-strip { flex-direction: column; }
+
+    /* Enes Doğanay | 14 Nisan 2026: Responsive — para birimi sütunu gizle */
+    .teklif-kalem-table__head,
+    .teklif-kalem-table__row {
+        grid-template-columns: 28px 1fr 60px 80px;
+    }
+    .teklif-kalem-col--toplam { display: none; }
+    .teklif-kalem-col--currency { display: none; }
+
+    .teklif-popup__footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .teklif-popup__footer-total {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .teklif-popup__footer-actions {
+        flex-direction: column;
+    }
+    .teklif-btn { width: 100%; justify-content: center; }
+}
+

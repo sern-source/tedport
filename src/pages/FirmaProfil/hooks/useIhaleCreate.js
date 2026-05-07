@@ -1,0 +1,92 @@
+﻿// Enes Doğanay | 7 Mayıs 2026: İhale oluşturma koordinatör — state, modal açıcılar, flat adapters
+import { useState, useRef, useCallback } from 'react';
+import * as ihaleService from '../services/ihaleService';
+import { CREATE_EMPTY_FORM } from '../constants/ihaleConstants';
+import { useIhaleCreateHandlers } from './useIhaleCreateHandlers';
+
+const useIhaleCreate = ({ companyId, reloadTenders }) => {
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [editTenderId, setEditTenderId] = useState(null);
+    const [createForm, setCreateForm] = useState(CREATE_EMPTY_FORM);
+    const [stepperState, setStepperState] = useState({ step: 0, error: '', saving: false });
+    const [createReqState, setCreateReqState] = useState({ madde: '', aciklama: '' });
+    const [emailState, setEmailState] = useState({ input: '', status: null });
+    const [firmaState, setFirmaState] = useState({ term: '', results: [], searching: false });
+    const [publishState, setPublishState] = useState({ verifiedUser: false, successId: null, linkCopied: false, refNoCopied: false });
+
+    const createFileInputRef = useRef(null);
+    const createFirmaResultsRef = useRef(null);
+
+    const handlers = useIhaleCreateHandlers({
+        companyId, createForm, setCreateForm, emailState, setEmailState,
+        firmaState, setFirmaState, createReqState, setCreateReqState,
+        setStepperState, createFileInputRef, createFirmaResultsRef,
+        editTenderId, setEditTenderId, setShowCreateModal, reloadTenders, setPublishState,
+    });
+
+    const resetFormState = useCallback((refNo, isVerified) => {
+        setStepperState({ step: 0, error: '', saving: false });
+        setCreateReqState({ madde: '', aciklama: '' });
+        setEmailState({ input: '', status: null });
+        setFirmaState({ term: '', results: [], searching: false });
+        setPublishState(p => ({ ...p, verifiedUser: isVerified }));
+        return refNo;
+    }, []);
+
+    const openCreateModal = useCallback(async () => {
+        const result = await ihaleService.generateRefNo(companyId).catch(() => ({ refNo: `TED-${Date.now()}`, isVerified: false }));
+        const todayStr = new Date().toISOString().split('T')[0];
+        const twoWeeks = new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0];
+        setEditTenderId(null);
+        setCreateForm({ ...CREATE_EMPTY_FORM, referans_no: resetFormState(result.refNo, result.isVerified), yayin_tarihi: todayStr, son_basvuru_tarihi: twoWeeks, teslim_suresi: '14' });
+        setShowCreateModal(true);
+    }, [companyId, resetFormState]);
+
+    const openEditInCreateModal = useCallback(async (tender) => {
+        const result = await ihaleService.generateRefNo(companyId).catch(() => ({ refNo: '', isVerified: false }));
+        setEditTenderId(tender.id);
+        setCreateForm({ baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: tender.yayin_tarihi || '', son_basvuru_tarihi: tender.son_basvuru_tarihi || '', teslim_suresi: tender.teslim_suresi ? String(tender.teslim_suresi) : '', durum: tender.durum || 'canli', referans_no: resetFormState(tender.referans_no || '', result.isVerified), teslim_il: tender.teslim_il || '', teslim_ilce: tender.teslim_ilce || '', gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: Array.isArray(tender.ek_dosyalar) ? tender.ek_dosyalar.filter(f => f && f.name) : [] });
+        setShowCreateModal(true);
+    }, [companyId, resetFormState]);
+
+    const openRepeatModal = useCallback(async (tender) => {
+        const result = await ihaleService.generateRefNo(companyId).catch(() => ({ refNo: `TED-${Date.now()}`, isVerified: false }));
+        const todayStr = new Date().toISOString().split('T')[0];
+        const thirtyDays = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+        setEditTenderId(null);
+        setCreateForm({ ...CREATE_EMPTY_FORM, baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: todayStr, son_basvuru_tarihi: thirtyDays, teslim_suresi: tender.teslim_suresi ? String(tender.teslim_suresi) : '', teslim_il: tender.teslim_il || '', teslim_ilce: tender.teslim_ilce || '', referans_no: resetFormState(result.refNo, result.isVerified), gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [] });
+        setShowCreateModal(true);
+    }, [companyId, resetFormState]);
+
+    // Enes Doğanay | 7 Mayıs 2026: IhaleFormModal flat adapter'lar
+    const showModal = showCreateModal;
+    const editingTender = editTenderId ? { id: editTenderId } : null;
+    const form = createForm; const setForm = setCreateForm;
+    const formSaving = stepperState.saving; const formError = stepperState.error;
+    const setFormError = (err) => setStepperState(p => ({ ...p, error: err }));
+    const stepperStep = stepperState.step;
+    const setStepperStep = (valOrFn) => setStepperState(p => ({ ...p, step: typeof valOrFn === 'function' ? valOrFn(p.step) : valOrFn, error: '' }));
+    const yeniGereksinimMadde = createReqState.madde; const setYeniGereksinimMadde = (val) => setCreateReqState(p => ({ ...p, madde: val }));
+    const yeniGereksinimAciklama = createReqState.aciklama; const setYeniGereksinimAciklama = (val) => setCreateReqState(p => ({ ...p, aciklama: val }));
+    const emailInput = emailState.input; const emailStatus = emailState.status;
+    const firmaSearchTerm = firmaState.term; const firmaSearchResults = firmaState.results; const firmaSearching = firmaState.searching;
+    const fileInputRef = createFileInputRef; const firmaResultsRef = createFirmaResultsRef;
+    const isVerifiedUser = publishState.verifiedUser;
+    const refNoCopied = publishState.refNoCopied; const setRefNoCopied = (val) => setPublishState(p => ({ ...p, refNoCopied: val }));
+    const handleFormSubmit = (_e, forceDurum) => handlers.handleCreateFormSubmit(forceDurum);
+
+    return {
+        showCreateModal, setShowCreateModal, editTenderId,
+        createForm, stepperState, publishState, setPublishState,
+        openCreateModal, openEditInCreateModal, openRepeatModal,
+        showModal, editingTender, form, setForm,
+        formSaving, formError, setFormError, stepperStep, setStepperStep,
+        yeniGereksinimMadde, setYeniGereksinimMadde, yeniGereksinimAciklama, setYeniGereksinimAciklama,
+        emailInput, emailStatus, firmaSearchTerm, firmaSearchResults, firmaSearching,
+        fileInputRef, firmaResultsRef, isVerifiedUser, refNoCopied, setRefNoCopied,
+        handleFormSubmit,
+        ...handlers,
+    };
+};
+
+export default useIhaleCreate;

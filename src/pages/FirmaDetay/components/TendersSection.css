@@ -1,0 +1,369 @@
+/* Enes Doganay | 6 Mayis 2026: TendersSection bilesen stilleri */
+/* ========== TENDER/-�HALE STYLES-� ========== */
+/* Enes Do-sanay | 4 Nisan 2026: Firma ihalelerini listelemek i+gin stiller */
+.tenders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Enes Do-sanay | 4 May-�s 2026: Kompakt tek sat-�r ihale kart-� */
+.tender-item {
+  padding: 11px 16px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.tender-item:last-child { border-bottom: none; }
+
+.tender-item:hover { background: var(--bg-hover, #f8fafc); }
+
+.tender-item--clickable { cursor: pointer; }
+.tender-item--clickable:hover .tender-item-title { color: var(--primary, #137fec); }
+
+.tender-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tender-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.tender-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tender-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.tender-item-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.tender-item-date .material-symbols-outlined { font-size: 0.9rem; }
+.tender-item-desc {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tender-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tender-status {
+  display: inline-flex;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Enes Do-sanay | 6 Nisan 2026: T++rk+ge karakterler ASCII'ye d+�n+++st++r++ld++ (canl-����canli, yakla+san���yaklasan, kapal-����kapali) */
+.tender-status-canli {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.tender-status-yaklasan {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.tender-status-kapali {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Tenders Section */
+.tenders-section {
+  margin-top: 1.5rem;
+}
+
+.firma-tenders-gate {
+  position: relative;
+}
+
+.firma-tenders-gate .tenders-blurred-content {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.firma-tenders-gate .tenders-blur-overlay {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  margin-bottom: -60px;
+}
+
+.firma-tenders-gate .tenders-blur-cta {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  max-width: 420px;
+}
+
+.firma-tenders-gate .tenders-blur-cta .material-symbols-outlined {
+  font-size: 40px;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.firma-tenders-gate .tenders-blur-cta h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 6px;
+}
+
+.firma-tenders-gate .tenders-blur-cta p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0 0 16px;
+}
+
+.firma-tenders-gate .tenders-blur-login-btn {
+  display: inline-block;
+  padding: 10px 32px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.firma-tenders-gate .tenders-blur-login-btn:hover {
+  background: #2563eb;
+}
+
+.firma-tenders-gate .tenders-blur-register {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.firma-tenders-gate .tenders-blur-register button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.tenders-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Enes Do-sanay | 6 Nisan 2026: Firma detay ihale bloguna liste sayfasina gecis baglantisi eklendi */
+.tenders-section-link {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.84rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.tenders-section-link .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.tender-info {
+  flex: 1;
+}
+
+.tender-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.tender-desc {
+  margin: 0 0 0.75rem 0;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.tender-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.tender-date-icon {
+  font-size: 18px;
+}
+
+.tender-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tender-meta-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.tenders-empty-state-inline {
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px dashed var(--border);
+  background: var(--bg-white);
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* Enes Do-sanay | 4 May-�s 2026: -�hale listesi geni+slet/daralt butonu */
+.tenders-show-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  border: 1.5px dashed var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tenders-show-more-btn:hover {
+  background: var(--bg-hover, #f8fafc);
+  color: var(--primary, #2563eb);
+  border-color: var(--primary, #2563eb);
+}
+.tenders-show-more-btn .material-symbols-outlined { font-size: 1.1rem; }
+[data-theme="dark"] .tenders-show-more-btn:hover { background: rgba(255,255,255,0.05); }
+
+.tenders-list-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tender-item-skeleton {
+  min-height: 128px;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #eef2f7 0%, #f8fafc 50%, #eef2f7 100%);
+  background-size: 200% 100%;
+  animation: tenderSkeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes tenderSkeleton {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* -- Dark Mode -- */
+/* Tender status badges ��� semantik, dark'ta koyu ton */
+[data-theme="dark"] .tender-status-canli {
+  background: #14291e;
+  color: #4ade80;
+  border-color: #166534;
+}
+
+[data-theme="dark"] .tender-status-yaklasan {
+  background: #292007;
+  color: #fbbf24;
+  border-color: #92400e;
+}
+
+[data-theme="dark"] .tender-status-kapali {
+  background: #2d1010;
+  color: #f87171;
+  border-color: #991b1b;
+}
+
+/* Tender meta chip (mavi) */
+[data-theme="dark"] .tender-meta-chip {
+  background: #1e2d4a;
+  color: #93c5fd;
+}
+
+/* Tender skeleton */
+[data-theme="dark"] .tender-item { background: var(--bg-white); }
+[data-theme="dark"] .tender-item:hover { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .tender-item-title { color: #e2e8f0; }
+[data-theme="dark"] .tender-item-skeleton {
+  background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+  background-size: 200% 100%;
+}
+
+/* Tenders blur CTA */
+[data-theme="dark"] .firma-tenders-gate .tenders-blur-cta {
+  background: rgba(30, 41, 59, 0.97);
+  border-color: var(--border);
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: TendersSection responsive */
+@media (max-width: 480px) {
+  .tender-item-row { flex-wrap: wrap; gap: 6px; }
+  .tender-item-right { flex-wrap: wrap; }
+  .tender-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+}

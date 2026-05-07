@@ -1,0 +1,132 @@
+/* Enes Doğanay | 6 Mayıs 2026: Filtre sidebar — şehir, sektör, kategori filtreleri, dark mode */
+
+.sidebar {
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  min-width: 100%;
+  min-height: auto;
+}
+
+.sidebar.sidebar-mobile-open {
+  display: flex;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    display: flex;
+    width: auto;
+    margin-bottom: 0;
+    gap: 1rem;
+    min-width: auto;
+  }
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h3 { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); }
+
+.clear-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── Details / Summary ────────────────────────────────────────────────── */
+.filter-group { display: flex; flex-direction: column; gap: 0.6rem; }
+
+details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-white);
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-light);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.78rem;
+  list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary .material-symbols-outlined { font-size: 18px; color: var(--text-muted); }
+details[open] summary .material-symbols-outlined { transform: rotate(180deg); }
+
+.filter-content {
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.filter-content::-webkit-scrollbar { width: 6px; }
+.filter-content::-webkit-scrollbar-track { background: var(--bg-light); border-radius: 3px; }
+.filter-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.filter-content::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+
+.filter-content label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-dark);
+  cursor: pointer;
+  padding: 3px;
+}
+
+.filter-content input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--primary); cursor: pointer; }
+
+.filter-search-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  box-sizing: border-box;
+  background: var(--bg-white);
+  color: var(--text-dark);
+  font-family: inherit;
+}
+.filter-search-input:focus { outline: none; border-color: var(--primary); }
+
+.filter-show-more-btn {
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: background 0.2s;
+  font-family: inherit;
+}
+.filter-show-more-btn:hover { background: var(--border); }
+
+/* ── Dark mode ────────────────────────────────────────────────────────── */
+[data-theme="dark"] details { background: var(--bg-card, #1e293b); }
+[data-theme="dark"] summary { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .filter-search-input { background: var(--bg-card, #1e293b); }

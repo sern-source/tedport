@@ -1,0 +1,557 @@
+/* ===============================================================
+   Enes Do�anay | 2 May�s 2026: TenderOffersManagement.css dark mode
+   =============================================================== */
+
+[data-theme="dark"] .tom-screen {
+  background: #0f172a;
+}
+
+/* Sidebar */
+[data-theme="dark"] .tom-sidebar {
+  background: #1e293b;
+  border-right-color: #334155;
+}
+
+[data-theme="dark"] .tom-sidebar__head {
+  border-bottom-color: #1e293b;
+}
+
+[data-theme="dark"] .tom-sidebar__head h2 {
+  color: var(--text-dark);
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Compact add button dark — daima mavi */
+[data-theme="dark"] .tom-sidebar__add-btn {
+  background: rgba(37,99,235,0.15);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+[data-theme="dark"] .tom-sidebar__add-btn:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(37,99,235,0.35);
+}
+
+[data-theme="dark"] .tom-sidebar__search {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-sidebar__search input {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-sidebar__list::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+[data-theme="dark"] .tom-tender-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-tender-card:hover {
+  background: #253347;
+  border-color: #3b9eff;
+}
+
+[data-theme="dark"] .tom-tender-card--active {
+  background: rgba(59, 158, 255, 0.13);
+  border-color: #3b9eff;
+  box-shadow: inset 0 0 0 1px #3b9eff, 0 4px 20px rgba(59, 158, 255, 0.25);
+}
+
+[data-theme="dark"] .tom-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-pill:hover {
+  background: #1e293b;
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+/* Enes Do�anay | 2 May�s 2026: Se�ili pill dark modda belirgin olsun */
+[data-theme="dark"] .tom-pill--on {
+  background: linear-gradient(135deg, #3b9eff, #2563eb);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 158, 255, 0.4);
+}
+
+/* Main area */
+[data-theme="dark"] .tom-main {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .tom-info-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__toggle {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__toggle:hover {
+  background: #253347;
+}
+
+[data-theme="dark"] .tom-info-card__title-row h2 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-info-card__chevron {
+  background: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-info-card__desc {
+  color: #94a3b8;
+  border-left-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__files {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-card__files h4 {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-info-cell {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-info-cell:hover {
+  background: #1a2f4e;
+  border-color: #3b9eff;
+}
+
+[data-theme="dark"] .tom-info-cell .material-symbols-outlined {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .tom-info-cell small {
+  color: #64748b;
+}
+
+[data-theme="dark"] .tom-info-cell strong {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-tag {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-info-card__file-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-info-card__file-btn:hover {
+  background: rgba(59, 158, 255, 0.1);
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+/* Offers section */
+[data-theme="dark"] .tom-offers-section {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .tom-offers-toolbar {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .tom-btn-icon {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-btn-icon:hover {
+  border-color: #3b9eff;
+  color: #93c5fd;
+  background: rgba(59, 158, 255, 0.08);
+}
+
+[data-theme="dark"] .tom-sort-trigger {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-sort-label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .tom-sort-menu {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .tom-sort-option {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-sort-option:hover {
+  background: #0f172a;
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .tom-sort-option.active {
+  background: rgba(59, 158, 255, 0.1);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-chip {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-chip:hover {
+  border-color: #3b9eff;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .tom-score-panel {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+/* Enes Do�anay | 4 May�s 2026: Puanlama paneli i�i yaz�lar */
+[data-theme="dark"] .tom-score-panel__head h4 {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .tom-score-panel__head p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-slider-row__label span {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .tom-slider-row__label strong {
+  color: #e2e8f0;
+}
+
+/* ===================================================
+   BO� STATE
+   =================================================== */
+/* Enes Do�anay | 7 May�s 2026: Hen�z teklif yok � styled empty state */
+.tom-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 48px 24px;
+    text-align: center;
+    background: var(--bg-white);
+    border-radius: 16px;
+    border: 1.5px dashed var(--border);
+}
+
+.tom-empty-state .material-symbols-outlined {
+    font-size: 44px;
+    color: #cbd5e1;
+}
+
+.tom-empty-state h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.tom-empty-state p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    max-width: 320px;
+    line-height: 1.6;
+}
+
+[data-theme="dark"] .tom-empty-state {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .tom-empty-state .material-symbols-outlined {
+    color: #475569;
+}
+
+[data-theme="dark"] .tom-empty-state h3 {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .tom-empty-state p {
+    color: #64748b;
+}
+
+/* Enes Do�anay | 7 May�s 2026: Filtre bo� state � inline, compact, cool */
+.tom-filter-empty {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    margin-bottom: 8px;
+    background: var(--bg-white);
+    border: 1.5px dashed #e2e8f0;
+    border-radius: 14px;
+    animation: tomSlideIn 0.22s ease;
+}
+
+.tom-filter-empty__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+.tom-filter-empty__icon .material-symbols-outlined { font-size: 22px; }
+
+.tom-filter-empty__body { flex: 1; }
+
+.tom-filter-empty__body h4 {
+    margin: 0 0 3px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tom-filter-empty__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px 2px 5px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.tom-filter-empty__chip .material-symbols-outlined { font-size: 14px; }
+
+.tom-filter-empty__body p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.tom-filter-empty__reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 9px;
+    border: 1.5px solid #e2e8f0;
+    background: var(--bg-white);
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.tom-filter-empty__reset:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #eff6ff;
+    transform: translateY(-1px);
+}
+
+.tom-filter-empty__reset .material-symbols-outlined { font-size: 16px; }
+
+@media (max-width: 600px) {
+    .tom-filter-empty { flex-wrap: wrap; gap: 10px; }
+    .tom-filter-empty__reset { width: 100%; justify-content: center; }
+}
+
+[data-theme="dark"] .tom-filter-empty {
+    background: #1e293b;
+    border-color: #334155;
+}
+[data-theme="dark"] .tom-filter-empty__icon { background: #0f172a; color: #475569; }
+[data-theme="dark"] .tom-filter-empty__body h4 { color: #e2e8f0; }
+[data-theme="dark"] .tom-filter-empty__chip { background: #0f172a; border-color: #334155; color: #64748b; }
+[data-theme="dark"] .tom-filter-empty__body p { color: #475569; }
+[data-theme="dark"] .tom-filter-empty__reset { background: #1e293b; border-color: #334155; color: #94a3b8; }
+[data-theme="dark"] .tom-filter-empty__reset:hover { border-color: #3b82f6; color: #60a5fa; background: #172554; }
+
+/* ===================================================
+   KAR�ILA�TIRMA TABLOSU � eksik class'lar
+   =================================================== */
+/* Enes Do�anay | 7 May�s 2026: Kar��la�t�rma kapat butonu */
+.tom-compare__clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(124,58,237,0.25);
+    background: #ffffff;
+    color: #7c3aed;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.tom-compare__clear:hover {
+    background: #f5f3ff;
+    border-color: #a78bfa;
+}
+
+.tom-compare__clear .material-symbols-outlined {
+    font-size: 17px;
+}
+
+[data-theme="dark"] .tom-compare__clear {
+    background: #1e293b;
+    color: #a78bfa;
+    border-color: rgba(167,139,250,0.3);
+}
+
+[data-theme="dark"] .tom-compare__clear:hover {
+    background: #6d28d9;
+    border-color: #6d28d9;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(109,40,217,0.35);
+}
+
+/* Enes Do�anay | 7 May�s 2026: Tablo sar�c� � yatay kayd�rma */
+.tom-compare__table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Enes Do�anay | 7 May�s 2026: Kar��la�t�rma HTML table stilleri */
+.tom-compare__tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.tom-compare__tbl thead tr {
+    border-bottom: 2px solid rgba(167,139,250,0.25);
+    background: #fafafa;
+}
+
+.tom-compare__tbl th {
+    padding: 10px 14px 8px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.tom-compare__tbl th:first-child {
+    width: 110px;
+    color: #475569;
+}
+
+.tom-compare__tbl tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+}
+
+.tom-compare__tbl tbody tr:last-child {
+    border-bottom: none;
+}
+
+.tom-compare__tbl tbody tr:hover {
+    background: #f8fafc;
+}
+
+.tom-compare__tbl td {
+    padding: 9px 14px;
+    vertical-align: top;
+    color: var(--text-dark);
+}
+
+.tom-compare__tbl td:first-child {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+/* Enes Do�anay | 7 May�s 2026: En iyi de�er h�cresi */
+.tom-compare__tbl td.tom-compare__best {
+    background: rgba(220,252,231,0.55);
+    font-weight: 700;
+    color: #15803d;
+}
+
+.tom-compare__tbl td.tom-compare__best strong {
+    color: #15803d;
+}
+
+/* Enes Do�anay | 7 May�s 2026: Ba�l�k h�cresindeki �irket ad� */
+.tom-compare__company {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 3px;
+}
+
+[data-theme="dark"] .tom-compare__tbl thead tr {
+    background: #1e293b;
+    border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-compare__tbl th {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .tom-compare__tbl tbody tr {
+    border-bottom-color: #1e293b;
+}
+
+[data-theme="dark"] .tom-compare__tbl tbody tr:hover {
+    background: #1a2538;
+}
+
+[data-theme="dark"] .tom-compare__tbl td {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .tom-compare__tbl td:first-child {
+    color: #64748b;
+}
+
+[data-theme="dark"] .tom-compare__tbl td.tom-compare__best {
+    background: rgba(22,101,52,0.2);
+    color: #86efac;
+}
+
+[data-theme="dark"] .tom-compare__company {
+    color: #e2e8f0;
+}
+

@@ -1,0 +1,348 @@
+/* Enes Do─şanay | 10 Nisan 2026: Hat─▒rlatma kartlar─▒ cool redesign */
+.upcoming-reminder-card,
+.notification-feed-card {
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.upcoming-reminder-card {
+  border-color: rgba(245, 158, 11, 0.15);
+  background: linear-gradient(180deg, #ffffff 0%, #fffcf5 100%);
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.06);
+}
+
+.upcoming-reminder-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+/* Enes Do─şanay | 9 Nisan 2026: T─▒klanabilir bildirim kart─▒ hover efekti */
+.notification-feed-card.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+.upcoming-reminder-card.overdue {
+  border-color: rgba(239, 68, 68, 0.15);
+  background: linear-gradient(180deg, #ffffff 0%, #fff8f8 100%);
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.06);
+}
+
+.upcoming-reminder-card.overdue:hover {
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.upcoming-reminder-top,
+.notification-feed-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.upcoming-reminder-time,
+.notification-feed-time,
+.notification-feed-type,
+.upcoming-reminder-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.upcoming-reminder-time {
+  background: linear-gradient(135deg, rgba(255, 244, 219, 0.95), rgba(254, 235, 200, 0.9));
+  color: #92400e;
+  padding: 4px 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 1px 3px rgba(146, 64, 14, 0.08);
+}
+
+.upcoming-reminder-badge {
+  background: linear-gradient(135deg, #dbeafe, #c7d2fe);
+  color: #3730a3;
+  padding: 4px 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 1px 3px rgba(55, 48, 163, 0.08);
+}
+
+.upcoming-reminder-time.overdue {
+  background: linear-gradient(135deg, rgba(254, 226, 226, 0.95), rgba(254, 202, 202, 0.9));
+  color: #991b1b;
+  box-shadow: 0 1px 3px rgba(153, 27, 27, 0.08);
+}
+
+.upcoming-reminder-badge.overdue {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #b91c1c;
+  box-shadow: 0 1px 3px rgba(185, 28, 28, 0.08);
+}
+
+.upcoming-reminder-card h4,
+.notification-feed-card h4 {
+  margin: 0 0 2px;
+  color: #0f172a;
+  font-size: 0.79rem;
+}
+
+.upcoming-reminder-card h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.upcoming-reminder-card p,
+.notification-feed-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.upcoming-reminder-card p {
+  color: #78716c;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.upcoming-reminder-link,
+.notification-read-btn,
+.notification-open-btn {
+  margin-top: 6px;
+  border: none;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.25s ease;
+}
+
+.upcoming-reminder-link {
+  background: rgba(245, 158, 11, 0.08);
+  color: #b45309;
+  padding: 5px 11px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 20px;
+  border: 1px solid rgba(245, 158, 11, 0.18);
+  letter-spacing: 0.2px;
+}
+
+.upcoming-reminder-link .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.upcoming-reminder-card.overdue .upcoming-reminder-link {
+  background: rgba(239, 68, 68, 0.06);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.upcoming-reminder-card.overdue .upcoming-reminder-link:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.28);
+}
+
+.notification-open-btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.notification-read-btn {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.upcoming-reminder-link:hover {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.3);
+  transform: translateY(-1px);
+}
+
+.notification-read-btn:hover,
+.notification-open-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.overdue-reminders-block {
+  margin-top: 10px;
+}
+
+/* Enes Do─şanay | 10 Nisan 2026: Hat─▒rlat─▒c─▒ kart aksiyon sat─▒r─▒ + sil butonu */
+.upcoming-reminder-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.reminder-delete-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  margin-left: auto;
+}
+
+.reminder-delete-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.reminder-delete-btn:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+/* Enes Do─şanay | 10 Nisan 2026: Hat─▒rlat─▒c─▒ inline silme onay─▒ */
+.reminder-inline-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  animation: inlineConfirmFade 0.2s ease-out;
+}
+
+@keyframes inlineConfirmFade {
+  from { opacity: 0; transform: translateX(6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.reminder-inline-confirm-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.reminder-inline-confirm-cancel,
+.reminder-inline-confirm-yes {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reminder-inline-confirm-cancel .material-symbols-outlined,
+.reminder-inline-confirm-yes .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.reminder-inline-confirm-cancel {
+  color: #94a3b8;
+}
+
+.reminder-inline-confirm-cancel:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.reminder-inline-confirm-yes {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+.reminder-inline-confirm-yes:hover {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+.notification-feed-card.unread {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: linear-gradient(135deg, #f0f7ff 0%, #f8faff 100%);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+  border-left: 3px solid #3b82f6;
+}
+
+.notification-feed-card.unread h4 {
+  color: #1e40af;
+  font-weight: 700;
+}
+
+.notification-feed-card.unread .notification-feed-type {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.notification-feed-type {
+  background: rgba(219, 234, 254, 0.9);
+  color: #1d4ed8;
+  margin-bottom: 4px;
+}
+
+.notification-feed-time {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+/* Enes Do─şanay | 10 Nisan 2026: Bildirim silme butonu sa─şa hizal─▒ */
+.notification-feed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Enes Do─şanay | 10 Nisan 2026: Tekil bildirim silme butonu ÔÇö sa─şa yasla */
+.notification-delete-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  margin-top: 2px;
+  margin-left: auto;
+}
+
+.notification-delete-btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.notification-delete-btn:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+

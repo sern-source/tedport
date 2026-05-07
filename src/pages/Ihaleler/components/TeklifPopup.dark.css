@@ -1,0 +1,107 @@
+﻿[data-theme="dark"] .teklif-popup { background: var(--bg-white); }
+[data-theme="dark"] .teklif-popup__head { background: linear-gradient(180deg, var(--bg-light), var(--bg-white)); }
+[data-theme="dark"] .teklif-popup__head-icon { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .teklif-popup__close { background: var(--bg-light); }
+[data-theme="dark"] .teklif-popup__close:hover { background: var(--border); }
+[data-theme="dark"] .teklif-popup__summary-item { background: var(--bg-light); border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-table { border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-table__head { background: var(--bg-light); border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-table__row { border-bottom-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-input { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }
+[data-theme="dark"] .teklif-kalem-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+[data-theme="dark"] .teklif-kalem-table__footer {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a3328 100%);
+    border-top-color: rgba(59, 130, 246, 0.2);
+}
+[data-theme="dark"] .teklif-popup__footer { background: var(--bg-light); border-top-color: var(--border); }
+[data-theme="dark"] .teklif-btn--draft { background: var(--bg-white); border-color: var(--border); color: var(--text-dark); }
+[data-theme="dark"] .teklif-btn--draft:hover { background: var(--bg-light); }
+[data-theme="dark"] .teklif-btn--withdraw { background: #450a0a; color: #f87171; border-color: #7f1d1d; }
+[data-theme="dark"] .teklif-btn--withdraw:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+[data-theme="dark"] .teklif-btn--submit { background: #1e3a5f; color: #93c5fd; border-color: #1e40af; }
+[data-theme="dark"] .teklif-btn--submit:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
+[data-theme="dark"] .teklif-popup__file-upload {
+    background: linear-gradient(160deg, #1e293b 0%, rgba(37, 99, 235, 0.04) 100%);
+    border-color: #334155;
+}
+[data-theme="dark"] .teklif-popup__file-upload .material-symbols-outlined {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
+}
+[data-theme="dark"] .teklif-popup__file-upload:hover {
+    border-color: #2563eb;
+    background: linear-gradient(160deg, #1e3a5f 0%, rgba(37, 99, 235, 0.1) 100%);
+    color: #93c5fd;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+}
+[data-theme="dark"] .teklif-popup__file-upload:hover .material-symbols-outlined {
+    background: rgba(96, 165, 250, 0.2);
+}
+[data-theme="dark"] .teklif-popup__section h3 .material-symbols-outlined {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
+}
+[data-theme="dark"] .teklif-popup__file-chip { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .teklif-popup__file-chip button { background: rgba(96, 165, 250, 0.1); color: #93c5fd; }
+[data-theme="dark"] .teklif-popup__file-chip button:hover { background: rgba(96, 165, 250, 0.2); }
+[data-theme="dark"] .teklif-btn--delete-draft {
+    background: var(--bg-white);
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+[data-theme="dark"] .teklif-btn--delete-draft:hover { background: #450a0a; border-color: #f87171; }
+[data-theme="dark"] .teklif-currency-modal__symbol { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .teklif-currency-modal { background: var(--bg-white); }
+[data-theme="dark"] .teklif-currency-modal__head { border-bottom-color: var(--border); }
+[data-theme="dark"] .teklif-currency-modal__search { border-bottom-color: var(--border); background: var(--bg-light); }
+[data-theme="dark"] .teklif-currency-modal__search input { color: var(--text-dark); background: transparent; }
+[data-theme="dark"] .teklif-currency-modal__item:hover { background: var(--bg-light); }
+[data-theme="dark"] .teklif-popup__amount-input { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }
+
+/* === Firma iletisim dark mode === */
+[data-theme="dark"] .firma-contact-row:hover {
+    background: #1e3a5f;
+    border-color: #2563eb;
+}
+[data-theme="dark"] .firma-contact-card__close:hover { background: var(--bg-light); }
+
+/* Enes Doğanay | 7 Mayıs 2026: eksik dark mode sınıfları */
+[data-theme="dark"] .teklif-popup__body { background: #0f172a; }
+[data-theme="dark"] .teklif-popup__head h2 { color: #e2e8f0; }
+[data-theme="dark"] .teklif-popup__tender-name { color: #f1f5f9; }
+[data-theme="dark"] .teklif-popup__tender-firma { color: #94a3b8; }
+[data-theme="dark"] .teklif-popup__ref { color: #64748b; }
+
+[data-theme="dark"] .teklif-popup__summary-strip { background: #0f172a; border-bottom-color: #334155; }
+[data-theme="dark"] .teklif-popup__summary-item strong { color: #e2e8f0; }
+[data-theme="dark"] .teklif-popup__summary-item span { color: #64748b; }
+
+[data-theme="dark"] .teklif-popup__section h3 { color: #e2e8f0; }
+[data-theme="dark"] .teklif-kalem-col--madde strong { color: #e2e8f0; }
+[data-theme="dark"] .teklif-kalem-table__footer span { color: #64748b; }
+[data-theme="dark"] .teklif-kalem-table__footer strong { color: #e2e8f0; }
+[data-theme="dark"] .teklif-kalem-table__footer-totals strong { color: #e2e8f0; }
+
+[data-theme="dark"] .firma-contact-card { background: #1e293b; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
+[data-theme="dark"] .firma-contact-card__avatar { background: #0f172a; border-color: #334155; }
+[data-theme="dark"] .firma-contact-card h3 { color: #e2e8f0; }
+[data-theme="dark"] .firma-contact-card__name { color: #94a3b8; }
+[data-theme="dark"] .firma-contact-row { border-bottom-color: #334155; }
+[data-theme="dark"] .firma-contact-row .material-symbols-outlined { color: #64748b; }
+[data-theme="dark"] .firma-contact-row small { color: #475569; }
+[data-theme="dark"] .firma-contact-row span:not(.material-symbols-outlined) { color: #e2e8f0; }
+[data-theme="dark"] .firma-contact-card__empty { color: #475569; }
+
+[data-theme="dark"] .teklif-popup__inline-field label { color: #94a3b8; }
+[data-theme="dark"] .teklif-popup__inline-field input { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .teklif-popup__inline-field input:focus { border-color: #3b9eff; }
+
+[data-theme="dark"] .teklif-popup__toggle-slider { background: #334155; }
+[data-theme="dark"] .teklif-popup__file-upload small { color: #475569; }
+[data-theme="dark"] .teklif-popup__textarea { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .teklif-popup__textarea:focus { border-color: #3b9eff; }
+[data-theme="dark"] .teklif-popup__error { background: rgba(127,29,29,0.2); border-color: rgba(248,113,113,0.25); color: #fca5a5; }
+[data-theme="dark"] .teklif-popup__error .material-symbols-outlined { color: #f87171; }
+[data-theme="dark"] .teklif-popup__footer-total span { color: #64748b; }
+[data-theme="dark"] .teklif-popup__footer-total strong { color: #e2e8f0; }
+[data-theme="dark"] .teklif-popup-overlay { background: rgba(0,0,0,0.65); }

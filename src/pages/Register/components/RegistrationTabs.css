@@ -1,0 +1,47 @@
+/* Enes Doğanay | 6 Mayıs 2026: Kayıt türü sekme butonları */
+.tabs-container {
+  padding: 6px 20px 0;
+}
+
+.tabs {
+  display: flex;
+  background-color: #f0f2f4;
+  border-radius: 8px;
+  padding: 3px;
+  height: 34px;
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-gray);
+  font-size: 0.78rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background-color: var(--bg-white);
+  color: var(--text-dark);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Mobil ────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .tabs-container { padding: 6px 14px 0; }
+}
+
+/* ── Dark mode ────────────────────────────────────────────────────────── */
+[data-theme="dark"] .tabs { background-color: #0f172a; }
+
+[data-theme="dark"] .tab-btn { color: #94a3b8; }
+
+[data-theme="dark"] .tab-btn.active {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}

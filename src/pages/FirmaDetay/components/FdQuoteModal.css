@@ -1,0 +1,261 @@
+﻿/* Enes Doğanay | 6 Mayıs 2026: FdQuoteModal bileşen stilleri */
+/* Enes Do─şanay | 7 Nisan 2026: Teklif ─░ste popup modal stilleri */
+
+.quote-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: 1rem;
+  animation: quoteOverlayIn 0.2s ease;
+}
+
+@keyframes quoteOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes quoteModalIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.quote-modal {
+  background: var(--bg-white);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18), 0 4px 16px rgba(15, 23, 42, 0.08);
+  animation: quoteModalIn 0.25s ease;
+}
+
+.quote-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0;
+}
+
+.quote-modal-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.quote-modal-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 3px 0 0;
+}
+
+.quote-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  color: var(--text-light);
+  transition: all 0.15s;
+}
+
+.quote-modal-close:hover {
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+
+.quote-modal-body {
+  padding: 0.875rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quote-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.quote-form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Enes Do─şanay | 9 Nisan 2026: select stili input/textarea ile ayn─▒ */
+.quote-form-group input,
+.quote-form-group textarea,
+.quote-form-group select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background: var(--bg-light);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+}
+
+.quote-form-group select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.quote-form-group input:focus,
+.quote-form-group textarea:focus,
+.quote-form-group select:focus {
+  border-color: #137fec;
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
+  background: var(--bg-white);
+}
+
+.quote-form-group textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.quote-form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.quote-form-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-light);
+  background: var(--bg-light);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.quote-form-info .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--text-light);
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+/* Enes Do─şanay | 9 Nisan 2026: Modal footer butonlar─▒ modernize edildi */
+/* Enes Do─şanay | 10 Nisan 2026: Buton hizalama ve g├Ârsellik d├╝zeltmesi */
+.quote-modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem 1rem;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border);
+}
+
+.quote-btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  border: 1.5px solid var(--border);
+  background: var(--bg-white);
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quote-btn-cancel:hover {
+  background: var(--bg-light);
+  border-color: var(--text-light);
+  color: var(--text-dark);
+}
+
+.quote-btn-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(19, 127, 236, 0.25);
+}
+
+.quote-btn-send:hover {
+  background: #0d6fd4;
+  box-shadow: 0 4px 12px rgba(19, 127, 236, 0.35);
+  transform: translateY(-1px);
+}
+
+.quote-btn-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.quote-modal-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  gap: 6px;
+}
+
+.quote-success-icon {
+  font-size: 42px;
+  color: #10b981;
+  margin-bottom: 4px;
+}
+
+.quote-modal-success h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.quote-modal-success p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+@media (max-width: 540px) {
+  .quote-form-row {
+    flex-direction: column;
+  }
+
+  .quote-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .quote-btn-cancel,
+  .quote-btn-send {
+    width: 100%;
+    text-align: center;
+  }
+}
+

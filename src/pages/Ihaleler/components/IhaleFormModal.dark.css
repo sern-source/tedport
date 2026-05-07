@@ -1,0 +1,119 @@
+[data-theme="dark"] .ihale-modal__close { color: var(--text-light); }
+[data-theme="dark"] .ihale-modal__close:hover { color: var(--text-dark); }
+[data-theme="dark"] .ihale-field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+[data-theme="dark"] .ihale-stepper-item--active .ihale-stepper-label { color: #93c5fd; }
+[data-theme="dark"] .ihale-stepper-item--done .ihale-stepper-label { color: #86efac; }
+[data-theme="dark"] .ihale-stepper-item--done .ihale-stepper-num {
+    background: #14532d;
+    border-color: #22c55e;
+    color: #86efac;
+}
+[data-theme="dark"] .ihale-deadline-sticky {
+    background: #451a03;
+    border-color: #78350f;
+    color: #fde68a;
+}
+[data-theme="dark"] .ihale-deadline-sticky .material-symbols-outlined { color: #fbbf24; }
+
+/* Enes Doğanay | 2 Mayıs 2026: Anonim toggle off-state + form-error dark */
+[data-theme="dark"] .ihale-anonim-toggle {
+    background: #334155;
+}
+[data-theme="dark"] .ihale-anonim-toggle--on {
+    background: #2563eb;
+}
+[data-theme="dark"] .ihale-form-error {
+    background: linear-gradient(135deg, #450a0a, #3f0000);
+    border-color: #7f1d1d;
+    color: #fca5a5;
+}
+[data-theme="dark"] .ihale-form-error::before {
+    color: #f87171;
+}
+[data-theme="dark"] .ihale-stepper-bar {
+    background: var(--bg-white);
+}
+[data-theme="dark"] .ihale-stepper-track {
+    background: #334155;
+}
+[data-theme="dark"] .ihale-step-content {
+    scrollbar-color: #334155 transparent;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Date input native takvim dark mode */
+[data-theme="dark"] .ihale-field input[type="date"],
+[data-theme="dark"] .ihale-field input[type="datetime-local"] {
+    color-scheme: dark;
+}
+
+/* === E-posta girişi ek === */
+[data-theme="dark"] .ihale-email-input-row--valid input {
+    border-color: #22c55e;
+    background: #14532d;
+    color: #86efac;
+}
+[data-theme="dark"] .ihale-email-input-row--error input {
+    border-color: #ef4444;
+    background: #450a0a;
+    color: #fca5a5;
+}
+[data-theme="dark"] .ihale-email-warning {
+    background: #451a03;
+    border-color: #78350f;
+    color: #fde68a;
+}
+[data-theme="dark"] .ihale-email-warning .material-symbols-outlined { color: #f97316; }
+[data-theme="dark"] .ihale-email-tag {
+    background: #1e3a5f;
+    border-color: #1e40af;
+    color: #93c5fd;
+}
+[data-theme="dark"] .ihale-email-tag button:hover { background: #1e3a8a; color: #bfdbfe; }
+
+/* === Davetli firma ek === */
+[data-theme="dark"] .ihale-firma-search__item--disabled { background: #1e1a00; }
+[data-theme="dark"] .ihale-firma-badge--ok { background: #14532d; color: #86efac; }
+[data-theme="dark"] .ihale-firma-badge--warn { background: #451a03; color: #fde68a; }
+[data-theme="dark"] .ihale-firma-tag {
+    background: #14532d;
+    border-color: #166534;
+    color: #86efac;
+}
+[data-theme="dark"] .ihale-firma-tag .material-symbols-outlined { color: #22c55e; }
+[data-theme="dark"] .ihale-firma-tag button:hover { background: #166534; color: #dc2626; }
+[data-theme="dark"] .ihale-req-table__num { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .ihale-req-table__remove:hover { background: #450a0a; color: #f87171; }
+[data-theme="dark"] .ihale-file-item button:hover { background: #450a0a; color: #f87171; }
+
+/* === Önizleme ek === */
+[data-theme="dark"] .ihale-preview__tags > span { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .ihale-preview__anonim-badge {
+    background: #451a03;
+    border-color: #78350f;
+    color: #fde68a;
+}
+[data-theme="dark"] .ihale-preview__anonim-badge .material-symbols-outlined { color: #fbbf24; }
+
+/* === Referans kopyalama ek === */
+[data-theme="dark"] .ihale-refno-copy-btn:hover { background: var(--border); color: #93c5fd; border-color: var(--text-light); }
+[data-theme="dark"] .ihale-refno-copy-btn--done {
+    background: #14532d !important;
+    color: #86efac !important;
+    border-color: #166534 !important;
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: dark mode eksik kurallar */
+[data-theme="dark"] .ihale-firma-search__results {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] .ihale-firma-search__item { border-bottom-color: #334155; }
+[data-theme="dark"] .ihale-firma-search__info strong { color: #e2e8f0; }
+[data-theme="dark"] .ihale-firma-warn-text { color: #fbbf24; }
+[data-theme="dark"] .ihale-modal__footer--preview { border-top-color: #334155; }
+[data-theme="dark"] .ihale-anonim-row { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .ihale-anonim-toggle { background: #334155; }
+[data-theme="dark"] .ihale-anonim-toggle--on { background: #2563eb; }

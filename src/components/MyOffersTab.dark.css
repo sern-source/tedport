@@ -1,0 +1,128 @@
+﻿[data-theme="dark"] .firma-contact-card {
+    background: #1e293b;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .firma-contact-card h3 { color: #f1f5f9; }
+[data-theme="dark"] .firma-contact-card__name { color: #64748b; }
+[data-theme="dark"] .firma-contact-card__close:hover { background: #334155; color: #94a3b8; }
+
+[data-theme="dark"] .firma-contact-row {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .firma-contact-row:hover { background: rgba(37, 99, 235, 0.1); border-color: #3b82f6; }
+[data-theme="dark"] .firma-contact-row span:not(.material-symbols-outlined) { color: #f1f5f9; }
+[data-theme="dark"] .firma-contact-card__empty { color: #475569; }
+
+/* ═══════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════ */
+[data-theme="dark"] .mop-toolbar__search {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .mop-toolbar__search:focus-within {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+[data-theme="dark"] .mop-toolbar__search input {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .mop-toolbar__clear { color: #475569; }
+[data-theme="dark"] .mop-toolbar__clear:hover { color: #94a3b8; }
+
+[data-theme="dark"] .mop-filter-chip {
+    background: #1e293b;
+    border-color: #334155;
+    color: #64748b;
+}
+
+[data-theme="dark"] .mop-filter-chip:hover {
+    border-color: #6366f1;
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .mop-filter-chip--active {
+    background: rgba(79, 70, 229, 0.15);
+    border-color: #6366f1;
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .mop-loading { color: #475569; }
+
+[data-theme="dark"] .mop-loading__spinner {
+    background: rgba(79, 70, 229, 0.1);
+}
+
+[data-theme="dark"] .mop-loading__spinner .material-symbols-outlined {
+    color: #6366f1;
+}
+
+[data-theme="dark"] .mop-empty { color: #475569; }
+
+[data-theme="dark"] .mop-empty h3 { color: #64748b; }
+
+[data-theme="dark"] .mop-delete-modal {
+    background: #1e293b;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .mop-delete-modal__icon { background: rgba(127, 29, 29, 0.2); }
+[data-theme="dark"] .mop-delete-modal__icon .material-symbols-outlined { color: #f87171; }
+
+[data-theme="dark"] .mop-delete-modal h3 { color: #f1f5f9; }
+
+[data-theme="dark"] .mop-delete-modal p { color: #94a3b8; }
+[data-theme="dark"] .mop-delete-modal__btn--cancel { background: #334155; color: #94a3b8; }
+[data-theme="dark"] .mop-delete-modal__btn--cancel:hover { background: #475569; }
+
+/* Enes Doğanay | 7 Mayıs 2026: Responsive — toolbar tek satır mobilde sarılıyor */
+@media (max-width: 768px) {
+    .mop-hero { padding: 14px 16px; }
+
+    .mop-hero__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .mop-kpis {
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .mop-kpi {
+        min-width: 52px;
+        padding: 6px 10px;
+        flex: 1;
+    }
+
+    .mop-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .mop-toolbar__search { min-width: unset; }
+
+    .mop-delete-modal { padding: 20px 16px; }
+
+    .mop-delete-modal__actions { flex-direction: column; }
+
+    .firma-contact-card { max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+    .mop-hero__title h2 { font-size: 0.95rem; }
+    .mop-kpi__value { font-size: 0.95rem; }
+    .mop-card__main { padding: 10px 12px; gap: 8px; }
+    .mop-card__status-area { min-width: 80px; }
+    .mop-card__summary { min-width: 80px; }
+}
+
+/* Enes Doğanay | 7 Mayıs 2026: Pagination dark mode → index.css global Pagination component */

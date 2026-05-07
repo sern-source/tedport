@@ -1,0 +1,490 @@
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 15 Nisan 2026: Firma İletişim Popup
+   ═══════════════════════════════════════════════════ */
+.firma-contact-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: firmaContactFadeIn 0.2s ease;
+}
+
+@keyframes firmaContactFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.firma-contact-card {
+    background: var(--bg-white);
+    border-radius: 20px;
+    padding: 32px 28px 28px;
+    width: 400px;
+    max-width: 92vw;
+    box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    text-align: center;
+    position: relative;
+    animation: firmaContactSlideUp 0.3s ease;
+}
+
+@keyframes firmaContactSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.firma-contact-card__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.firma-contact-card__close:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.firma-contact-card__avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #fff;
+}
+
+.firma-contact-card__avatar .material-symbols-outlined {
+    font-size: 28px;
+}
+
+.firma-contact-card h3 {
+    margin: 0 0 2px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.firma-contact-card__name {
+    margin: 0 0 16px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.firma-contact-card__rows {
+    display: grid;
+    gap: 8px;
+    text-align: left;
+}
+
+.firma-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+}
+
+.firma-contact-row:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.firma-contact-row .material-symbols-outlined {
+    font-size: 22px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.firma-contact-row div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.firma-contact-row small {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.firma-contact-row span:not(.material-symbols-outlined) {
+    font-size: 0.92rem;
+    color: var(--text-dark);
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.firma-contact-card__empty {
+    margin: 12px 0 0;
+    font-size: 0.88rem;
+    color: #94a3b8;
+}
+
+.teklif-popup__amount-input:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Tek tutar para birimi — SimpleSelect wrapper */
+.teklif-popup__currency-simple {
+    width: 140px;
+    flex-shrink: 0;
+}
+.teklif-popup__currency-simple .simple-select-trigger {
+    border-radius: 12px;
+    padding: 10px 10px;
+    font-size: 0.88rem;
+    border: 1px solid var(--border);
+    background: var(--bg-white);
+}
+
+/* Inline satır */
+.teklif-popup__inline-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.teklif-popup__inline-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 140px;
+}
+
+.teklif-popup__inline-field--grow { flex: 1; }
+
+.teklif-popup__inline-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.teklif-popup__inline-field input,
+.teklif-popup__inline-field select {
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.teklif-popup__inline-field input:focus,
+.teklif-popup__inline-field select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Toggle */
+.teklif-popup__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    user-select: none;
+}
+
+.teklif-popup__toggle input { display: none; }
+
+.teklif-popup__toggle-slider {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.teklif-popup__toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.teklif-popup__toggle input:checked + .teklif-popup__toggle-slider {
+    background: #2563eb;
+}
+
+.teklif-popup__toggle input:checked + .teklif-popup__toggle-slider::after {
+    transform: translateX(18px);
+}
+
+/* Dosya alanı */
+.teklif-popup__file-area {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Dosya yükleme alanı — görsel iyileştirme */
+.teklif-popup__file-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 20px;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    background: linear-gradient(160deg, var(--bg-light) 0%, rgba(59, 130, 246, 0.03) 100%);
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, transform 0.15s, box-shadow 0.25s;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.teklif-popup__file-upload:hover {
+    border-color: #3b82f6;
+    background: linear-gradient(160deg, #eff6ff 0%, #f0f9ff 100%);
+    color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Upload ikonu — renkli arka plan halkası */
+.teklif-popup__file-upload .material-symbols-outlined {
+    font-size: 32px;
+    color: #2563eb;
+    background: rgba(37, 99, 235, 0.1);
+    padding: 12px;
+    border-radius: 50%;
+    transition: background 0.25s, transform 0.2s;
+}
+
+.teklif-popup__file-upload:hover .material-symbols-outlined {
+    background: rgba(37, 99, 235, 0.18);
+    transform: scale(1.08);
+}
+
+.teklif-popup__file-upload small { font-size: 0.76rem; font-weight: 500; color: var(--text-light); margin-top: 2px; }
+
+.teklif-popup__file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #eff6ff;
+    border-radius: 10px;
+    color: #1d4ed8;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.teklif-popup__file-chip .material-symbols-outlined { font-size: 18px; }
+
+.teklif-popup__file-chip button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: rgba(37, 99, 235, 0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    color: #1d4ed8;
+    margin-left: auto;
+}
+
+.teklif-popup__file-chip button:hover { background: rgba(37, 99, 235, 0.2); }
+.teklif-popup__file-chip button .material-symbols-outlined { font-size: 14px; }
+
+/* Textarea */
+.teklif-popup__textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-height: 70px;
+}
+
+.teklif-popup__textarea:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Error */
+.teklif-popup__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    font-size: 0.84rem;
+    font-weight: 600;
+    animation: tpShake 0.4s ease;
+}
+
+.teklif-popup__error .material-symbols-outlined { font-size: 18px; }
+
+@keyframes tpShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+/* Enes Doğanay | 2 Mayıs 2026: Footer — görsel iyileştirme */
+/* Footer */
+.teklif-popup__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-light);
+}
+
+.teklif-popup__footer-total span {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.teklif-popup__footer-total strong {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.teklif-popup__footer-total small {
+    font-size: 0.68rem;
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.teklif-popup__footer-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.teklif-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.teklif-btn .material-symbols-outlined { font-size: 15px; }
+
+.teklif-btn--draft {
+    background: var(--bg-white);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+}
+
+.teklif-btn--draft:hover { background: var(--bg-light); transform: translateY(-1px); }
+
+/* Enes Doğanay | 13 Nisan 2026: Teklifi Geri Çek butonu */
+.teklif-btn--withdraw {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
+}
+
+.teklif-btn--withdraw:hover {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+    box-shadow: 0 3px 10px rgba(220,38,38,0.22);
+    transform: translateY(-1px);
+}
+
+/* Enes Doğanay | 15 Nisan 2026: Taslağı Sil butonu */
+.teklif-btn--delete-draft {
+    background: #fff;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
+}
+
+.teklif-btn--delete-draft:hover {
+    background: #fef2f2;
+    border-color: #f87171;
+    transform: translateY(-1px);
+}
+
+.teklif-btn--delete-draft:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.teklif-btn--submit {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1.5px solid #bfdbfe;
+}
+
+.teklif-btn--submit:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.22);
+    transform: translateY(-1px);
+}
+
+.teklif-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Responsive */
