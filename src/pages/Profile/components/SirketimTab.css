@@ -106,39 +106,40 @@
 .ekip-panel__header h2 .material-symbols-outlined { font-size: 22px; color: #7c3aed; }
 .ekip-panel__header p { font-size: 0.85rem; color: #64748b; margin: 0; }
 
-/* Davet kartı */
+/* Davet kartı — Enes Doğanay | 8 Mayıs 2026: Compact redesign */
 .ekip-invite-card {
   background: #ffffff;
   border: 1.5px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .ekip-invite-card h3 {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 0.88rem;
+  gap: 6px;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
 }
 
-.ekip-invite-card h3 .material-symbols-outlined { font-size: 17px; color: #7c3aed; }
+.ekip-invite-card h3 .material-symbols-outlined { font-size: 15px; color: #7c3aed; }
 
-.ekip-invite-form { display: flex; flex-direction: column; gap: 10px; }
-.ekip-invite-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.ekip-invite-form { display: flex; flex-direction: column; gap: 8px; }
+.ekip-invite-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
 
 .ekip-input {
   flex: 1;
-  min-width: 180px;
-  padding: 9px 12px;
+  min-width: 160px;
+  height: 34px;
+  padding: 0 10px;
   border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
   color: #0f172a;
   background: #f8fafc;
   outline: none;
@@ -146,41 +147,103 @@
 }
 
 .ekip-input:focus { border-color: #a78bfa; background: #fff; }
-.ekip-input--title { flex: 0.7; min-width: 130px; }
-.ekip-input--sm { flex: 1; min-width: 100px; padding: 6px 10px; font-size: 0.8rem; }
+.ekip-input--title { flex: 0.6; min-width: 110px; }
+.ekip-input--sm { flex: 1; min-width: 100px; height: 30px; padding: 0 8px; font-size: 0.78rem; }
 
-.ekip-select {
-  padding: 9px 10px;
+/* Enes Doğanay | 8 Mayıs 2026: Custom rol dropdown */
+.ekip-role-wrap { position: relative; flex-shrink: 0; }
+
+.ekip-role-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+}
+.ekip-role-trigger:hover { border-color: #a78bfa; background: #fff; }
+.ekip-role-trigger--open { border-color: #a78bfa; background: #fff; }
+
+.ekip-role-chevron {
+  font-size: 16px;
+  color: #94a3b8;
+  transition: transform 0.18s;
+}
+.ekip-role-trigger--open .ekip-role-chevron { transform: rotate(180deg); }
+
+.ekip-role-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 148px;
+  background: #fff;
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
-  font-size: 0.82rem;
-  color: #0f172a;
-  background: #f8fafc;
-  cursor: pointer;
-  outline: none;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.10);
+  z-index: 50;
+  overflow: hidden;
+  animation: ekipRoleMenuIn 0.14s ease;
 }
 
-.ekip-select:focus { border-color: #a78bfa; }
-.ekip-select--sm { padding: 6px 8px; font-size: 0.8rem; }
+@keyframes ekipRoleMenuIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ekip-role-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #1e293b;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.ekip-role-option:hover { background: #f5f3ff; }
+.ekip-role-option--active { color: #7c3aed; background: #faf5ff; }
+
+.ekip-role-option-sub {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 400;
+}
+.ekip-role-option--active .ekip-role-option-sub { color: #a78bfa; }
+
+.ekip-role-check {
+  font-size: 14px;
+  color: #7c3aed;
+  margin-left: auto;
+}
 
 .ekip-invite-btn {
-  padding: 8px 16px;
+  height: 34px;
+  padding: 0 14px;
   background: linear-gradient(135deg, #7c3aed, #6d28d9);
   color: #fff;
   border: none;
-  border-radius: 9px;
-  font-size: 0.82rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s;
-  box-shadow: 0 2px 8px rgba(124,58,237,0.25);
+  box-shadow: 0 2px 6px rgba(124,58,237,0.25);
 }
 
 .ekip-invite-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #6d28d9, #5b21b6);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(124,58,237,0.35);
+  box-shadow: 0 4px 10px rgba(124,58,237,0.35);
 }
 .ekip-invite-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 

@@ -245,25 +245,26 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Detail grid — compact */
 .mop-detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 8px;
-    padding: 12px 0;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 6px;
+    padding: 8px 0;
 }
 
 .mop-detail-cell {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    padding: 9px 11px;
+    gap: 6px;
+    padding: 6px 9px;
     background: #f8fafc;
-    border-radius: 9px;
+    border-radius: 8px;
     border: 1px solid #f1f5f9;
 }
 
 .mop-detail-cell .material-symbols-outlined {
-    font-size: 16px;
+    font-size: 14px;
     color: #2563eb;
     margin-top: 2px;
     flex-shrink: 0;
@@ -275,7 +276,7 @@
 }
 
 .mop-detail-cell small {
-    font-size: 0.68rem;
+    font-size: 0.63rem;
     color: #94a3b8;
     font-weight: 600;
     text-transform: uppercase;
@@ -283,7 +284,7 @@
 }
 
 .mop-detail-cell strong {
-    font-size: 0.84rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: #1e293b;
     margin-top: 1px;
@@ -443,13 +444,14 @@
 /* ═══════════════════════════════════════════════════
    BUTONLAR
    ═══════════════════════════════════════════════════ */
+/* Enes Doğanay | 8 Mayıs 2026: Footer butonlar — compact */
 .mop-btn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 6px 13px;
-    border-radius: 8px;
-    font-size: 0.79rem;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 7px;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
     border: none;
@@ -457,7 +459,7 @@
     font-family: inherit;
 }
 
-.mop-btn .material-symbols-outlined { font-size: 15px; }
+.mop-btn .material-symbols-outlined { font-size: 14px; }
 
 .mop-btn--primary {
     background: linear-gradient(135deg, #2563eb, #3b82f6);
@@ -491,19 +493,6 @@
 }
 
 .mop-btn--outline:hover {
-    background: #f8fafc;
-    color: #334155;
-    border-color: #cbd5e1;
-}
-
-/* Enes Doğanay | 15 Nisan 2026: Firma iletişim butonu */
-.mop-btn--contact {
-    background: #fff;
-    color: #64748b;
-    border: 1.5px solid #e2e8f0;
-}
-
-.mop-btn--contact:hover {
     background: #f8fafc;
     color: #334155;
     border-color: #cbd5e1;

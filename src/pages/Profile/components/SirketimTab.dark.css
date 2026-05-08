@@ -11,7 +11,15 @@
 [data-theme="dark"] .ekip-invite-card h3 { color: #e2e8f0; }
 [data-theme="dark"] .ekip-input { background: #0f172a; border-color: #334155; color: #e2e8f0; }
 [data-theme="dark"] .ekip-input:focus { border-color: #7c3aed; background: #1e293b; }
-[data-theme="dark"] .ekip-select { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .ekip-role-trigger { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .ekip-role-trigger:hover,
+[data-theme="dark"] .ekip-role-trigger--open { background: #1e293b; border-color: #7c3aed; }
+[data-theme="dark"] .ekip-role-menu { background: #1e293b; border-color: #334155; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+[data-theme="dark"] .ekip-role-option { color: #e2e8f0; }
+[data-theme="dark"] .ekip-role-option:hover { background: rgba(124,58,237,0.12); }
+[data-theme="dark"] .ekip-role-option--active { color: #c4b5fd; background: rgba(124,58,237,0.15); }
+[data-theme="dark"] .ekip-role-option-sub { color: #475569; }
+[data-theme="dark"] .ekip-role-option--active .ekip-role-option-sub { color: #a78bfa; }
 [data-theme="dark"] .ekip-role-hint { border-top-color: #334155; }
 [data-theme="dark"] .ekip-role-hint__row { color: #94a3b8; }
 [data-theme="dark"] .ekip-card { background: #1e293b; border-color: #334155; }

@@ -1,11 +1,92 @@
 /* Enes Doğanay | 6 Mayıs 2026: FirmaProfilPage — kurumsal özel stiller */
 
-/* Enes Doğanay | 8 Mayıs 2026: Şirketim'den navigate ile gelince geri butonu */
+/* Enes Doğanay | 8 Mayıs 2026: Şirketim'den navigate ile gelince geri butonu + firma chip */
 .fp-back-bar {
   margin-bottom: 12px;
   max-width: 900px;
   margin-left: auto;
   margin-right: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Enes Doğanay | 8 Mayıs 2026: Firma kimlik chip'i — sağ taraf */
+.fp-firma-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 6px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border, #e2e8f0);
+  background: var(--bg-white, #fff);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.fp-firma-chip-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: contain;
+  padding: 2px;
+  border: 1.5px solid var(--border, #e2e8f0);
+  background: var(--bg-white, #fff);
+}
+
+.fp-firma-chip-logo-fallback {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  border: 1.5px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+  font-size: 13px;
+}
+
+.fp-firma-chip-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-dark, #1e293b);
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fp-firma-chip-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--border, #e2e8f0);
+}
+
+.fp-firma-chip-role {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7c3aed;
+  white-space: nowrap;
+  background: #f5f3ff;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+[data-theme="dark"] .fp-firma-chip {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+[data-theme="dark"] .fp-firma-chip-logo { border-color: #334155; background: #0f172a; }
+[data-theme="dark"] .fp-firma-chip-logo-fallback { background: linear-gradient(135deg, #1e3a5f, #1e293b); border-color: #3b82f6; }
+[data-theme="dark"] .fp-firma-chip-name { color: #f1f5f9; }
+[data-theme="dark"] .fp-firma-chip-sep { background: #334155; }
+[data-theme="dark"] .fp-firma-chip-role { background: #2e1065; color: #c4b5fd; }
+
+@media (max-width: 480px) {
+  .fp-firma-chip-name { max-width: 100px; }
+  .fp-firma-chip-sep, .fp-firma-chip-role { display: none; }
 }
 
 .fp-back-btn {

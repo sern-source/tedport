@@ -42,7 +42,7 @@ const renderOfferAmount = (offer) => {
 const MyOfferCard = ({
     offer, tender, firmaAdi, isExpanded, isHighlight, highlightRef,
     unreadMopChatIds, unreadMopChatCounts,
-    onToggle, onOpenChat, onOpenFirmaContact, onDelete, navigate,
+    onToggle, onOpenChat, onDelete, navigate,
 }) => {
     const st = getStatus(offer.durum);
     const tenderSt = getTenderStatus(tender?.durum);
@@ -107,7 +107,7 @@ const MyOfferCard = ({
                 <MyOfferCardDetail
                     offer={offer} tender={tender} firmaAdi={firmaAdi}
                     unreadMopChatIds={unreadMopChatIds} unreadMopChatCounts={unreadMopChatCounts}
-                    onOpenChat={onOpenChat} onOpenFirmaContact={onOpenFirmaContact} onDelete={onDelete} navigate={navigate}
+                    onOpenChat={onOpenChat} onDelete={onDelete} navigate={navigate}
                     tenderSt={tenderSt.tone} stTone={st.tone}
                 />
             )}

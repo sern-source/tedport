@@ -8,7 +8,7 @@ const SORT_OPTIONS = [
   { value: 'z-a', label: "Z'den A'ya", icon: 'arrow_upward' },
 ];
 
-const FirmalarToolbar = ({ totalCount, hasSearch, page, totalPages, onPageChange, sortMode, onSortChange, viewMode, onViewToggle }) => {
+const FirmalarToolbar = ({ totalCount, hasSearch, loading, page, totalPages, onPageChange, sortMode, onSortChange, viewMode, onViewToggle }) => {
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = useRef(null);
 
@@ -23,7 +23,7 @@ const FirmalarToolbar = ({ totalCount, hasSearch, page, totalPages, onPageChange
 
   return (
     <div className="firmalar-toolbar-row">
-      {hasSearch && (
+      {hasSearch && !loading && (
         <p className="firmalar-result-count">
           <span>{totalCount}</span> firma listeleniyor
         </p>

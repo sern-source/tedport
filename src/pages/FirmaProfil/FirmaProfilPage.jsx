@@ -66,12 +66,28 @@ const FirmaProfilPage = () => {
       {!isEmbedded && <SharedHeader navItems={NAV_ITEMS} isLoggedIn onLogout={handleLogout} currentPage="firma-profil" />}
       <div className={`page${isEmbedded ? ' page--embedded' : ''}`}>
         {/* Enes Doğanay | 8 Mayıs 2026: Şirketim'den navigate ile gelince geri dön butonu */}
+        {/* Enes Doğanay | 8 Mayıs 2026: Şirketim'den gelince geri butonu + firma kimlik chip'i */}
         {fromSirketim && (
           <div className="fp-back-bar">
             <button className="fp-back-btn" onClick={() => navigate('/profile?tab=sirketim')}>
               <span className="material-symbols-outlined">arrow_back</span>
               Profilime Dön
             </button>
+            {firma && (
+              <div className="fp-firma-chip">
+                {firma.logo_url
+                  ? <img className="fp-firma-chip-logo" src={firma.logo_url} alt={firma.firma_adi} />
+                  : <span className="fp-firma-chip-logo-fallback material-symbols-outlined">apartment</span>
+                }
+                <span className="fp-firma-chip-name">{firma.firma_adi}</span>
+                {myRole && (
+                  <>
+                    <span className="fp-firma-chip-sep" />
+                    <span className="fp-firma-chip-role">{myRole}</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         )}
         <div className={`layout${isEmbedded ? ' layout--embedded' : ''}${fromSirketim ? ' layout--no-sidebar' : ''}`}>

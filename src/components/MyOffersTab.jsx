@@ -88,7 +88,7 @@ const MyOffersTab = ({ userId, companyId, mopChatTrigger, onChatOpened, onUnread
                                 isExpanded={expandedId === offer.id} isHighlight={highlightId === offer.id}
                                 highlightRef={highlightRef} unreadMopChatIds={unreadMopChatIds} unreadMopChatCounts={unreadMopChatCounts}
                                 onToggle={() => setExpandedId(expandedId === offer.id ? null : offer.id)}
-                                onOpenChat={handleOpenChatWithLogo} onOpenFirmaContact={handleOpenFirmaContact}
+                                onOpenChat={handleOpenChatWithLogo}
                                 onDelete={(o) => setDeleteConfirm(o)} navigate={navigate} />
                         );
                     })}

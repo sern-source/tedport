@@ -84,13 +84,22 @@ export function useMyOffers({ userId, companyId, mopChatTrigger, onChatOpened, o
     }, [userId, companyId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Enes Doğanay | 7 Mayıs 2026: sessionStorage highlight — ihale bildirimine tıklanınca
+    // Enes Doğanay | 8 Mayıs 2026: mop_restore_expanded — İhaleye Git'ten geri dönünce kartı aç
     useEffect(() => {
         if (loading || offers.length === 0) return;
         const hlIhale = sessionStorage.getItem('mop_highlight_ihale');
-        if (!hlIhale) return;
-        sessionStorage.removeItem('mop_highlight_ihale');
-        const target = offers.find(o => String(o.ihale_id) === String(hlIhale));
-        if (target) { setExpandedId(target.id); setHighlightId(target.id); setTimeout(() => setHighlightId(null), 4000); }
+        if (hlIhale) {
+            sessionStorage.removeItem('mop_highlight_ihale');
+            const target = offers.find(o => String(o.ihale_id) === String(hlIhale));
+            if (target) { setExpandedId(target.id); setHighlightId(target.id); setTimeout(() => setHighlightId(null), 4000); }
+            return;
+        }
+        const restoreId = sessionStorage.getItem('mop_restore_expanded');
+        if (restoreId) {
+            sessionStorage.removeItem('mop_restore_expanded');
+            const target = offers.find(o => String(o.id) === restoreId);
+            if (target) { setExpandedId(target.id); setTimeout(() => highlightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200); }
+        }
     }, [loading, offers]);
 
     useEffect(() => {

@@ -37,7 +37,7 @@ const FirmalarPage = () => {
           <FirmaFilterSidebar {...filters} isOpen={filtersOpen} />
           <section>
             <FirmalarActiveFilterTags activeTags={page.activeTags} removeFilterTag={page.removeFilterTag} setFilters={page.setFilters} />
-            <FirmalarToolbar totalCount={page.totalCount} hasSearch={!!(page.debouncedSearch || page.activeTags.length > 0)} page={page.page} totalPages={page.totalPages} onPageChange={page.setPage} sortMode={page.sortMode} onSortChange={page.setSortMode} viewMode={page.viewMode} onViewToggle={page.toggleViewMode} />
+            <FirmalarToolbar totalCount={page.totalCount} hasSearch={!!(page.debouncedSearch || page.activeTags.length > 0)} loading={page.loading} page={page.page} totalPages={page.totalPages} onPageChange={page.setPage} sortMode={page.sortMode} onSortChange={page.setSortMode} viewMode={page.viewMode} onViewToggle={page.toggleViewMode} />
             {page.loading ? (
               <FirmalarSkeletonCards />
             ) : page.suppliers.length === 0 ? (

@@ -44,7 +44,7 @@ const GroupedTotals = ({ kalemler, defaultCurrency }) => {
 
 const MyOfferCardDetail = ({
     offer, tender, firmaAdi, unreadMopChatIds, unreadMopChatCounts,
-    onOpenChat, onOpenFirmaContact, onDelete, navigate, tenderSt, stTone,
+    onOpenChat, onDelete, navigate, tenderSt, stTone,
 }) => {
     const kalemler = Array.isArray(offer.kalemler) ? offer.kalemler : [];
     return (
@@ -126,7 +126,7 @@ const MyOfferCardDetail = ({
                 </div>
             )}
             <div className="mop-card__footer">
-                <button className="mop-btn mop-btn--outline" onClick={() => navigate(`/ihaleler?ihale=${offer.ihale_id}`)}>
+                <button className="mop-btn mop-btn--outline" onClick={() => { sessionStorage.setItem('mop_restore_expanded', String(offer.id)); navigate(`/ihaleler?ihale=${offer.ihale_id}`); }}>
                     <span className="material-symbols-outlined">gavel</span>İhaleye Git
                 </button>
                 {offer.durum !== 'taslak' && (
@@ -136,14 +136,10 @@ const MyOfferCardDetail = ({
                         {unreadMopChatIds.has(offer.id) && <span className="mop-chat-unread-badge">{unreadMopChatCounts[offer.id] || ''}</span>}
                     </button>
                 )}
-                {tender?.firma_id && !tender.anonim && (
-                    <button className="mop-btn mop-btn--contact" onClick={() => onOpenFirmaContact(tender.firma_id, firmaAdi)}>
-                        <span className="material-symbols-outlined">contact_phone</span>Firma ile İletişime Geç
-                    </button>
-                )}
+                {/* Enes Doğanay | 8 Mayıs 2026: Firma ile İletişime Geç kaldırıldı — mesajlaşma zaten var */}
                 {tenderSt === 'active' && stTone !== 'accepted' && (
                     <button className={`mop-btn ${stTone === 'draft' ? 'mop-btn--draft' : 'mop-btn--primary'}`}
-                        onClick={() => navigate(`/ihaleler?ihale=${tender?.id}&teklif=1`)}>
+                        onClick={() => { sessionStorage.setItem('mop_restore_expanded', String(offer.id)); navigate(`/ihaleler?ihale=${tender?.id}&teklif=1`); }}>
                         <span className="material-symbols-outlined">edit</span>
                         {stTone === 'draft' ? 'Taslağı Güncelle' : 'Teklifi Güncelle'}
                     </button>

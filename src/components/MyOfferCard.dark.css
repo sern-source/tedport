@@ -98,18 +98,6 @@
     border-color: #475569;
 }
 
-[data-theme="dark"] .mop-btn--contact {
-    background: #1e293b;
-    color: #64748b;
-    border-color: #334155;
-}
-
-[data-theme="dark"] .mop-btn--contact:hover {
-    background: #0f172a;
-    color: #94a3b8;
-    border-color: #475569;
-}
-
 [data-theme="dark"] .mop-btn--chat {
     background: rgba(79, 70, 229, 0.12);
     color: #a5b4fc;
