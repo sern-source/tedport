@@ -1,4 +1,16 @@
 ﻿@media (max-width: 600px) {
+    /* Enes Doğanay | 8 Mayıs 2026: Modal overlay mobilde bottom-sheet gibi — üstten baskılı değil */
+    .ihale-modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+    .ihale-modal {
+        border-radius: 20px 20px 0 0;
+        max-height: 92vh;
+        width: 100%;
+        max-width: 100%;
+    }
+
     .ihale-modal__grid {
         grid-template-columns: 1fr;
     }

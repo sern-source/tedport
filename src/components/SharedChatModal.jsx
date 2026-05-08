@@ -75,7 +75,7 @@ const SharedChatModal = ({
                     </div>
                     <div className="scm-header__actions">
                         {extraActions}
-                        <button className="scm-btn-icon scm-btn-icon--close" onClick={onClose} data-tooltip="Kapat">
+                        <button className="scm-btn-icon scm-btn-icon--close" onClick={onClose}>
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>

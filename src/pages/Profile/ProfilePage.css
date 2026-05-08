@@ -29,6 +29,37 @@
   padding: 0;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Şirketim'den navigate ile gelince sidebar yok — tek sütun */
+.layout--no-sidebar {
+  grid-template-columns: 1fr;
+  max-width: 900px;
+}
+
+/* Enes Doğanay | 8 Mayıs 2026: Embedded iframe — tam yükseklik zinciri */
+.page--embedded {
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  min-height: unset;
+}
+.page--embedded .layout--embedded {
+  height: 100%;
+  overflow: hidden;
+}
+.page--embedded .content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  gap: 0;
+}
+.page--embedded .content > div {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;

@@ -41,7 +41,7 @@ const IhaleChatModal = ({ activeTenderChat, tenderChatMessages, tenderChatLoadin
             onReport={handleReport}
             extraActions={
                 onOpenContact && (
-                    <button className="scm-btn-icon" onClick={onOpenContact} data-tooltip="İletişim Bilgileri">
+                    <button className="scm-btn-icon" onClick={onOpenContact}>
                         <span className="material-symbols-outlined">contact_phone</span>
                     </button>
                 )

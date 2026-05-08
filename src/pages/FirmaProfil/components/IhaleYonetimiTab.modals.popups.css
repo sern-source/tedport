@@ -270,12 +270,16 @@
 
 .tom-btn--repeat .material-symbols-outlined { font-size: 18px; }
 
-/* Enes Doğanay | 7 Mayıs 2026: Küçük tekrar butonu (CTA banner içi) */
+/* Enes Doğanay | 8 Mayıs 2026: Küçük tekrar butonu (CTA banner içi) — compact */
 .tom-btn--repeat-sm {
-    padding: 7px 14px;
-    font-size: 0.78rem;
+    padding: 5px 10px;
+    font-size: 0.74rem;
+    border-radius: 8px;
+    gap: 4px;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(5,150,105,0.2);
 }
+.tom-btn--repeat-sm .material-symbols-outlined { font-size: 14px; }
 
 .tom-btn-icon--add {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
@@ -298,7 +302,8 @@
     color: #991b1b;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 7px;
+    font-size: 0.74rem;
 }
 
 @media (max-width: 600px) {
@@ -341,28 +346,6 @@
 }
 
 @media (max-width: 768px) {
-    .tom-hero {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 20px 18px;
-        border-radius: 18px;
-        gap: 16px;
-    }
-
-    .tom-hero__text h1 { font-size: 1.2rem; }
-    .tom-hero__text p  { font-size: 0.82rem; margin-top: 4px; }
-    .tom-hero__stats   { width: 100%; gap: 8px; }
-
-    .tom-stat {
-        flex: 1;
-        min-width: 0;
-        padding: 10px 12px;
-        gap: 8px;
-    }
-
-    .tom-stat strong { font-size: 1.2rem; }
-    .tom-stat span:last-child { font-size: 0.65rem; }
-
     .tom-sidebar { border-radius: 16px; }
     .tom-sidebar__head { padding: 14px 16px 0; }
     .tom-sidebar__head h2 { font-size: 0.92rem; }
@@ -405,16 +388,6 @@
 }
 
 @media (max-width: 480px) {
-    .tom-hero { padding: 16px 14px; border-radius: 16px; gap: 12px; }
-    .tom-hero__text h1 { font-size: 1.05rem; gap: 8px; }
-    .tom-hero__text h1 .material-symbols-outlined { font-size: 22px; }
-    .tom-hero__text p { font-size: 0.75rem; }
-    .tom-hero__stats { gap: 6px; }
-
-    .tom-stat { padding: 8px 10px; gap: 6px; border-radius: 12px; }
-    .tom-stat strong { font-size: 1rem; }
-    .tom-stat .material-symbols-outlined { font-size: 18px; }
-
     .tom-body { gap: 12px; }
 
     .tom-sidebar__list .tom-tender-card { min-width: 180px; max-width: 220px; }

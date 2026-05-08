@@ -54,7 +54,7 @@ const IhaleContactPopup = ({ contactState, setContactState }) => {
                         </div>
 
                         <div className="tom-contact-card__identity">
-                            <h3>{popup.name || 'Ýsimsiz'}</h3>
+                            <h3>{popup.name || 'İsimsiz'}</h3>
                             {(popup.firma || popup.companyName) && (
                                 <p className="tom-contact-card__firma">
                                     <span className="material-symbols-outlined">business</span>
@@ -64,7 +64,7 @@ const IhaleContactPopup = ({ contactState, setContactState }) => {
                             {popup.avatar && (
                                 <span className="tom-contact-card__badge">
                                     <span className="material-symbols-outlined">verified</span>
-                                    Kayýtlý Üye
+                                    Kayıtlı Üye
                                 </span>
                             )}
                         </div>
@@ -125,7 +125,7 @@ const IhaleContactPopup = ({ contactState, setContactState }) => {
                                 </div>
                             )}
                             {!popup.email && !popup.phone && !popup.firmaPhone && (
-                                <p className="tom-contact-card__empty">Ýletiþim bilgisi mevcut deðil.</p>
+                                <p className="tom-contact-card__empty">İletişim bilgisi mevcut değil.</p>
                             )}
                         </div>
                     </>

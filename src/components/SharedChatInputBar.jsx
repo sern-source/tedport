@@ -46,7 +46,6 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
                 <button
                     className={`scm-emoji-trigger${emojiOpen ? ' active' : ''}`}
                     onClick={() => setEmojiOpen(o => !o)}
-                    data-tooltip="Emoji ekle"
                     type="button"
                 >
                     <span>😊</span>
@@ -80,7 +79,6 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
                 className="scm-send-btn"
                 onClick={onSend}
                 disabled={sending || !input.trim()}
-                data-tooltip="Gönder"
             >
                 {sending
                     ? <span className="material-symbols-outlined scm-spin">progress_activity</span>

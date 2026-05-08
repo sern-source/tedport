@@ -23,7 +23,7 @@ const EMPTY_QUOTES_DATA = { reportModal: null, setReportModal: () => {}, reportN
 
 const FirmaProfilPage = () => {
   const { latestNotification, setActiveViewingTeklifId, updateNotifPrefsCache, ihaleYonetimiUnreadCount, setIhaleYonetimiUnreadCount, refreshCounts } = useAuth();
-  const { companyId, firma, setFirma, userId, loading, myRole, showEkipPublic, ekipVisibilitySaving, handleEkipPublicToggle, isEmbedded, currentTab, setTab, searchParams, setSearchParams, navigate, fpToast, showFpToast, notifPrefs, setNotifPrefs, handleLogout } = useFirmaCore();
+  const { companyId, firma, setFirma, userId, loading, myRole, showEkipPublic, ekipVisibilitySaving, handleEkipPublicToggle, isEmbedded, fromSirketim, currentTab, setTab, searchParams, setSearchParams, navigate, fpToast, showFpToast, notifPrefs, setNotifPrefs, handleLogout } = useFirmaCore();
 
   const notifData = useNotifications(userId, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showFpToast);
   const favData = useFavorites(userId, showFpToast);
@@ -64,9 +64,18 @@ const FirmaProfilPage = () => {
       {/* Enes Doğanay | 7 Mayıs 2026: Favori sil + liste sil confirm modalları */}
       <ProfileModals quotesData={EMPTY_QUOTES_DATA} favData={favData} />
       {!isEmbedded && <SharedHeader navItems={NAV_ITEMS} isLoggedIn onLogout={handleLogout} currentPage="firma-profil" />}
-      <div className="page">
-        <div className={`layout${isEmbedded ? ' layout--embedded' : ''}`}>
-          {!isEmbedded && <FirmaSidebar firma={firma} currentTab={currentTab} setTab={setTab} myRole={myRole} unreadNotifCount={content.unreadNotifCount} ihaleYonetimiUnreadCount={ihaleYonetimiUnreadCount} incomingQuotes={teklifData.incomingQuotes} unreadQuoteIds={content.unreadQuoteIds} setActiveQuoteChat={teklifData.setActiveQuoteChat} handleLogout={handleLogout} favData={favData} />}
+      <div className={`page${isEmbedded ? ' page--embedded' : ''}`}>
+        {/* Enes Doğanay | 8 Mayıs 2026: Şirketim'den navigate ile gelince geri dön butonu */}
+        {fromSirketim && (
+          <div className="fp-back-bar">
+            <button className="fp-back-btn" onClick={() => navigate('/profile?tab=sirketim')}>
+              <span className="material-symbols-outlined">arrow_back</span>
+              Profilime Dön
+            </button>
+          </div>
+        )}
+        <div className={`layout${isEmbedded ? ' layout--embedded' : ''}${fromSirketim ? ' layout--no-sidebar' : ''}`}>
+          {!isEmbedded && !fromSirketim && <FirmaSidebar firma={firma} currentTab={currentTab} setTab={setTab} myRole={myRole} unreadNotifCount={content.unreadNotifCount} ihaleYonetimiUnreadCount={ihaleYonetimiUnreadCount} incomingQuotes={teklifData.incomingQuotes} unreadQuoteIds={content.unreadQuoteIds} setActiveQuoteChat={teklifData.setActiveQuoteChat} handleLogout={handleLogout} favData={favData} />}
           <FirmaProfilContent firma={firma} setFirma={setFirma} currentTab={currentTab} companyId={companyId} searchParams={searchParams} setTab={setTab} setIhaleYonetimiUnreadCount={setIhaleYonetimiUnreadCount} myRole={myRole} teklifData={teklifData} notifData={notifData} notifPrefs={notifPrefs} ekipData={ekipData} userId={userId} favData={favData} content={content} navigate={navigate} showEkipPublic={showEkipPublic} ekipVisibilitySaving={ekipVisibilitySaving} handleEkipPublicToggle={handleEkipPublicToggle} />
         </div>
       </div>

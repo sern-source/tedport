@@ -2,45 +2,45 @@
    GENİŞLETİLMİŞ TEKLİF DETAYI
    ═══════════════════════════════════════════════════ */
 .tom-offer-card__detail {
-    padding: 0 14px 14px;
+    padding: 0 12px 10px;
     border-top: 1px solid #f1f5f9;
     animation: tomSlideIn 0.25s ease;
 }
 
 /* Puan Detayı */
-.tom-score-breakdown { padding: 10px 0; }
+.tom-score-breakdown { padding: 8px 0; }
 
 .tom-score-breakdown h4 {
-    margin: 0 0 8px;
-    font-size: 0.8rem;
+    margin: 0 0 6px;
+    font-size: 0.74rem;
     font-weight: 700;
     color: #334155;
 }
 
-.tom-score-bars { display: grid; gap: 7px; }
+.tom-score-bars { display: grid; gap: 5px; }
 
 .tom-score-bar {
     display: grid;
-    grid-template-columns: 52px 1fr 30px;
+    grid-template-columns: 48px 1fr 26px;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
 }
 
 .tom-score-bar > span {
-    font-size: 0.78rem;
+    font-size: 0.71rem;
     font-weight: 600;
     color: #64748b;
 }
 
 .tom-score-bar > strong {
-    font-size: 0.82rem;
+    font-size: 0.74rem;
     font-weight: 800;
     color: #0f172a;
     text-align: right;
 }
 
 .tom-bar {
-    height: 8px;
+    height: 6px;
     border-radius: 99px;
     background: #f1f5f9;
     overflow: hidden;
@@ -63,13 +63,13 @@
 /* Detay satırları */
 .tom-detail-row {
     display: flex;
-    gap: 10px;
-    padding: 8px 10px;
+    gap: 8px;
+    padding: 6px 8px;
     border-top: 1px solid #f8fafc;
     border-left: 3px solid #bfdbfe;
     border-radius: 0 6px 6px 0;
     background: #f8faff;
-    margin: 4px 0;
+    margin: 3px 0;
 }
 
 /* Enes Doğanay | 4 Mayıs 2026: İkon yerine sol border çizgisi — kutu görünüm kaldırıldı */
@@ -89,7 +89,7 @@
 
 .tom-detail-row p {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: #334155;
     line-height: 1.5;
 }
@@ -98,16 +98,16 @@
 .tom-kalemler { padding-top: 10px; border-top: 1px solid #f1f5f9; }
 
 .tom-kalemler h4 {
-    margin: 0 0 8px;
-    font-size: 0.8rem;
+    margin: 0 0 6px;
+    font-size: 0.74rem;
     font-weight: 700;
     color: #334155;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
 }
 
-.tom-kalemler h4 .material-symbols-outlined { font-size: 16px; color: #3b82f6; }
+.tom-kalemler h4 .material-symbols-outlined { font-size: 14px; color: #3b82f6; }
 
 .tom-kalemler__wrap {
     overflow-x: auto;
@@ -126,15 +126,16 @@
     color: #64748b;
     font-weight: 700;
     text-align: left;
-    padding: 6px 10px;
-    font-size: 0.66rem;
+    padding: 5px 8px;
+    font-size: 0.62rem;
     text-transform: uppercase;
     letter-spacing: 0.4px;
     border-bottom: 1px solid #f1f5f9;
 }
 
 .tom-kalemler__wrap td {
-    padding: 7px 10px;
+    padding: 5px 8px;
+    font-size: 0.74rem;
     color: #334155;
     border-bottom: 1px solid #f8fafc;
 }
@@ -145,11 +146,11 @@
 .tom-kalemler__grouped-total {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
+    gap: 10px;
+    padding: 7px 10px;
     background: linear-gradient(135deg, #eff6ff, #f0fdf4);
     border-top: 2px solid #e2e8f0;
-    font-size: 0.86rem;
+    font-size: 0.76rem;
 }
 
 .tom-kalemler__grouped-total strong { color: #334155; font-weight: 600; }
@@ -161,27 +162,27 @@
 .tom-my-note label {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 0.78rem;
+    gap: 4px;
+    font-size: 0.72rem;
     font-weight: 700;
     color: #334155;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
-.tom-my-note label .material-symbols-outlined { font-size: 16px; color: #3b82f6; }
+.tom-my-note label .material-symbols-outlined { font-size: 14px; color: #3b82f6; }
 
 .tom-my-note textarea {
     width: 100%;
     box-sizing: border-box;
-    border-radius: 9px;
-    border: 1.5px solid #e2e8f0;
-    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 6px 9px;
     font-family: inherit;
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     color: #0f172a;
     resize: none;
-    min-height: 60px;
-    max-height: 180px;
+    min-height: 50px;
+    max-height: 140px;
     overflow-y: auto;
     transition: border-color 0.2s, box-shadow 0.2s;
     background: #f8fafc;
@@ -199,16 +200,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding-top: 10px;
+    gap: 6px;
+    padding-top: 8px;
     border-top: 1px solid #f1f5f9;
-    margin-top: 10px;
+    margin-top: 8px;
     flex-wrap: wrap;
 }
 
 .tom-offer-card__footer-right {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     margin-left: auto;
 }
 
@@ -216,11 +217,11 @@
 .tom-btn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 6px 14px;
-    border-radius: 9px;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 8px;
     font-family: inherit;
-    font-size: 0.8rem;
+    font-size: 0.74rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -229,12 +230,12 @@
     letter-spacing: 0.01em;
 }
 
-.tom-btn .material-symbols-outlined { font-size: 16px; }
+.tom-btn .material-symbols-outlined { font-size: 14px; }
 
 .tom-btn--outline {
     background: #f8fafc;
     color: #475569;
-    border: 1.5px solid #e2e8f0;
+    border: 1px solid #e2e8f0;
 }
 
 .tom-btn--outline:hover {
@@ -248,7 +249,7 @@
 .tom-btn--accept {
     background: #f0fdf4;
     color: #059669;
-    border: 1.5px solid #6ee7b7;
+    border: 1px solid #6ee7b7;
 }
 
 .tom-btn--accept:hover {
@@ -265,7 +266,7 @@
 .tom-btn--reject {
     background: #fef2f2;
     color: #dc2626;
-    border: 1.5px solid #fecaca;
+    border: 1px solid #fecaca;
 }
 
 .tom-btn--reject:hover {
@@ -282,12 +283,12 @@
 .tom-btn--chat {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 0.78rem;
+    gap: 4px;
+    padding: 4px 9px;
+    border-radius: 7px;
+    font-size: 0.72rem;
     font-weight: 600;
-    border: 1.5px solid #6366f1;
+    border: 1px solid #6366f1;
     background: #eef2ff;
     color: #4f46e5;
     cursor: pointer;

@@ -34,7 +34,6 @@ const IhaleOfferCard = ({ offer, idx, isExpanded, isCompare, compareCount, isHig
                             className={`tom-compare-btn${isCompare ? ' tom-compare-btn--active' : ''}${!isCompare && !compareHintDismissed ? ' tom-compare-btn--hint' : ''}`}
                             onClick={onToggleCompare}
                             disabled={!isCompare && compareCount >= 3}
-                            data-tooltip={isCompare ? 'Karşılaştırmadan Çıkar' : compareCount >= 3 ? 'Maks. 3 teklif' : 'Karşılaştır'}
                         >
                             <span className="material-symbols-outlined">{isCompare ? 'done' : 'compare_arrows'}</span>
                             <span className="tom-compare-btn__text">{isCompare ? 'Seçildi' : 'Karşılaştır'}</span>

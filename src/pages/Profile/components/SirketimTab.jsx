@@ -1,14 +1,18 @@
 // Enes Doğanay | 7 Mayıs 2026: SirketimTab — şirket üyeliği ve panel erişimi
+// Enes Doğanay | 8 Mayıs 2026: Panel butonları iframe yerine tam sayfa navigasyona geçirildi
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './SirketimTab.css';
 import './SirketimTab.ekip.css';
 import './SirketimTab.dark.css';
 import './SirketimTab.responsive.css';
 
 const SirketimTab = ({
-  myCompany, myCompanyFirma, pendingInvites, sirketimSubPanel, setSirketimSubPanel,
-  sirketimIframeRef, theme, handleDavetKabul, handleDavetRed,
+  myCompany, myCompanyFirma, pendingInvites,
+  handleDavetKabul, handleDavetRed,
 }) => {
+  // Enes Doğanay | 8 Mayıs 2026: Tam sayfa navigasyon
+  const navigate = useNavigate();
   /* Enes Doğanay | 7 Mayıs 2026: Hero KPI hesapları */
   const pendingCount = pendingInvites.length;
   const activePermCount = myCompany?.page_permissions
@@ -109,57 +113,34 @@ const SirketimTab = ({
           </div>
           <div className="sc-firma-actions">
             {myCompany.page_permissions?.firma_paneli && (
-              <button className={`sc-panel-btn${sirketimSubPanel === 'panel' ? ' active' : ''}`}
-                onClick={() => setSirketimSubPanel(p => p === 'panel' ? null : 'panel')}>
+              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=panel&from=sirketim')}>
                 <span className="material-symbols-outlined">storefront</span>
                 Firma Paneli
-                <span className="material-symbols-outlined sc-panel-btn__arrow">
-                  {sirketimSubPanel === 'panel' ? 'expand_less' : 'expand_more'}
-                </span>
+                <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
             {myCompany.page_permissions?.teklif_yonetimi && (
-              <button className={`sc-panel-btn${sirketimSubPanel === 'teklifler' ? ' active' : ''}`}
-                onClick={() => setSirketimSubPanel(p => p === 'teklifler' ? null : 'teklifler')}>
+              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=teklifler&from=sirketim')}>
                 <span className="material-symbols-outlined">request_quote</span>
                 Teklif Yönetimi
-                <span className="material-symbols-outlined sc-panel-btn__arrow">
-                  {sirketimSubPanel === 'teklifler' ? 'expand_less' : 'expand_more'}
-                </span>
+                <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
             {myCompany.page_permissions?.ihale_yonetimi && (
-              <button className={`sc-panel-btn${sirketimSubPanel === 'ihaleler' ? ' active' : ''}`}
-                onClick={() => setSirketimSubPanel(p => p === 'ihaleler' ? null : 'ihaleler')}>
+              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=ihale-yonetimi&from=sirketim')}>
                 <span className="material-symbols-outlined">gavel</span>
                 İhale Yönetimi
-                <span className="material-symbols-outlined sc-panel-btn__arrow">
-                  {sirketimSubPanel === 'ihaleler' ? 'expand_less' : 'expand_more'}
-                </span>
+                <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
             {myCompany.page_permissions?.ekip_yonetimi && (
-              <button className={`sc-panel-btn${sirketimSubPanel === 'ekip' ? ' active' : ''}`}
-                onClick={() => setSirketimSubPanel(p => p === 'ekip' ? null : 'ekip')}>
+              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=ekip&from=sirketim')}>
                 <span className="material-symbols-outlined">group</span>
                 Ekip Yönetimi
-                <span className="material-symbols-outlined sc-panel-btn__arrow">
-                  {sirketimSubPanel === 'ekip' ? 'expand_less' : 'expand_more'}
-                </span>
+                <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
           </div>
-          {sirketimSubPanel && (
-            <div className="sirketim-iframe-wrap">
-              <iframe
-                key={sirketimSubPanel} ref={sirketimIframeRef}
-                src={`/firma-profil?tab=${sirketimSubPanel === 'teklifler' ? 'teklifler' : sirketimSubPanel === 'ihaleler' ? 'ihale-yonetimi' : sirketimSubPanel === 'ekip' ? 'ekip' : 'panel'}&embedded=1`}
-                className="sirketim-iframe"
-                title={sirketimSubPanel === 'teklifler' ? 'Teklif Yönetimi' : sirketimSubPanel === 'ihaleler' ? 'İhale Yönetimi' : sirketimSubPanel === 'ekip' ? 'Ekip Yönetimi' : 'Firma Paneli'}
-                onLoad={() => sirketimIframeRef.current?.contentWindow?.postMessage({ type: 'tedport-theme', theme }, window.location.origin)}
-              />
-            </div>
-          )}
         </div>
       )}
 

@@ -76,10 +76,10 @@ export const TENDER_STATUS = {
 export const getTenderStatus = (v) => TENDER_STATUS[String(v || '').toLowerCase()] || { label: v || 'Bilinmiyor', tone: 'draft', icon: 'help' };
 
 export const OFFER_STATUS = {
-    gonderildi: { label: 'Değerlendiriliyor', tone: 'pending', icon: 'hourglass_top' },
-    kabul: { label: 'Kabul Edildi', tone: 'accept', icon: 'check_circle' },
-    red: { label: 'Reddedildi', tone: 'reject', icon: 'cancel' },
-    taslak: { label: 'Taslak', tone: 'draft', icon: 'edit_note' },
+    gonderildi: { label: 'Değerlendiriliyor', tone: 'review',    icon: 'hourglass_top' },
+    kabul:      { label: 'Kabul Edildi',       tone: 'accepted',  icon: 'check_circle' },
+    red:        { label: 'Reddedildi',         tone: 'rejected',  icon: 'cancel' },
+    taslak:     { label: 'Taslak',             tone: 'draft',     icon: 'edit_note' },
 };
 export const getOfferStatus = (v) => OFFER_STATUS[String(v || '').toLowerCase()] || { label: v || 'Bilinmiyor', tone: 'pending', icon: 'help' };
 

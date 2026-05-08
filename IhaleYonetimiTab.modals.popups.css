@@ -78,8 +78,27 @@
 
 .tom-scoring-info-item p { margin: 0; font-size: 0.82rem; color: #64748b; line-height: 1.5; }
 
-/* ═══════════════════════════════════════════════════
-   RED NEDENİ POPUP
+/* Enes Doğanay | 8 Mayıs 2026: Puanlama popup mobilde kompakt */
+@media (max-width: 480px) {
+    .tom-scoring-info-card {
+        padding: 20px 16px 16px;
+        border-radius: 16px;
+        max-height: 88vh;
+    }
+    .tom-scoring-info-card__icon {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 10px;
+    }
+    .tom-scoring-info-card__icon .material-symbols-outlined { font-size: 22px; }
+    .tom-scoring-info-card h3 { font-size: 1rem; }
+    .tom-scoring-info-card__body { margin-top: 12px; }
+    .tom-scoring-info-card__body > p { font-size: 0.82rem; margin-bottom: 12px; }
+    .tom-scoring-info-item { padding: 10px; border-radius: 10px; gap: 10px; margin-bottom: 8px; }
+    .tom-scoring-info-item > .material-symbols-outlined { font-size: 20px; }
+    .tom-scoring-info-item strong { font-size: 0.84rem; margin-bottom: 2px; }
+    .tom-scoring-info-item p { font-size: 0.76rem; }
+}
    ═══════════════════════════════════════════════════ */
 .tom-reject-note-card {
     background: #fff;

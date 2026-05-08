@@ -1,5 +1,5 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale yönetimi — sidebar + ana içerik alanı
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import IhaleSidebar from './IhaleSidebar';
 import IhaleInfoCard from './IhaleInfoCard';
 import IhaleOffersSection from './IhaleOffersSection';
@@ -8,8 +8,22 @@ const IhaleYonetimiBody = ({
     core, chat, create, tenderActions, offerActions, combinedModals, sortedFilteredTenders,
 }) => {
     const selectedTender = core.selectedTender;
+    // Enes Doğanay | 8 Mayıs 2026: Mobil liste/detay geçiş state'i
+    const [mobileView, setMobileView] = useState(core.selectedId ? 'detail' : 'list');
+
+    // Enes Doğanay | 8 Mayıs 2026: URL/bildirim ile selectedId değişince → detay görünümüne geç
+    useEffect(() => {
+        if (core.selectedId) setMobileView('detail');
+    }, [core.selectedId]); // eslint-disable-line
+
+    // Enes Doğanay | 8 Mayıs 2026: Tender seçimi — mobilde detay görünümüne geç
+    const handleSelectTender = (id) => {
+        core.setSelectedId(id);
+        setMobileView('detail');
+    };
+
     return (
-        <div className="tom-body">
+        <div className={`tom-body tom-body--mobile-${mobileView}`}>
             {/* Enes Doğanay | 6 Mayıs 2026: İhale listesi sidebar */}
             <IhaleSidebar
                 filteredTenders={sortedFilteredTenders} selectedId={core.selectedId}
@@ -17,9 +31,14 @@ const IhaleYonetimiBody = ({
                 tenderSearch={core.tenderSearch} setTenderSearch={core.setTenderSearch}
                 tenderFilter={core.tenderFilter} setTenderFilter={core.setTenderFilter}
                 tenderPage={core.tenderPage} setTenderPage={core.setTenderPage}
-                onSelectTender={core.setSelectedId} onNewTender={create.openCreateModal}
+                onSelectTender={handleSelectTender} onNewTender={create.openCreateModal}
             />
             <main className="tom-main">
+                {/* Enes Doğanay | 8 Mayıs 2026: Mobil geri butonu — sadece ≤768px detay görünümünde görünür */}
+                <button className="tom-mobile-back" onClick={() => setMobileView('list')}>
+                    <span className="material-symbols-outlined">arrow_back</span>
+                    İhale Listesi
+                </button>
                 {!selectedTender ? (
                     <div className="tom-empty-state">
                         <span className="material-symbols-outlined">gavel</span>

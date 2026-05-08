@@ -1,0 +1,226 @@
+/* ══════════════════════════════════════════════════
+   Enes Doğanay | 8 Mayıs 2026: IhaleYonetimiTab dark mode — Part 4
+   Eksik kalan sınıfların tümü bu dosyada toplanmıştır.
+   ══════════════════════════════════════════════════ */
+
+/* ── panel.css eksikleri ── */
+
+/* Offers toolbar başlık rengi */
+[data-theme="dark"] .tom-offers-toolbar__left h3 { color: #e2e8f0; }
+
+/* Count badge — gradyan yeterli, sadece shadow düzeltme */
+[data-theme="dark"] .tom-count-badge {
+    box-shadow: 0 2px 8px rgba(59,130,246,0.2);
+}
+
+/* Aktif icon buton — gradyan yeterli, görünür kalır */
+[data-theme="dark"] .tom-btn-icon--active {
+    box-shadow: 0 3px 10px rgba(37,99,235,0.35);
+}
+
+/* Aktif chip (filtre) */
+/* Enes Doğanay | 8 Mayıs 2026: chip--on dark modda gradient koru */
+[data-theme="dark"] .tom-chip--on {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 2px 10px rgba(37,99,235,0.4);
+}
+[data-theme="dark"] .tom-chip--on .material-symbols-outlined { color: #fff; }
+
+/* Offer filtre chips container — yok, sadece flex wrap, arka plan yok */
+/* tom-info-card__grid — grid layout, arka plan yok */
+/* tom-info-card__body — animation only, renk yok */
+/* tom-info-card__tags — flex, renk yok */
+/* tom-info-card__files-list — flex, renk yok */
+/* tom-offers-toolbar__right — flex, renk yok */
+/* tom-sort-wrap, tom-sort-chevron — renk zaten #94a3b8 dark'ta yeterli */
+
+/* info-card__desc sol border */
+[data-theme="dark"] .tom-info-card__desc { border-left-color: #1e3a5f; }
+
+/* ── cards.css eksikleri ── */
+
+/* Sıralama rozetleri */
+[data-theme="dark"] .tom-rank--1 {
+    box-shadow: 0 2px 8px rgba(245,158,11,0.2);
+}
+[data-theme="dark"] .tom-rank--3 {
+    /* turuncu gradient karanlıkta yeterli */
+}
+
+/* Teklif kartı bilgi alanı */
+[data-theme="dark"] .tom-offer-card__info { /* flex container, renk yok */ }
+[data-theme="dark"] .tom-offer-card__company strong { color: #e2e8f0; }
+[data-theme="dark"] .tom-offer-card__email { color: #64748b; }
+[data-theme="dark"] .tom-offer-card__metrics { /* flex container */ }
+[data-theme="dark"] .tom-offer-card__time { color: #64748b; }
+[data-theme="dark"] .tom-offer-card__actions { /* flex container */ }
+
+/* Teklif kartı main row hover */
+[data-theme="dark"] .tom-offer-card__main:hover { background: #253347; }
+
+/* highlight animasyonu dark'ta mor yerine mavi */
+[data-theme="dark"] .tom-offer-card--highlight {
+    border-color: #3b9eff;
+    box-shadow: 0 0 0 3px rgba(59,158,255,0.18), 0 0 24px rgba(59,158,255,0.12);
+}
+
+/* Karşılaştır ipucu hint state */
+[data-theme="dark"] .tom-compare-check--hint {
+    border-color: #a78bfa;
+    color: #c4b5fd;
+    background: #2d1f4f;
+}
+
+/* Offer list — flex container */
+/* tom-offer-list — renk yok, skip */
+
+/* Balance slider readout */
+[data-theme="dark"] .tom-balance-slider__readout { color: #94a3b8; }
+[data-theme="dark"] .tom-balance-slider__labels { /* flex container */ }
+[data-theme="dark"] .tom-balance-slider__fill-left  { /* gradient, renk yeterli */ }
+[data-theme="dark"] .tom-balance-slider__fill-right { /* gradient, renk yeterli */ }
+[data-theme="dark"] .tom-balance-slider__input      { /* opacity 0, renk önemsiz */ }
+[data-theme="dark"] .tom-balance-slider__side--left  { color: #34d399; }
+[data-theme="dark"] .tom-balance-slider__side--right { color: #fbbf24; }
+
+/* ── compare.css eksikleri ── */
+
+/* Karşılaştırma ipucu dismiss butonu */
+[data-theme="dark"] .tom-compare-hint__dismiss { color: #c4b5fd; }
+[data-theme="dark"] .tom-compare-hint__dismiss:hover { background: rgba(124,58,237,0.2); color: #a78bfa; }
+
+/* Karşılaştırma ipucu ikon */
+[data-theme="dark"] .tom-compare-hint__icon {
+    box-shadow: 0 3px 10px rgba(124,58,237,0.2);
+}
+
+/* metric-label-wrap, tbl-cell-top, grid — sadece layout, renk yok */
+/* tom-compare__grid — display:none zaten */
+
+/* ── detail.css eksikleri ── */
+
+/* Bar fill — gradient renkler dark'ta yeterli */
+/* tom-bar--sm — sadece height:6px */
+/* tom-score-bars — sadece display:grid */
+/* tom-offer-card__footer-right — sadece flex */
+
+/* Chat okunmamış nokta */
+[data-theme="dark"] .tom-chat-unread-dot {
+    background: #ef4444;
+    border-color: #1e293b;
+}
+
+/* Footer border */
+[data-theme="dark"] .tom-offer-card__footer {
+    border-top-color: #334155;
+}
+
+/* ── actions.css eksikleri ── */
+
+/* Confirm butonları — gradyan yeterli, dark özel gereksiz */
+/* tom-btn--confirm — amber gradyan, karanlıkta yeterli */
+/* tom-btn--confirm-red — kırmızı gradyan, karanlıkta yeterli */
+
+/* share-link icon rengi */
+[data-theme="dark"] .tom-share-link-row__icon { color: #60a5fa; }
+
+/* ── IhaleYonetimiTab.css eksikleri ── */
+
+/* Sidebar count pill */
+[data-theme="dark"] .tom-sidebar__count {
+    background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(29,78,216,0.15));
+    color: #93c5fd;
+    border-color: rgba(59,130,246,0.2);
+}
+
+/* Sidebar clear butonu */
+[data-theme="dark"] .tom-sidebar__clear {
+    background: #334155;
+    color: #94a3b8;
+}
+[data-theme="dark"] .tom-sidebar__clear:hover { background: #475569; }
+
+/* Sidebar filter container — renk yok */
+/* tom-sidebar__filters — flex, renk yok */
+/* tom-sidebar__head-top — flex, renk yok */
+
+/* Tender card body text */
+[data-theme="dark"] .tom-tender-card__top h3 { color: #e2e8f0; }
+[data-theme="dark"] .tom-tender-card--active .tom-tender-card__top h3 { color: #93c5fd; }
+[data-theme="dark"] .tom-tender-card__meta { color: #64748b; }
+[data-theme="dark"] .tom-tender-card__offers { color: #94a3b8; }
+
+/* Deadline renkleri dark'ta zaten canlı, extra gerekmiyor */
+
+/* Unread msg indicator */
+[data-theme="dark"] .tom-offer-card__unread-msg-indicator {
+    box-shadow: none;
+}
+
+/* Stat container — beyond hero gradient */
+[data-theme="dark"] .tom-stat strong { color: #f1f5f9; }
+[data-theme="dark"] .tom-stat span:last-child { opacity: 0.55; }
+
+/* ── SirketimTab dark eksik ── */
+
+/* iframe wrapper dark'ta border rengi */
+[data-theme="dark"] .sirketim-iframe-wrap {
+    border-color: #334155;
+    background: #0f172a;
+}
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 8 Mayıs 2026: Yeni karşılaştırma tablosu dark mode
+   ═══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-compare {
+    background: #0f172a;
+    border-color: rgba(139,92,246,0.18);
+}
+
+[data-theme="dark"] .tom-compare__head {
+    background: linear-gradient(135deg, #1e1736, #1e293b);
+    border-bottom-color: rgba(167,139,250,0.12);
+}
+
+[data-theme="dark"] .tom-compare__head h3 { color: #c4b5fd; }
+
+[data-theme="dark"] .tom-cmp__cards {
+    background: #1a2235;
+    border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .tom-cmp__card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .tom-cmp__card--winner {
+    background: #0d2418;
+    border-color: #34d399;
+    box-shadow: 0 0 0 2px rgba(52,211,153,0.1);
+}
+
+[data-theme="dark"] .tom-cmp__card-name { color: #cbd5e1; }
+
+[data-theme="dark"] .tom-cmp__row--alt { background: #1a2235; }
+
+[data-theme="dark"] .tom-cmp__row { border-bottom-color: #1e293b; }
+
+[data-theme="dark"] .tom-cmp__lbl-icon-ms { color: #475569; }
+
+[data-theme="dark"] .tom-cmp__lbl > span:last-child { color: #64748b; }
+
+[data-theme="dark"] .tom-cmp__cell { border-left-color: #1e293b; }
+[data-theme="dark"] .tom-cmp__cell--best { background: rgba(16,185,129,0.08); }
+
+[data-theme="dark"] .tom-cmp__score-val          { color: #e2e8f0; }
+[data-theme="dark"] .tom-cmp__score-val--best     { color: #34d399; }
+[data-theme="dark"] .tom-cmp__ring-wrap           { --ring-track: #334155; }
+[data-theme="dark"] .tom-cmp__check      { color: #34d399; }
+[data-theme="dark"] .tom-cmp__bar-track  { background: #334155; }
+[data-theme="dark"] .tom-cmp__amount-val { color: #e2e8f0; }
+[data-theme="dark"] .tom-cmp__kdv-tag    { color: #475569; }
+[data-theme="dark"] .tom-cmp__plain-val  { color: #94a3b8; }
+[data-theme="dark"] .tom-cmp__fast-tag   { background: rgba(16,185,129,0.12); color: #34d399; }

@@ -76,7 +76,9 @@ export const useCompanyManagement = ({ company, onCompanyUpdated, onSave, onDele
                 web_sitesi: fields.web_sitesi, telefon: fields.telefon, eposta: fields.eposta,
                 latitude: fields.latitude === '' ? null : Number(fields.latitude),
                 longitude: fields.longitude === '' ? null : Number(fields.longitude),
-                adres: fields.adres, description: fields.description, urun_kategorileri: getSerialized()
+                adres: fields.adres, description: fields.description, urun_kategorileri: getSerialized(),
+                // Enes Doğanay | 8 Mayıs 2026: logo_url payload'a eklenmezse Edge Function null yazıp logoyu siliyordu
+                logo_url: fields.logo_url || null,
             };
             const result = onSave ? await onSave(payload) : await updateManagedCompany(payload);
             originalFieldsRef.current = JSON.stringify(fields);

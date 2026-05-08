@@ -16,6 +16,8 @@ import './IhaleYonetimiTab.modals.popups.css';
 import './IhaleYonetimiTab.dark.css';
 import './IhaleYonetimiTab.dark2.css';
 import './IhaleYonetimiTab.dark3.css';
+import './IhaleYonetimiTab.dark4.css';
+import './IhaleYonetimiTab.responsive.css';
 
 /* Enes Doğanay | 6 Mayıs 2026: İhale Yönetimi tab içeriği — subtab switcher + her iki panel */
 const IhaleYonetimiTab = ({ companyId, searchParams, setTab, setIhaleYonetimiUnreadCount }) => {

@@ -35,8 +35,8 @@ const ProfilePage = () => {
   const core = useProfileCore();
   const { user, profile, cities, loading, uploading, pendingEmail, fieldFeedback, setFieldFeedback,
     marketingConsent, marketingConsentSaving, myCompany, myCompanyFirma, pendingInvites,
-    sirketimSubPanel, setSirketimSubPanel, mopChatTrigger, setMopChatTrigger,
-    prToast, setPrToast, notifPrefs, setNotifPrefs, fileInputRef, sirketimIframeRef, theme,
+    mopChatTrigger, setMopChatTrigger,
+    prToast, setPrToast, notifPrefs, setNotifPrefs, fileInputRef, theme,
     searchParams, setSearchParams, navigate, showPrToast,
     handleLogout, handleAvatarUpload, handleUpdateField,
     handleCancelEmailChange, handleResendEmailChange, handleDavetKabul, handleDavetRed, handleToggleMarketing,
@@ -101,8 +101,6 @@ const ProfilePage = () => {
             )}
             {currentTab === 'sirketim' && (
               <SirketimTab myCompany={myCompany} myCompanyFirma={myCompanyFirma} pendingInvites={pendingInvites}
-                sirketimSubPanel={sirketimSubPanel} setSirketimSubPanel={setSirketimSubPanel}
-                sirketimIframeRef={sirketimIframeRef} theme={theme}
                 handleDavetKabul={handleDavetKabul} handleDavetRed={handleDavetRed} />
             )}
             {currentTab === 'notifications' && (

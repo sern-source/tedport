@@ -74,13 +74,25 @@
   color: #93c5fd;
 }
 
-/* Enes Do�anay | 2 May�s 2026: Se�ili pill dark modda belirgin olsun */
+/* Enes Doğanay | 2 Mayıs 2026: Seçili pill dark modda belirgin olsun */
 [data-theme="dark"] .tom-pill--on {
   background: linear-gradient(135deg, #3b9eff, #2563eb);
   border-color: transparent;
   color: #fff;
   box-shadow: 0 2px 8px rgba(59, 158, 255, 0.4);
 }
+[data-theme="dark"] .tom-pill--on .material-symbols-outlined { color: #fff; }
+[data-theme="dark"] .tom-pill .material-symbols-outlined { color: #475569; }
+[data-theme="dark"] .tom-pill:hover .material-symbols-outlined { color: #93c5fd; }
+
+/* Enes Doğanay | 8 Mayıs 2026: Teklif sayısı renk — dark */
+[data-theme="dark"] .tom-offer-count--zero  { color: #64748b; }
+[data-theme="dark"] .tom-offer-count--amber { color: #fbbf24; }
+[data-theme="dark"] .tom-offer-count--green { color: #34d399; }
+
+/* Enes Doğanay | 8 Mayıs 2026: Son başvuru deadline — dark */
+[data-theme="dark"] .tom-deadline--urgent { color: #f87171 !important; }
+[data-theme="dark"] .tom-deadline--past   { color: #94a3b8 !important; }
 
 /* Main area */
 [data-theme="dark"] .tom-main {
@@ -168,8 +180,7 @@
 }
 
 [data-theme="dark"] .tom-offers-toolbar {
-  background: #1e293b;
-  border-color: #334155;
+  /* toolbar has no background in light mode — don't add one in dark */
 }
 
 [data-theme="dark"] .tom-btn-icon {

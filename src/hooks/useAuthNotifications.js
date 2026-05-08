@@ -83,7 +83,7 @@ export const useAuthNotifications = ({ authChecked, realtimeUserId, notifPrefsRe
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bildirimler', filter: `user_id=eq.${userId}` },
                 payload => handleNewNotification(payload.new))
             .subscribe((status, err) => {
-                if (status !== 'SUBSCRIBED') console.warn('[Realtime] bildirimler kanal durumu:', status, err);
+                if (status !== 'SUBSCRIBED' && status !== 'CLOSED' && status !== 'CHANNEL_ERROR') console.warn('[Realtime] bildirimler kanal durumu:', status, err);
             });
         realtimeChannelRef.current = channel;
         return () => {

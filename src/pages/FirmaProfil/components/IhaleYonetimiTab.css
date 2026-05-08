@@ -205,13 +205,13 @@
     overflow: visible;
 }
 
-/* Enes Doğanay | 7 Mayıs 2026: Sidebar head — compact tek satır */
+/* Enes Doğanay | 8 Mayıs 2026: tom-sidebar compact — boyut standardına uydu */
 .tom-sidebar__head {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 11px 14px;
+    padding: 9px 12px;
     border-bottom: 1px solid #f1f5f9;
 }
 
@@ -248,7 +248,7 @@
 
 .tom-sidebar__head h2 {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 700;
     color: #0f172a;
     letter-spacing: -0.01em;
@@ -258,13 +258,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 26px;
-    height: 26px;
-    padding: 0 8px;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 6px;
     border-radius: 99px;
     background: linear-gradient(135deg, #eff6ff, #dbeafe);
     color: #1d4ed8;
-    font-size: 0.72rem;
+    font-size: 0.65rem;
     font-weight: 800;
     border: 1px solid rgba(37,99,235,0.12);
 }
@@ -273,13 +273,13 @@
 .tom-sidebar__search {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin: 10px 14px 0;
-    padding: 0 12px;
-    height: 36px;
-    border-radius: 10px;
+    gap: 6px;
+    margin: 8px 12px 0;
+    padding: 0 10px;
+    height: 32px;
+    border-radius: 8px;
     background: #f8fafc;
-    border: 1.5px solid #e8edf2;
+    border: 1px solid #e8edf2;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
@@ -290,7 +290,7 @@
 }
 
 .tom-sidebar__search .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
     color: #94a3b8;
 }
 
@@ -300,7 +300,7 @@
     outline: none;
     background: transparent;
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.76rem;
     color: #0f172a;
 }
 
@@ -326,23 +326,28 @@
 /* Filtre pilleri */
 .tom-sidebar__filters {
     display: flex;
-    gap: 6px;
-    padding: 10px 14px 0;
+    gap: 4px;
+    padding: 8px 12px 0;
     flex-wrap: wrap;
 }
 
 .tom-pill {
-    padding: 5px 12px;
+    padding: 4px 9px;
     border-radius: 99px;
-    border: 1.5px solid #e2e8f0;
+    border: 1px solid #e2e8f0;
     background: #fff;
     color: #64748b;
-    font-size: 0.73rem;
+    font-size: 0.68rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s ease;
     letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
 }
+
+.tom-pill .material-symbols-outlined { font-size: 12px; }
 
 .tom-pill:hover {
     border-color: #93c5fd;
@@ -357,14 +362,16 @@
     box-shadow: 0 2px 8px rgba(37,99,235,0.3);
 }
 
+.tom-pill--on .material-symbols-outlined { color: #fff; }
+
 /* İhale listesi */
 .tom-sidebar__list {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 14px 14px;
+    padding: 8px 12px 12px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     scrollbar-width: thin;
     scrollbar-color: #e2e8f0 transparent;
 }
@@ -416,7 +423,7 @@
 
 .tom-tender-card__body {
     flex: 1;
-    padding: 12px 14px;
+    padding: 8px 10px;
     min-width: 0;
 }
 
@@ -429,7 +436,7 @@
 
 .tom-tender-card__top h3 {
     margin: 0;
-    font-size: 0.87rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: #1e293b;
     line-height: 1.35;
@@ -448,16 +455,16 @@
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    padding: 3px 8px;
+    padding: 2px 6px;
     border-radius: 99px;
-    font-size: 0.67rem;
+    font-size: 0.62rem;
     font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: 0.02em;
 }
 
-.tom-badge .material-symbols-outlined { font-size: 11px; }
+.tom-badge .material-symbols-outlined { font-size: 10px; }
 
 .tom-badge--active { background: #dcfce7; color: #15803d; }
 .tom-badge--closed { background: #fee2e2; color: #b91c1c; }
@@ -468,9 +475,9 @@
 .tom-tender-card__meta {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-top: 7px;
-    font-size: 0.73rem;
+    gap: 8px;
+    margin-top: 5px;
+    font-size: 0.68rem;
     color: #64748b;
 }
 
@@ -480,7 +487,7 @@
     gap: 3px;
 }
 
-.tom-tender-card__meta .material-symbols-outlined { font-size: 13px; }
+.tom-tender-card__meta .material-symbols-outlined { font-size: 11px; }
 
 .tom-tender-card__offers {
     font-weight: 700;
@@ -552,19 +559,75 @@
     50% { box-shadow: 0 0 0 4px rgba(99,102,241,0); }
 }
 
-/* Enes Doğanay | 7 Mayıs 2026: IhaleYonetimiTab.css responsive */
+/* Enes Doğanay | 7 Mayıs 2026: IhaleYonetimiTab.css responsive — hero responsive.css'e taşındı */
 @media (max-width: 768px) {
-    .tom-hero { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .tom-hero__stats { width: 100%; }
     .tom-body { grid-template-columns: 1fr; }
     .tom-sidebar { max-height: 240px; border-right: none; border-bottom: 1px solid rgba(226,232,240,0.8); border-radius: 16px 16px 0 0; }
     .tom-sidebar__list { flex-direction: row; overflow-x: auto; }
     .tom-sidebar__list .tom-tender-card { flex-shrink: 0; min-width: 200px; max-width: 240px; }
 }
-@media (max-width: 480px) {
-    .tom-hero { padding: 14px; border-radius: 14px; }
-    .tom-hero__text h1 { font-size: 1.05rem; }
-    .tom-hero__text p  { font-size: 0.75rem; }
-    .tom-stat { padding: 7px 10px; min-width: 70px; }
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 8 Mayıs 2026: EMBEDDED MOD — iframe içinde tam yükseklik layout
+   ═══════════════════════════════════════════════════ */
+.page--embedded .tom-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+.page--embedded .tom-hero {
+    flex-shrink: 0;
+    margin-bottom: 10px;
+    padding: 10px 16px;
+}
+.page--embedded .tom-hero__text h1 { font-size: 1rem; }
+.page--embedded .tom-hero__text p  { display: none; }
+.page--embedded .tom-stat { padding: 6px 10px; min-width: 60px; }
+.page--embedded .tom-error-banner { flex-shrink: 0; }
+.page--embedded .tom-loading { flex: 1; }
+
+/* tom-body grid — tek satır yüksekliği flex'ten aldığı tüm alan */
+.page--embedded .tom-body {
+    flex: 1;
+    min-height: 0 !important;
+    overflow: hidden;
+    grid-template-rows: 1fr;
+    align-items: stretch;
+}
+
+/* Sidebar tam yüksekliği alır, liste kendi içinde scroll */
+.page--embedded .tom-sidebar {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Sağ içerik: grid satır yüksekliğini alır, kendi scroll eder */
+.page--embedded .tom-main {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+}
+.page--embedded .tom-main::-webkit-scrollbar { width: 5px; }
+.page--embedded .tom-main::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 99px; }
+
+/* Embedded + mobil — sidebar yatay compact, main aşağıda scroll */
+@media (max-width: 768px) {
+    .page--embedded .tom-body {
+        grid-template-rows: auto 1fr;
+    }
+    .page--embedded .tom-sidebar {
+        height: auto;
+        max-height: 190px;
+    }
+    .page--embedded .tom-main {
+        height: 100%;
+        overflow-y: auto;
+    }
 }
 

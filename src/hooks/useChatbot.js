@@ -1,6 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Chatbot state, effects ve mesaj mantığı
 import { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { fetchChatbotQA, fetchChatbotQuickQuestions } from '../services/chatbotService';
 
 const FALLBACK_ANSWER =
@@ -25,7 +25,21 @@ function findAnswer(text, qaList) {
 
 const useChatbot = () => {
     const location = useLocation();
-    const isHidden = location.pathname.startsWith('/admin');
+    const [chatSearchParams] = useSearchParams();
+    // Enes Doğanay | 8 Mayıs 2026: Mobil ekran takibi (≤768px)
+    const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 768px)');
+        const handler = (e) => setIsMobile(e.matches);
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
+    }, []);
+    // Enes Doğanay | 8 Mayıs 2026: Admin her zaman, firma profil tab'ları sadece mobilde gizlenir
+    const isFirmaProfil = location.pathname.startsWith('/firma-profil');
+    const currentTab = chatSearchParams.get('tab');
+    const isIhaleYonetimi = isFirmaProfil && currentTab === 'ihale-yonetimi';
+    const isTeklifYonetimi = isFirmaProfil && currentTab === 'teklifler';
+    const isHidden = location.pathname.startsWith('/admin') || (isMobile && (isIhaleYonetimi || isTeklifYonetimi));
     const [open, setOpen] = useState(false);
     const [qaList, setQaList] = useState([]);
     const [quickQuestions, setQuickQuestions] = useState([]);

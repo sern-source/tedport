@@ -14,7 +14,7 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
                     <h2>İhale Listesi</h2>
                     <span className="tom-sidebar__count">{filteredTenders.length}</span>
                 </div>
-                <button className="tom-sidebar__add-btn" onClick={onNewTender} data-tooltip="Yeni ihale oluştur">
+                <button className="tom-sidebar__add-btn" onClick={onNewTender} data-tooltip="Yeni ihale oluştur" data-tooltip-pos="bottom">
                     <span className="material-symbols-outlined">add</span>
                 </button>
             </div>
@@ -26,8 +26,15 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
             </div>
 
             <div className="tom-sidebar__filters">
-                {[{ key: 'all', label: 'Tümü' }, { key: 'active', label: 'Aktif' }, { key: 'closed', label: 'Kapandı' }, { key: 'draft', label: 'Taslak' }].map(f => (
-                    <button key={f.key} className={`tom-pill${tenderFilter === f.key ? ' tom-pill--on' : ''}`} onClick={() => { setTenderFilter(f.key); setTenderPage(1); }}>{f.label}</button>
+                {[
+                    { key: 'all',    label: 'Tümü',    icon: 'apps' },
+                    { key: 'active', label: 'Aktif',   icon: 'check_circle' },
+                    { key: 'closed', label: 'Kapandı', icon: 'lock' },
+                    { key: 'draft',  label: 'Taslak',  icon: 'edit_note' },
+                ].map(f => (
+                    <button key={f.key} className={`tom-pill${tenderFilter === f.key ? ' tom-pill--on' : ''}`} onClick={() => { setTenderFilter(f.key); setTenderPage(1); }}>
+                        <span className="material-symbols-outlined">{f.icon}</span>{f.label}
+                    </button>
                 ))}
             </div>
 

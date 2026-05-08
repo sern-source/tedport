@@ -7,6 +7,8 @@ export const useFirmaCore = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const isEmbedded = searchParams.get('embedded') === '1';
+    // Enes Doğanay | 8 Mayıs 2026: Şirketim sayfasından navigate ile gelindi mi?
+    const fromSirketim = searchParams.get('from') === 'sirketim';
     const currentTab = searchParams.get('tab') || 'panel';
 
     const [fpToast, setFpToast] = useState(null);
@@ -22,8 +24,10 @@ export const useFirmaCore = () => {
 
     const setTab = useCallback((params) => {
         if (isEmbedded) setSearchParams({ ...params, embedded: '1' });
+        // Enes Doğanay | 8 Mayıs 2026: from=sirketim parametresini koru
+        else if (fromSirketim) setSearchParams({ ...params, from: 'sirketim' });
         else setSearchParams(params);
-    }, [isEmbedded, setSearchParams]);
+    }, [isEmbedded, fromSirketim, setSearchParams]);
 
     // Enes Doğanay | 7 Mayıs 2026: Embedded modda yatay scroll engelle
     useEffect(() => {
@@ -56,7 +60,7 @@ export const useFirmaCore = () => {
 
     return {
         ...coreInit,
-        isEmbedded, currentTab, setTab,
+        isEmbedded, fromSirketim, currentTab, setTab,
         searchParams, setSearchParams, navigate,
         fpToast, showFpToast,
     };

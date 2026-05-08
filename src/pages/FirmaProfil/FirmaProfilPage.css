@@ -1,5 +1,49 @@
 /* Enes Doğanay | 6 Mayıs 2026: FirmaProfilPage — kurumsal özel stiller */
 
+/* Enes Doğanay | 8 Mayıs 2026: Şirketim'den navigate ile gelince geri butonu */
+.fp-back-bar {
+  margin-bottom: 12px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.fp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border, #e2e8f0);
+  background: var(--bg-white, #fff);
+  color: var(--text-muted, #475569);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fp-back-btn:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.fp-back-btn .material-symbols-outlined { font-size: 17px; }
+
+[data-theme="dark"] .fp-back-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .fp-back-btn:hover {
+  border-color: #3b82f6;
+  color: #93c5fd;
+  background: #1e3a5f;
+}
+
 /* Enes Doğanay | 6 Mayıs 2026: İhale yönetimi wrapper + bildirimler wrapper */
 .firma-profil-section {
   padding: 0;
@@ -14,4 +58,23 @@
   .firma-profil-section {
     padding: 0;
   }
+}
+
+/* Enes Doğanay | 8 Mayıs 2026: Embedded mod — ihale yönetimi sekme tam yükseklik zinciri */
+.page--embedded .firma-profil-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.page--embedded .firma-profil-section > .cmp-quotes-tabs {
+  flex-shrink: 0;
+  flex-grow: 0;
+  margin-bottom: 8px !important;
+}
+.page--embedded .firma-profil-section > div:not(.cmp-quotes-tabs) {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }

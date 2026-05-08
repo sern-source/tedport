@@ -22,7 +22,6 @@ export const useProfileCore = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const { theme } = useTheme();
     const fileInputRef = useRef(null);
-    const sirketimIframeRef = useRef(null);
     const prToastTimerRef = useRef(null);
 
     const [user, setUser] = useState(null);
@@ -33,7 +32,6 @@ export const useProfileCore = () => {
     const [myCompany, setMyCompany] = useState(null);
     const [myCompanyFirma, setMyCompanyFirma] = useState(null);
     const [pendingInvites, setPendingInvites] = useState([]);
-    const [sirketimSubPanel, setSirketimSubPanel] = useState(null);
     const [mopChatTrigger, setMopChatTrigger] = useState(null);
     const [prToast, setPrToast] = useState(null);
     const [notifPrefs, setNotifPrefs] = useState(DEFAULT_NOTIF_PREFS);
@@ -93,11 +91,6 @@ export const useProfileCore = () => {
         fetchPendingInvites(user.id).then(invites => setPendingInvites(invites)).catch(() => {});
     }, [searchParams, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    useEffect(() => {
-        if (!sirketimIframeRef.current?.contentWindow) return;
-        sirketimIframeRef.current.contentWindow.postMessage({ type: 'tedport-theme', theme }, window.location.origin);
-    }, [theme]);
-
     const handleLogout = useCallback(async () => { await supabase.auth.signOut(); navigate('/'); }, [navigate]);
 
     const handleAvatarUpload = useCallback(async (event) => {
@@ -138,10 +131,10 @@ export const useProfileCore = () => {
 
     return {
         user, profile, cities, loading, uploading, myCompany, myCompanyFirma, pendingInvites,
-        sirketimSubPanel, setSirketimSubPanel, mopChatTrigger, setMopChatTrigger,
+        mopChatTrigger, setMopChatTrigger,
         prToast, setPrToast, showPrToast, notifPrefs, setNotifPrefs,
         marketingConsent, marketingConsentSaving,
-        fileInputRef, sirketimIframeRef, theme, searchParams, setSearchParams, navigate,
+        fileInputRef, theme, searchParams, setSearchParams, navigate,
         handleLogout, handleAvatarUpload, handleDavetKabul, handleDavetRed, handleToggleMarketing,
         ...emailHandlers,
     };
