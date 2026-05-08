@@ -175,17 +175,17 @@
 .teklif-popup__inline-field--grow { flex: 1; }
 
 .teklif-popup__inline-field label {
-    font-size: 0.8rem;
+    font-size: 0.74rem;
     font-weight: 600;
     color: var(--text-dark);
 }
 
 .teklif-popup__inline-field input,
 .teklif-popup__inline-field select {
-    padding: 9px 12px;
+    padding: 6px 9px;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 0.88rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
     font-family: inherit;
     color: var(--text-dark);
     outline: none;
@@ -250,49 +250,48 @@
     gap: 8px;
 }
 
-/* Enes Doğanay | 2 Mayıs 2026: Dosya yükleme alanı — görsel iyileştirme */
+/* Enes Doğanay | 8 Mayıs 2026: Dosya yükleme alanı — compact inline row */
 .teklif-popup__file-upload {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 8px;
-    padding: 32px 20px;
-    border: 2px dashed var(--border);
-    border-radius: 16px;
-    background: linear-gradient(160deg, var(--bg-light) 0%, rgba(59, 130, 246, 0.03) 100%);
+    gap: 7px;
+    padding: 7px 11px;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 9px;
+    background: var(--bg-light);
     cursor: pointer;
-    transition: border-color 0.25s, background 0.25s, transform 0.15s, box-shadow 0.25s;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
     color: var(--text-muted);
     font-weight: 600;
-    font-size: 0.9rem;
-    position: relative;
-    overflow: hidden;
+    font-size: 0.82rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .teklif-popup__file-upload:hover {
     border-color: #3b82f6;
-    background: linear-gradient(160deg, #eff6ff 0%, #f0f9ff 100%);
+    background: #eff6ff;
     color: #1d4ed8;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.08);
 }
 
-/* Enes Doğanay | 2 Mayıs 2026: Upload ikonu — renkli arka plan halkası */
+/* Enes Doğanay | 8 Mayıs 2026: Upload ikonu — kompakt pill */
 .teklif-popup__file-upload .material-symbols-outlined {
-    font-size: 32px;
+    font-size: 15px;
     color: #2563eb;
     background: rgba(37, 99, 235, 0.1);
-    padding: 12px;
-    border-radius: 50%;
-    transition: background 0.25s, transform 0.2s;
+    padding: 5px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: background 0.2s;
 }
 
 .teklif-popup__file-upload:hover .material-symbols-outlined {
     background: rgba(37, 99, 235, 0.18);
-    transform: scale(1.08);
 }
 
-.teklif-popup__file-upload small { font-size: 0.76rem; font-weight: 500; color: var(--text-light); margin-top: 2px; }
+.teklif-popup__file-upload small { font-size: 0.71rem; font-weight: 400; color: var(--text-light); margin-left: auto; }
 
 .teklif-popup__file-chip {
     display: inline-flex;

@@ -51,20 +51,25 @@ const SharedChatModal = ({
 
     return (
         // Enes Doğanay | 7 Mayıs 2026: inline=false → overlay popup; inline=true → direkt render
-        <div className={inline ? 'scm-inline' : 'scm-overlay'}>
+        <div
+            className={inline ? 'scm-inline' : 'scm-overlay'}
+            role={inline ? undefined : 'dialog'}
+            aria-modal={inline ? undefined : true}
+            aria-labelledby={inline ? undefined : 'scm-title'}
+        >
             <div className={`scm-modal${inline ? ' scm-modal--inline' : ''}`} onClick={e => e.stopPropagation()}>
 
                 {/* ── HEADER ── */}
                 {!hideHeader && (
                 <div className="scm-header">
-                    <div className={`scm-avatar${showImg || true ? ' scm-avatar--online' : ''}`}>
+                    <div className="scm-avatar scm-avatar--online">
                         {showImg
                             ? <img src={avatarUrl} alt={title} onError={() => setAvatarErr(true)} />
                             : <span className="scm-avatar__initial">{initial}</span>
                         }
                     </div>
                     <div className="scm-header__info">
-                        <strong className="scm-header__name">{title}</strong>
+                        <strong className="scm-header__name" id="scm-title">{title}</strong>
                         {subtitle && <span className="scm-header__sub">{subtitle}</span>}
                         {tenderTag && (
                             <span className="scm-header__tag">
@@ -75,7 +80,7 @@ const SharedChatModal = ({
                     </div>
                     <div className="scm-header__actions">
                         {extraActions}
-                        <button className="scm-btn-icon scm-btn-icon--close" onClick={onClose}>
+                        <button className="scm-btn-icon scm-btn-icon--close" onClick={onClose} aria-label="Chat’ı kapat" type="button">
                             <span className="material-symbols-outlined">close</span>
                         </button>
                     </div>

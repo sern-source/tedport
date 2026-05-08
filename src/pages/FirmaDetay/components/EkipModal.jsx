@@ -4,10 +4,11 @@ import './EkipModal.css';
 
 const EkipModal = ({ firmaEkip, onClose }) => (
     <div className="ekip-modal-overlay" onClick={onClose}>
-        <div className="ekip-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
+        <div className="ekip-modal" role="dialog" aria-modal="true" aria-labelledby="ekip-modal-title" onClick={(e) => e.stopPropagation()}>
             <div className="ekip-modal-header">
-                <h3>Ekibimiz</h3>
-                <button type="button" className="ekip-modal-close" onClick={onClose}>
+                <h3 id="ekip-modal-title">Ekibimiz</h3>
+                <button type="button" className="ekip-modal-close" onClick={onClose} aria-label="Kapat">
                     <span className="material-symbols-outlined">close</span>
                 </button>
             </div>

@@ -45,11 +45,8 @@ const EkipMemberCard = ({
           <button
             className={`ekip-visibility-btn${m.is_public ? '' : ' ekip-visibility-btn--hidden'}`}
             onClick={() => handleVisibilityToggle(m.user_id, m.is_public)}
-            data-tooltip={
-              m.is_public
-                ? 'Gizlemek için tıkla'
-                : 'Göstermek için tıkla'
-            }
+            data-tooltip={m.is_public ? 'Gizlemek için tıkla' : 'Göstermek için tıkla'}
+            aria-label={m.is_public ? 'Gizlemek için tıkla' : 'Göstermek için tıkla'}
           >
             <span className="material-symbols-outlined">
               {m.is_public ? 'visibility' : 'visibility_off'}
@@ -88,6 +85,7 @@ const EkipMemberCard = ({
                 className="ekip-edit-btn"
                 onClick={() => setEditingMember({ user_id: m.user_id, role: m.role, title: m.title || '' })}
                 data-tooltip="Düzenle"
+                aria-label="Düzenle"
               >
                 <span className="material-symbols-outlined">edit</span>
               </button>
@@ -106,6 +104,7 @@ const EkipMemberCard = ({
                   className="ekip-remove-btn"
                   onClick={() => setConfirmRemoveMember({ user_id: m.user_id, name: fullName })}
                   data-tooltip="Ekipten çıkar"
+                  aria-label="Ekipten çıkar"
                 >
                   <span className="material-symbols-outlined">person_remove</span>
                 </button>

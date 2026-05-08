@@ -23,14 +23,21 @@ const CategoriesSection = () => {
                         <h2 className="sc-section-title">Öne Çıkan Kategoriler</h2>
                         <p className="sc-section-desc">Kapsamlı endüstriyel kategorilerimizi keşfedin.</p>
                     </div>
-                    <span className="sc-view-all" onClick={() => navigate('/firmalar')} style={{ cursor: 'pointer' }}>
+                    {/* Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği */}
+                    <span className="sc-view-all" onClick={() => navigate('/firmalar')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar'); }} style={{ cursor: 'pointer' }}>
                         Tüm kategorileri gör <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
                     </span>
                 </div>
 
                 <div className="sc-cat-grid">
                     {CATEGORIES.map(({ icon, name, sub, search }) => (
-                        <div className="sc-cat-card" key={name} onClick={() => navigate(`/firmalar?search=${search}`)} style={{ cursor: 'pointer' }}>
+                        <div className="sc-cat-card" key={name}
+                            onClick={() => navigate(`/firmalar?search=${search}`)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`${name} kategorisini ara`}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmalar?search=${search}`); }}
+                            style={{ cursor: 'pointer' }}>
                             <div className="sc-cat-icon">
                                 <span className="material-symbols-outlined">{icon}</span>
                             </div>

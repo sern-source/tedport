@@ -57,6 +57,9 @@ const TendersSection = ({
                                         key={tender.id}
                                         className="tender-item tender-item--clickable"
                                         onClick={() => navigate(`/ihaleler?ihale=${tender.id}`)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ihaleler?ihale=${tender.id}`); }}
                                     >
                                         <div className="tender-item-row">
                                             <div className="tender-item-left">

@@ -99,8 +99,10 @@ export const uploadLogoToPending = async (firmaId, file) => {
     const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
     if (!allowed.includes(file.type)) throw new Error('Yalnızca PNG, JPG, WebP veya SVG yüklenebilir.');
 
-    const ext = file.name.split('.').pop();
-    const filePath = `logos/pending_${firmaId}_${Date.now()}.${ext}`;
+    // Enes Doğanay | 8 Mayıs 2026: Dosya uzantısı sanitize edilir — boş veya özel karakter içerirse storage path güvenliği bozulur
+    const rawExt = (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!rawExt) throw new Error('Geçersiz dosya uzantısı.');
+    const filePath = `logos/pending_${firmaId}_${Date.now()}.${rawExt}`;
     const { error: uploadError } = await supabase.storage
         .from('firma-logolari')
         .upload(filePath, file, { cacheControl: '3600', upsert: true });

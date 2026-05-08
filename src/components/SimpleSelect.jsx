@@ -74,6 +74,9 @@ export default function SimpleSelect({ value, onChange, options = [], placeholde
         className={`simple-select-trigger${open ? ' simple-select-trigger--open' : ''}`}
         ref={triggerRef}
         onClick={handleOpen}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-label={selected ? selected.label : placeholder}
       >
         {icon && (
           <span className="material-symbols-outlined simple-select-icon">{icon}</span>
@@ -91,7 +94,7 @@ export default function SimpleSelect({ value, onChange, options = [], placeholde
 
       {open && createPortal(
         <div className="simple-select-dropdown" ref={dropdownRef} style={style}>
-          <ul className="simple-select-list">
+          <ul className="simple-select-list" role="listbox" aria-label={placeholder}>
             {options.map(opt => (
               <li
                 key={opt.value}
@@ -101,6 +104,9 @@ export default function SimpleSelect({ value, onChange, options = [], placeholde
                   opt.disabled ? 'simple-select-option--disabled' : '',
                 ].join(' ').trim()}
                 onClick={() => handleSelect(opt)}
+                role="option"
+                aria-selected={opt.value === value}
+                aria-disabled={opt.disabled ?? false}
               >
                 {opt.icon && (
                   <span className="material-symbols-outlined simple-select-opt-icon">{opt.icon}</span>

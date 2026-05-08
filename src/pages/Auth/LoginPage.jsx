@@ -40,12 +40,13 @@ export default function LoginPage() {
         <div className="login-card">
 
           {/* Sekmeler */}
-          <div className="login-tabs">
-            <button className={`tab-item ${activeTab === 'individual' ? 'active' : ''}`} onClick={() => handleTabChange('individual')}>
+          {/* Enes Doğanay | 8 Mayıs 2026: role=tablist + role=tab + aria-selected — sekme erişilebilirlik */}
+          <div className="login-tabs" role="tablist">
+            <button className={`tab-item ${activeTab === 'individual' ? 'active' : ''}`} onClick={() => handleTabChange('individual')} role="tab" aria-selected={activeTab === 'individual'} type="button">
               <span className="material-symbols-outlined">person</span>
               <span>Bireysel Giriş</span>
             </button>
-            <button className={`tab-item ${activeTab === 'corporate' ? 'active' : ''}`} onClick={() => handleTabChange('corporate')}>
+            <button className={`tab-item ${activeTab === 'corporate' ? 'active' : ''}`} onClick={() => handleTabChange('corporate')} role="tab" aria-selected={activeTab === 'corporate'} type="button">
               <span className="material-symbols-outlined">business</span>
               <span>Kurumsal Giriş</span>
             </button>
@@ -70,7 +71,7 @@ export default function LoginPage() {
                 <label>Şifre</label>
                 <div className="input-wrapper">
                   <input type={showPassword ? 'text' : 'password'} placeholder="******" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  <button type="button" className="toggle-password" onClick={() => setShowPassword((p) => !p)}>
+                  <button type="button" className="toggle-password" onClick={() => setShowPassword((p) => !p)} aria-label={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}>
                     <span className="material-symbols-outlined">{showPassword ? 'visibility' : 'visibility_off'}</span>
                   </button>
                 </div>

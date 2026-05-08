@@ -1,6 +1,22 @@
 // Enes Doğanay | 7 Mayıs 2026: Teklif form supabase işlemleri — service katmanı
 import { supabase } from '../../../supabaseClient';
 
+// Enes Doğanay | 8 Mayıs 2026: Mevcut auth oturumunu döndür — hook'larda doğrudan supabase çağırılmasını engeller
+export const getAuthSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session;
+};
+
+// Enes Doğanay | 8 Mayıs 2026: Giriş yapmış kullanıcının tekliflerini ihale_id haritaşı olarak döndür
+export const fetchCurrentUserOffersMap = async () => {
+    const session = await getAuthSession();
+    if (!session?.user) return {};
+    const data = await fetchUserOffers(session.user.id);
+    const map = {};
+    data.forEach(o => { map[String(o.ihale_id)] = o; });
+    return map;
+};
+
 // Enes Doğanay | 7 Mayıs 2026: Giriş yapmış kullanıcının tüm tekliflerini çek
 export const fetchUserOffers = async (userId) => {
     const { data, error } = await supabase

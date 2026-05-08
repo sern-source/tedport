@@ -2,13 +2,6 @@
 import React from 'react';
 import { createSignedTeklifUrl } from '../services/myOffersService';
 
-const ALL_CURRENCIES = [
-    { code: 'TRY', symbol: '₺' }, { code: 'USD', symbol: '$' }, { code: 'EUR', symbol: '€' },
-    { code: 'GBP', symbol: '£' }, { code: 'CHF', symbol: 'CHF' }, { code: 'JPY', symbol: '¥' },
-    { code: 'CNY', symbol: '¥' }, { code: 'RUB', symbol: '₽' }, { code: 'SAR', symbol: 'SR' },
-    { code: 'AED', symbol: 'د.إ' }, { code: 'AUD', symbol: 'A$' }, { code: 'CAD', symbol: 'C$' },
-];
-
 const formatMoney = (amount, currency) => {
     const v = Number(amount || 0);
     if (!v) return '—';
@@ -16,6 +9,20 @@ const formatMoney = (amount, currency) => {
     catch { return `${currency || ''} ${v.toLocaleString('tr-TR')}`; }
 };
 const formatDate = (iso) => iso ? new Date(iso).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+
+// Enes Doğanay | 8 Mayıs 2026: IIFE anti-pattern’ı kaldırıldı — JSX içi IIFE yerine module-level helper
+const renderDetailAmounts = (kalemler, defaultCurrency) => {
+    const groups = {};
+    kalemler.forEach(k => {
+        const c = k.para_birimi || defaultCurrency || 'TRY';
+        const t = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+        if (t > 0) groups[c] = (groups[c] || 0) + t;
+    });
+    const entries = Object.entries(groups);
+    return entries.length > 0
+        ? entries.map(([c, v], i) => <strong key={c}>{i > 0 && ' + '}{formatMoney(v, c)}</strong>)
+        : <strong>—</strong>;
+};
 
 // Enes Doğanay | 6 Mayıs 2026: Gruplu toplam satırı
 const GroupedTotals = ({ kalemler, defaultCurrency }) => {
@@ -50,18 +57,8 @@ const MyOfferCardDetail = ({
                         {kalemler.length === 0 ? (
                             <strong>{formatMoney(offer.toplam_tutar, offer.para_birimi)}</strong>
                         ) : (
-                            (() => {
-                                const groups = {};
-                                kalemler.forEach(k => {
-                                    const c = k.para_birimi || offer.para_birimi || 'TRY';
-                                    const t = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
-                                    if (t > 0) groups[c] = (groups[c] || 0) + t;
-                                });
-                                const entries = Object.entries(groups);
-                                return entries.length > 0
-                                    ? entries.map(([c, v], i) => <strong key={c}>{i > 0 && ' + '}{formatMoney(v, c)}</strong>)
-                                    : <strong>—</strong>;
-                            })()
+                            // Enes Doğanay | 8 Mayıs 2026: IIFE kaldırıldı — module-level helper kullanılıyor
+                            renderDetailAmounts(kalemler, offer.para_birimi)
                         )}
                         {offer.kdv_dahil !== undefined && <span className="mop-tag">{offer.kdv_dahil ? 'KDV Dahil' : 'KDV Hariç'}</span>}
                     </div>
@@ -101,8 +98,9 @@ const MyOfferCardDetail = ({
                                 {kalemler.map((k, i) => {
                                     const kCur = k.para_birimi || offer.para_birimi || 'TRY';
                                     const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
+                                    // Enes Doğanay | 8 Mayıs 2026: index as key kaldırıldı — composite key kullanılıyor
                                     return (
-                                        <tr key={i}>
+                                        <tr key={`${i}-${k.madde || 'kalem'}`}>
                                             <td><strong>{k.madde || '—'}</strong></td>
                                             <td>{k.miktar || '—'}</td>
                                             <td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td>

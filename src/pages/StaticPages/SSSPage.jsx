@@ -8,6 +8,15 @@ import SEO from '../../components/SEO';
 import { useSSS } from './hooks/useSSS';
 import './SSSPage.css';
 
+// Enes Doğanay | 8 Mayıs 2026: Module-level sabiti — JSX içi inline array kaldırıldı
+const SSS_NAV = [
+  { label: 'Anasayfa',   href: '/' },
+  { label: 'Firmalar',   href: '/firmalar' },
+  { label: 'İhaleler',   href: '/ihaleler' },
+  { label: 'Hakkımızda', href: '/hakkimizda' },
+  { label: 'İletişim',   href: '/iletisim' },
+];
+
 // Enes Doğanay | 6 Mayıs 2026: Kategori ikonları sabiti
 const CATEGORY_ICONS = {
   'Platform Genel':       'info',
@@ -58,13 +67,7 @@ export default function SSSPage() {
       )}
 
       <SharedHeader
-        navItems={[
-          { label: 'Anasayfa',   href: '/' },
-          { label: 'Firmalar',   href: '/firmalar' },
-          { label: 'İhaleler',   href: '/ihaleler' },
-          { label: 'Hakkımızda', href: '/hakkimizda' },
-          { label: 'İletişim',   href: '/iletisim' },
-        ]}
+        navItems={SSS_NAV}
       />
 
       <main className="sss-page">

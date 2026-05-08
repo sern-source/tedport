@@ -1,7 +1,7 @@
 // Enes Doğanay | 7 Mayıs 2026: Profil e-posta değişikliği state + handler'lar
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../../supabaseClient';
-import { updateUserEmail, updateProfileField, syncEmailAfterConfirm } from '../services/profileService';
+import { supabase } from '../../../supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: sadece onAuthStateChange için
+import { updateUserEmail, updateProfileField, syncEmailAfterConfirm, getAuthUser } from '../services/profileService';
 
 // Enes Doğanay | 7 Mayıs 2026: E-posta değişikliği izleme, onay, handler — user/setUser/setProfile dışarıdan gelir
 export const useProfileEmailHandlers = ({ user, setUser, setProfile }) => {
@@ -31,11 +31,11 @@ export const useProfileEmailHandlers = ({ user, setUser, setProfile }) => {
         });
         const pollInterval = setInterval(async () => {
             if (!pendingEmail) return;
-            try { const { data: { user: u } } = await supabase.auth.getUser(); if (u && !u.new_email) await handleEmailUpdate(u); } catch { /* sessiz */ }
+            try { const u = await getAuthUser(); if (u && !u.new_email) await handleEmailUpdate(u); } catch { /* sessiz */ }
         }, 5000);
         const handleVisibility = async () => {
             if (document.visibilityState !== 'visible' || !pendingEmail) return;
-            try { const { data: { user: u } } = await supabase.auth.getUser(); if (u && !u.new_email) await handleEmailUpdate(u); } catch { /* sessiz */ }
+            try { const u = await getAuthUser(); if (u && !u.new_email) await handleEmailUpdate(u); } catch { /* sessiz */ }
         };
         document.addEventListener('visibilitychange', handleVisibility);
         return () => { subscription.unsubscribe(); clearInterval(pollInterval); document.removeEventListener('visibilitychange', handleVisibility); };

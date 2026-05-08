@@ -61,3 +61,14 @@ export const markNotificationsRead = async (ids) => {
     .in('id', ids);
   if (error) throw new Error(error.message);
 };
+
+// Enes Doğanay | 8 Mayıs 2026: Auth session'ı döndür — hook'larda doğrudan supabase çağrısını engeller
+export const getAuthSession = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session;
+};
+
+// Enes Doğanay | 8 Mayıs 2026: Oturumu kapat — hook'larda doğrudan supabase çağrısını engeller
+export const signOutService = async () => {
+  await supabase.auth.signOut();
+};

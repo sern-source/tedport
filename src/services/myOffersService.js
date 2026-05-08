@@ -115,32 +115,29 @@ export async function deleteOffer(offerId) {
 }
 
 // Enes Doğanay | 6 Mayıs 2026: Firma yöneticilerine bildirim gönder (fire-and-forget)
+// Enes Doğanay | 8 Mayıs 2026: void operatörü — intentional fire-and-forget, hata yutulur değil görmezden gelinir (bildirim kritik değil)
 export function notifyFirmaManagers(firmaId, notifRows) {
     if (!firmaId || !notifRows.length) return;
-    supabase.from('bildirimler').insert(notifRows).then(() => {}).catch(() => {});
+    void supabase.from('bildirimler').insert(notifRows);
 }
 
 // Enes Doğanay | 6 Mayıs 2026: Firma iletişim bilgilerini çek
+// Enes Doğanay | 8 Mayıs 2026: firma + manager sorguları paralel — ikisi de sadece firmaId'ye bağımlı, 1 round-trip kazanıldı
 export async function fetchFirmaContact(firmaId) {
     const info = { name: null, firma: null, email: null, phone: null, firmaPhone: null, firmaEmail: null };
     if (!firmaId) return info;
 
-    const { data: firma } = await supabase
-        .from('firmalar')
-        .select('firma_adi, telefon, eposta')
-        .eq('firmaID', firmaId)
-        .maybeSingle();
+    const [{ data: firma }, { data: mgr }] = await Promise.all([
+        supabase.from('firmalar').select('firma_adi, telefon, eposta').eq('firmaID', firmaId).maybeSingle(),
+        supabase.from('kurumsal_firma_yoneticileri').select('user_id').eq('firma_id', firmaId).maybeSingle(),
+    ]);
+
     if (firma) {
         info.firma = firma.firma_adi || null;
         if (firma.telefon) info.firmaPhone = firma.telefon;
         if (firma.eposta) info.firmaEmail = firma.eposta;
     }
 
-    const { data: mgr } = await supabase
-        .from('kurumsal_firma_yoneticileri')
-        .select('user_id')
-        .eq('firma_id', firmaId)
-        .maybeSingle();
     if (mgr?.user_id) {
         const { data: prof } = await supabase
             .from('profiles')

@@ -6,8 +6,10 @@ import { useAuth } from '../AuthContext';
 import { useTheme } from '../hooks/useTheme';
 import './SharedFooter.css';
 
+// Enes Doğanay | 8 Mayıs 2026: Build anında sabitlenir — her render’da new Date() çağrısı gereksiz
+const CURRENT_YEAR = new Date().getFullYear();
+
 const SharedFooter = () => {
-    const currentYear = new Date().getFullYear();
     // Enes Doğanay | 2 Mayıs 2026: Giriş yapmış kullanıcıya Kayıt/Giriş linkleri gösterilmez
     const { userProfile } = useAuth();
     // Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo
@@ -72,7 +74,7 @@ const SharedFooter = () => {
 
                 {/* Bottom */}
                 <div className="sf-bottom">
-                    <p>© {currentYear} Tedport. Tüm hakları saklıdır.</p>
+                    <p>© {CURRENT_YEAR} Tedport. Tüm hakları saklıdır.</p>
                     <div className="sf-legal-links">
                         <Link to="/hizmet-sartlari">Hizmet Şartları</Link>
                         <Link to="/gizlilik-politikasi">Gizlilik Politikası</Link>

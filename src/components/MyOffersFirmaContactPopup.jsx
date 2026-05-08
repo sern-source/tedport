@@ -6,7 +6,13 @@ const MyOffersFirmaContactPopup = ({ firmaContactPopup, setFirmaContactPopup, fi
     const p = firmaContactPopup;
     return (
         <div className="firma-contact-overlay" onClick={() => !firmaContactLoading && setFirmaContactPopup(null)}>
-            <div className="firma-contact-card" onClick={e => e.stopPropagation()}>
+            {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal — modal semantik erişilebilirlik */}
+            <div
+                className="firma-contact-card"
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+            >
                 {firmaContactLoading ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '20px 0', color: '#64748b' }}>
                         <div className="mop-chat-spinner" style={{ borderTopColor: '#2563eb' }} />
@@ -14,7 +20,7 @@ const MyOffersFirmaContactPopup = ({ firmaContactPopup, setFirmaContactPopup, fi
                     </div>
                 ) : (
                     <>
-                        <button className="firma-contact-card__close" onClick={() => setFirmaContactPopup(null)}>
+                        <button className="firma-contact-card__close" onClick={() => setFirmaContactPopup(null)} aria-label="Kapat">
                             <span className="material-symbols-outlined">close</span>
                         </button>
                         <div className="firma-contact-card__avatar">

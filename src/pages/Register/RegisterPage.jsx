@@ -12,6 +12,15 @@ import useIndividualRegister from './hooks/useIndividualRegister';
 import useCorporateRegister from './hooks/useCorporateRegister';
 import './RegisterPage.css';
 
+// Enes Doğanay | 8 Mayıs 2026: Module-level sabiti — JSX içindeki inline array kaldırıldı
+const REGISTER_NAV = [
+    { label: 'Anasayfa', href: '/' },
+    { label: 'Firmalar', href: '/firmalar' },
+    { label: 'İhaleler', href: '/ihaleler' },
+    { label: 'Hakkımızda', href: '/hakkimizda' },
+    { label: 'İletişim', href: '/iletisim' },
+];
+
 const RegisterPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [registrationType, setRegistrationType] = useState(
@@ -45,9 +54,10 @@ const RegisterPage = () => {
         };
     }, [showMarketingModal]);
 
+    // Enes Doğanay | 8 Mayıs 2026: window.setTimeout → setTimeout — gereksiz window prefix
     const showMessage = (type, message) => {
         setNotification({ show: true, type, message });
-        window.setTimeout(() => setNotification({ show: false, type: '', message: '' }), 5000);
+        setTimeout(() => setNotification({ show: false, type: '', message: '' }), 5000);
     };
 
     const handleTabChange = (nextType) => {
@@ -71,19 +81,14 @@ const RegisterPage = () => {
         <div className="page-container">
             <SEO title="Kayıt Ol" description="Tedport'a ücretsiz kayıt olun. Tedarikçi ağına katılın." path="/register" noIndex />
             <SharedHeader
-                navItems={[
-                    { label: 'Anasayfa', href: '/' },
-                    { label: 'Firmalar', href: '/firmalar' },
-                    { label: 'İhaleler', href: '/ihaleler' },
-                    { label: 'Hakkımızda', href: '/hakkimizda' },
-                    { label: 'İletişim', href: '/iletisim' },
-                ]}
+                navItems={REGISTER_NAV}
             />
 
             <main className="main-content">
                 <div className={`registration-card${registrationType === 'corporate' ? ' registration-card-corporate' : ''}`}>
+                    {/* Enes Doğanay | 8 Mayıs 2026: role=alert — screen reader'a bildirim anlamı */}
                     {notification.show && (
-                        <div className={`register-notification${notification.type === 'success' ? ' register-notification--success' : ' register-notification--error'}`}>
+                        <div className={`register-notification${notification.type === 'success' ? ' register-notification--success' : ' register-notification--error'}`} role="alert">
                             <span className="material-symbols-outlined register-notification-icon">
                                 {notification.type === 'success' ? 'check_circle' : 'error'}
                             </span>

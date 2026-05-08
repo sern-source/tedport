@@ -6,11 +6,11 @@ export const IhaleStatusConfirmPopup = ({ statusConfirmPopup, setStatusConfirmPo
     const handleConfirm = () => { onConfirmStatus(statusConfirmPopup.offerId, statusConfirmPopup.status); setStatusConfirmPopup(null); };
     return (
         <div className="tom-contact-overlay" onClick={() => setStatusConfirmPopup(null)}>
-            <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+            <div className="tom-accept-close-card" role="dialog" aria-modal="true" aria-labelledby="status-confirm-title" onClick={e => e.stopPropagation()}>
                 <div className="tom-scoring-info-card__icon" style={{ background: 'linear-gradient(135deg, #2563eb, #3b82f6)' }}>
                     <span className="material-symbols-outlined">hourglass_top</span>
                 </div>
-                <h3>Değerlendirmeye Al</h3>
+                <h3 id="status-confirm-title">Değerlendirmeye Al</h3>
                 <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>Bu teklifi tekrar değerlendirmeye almak istediğinize emin misiniz?</p>
                 <div className="tom-accept-close-actions">
                     <button className="tom-btn tom-btn--accept" style={{ background: 'linear-gradient(135deg, #2563eb, #3b82f6)' }} onClick={handleConfirm}>
@@ -27,11 +27,11 @@ export const IhaleStatusSuccessPopup = ({ statusSuccessModal, setStatusSuccessMo
     if (!statusSuccessModal) return null;
     return (
         <div className="tom-contact-overlay" onClick={() => setStatusSuccessModal(null)}>
-            <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+            <div className="tom-accept-close-card" role="dialog" aria-modal="true" aria-labelledby="status-success-title" onClick={e => e.stopPropagation()}>
                 <div className="tom-scoring-info-card__icon" style={{ background: statusSuccessModal.color }}>
                     <span className="material-symbols-outlined">{statusSuccessModal.icon}</span>
                 </div>
-                <h3>{statusSuccessModal.title}</h3>
+                <h3 id="status-success-title">{statusSuccessModal.title}</h3>
                 <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>{statusSuccessModal.text}</p>
                 <button className="tom-btn tom-btn--accept" style={{ width: '100%', justifyContent: 'center', background: statusSuccessModal.color }} onClick={() => setStatusSuccessModal(null)}>
                     <span className="material-symbols-outlined">check</span>Tamam

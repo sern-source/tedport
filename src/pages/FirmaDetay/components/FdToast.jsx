@@ -4,7 +4,8 @@ import React from 'react';
 const FdToast = ({ toast, onClose }) => {
     if (!toast) return null;
     return (
-        <div style={{
+        // Enes Doğanay | 8 Mayıs 2026: role=alert — screen reader bildirimi
+        <div role="alert" style={{
             position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
             zIndex: 99999, display: 'flex', alignItems: 'center', gap: '10px',
             padding: '12px 18px', borderRadius: '12px', maxWidth: '380px', width: 'max-content',
@@ -20,7 +21,7 @@ const FdToast = ({ toast, onClose }) => {
                 {toast.type === 'error' ? 'error' : toast.type === 'warning' ? 'warning' : 'info'}
             </span>
             {toast.message}
-            <button onClick={onClose} style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
+            <button onClick={onClose} aria-label="Kapat" style={{ marginLeft: '4px', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', opacity: 0.55, lineHeight: 1 }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
             </button>
         </div>

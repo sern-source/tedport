@@ -47,6 +47,8 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
                     className={`scm-emoji-trigger${emojiOpen ? ' active' : ''}`}
                     onClick={() => setEmojiOpen(o => !o)}
                     type="button"
+                    aria-label="Emoji seç"
+                    aria-expanded={emojiOpen}
                 >
                     <span>😊</span>
                 </button>
@@ -69,6 +71,7 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
                 type="text"
                 className="scm-input"
                 placeholder="Mesajınızı yazın…"
+                aria-label="Mesaj yaz"
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKey}

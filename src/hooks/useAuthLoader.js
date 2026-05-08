@@ -1,9 +1,8 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Auth veri yukleme koordinator — state, oturum, profil
 import { useState, useRef, useCallback } from 'react';
-import { supabase } from '../supabaseClient';
 import { isAdminEmail } from '../pages/Admin/adminAccess';
 import { resolveIsAdminUser } from '../services/corporateApplicationsApi';
-import { fetchUserProfile, fetchOwnedCompanyId, fetchUnreadNotifications, fetchNotifPrefs, upsertOAuthProfile } from '../services/authService';
+import { fetchUserProfile, fetchOwnedCompanyId, fetchUnreadNotifications, fetchNotifPrefs, upsertOAuthProfile, getAuthSession, setRealtimeAuth, signOutGlobal } from '../services/authService';
 import { NOTIF_TYPE_TO_PREF_KEY, COMPANY_TENDER_TYPES } from '../constants/notifTypes';
 import { useAuthBadgeCounts } from './useAuthBadgeCounts';
 
@@ -42,11 +41,11 @@ export const useAuthLoader = () => {
         if (isLoggingOutRef.current || isLoadingRef.current) return;
         isLoadingRef.current = true;
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            const session = await getAuthSession();
             const user = session?.user;
             setAuthChecked(true);
             if (!user) { clearAuthState(); return; }
-            if (session?.access_token) supabase.realtime.setAuth(session.access_token);
+            if (session?.access_token) setRealtimeAuth(session.access_token);
             setRealtimeUserId(user.id);
             userIdRef.current = user.id;
             try {
@@ -61,9 +60,9 @@ export const useAuthLoader = () => {
                     const meta = user.user_metadata;
                     if (meta && (meta.full_name || meta.name || meta.email)) {
                         const { error: upsertError, profile: oauthProfile } = await upsertOAuthProfile(user.id, meta, user.email, navigator.userAgent, user.app_metadata?.provider || 'oauth');
-                        if (upsertError) { try { await supabase.auth.signOut(); } catch {} clearAuthState(); return; }
+                        if (upsertError) { await signOutGlobal(); clearAuthState(); return; }
                         profileResult.data = oauthProfile;
-                    } else { try { await supabase.auth.signOut(); } catch {} clearAuthState(); return; }
+                    } else { await signOutGlobal(); clearAuthState(); return; }
                 }
                 setIsCurrentUserAdmin(adminResult);
                 notifPrefsRef.current = prefs;
@@ -84,13 +83,11 @@ export const useAuthLoader = () => {
                 await badges.loadBadgeCounts(user.id, companyId);
                 setManagedCompanyId(companyId);
                 setUserProfile(profileResult.data || { first_name: 'Profilime', last_name: 'Git' });
-            } catch (dataErr) {
-                if (dataErr?.name !== 'AbortError' && !dataErr?.message?.includes('abort'))
-                    console.warn('[Auth] Veri yukleme hatasi:', dataErr);
+            } catch {
+                /* sessiz — AbortError veya ağ hatası, session etkilenmez */
             }
         } catch (authErr) {
             if (authErr?.name !== 'AbortError' && !authErr?.message?.includes('abort')) {
-                console.error('Auth hatasi:', authErr);
                 clearAuthState();
             }
         } finally {
@@ -122,8 +119,13 @@ export const useAuthLoader = () => {
                 return true;
             });
             setUnreadNotifCount(filtered.length);
-        } catch { /* sessiz */ }
+        } catch {
+            /* sessiz — bildirim tercihi yenileme başarısız, kritik değil */
+        }
     }, [managedCompanyId]);
+
+    // Enes Doğanay | 8 Mayıs 2026: Top-level'a taşındı — return {} içinde useCallback çağırmak anti-pattern (lint + okunabilirlik)
+    const getUserId = useCallback(() => userIdRef.current, []);
 
     return {
         authChecked, setAuthChecked, userProfile, isCurrentUserAdmin, managedCompanyId,
@@ -133,8 +135,6 @@ export const useAuthLoader = () => {
         ihaleYonetimiUnreadCount: badges.ihaleYonetimiUnreadCount, setIhaleYonetimiUnreadCount: badges.setIhaleYonetimiUnreadCount,
         realtimeUserId, setRealtimeUserId,
         userIdRef, notifPrefsRef, isLoggingOutRef, validatingLoginRef,
-        loadUserData, refreshCounts, clearAuthState, updateNotifPrefsCache,
-        // Enes Doğanay | 7 Mayıs 2026: useCallback — inline arrow her render yeni ref üretir
-        getUserId: useCallback(() => userIdRef.current, []),
+        loadUserData, refreshCounts, clearAuthState, updateNotifPrefsCache, getUserId,
     };
 };

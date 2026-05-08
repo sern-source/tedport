@@ -41,7 +41,7 @@ const FirmaFilterSidebar = ({
   const expand = (section, count) => setExpandedCount(prev => ({ ...prev, [section]: count }));
 
   return (
-    <aside className={`sidebar${isOpen ? ' sidebar-mobile-open' : ''}`}>
+    <aside id="firma-filter-sidebar" className={`sidebar${isOpen ? ' sidebar-mobile-open' : ''}`}>
       <div className="sidebar-header">
         <h3>Filtreler</h3>
         <button className="clear-btn" onClick={onClearAll}>Tümünü temizle</button>

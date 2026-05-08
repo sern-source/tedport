@@ -31,19 +31,19 @@ const FirmalarToolbar = ({ totalCount, hasSearch, page, totalPages, onPageChange
 
       {totalPages > 1 && (
         <div className="mini-pagination">
-          <button className="mini-page-btn" disabled={page === 1} onClick={() => onPageChange(1)} data-tooltip="İlk sayfa" data-tooltip-pos="bottom">
+          <button className="mini-page-btn" disabled={page === 1} onClick={() => onPageChange(1)} aria-label="İlk sayfa">
             <span className="material-symbols-outlined">first_page</span>
           </button>
-          <button className="mini-page-btn" disabled={page === 1} onClick={() => onPageChange(p => p - 1)}>
+          <button className="mini-page-btn" disabled={page === 1} onClick={() => onPageChange(p => p - 1)} aria-label="Önceki sayfa">
             <span className="material-symbols-outlined">chevron_left</span>
           </button>
           <span className="mini-page-info">
             <span className="mini-page-current">{page}</span> / {totalPages}
           </span>
-          <button className="mini-page-btn" disabled={page === totalPages} onClick={() => onPageChange(p => p + 1)}>
+          <button className="mini-page-btn" disabled={page === totalPages} onClick={() => onPageChange(p => p + 1)} aria-label="Sonraki sayfa">
             <span className="material-symbols-outlined">chevron_right</span>
           </button>
-          <button className="mini-page-btn" disabled={page === totalPages} onClick={() => onPageChange(totalPages)} data-tooltip="Son sayfa" data-tooltip-pos="bottom">
+          <button className="mini-page-btn" disabled={page === totalPages} onClick={() => onPageChange(totalPages)} aria-label="Son sayfa">
             <span className="material-symbols-outlined">last_page</span>
           </button>
         </div>
@@ -51,7 +51,11 @@ const FirmalarToolbar = ({ totalCount, hasSearch, page, totalPages, onPageChange
 
       <div className="firmalar-toolbar-actions">
         <div className="firmalar-sort-wrap" ref={sortRef}>
-          <button type="button" className="firmalar-sort-trigger" onClick={() => setSortOpen(o => !o)}>
+          <button type="button" className="firmalar-sort-trigger"
+            onClick={() => setSortOpen(o => !o)}
+            aria-expanded={sortOpen}
+            aria-haspopup="listbox"
+          >
             <span className="material-symbols-outlined firmalar-sort-icon">sort</span>
             <span className="firmalar-sort-label">{currentSort.label}</span>
             <span className={`material-symbols-outlined firmalar-sort-chevron${sortOpen ? ' open' : ''}`}>expand_more</span>
@@ -77,8 +81,7 @@ const FirmalarToolbar = ({ totalCount, hasSearch, page, totalPages, onPageChange
           type="button"
           className="firmalar-view-toggle"
           onClick={onViewToggle}
-          data-tooltip={viewMode === 'grid' ? 'Liste görünümüne geç' : 'Kart görünümüne geç'}
-          data-tooltip-pos="bottom"
+          aria-label={viewMode === 'grid' ? 'Liste görünümüne geç' : 'Kart görünümüne geç'}
         >
           <span className="material-symbols-outlined">{viewMode === 'grid' ? 'view_list' : 'grid_view'}</span>
         </button>

@@ -45,6 +45,7 @@ const TeklifChatModal = ({
                     <button
                         className="scm-btn-icon scm-btn-icon--danger"
                         data-tooltip="Reddet"
+                        aria-label="Reddet"
                         onClick={() => { setConfirmRejectQuoteId(q.id); setConfirmCloseQuoteId(null); }}
                     >
                         <span className="material-symbols-outlined">cancel</span>
@@ -62,6 +63,7 @@ const TeklifChatModal = ({
                 <button
                     className="scm-btn-icon"
                     data-tooltip="Görüşmeyi Sonlandır"
+                    aria-label="Görüşmeyi Sonlandır"
                     onClick={() => { setConfirmCloseQuoteId(q.id); setConfirmRejectQuoteId(null); }}
                 >
                     <span className="material-symbols-outlined">archive</span>
@@ -71,6 +73,7 @@ const TeklifChatModal = ({
             <button
                 className="scm-btn-icon"
                 data-tooltip="İletişim Bilgileri"
+                aria-label="İletişim Bilgileri"
                 onClick={() => handleOpenQuoteContact?.(q)}
             >
                 <span className="material-symbols-outlined">contact_phone</span>

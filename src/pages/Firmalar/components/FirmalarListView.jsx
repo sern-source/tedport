@@ -63,10 +63,18 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
             )}
           </a>
 
-          <span className="firmalar-list-col firmalar-list-col--sector" onClick={() => navigate(`/firmadetay/${supplier.id}`)}>
+          <span className="firmalar-list-col firmalar-list-col--sector"
+            onClick={() => navigate(`/firmadetay/${supplier.id}`)}
+            role="button" tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${supplier.id}`); }}
+          >
             {(supplier.tags || []).slice(0, 2).join(', ') || '—'}
           </span>
-          <span className="firmalar-list-col firmalar-list-col--location" onClick={() => navigate(`/firmadetay/${supplier.id}`)}>
+          <span className="firmalar-list-col firmalar-list-col--location"
+            onClick={() => navigate(`/firmadetay/${supplier.id}`)}
+            role="button" tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${supplier.id}`); }}
+          >
             {supplier.location || '—'}
           </span>
 
@@ -74,7 +82,7 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
             <button
               className={`list-fav-btn${favoriteIds.has(supplier.id) ? ' list-fav-btn--active' : ''}`}
               onClick={() => onToggleFavorite(supplier.id)}
-              data-tooltip={!isLoggedIn ? 'Giriş yapın' : favoriteIds.has(supplier.id) ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+              aria-label={!isLoggedIn ? 'Giriş yapın' : favoriteIds.has(supplier.id) ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
               type="button"
               disabled={!isLoggedIn}
             >

@@ -8,11 +8,18 @@ const CompanyModals = ({ showDeleteConfirm, setShowDeleteConfirm, deleting, hand
         <>
             {showDeleteConfirm && (
                 <div className="cmp-success-overlay" onClick={() => setShowDeleteConfirm(false)}>
-                    <div className="cmp-success-card cmp-delete-card" onClick={e => e.stopPropagation()}>
+                    {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal — modal semantik erişilebilirlik */}
+                    <div
+                        className="cmp-success-card cmp-delete-card"
+                        onClick={e => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="cmp-delete-modal-title"
+                    >
                         <div className="cmp-success-card__icon cmp-delete-card__icon">
                             <span className="material-symbols-outlined">warning</span>
                         </div>
-                        <h3>Firmayı Sil</h3>
+                        <h3 id="cmp-delete-modal-title">Firmayı Sil</h3>
                         <p>Bu firma ve ilişkili tüm veriler kalıcı olarak silinecektir. Bu işlem geri alınamaz.</p>
                         <p className="cmp-delete-card__name">{firmaAdi}</p>
                         <div className="cmp-delete-card__actions">
@@ -32,11 +39,18 @@ const CompanyModals = ({ showDeleteConfirm, setShowDeleteConfirm, deleting, hand
 
             {showSaveSuccess && (
                 <div className="cmp-success-overlay" onClick={() => setShowSaveSuccess(false)}>
-                    <div className="cmp-success-card" onClick={e => e.stopPropagation()}>
+                    {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal — modal semantik erişilebilirlik */}
+                    <div
+                        className="cmp-success-card"
+                        onClick={e => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="cmp-save-modal-title"
+                    >
                         <div className="cmp-success-card__icon">
                             <span className="material-symbols-outlined">check_circle</span>
                         </div>
-                        <h3>Değişiklikler Kaydedildi!</h3>
+                        <h3 id="cmp-save-modal-title">Değişiklikler Kaydedildi!</h3>
                         <p>Firma bilgileriniz başarıyla güncellendi.</p>
                         <button className="cmp-success-card__btn" onClick={() => setShowSaveSuccess(false)}>Tamam</button>
                     </div>

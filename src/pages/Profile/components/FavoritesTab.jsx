@@ -58,11 +58,6 @@ const FavoritesTab = ({ favorites, myLists, selectedListId, setSelectedListId, i
       </div>
 
       <div className="mobile-fav-panel">
-        <div className="mobile-fav-stats">
-          <span className="material-symbols-outlined">bookmark</span>
-          <span className="mobile-fav-stats-value">{favorites.length}</span>
-          <span className="mobile-fav-stats-label">Kayıtlı Tedarikçi</span>
-        </div>
         <div className="mobile-fav-lists">
           <div className={`mobile-fav-chip ${selectedListId === null ? 'active' : ''}`} onClick={() => setSelectedListId(null)}>
             Tümü <span className="chip-count">{favorites.length}</span>

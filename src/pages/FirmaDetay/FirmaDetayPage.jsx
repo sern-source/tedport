@@ -35,7 +35,7 @@ const FirmaDetayPage = () => {
         <>
             <FdToast toast={fd.fdToast} onClose={() => fd.setFdToast(null)} />
             <SharedHeader search={fd.detaySearch} setSearch={fd.setDetaySearch} showSearchBar={true} suggestions={fd.suggestions} onSuggestionClick={fd.handleSuggestionClick} onSearchSubmit={fd.handleSearchSubmit} noResults={fd.noResults} navItems={NAV_ITEMS} />
-            <FirmaDetayHero firma={fd.firma} isVerified={fd.isVerified} isCurrentUserCompanyManager={fd.isCurrentUserCompanyManager} firmaEkip={fd.firmaEkip} onShowEkipModal={() => fd.setShowEkipModal(true)} />
+            <FirmaDetayHero firma={fd.firma} isVerified={fd.isVerified} isCurrentUserCompanyManager={fd.isCurrentUserCompanyManager} firmaEkip={fd.firmaEkip} onShowEkipModal={() => fd.setShowEkipModal(true)} isLoggedIn={!!fd.userProfile} />
             <FirmaDetayMain fd={fd} firmaId={id} />
             <FirmaDetayModals fd={fd} />
         </>

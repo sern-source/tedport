@@ -13,7 +13,8 @@ const MyOffersToolbar = ({ search, setSearch, filter, setFilter, setCurrentPage 
     <div className="mop-toolbar">
         <div className="mop-toolbar__search">
             <span className="material-symbols-outlined">search</span>
-            <input type="text" placeholder="İhale adı veya referans ara…" value={search}
+            {/* Enes Doğanay | 8 Mayıs 2026: aria-label — görünür label olmayan input için */}
+            <input type="text" placeholder="İhale adı veya referans ara…" aria-label="İhale ara" value={search}
                 onChange={e => { setSearch(e.target.value); setCurrentPage(1); }} />
             {search && (
                 <button className="mop-toolbar__clear" onClick={() => { setSearch(''); setCurrentPage(1); }} aria-label="Aramayı temizle">

@@ -3,6 +3,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SuppliersSection.css';
 
+// Enes Doğanay | 8 Mayıs 2026: IIFE anti-pattern kaldırıldı — module-level helper
+const parseFirmaTags = (raw) => {
+    if (!raw) return [];
+    let arr = raw;
+    if (typeof arr === 'string') {
+        try { arr = JSON.parse(arr); } catch { return []; }
+    }
+    if (!Array.isArray(arr)) return [];
+    return arr.map(k => k.ana_kategori).filter(Boolean).slice(0, 3);
+};
+
 const SuppliersSection = ({ topSuppliers, isLoading }) => {
     const navigate = useNavigate();
 
@@ -17,16 +28,12 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                         ))
                         : topSuppliers.map((firma, index) => {
                             const validLogo = firma.logo_url?.includes('firma-logolari') ? firma.logo_url : null;
-                            const tags = (() => {
-                                let raw = firma.urun_kategorileri;
-                                if (!raw) return [];
-                                if (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch { return []; } }
-                                if (!Array.isArray(raw)) return [];
-                                return raw.map(k => k.ana_kategori).filter(Boolean).slice(0, 3);
-                            })();
+                            // Enes Doğanay | 8 Mayıs 2026: IIFE → module-level parseFirmaTags
+                            const tags = parseFirmaTags(firma.urun_kategorileri);
 
                             return (
-                                <div className="sc-sup-card" key={`supplier-${index}`}>
+                                // Enes Doğanay | 8 Mayıs 2026: firmaID tabanlı stabil key
+                                <div className="sc-sup-card" key={firma.firmaID || `supplier-${index}`}>
                                     <div className="sc-sup-header">
                                         {validLogo ? (
                                             <img
@@ -35,12 +42,18 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                                                 alt={firma.firma_adi}
                                                 onClick={() => navigate(`/firmadetay/${firma.firmaID}`)}
                                                 style={{ objectFit: 'contain', background: '#fff', border: '1px solid #e0e7ff', cursor: 'pointer' }}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${firma.firmaID}`); }}
                                             />
                                         ) : (
                                             <div
                                                 className="sc-sup-avatar"
                                                 onClick={() => navigate(`/firmadetay/${firma.firmaID}`)}
                                                 style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', cursor: 'pointer' }}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${firma.firmaID}`); }}
                                             >
                                                 {firma.firma_adi?.charAt(0)}
                                             </div>
@@ -56,6 +69,9 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                                             className="sc-sup-name"
                                             onClick={() => navigate(`/firmadetay/${firma.firmaID}`)}
                                             style={{ cursor: 'pointer' }}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${firma.firmaID}`); }}
                                         >
                                             {firma.firma_adi}
                                         </h3>
@@ -66,7 +82,7 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                                     </div>
                                     <div className="sc-sup-tags">
                                         {tags.length > 0
-                                            ? tags.map((tag, i) => <span className="sc-tag" key={i}>{tag}</span>)
+                                            ? tags.map((tag) => <span className="sc-tag" key={tag}>{tag}</span>)
                                             : <span className="sc-tag">{firma.ana_sektor}</span>
                                         }
                                     </div>

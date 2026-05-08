@@ -18,11 +18,15 @@ const IhaleOffersToolbar = ({ displayCount, offerFilter, setOfferFilter, sortSta
                 <h3>Gelen Teklifler<span className="tom-count-badge">{displayCount}</span></h3>
             </div>
             <div className="tom-offers-toolbar__right">
-                {displayCount > 0 && <button className="tom-btn-icon" onClick={onExportCSV} data-tooltip="Teklifleri CSV olarak indir" data-tooltip-pos="bottom"><span className="material-symbols-outlined">download</span></button>}
-                <button className={`tom-btn-icon${showScorePanel ? ' tom-btn-icon--active' : ''}`} onClick={() => setShowScorePanel(p => !p)} data-tooltip="Puanlama Ayarları" data-tooltip-pos="bottom"><span className="material-symbols-outlined">tune</span></button>
-                <button className="tom-btn-icon" onClick={() => setShowScoringInfo(true)} data-tooltip="Akıllı Puanlama Nasıl Çalışır?" data-tooltip-pos="bottom"><span className="material-symbols-outlined">help</span></button>
+                {displayCount > 0 && <button className="tom-btn-icon" onClick={onExportCSV} aria-label="Teklifleri CSV olarak indir" data-tooltip="CSV İndir" data-tooltip-pos="bottom"><span className="material-symbols-outlined">download</span></button>}
+                <button className={`tom-btn-icon${showScorePanel ? ' tom-btn-icon--active' : ''}`} onClick={() => setShowScorePanel(p => !p)} aria-label="Puanlama Ayarları" data-tooltip="Puanlama Ayarları" data-tooltip-pos="bottom"><span className="material-symbols-outlined">tune</span></button>
+                <button className="tom-btn-icon" onClick={() => setShowScoringInfo(true)} aria-label="Akıllı Puanlama Nasıl Çalışır?" data-tooltip="Puanlama Hakkında" data-tooltip-pos="bottom"><span className="material-symbols-outlined">help</span></button>
                 <div className="tom-sort-wrap" ref={sortDropdownRef}>
-                    <button type="button" className="tom-sort-trigger" onClick={() => setSortState(p => ({ ...p, open: !p.open }))}>
+                    <button type="button" className="tom-sort-trigger"
+                        onClick={() => setSortState(p => ({ ...p, open: !p.open }))}
+                        aria-expanded={sortState.open}
+                        aria-haspopup="listbox"
+                    >
                         <span className="material-symbols-outlined">sort</span>
                         <span className="tom-sort-label">{SORT_LABEL_MAP[sortState.value] || 'Sırala'}</span>
                         <span className={`material-symbols-outlined tom-sort-chevron${sortState.open ? ' open' : ''}`}>expand_more</span>

@@ -46,6 +46,11 @@ export function useFirmaDetay(id) {
         fdToastTimerRef.current = setTimeout(() => setFdToast(null), 3800);
     };
 
+    // Enes Doğanay | 8 Mayıs 2026: fdToast timer cleanup — memory leak önleme
+    useEffect(() => {
+        return () => { if (fdToastTimerRef.current) clearTimeout(fdToastTimerRef.current); };
+    }, []);
+
     const notes = useFirmaDetayNotes({ userId: sessionUserIdRef.current, userEmail: sessionUserEmailRef.current, firmaId: id, showFdToast });
     const favorites = useFirmaDetayFavorites({ userId: sessionUserIdRef.current, firmaId: id, showFdToast });
 
@@ -71,7 +76,7 @@ export function useFirmaDetay(id) {
         setManagedCompanyId(sessionData.managedCompanyId);
         notes.setSavedNotes(sessionData.notes);
         favorites.setMyLists(sessionData.lists);
-        if (sessionData.remindersError && !isMissingRelationError(sessionData.remindersError)) console.error('Hatırlatıcılar alınamadı:', sessionData.remindersError);
+        if (sessionData.remindersError && !isMissingRelationError(sessionData.remindersError)) { /* sessiz — hatırlatıcı yüklenemedi, kritik değil */ }
         notes.setNoteReminders(sessionData.reminders || []);
         if (sessionData.favorite) { favorites.setIsFavorited(true); favorites.setSelectedListId(sessionData.favorite.liste_id || ''); }
     };

@@ -39,6 +39,7 @@ const HeroSection = ({
                                 <span className="material-symbols-outlined" style={{ color: '#94a3b8', marginRight: '12px' }}>search</span>
                                 <input
                                     type="text"
+                                    aria-label="Ürün veya firma ara"
                                     placeholder="Ürün veya firma ara..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -49,9 +50,14 @@ const HeroSection = ({
                                     }}
                                 />
                                 {searchTerm.length > 0 && (
+                                    // Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği — DatePicker/CitySelect ile aynı pattern
                                     <span
                                         className="material-symbols-outlined sc-search-clear"
                                         onClick={handleClearSearch}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-label="Aramayı temizle"
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClearSearch(); }}
                                         style={{ cursor: 'pointer', color: '#94a3b8', fontSize: '20px', marginLeft: '4px' }}
                                     >close</span>
                                 )}
@@ -64,12 +70,13 @@ const HeroSection = ({
 
                         <HeroSearchDropdown heroSuggestions={heroSuggestions} heroNoResults={heroNoResults} heroDidYouMean={heroDidYouMean} setSearchTerm={setSearchTerm} setHeroDidYouMean={setHeroDidYouMean} heroHistoryVisible={heroHistoryVisible} searchHistory={searchHistory} searchTerm={searchTerm} removeFromHistory={removeFromHistory} clearHistory={clearHistory} handleCloseSuggestions={handleCloseSuggestions} handleSearch={handleSearch} />
 
+                        {/* Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği — popüler etiket kısayolları */}
                         <div className="sc-popular-tags">
                             <span>Popüler:</span>
-                            <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=çelik')}>Çelik Borular</span>
-                            <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=pamuk')}>Pamuklu Kumaş</span>
-                            <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=ambalaj')}>Ambalaj</span>
-                            <span className="sc-popular-tag" onClick={() => navigate('/firmalar?search=elektronik')}>Elektronik</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=çelik')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=çelik'); }}>Çelik Borular</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=pamuk')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=pamuk'); }}>Pamuklu Kumaş</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=ambalaj')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=ambalaj'); }}>Ambalaj</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=elektronik')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=elektronik'); }}>Elektronik</span>
                         </div>
                     </div>
                 </div>

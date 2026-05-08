@@ -2,6 +2,9 @@
 import React from 'react';
 import './QuoteCard.css';
 
+// Enes Doğanay | 8 Mayıs 2026: Module seviyesi formatter — her render’da yeni Intl nesnesi üretmez
+const quoteDateFormatter = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' });
+
 /* Enes Doğanay | 7 Mayıs 2026: Durum etiket haritaları */
 const STATUS_MAP_IN = {
   pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı',
@@ -49,13 +52,14 @@ const QuoteCard = ({
           <div className="cmp-quote-sender-info">
             <span className="cmp-quote-sender">{senderLabel}</span>
             <span className="cmp-quote-date">
-              {new Date(q.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+              {/* Enes Doğanay | 8 Mayıs 2026: module-level formatter kullanılıyor */}
+              {quoteDateFormatter.format(new Date(q.created_at))}
             </span>
           </div>
           <button
             className="cmp-quote-delete-trigger"
             onClick={(e) => { e.stopPropagation(); setConfirmDeleteQuoteId(q.id); }}
-            data-tooltip="Teklifi Sil"
+            aria-label="Teklifi sil"
           >
             <span className="material-symbols-outlined">delete</span>
           </button>

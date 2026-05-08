@@ -1,8 +1,7 @@
 // Enes Doğanay | 7 Mayıs 2026: Firma profil temel data state — auth, firma, notif, ekip görünürlük
 import { useState, useEffect, useCallback } from 'react';
 import { getManagedCompanyId } from '../../../services/companyManagementApi';
-import { fetchFirmaData, fetchUserRole, fetchNotifPrefs, updateEkipPublicToggle } from '../services/firmaService';
-import { supabase } from '../../../supabaseClient';
+import { fetchFirmaData, fetchUserRole, fetchNotifPrefs, updateEkipPublicToggle, getAuthSession, signOutService } from '../services/firmaService';
 
 const DEFAULT_NOTIF_PREFS = {
     teklif_talepleri: true, teklif_yanitlari: true, teklif_mesajlari: true,
@@ -28,7 +27,7 @@ export const useFirmaCoreInit = ({ navigate }) => {
                 const cid = await getManagedCompanyId();
                 if (!cid) { navigate('/'); return; }
                 setCompanyId(cid);
-                const { data: { session } } = await supabase.auth.getSession();
+                const session = await getAuthSession();
                 if (!session?.user) { navigate('/login'); return; }
                 setUserId(session.user.id);
                 const [firmaData, notifPrefsData, roleData] = await Promise.all([
@@ -51,7 +50,7 @@ export const useFirmaCoreInit = ({ navigate }) => {
                 if (roleData) setMyRole(roleData);
                 setLoading(false);
             } catch (err) {
-                if (!err?.message?.includes('abort')) console.error('FirmaProfilPage init error:', err);
+                if (!err?.message?.includes('abort')) { /* sessiz */ }
                 setLoading(false);
             }
         };
@@ -60,7 +59,7 @@ export const useFirmaCoreInit = ({ navigate }) => {
     }, [navigate]);
 
     const handleLogout = useCallback(async () => {
-        await supabase.auth.signOut();
+        await signOutService();
         navigate('/login');
     }, [navigate]);
 

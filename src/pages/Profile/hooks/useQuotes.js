@@ -36,7 +36,7 @@ export const useQuotes = (userId, setActiveViewingTeklifId, notifications, setNo
                 return enriched;
             });
         } catch (err) {
-            if (err?.name !== 'AbortError' && !err?.message?.includes('abort')) console.warn('[useQuotes] loadQuotes hatası:', err);
+            if (err?.name !== 'AbortError' && !err?.message?.includes('abort')) { /* sessiz — realtime zaten canlı mesajı yakalar */ }
         }
     }, [userId]);
 

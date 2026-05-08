@@ -23,8 +23,11 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
       return (
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
+        <div
+          role="alert"
+          aria-live="assertive"
+          style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
           justifyContent: 'center', minHeight: '60vh', padding: '2rem',
           fontFamily: 'Inter, sans-serif', textAlign: 'center',
         }}>

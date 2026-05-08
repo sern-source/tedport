@@ -405,5 +405,56 @@
 }
 
 /* ═══════════════════════════════════ */
+/*  Compact variant (modal forms)     */
+/* ═══════════════════════════════════ */
+/* Enes Doğanay | 8 Mayıs 2026: Compact panel — modal içi takvim için küçültülmüş stil */
+.dp-panel--compact {
+    border-radius: 10px;
+}
+.dp-panel--compact .dp-header {
+    padding: 5px 7px;
+}
+.dp-panel--compact .dp-month {
+    font-size: 0.78rem;
+}
+.dp-panel--compact .dp-month--btn {
+    padding: 3px 6px;
+}
+.dp-panel--compact .dp-nav {
+    width: 22px;
+    height: 22px;
+}
+.dp-panel--compact .dp-nav .material-symbols-outlined {
+    font-size: 14px;
+}
+.dp-panel--compact .dp-grid {
+    padding: 3px 5px 1px;
+    gap: 0;
+}
+.dp-panel--compact .dp-weekday {
+    font-size: 0.6rem;
+    padding: 2px 0 3px;
+}
+.dp-panel--compact .dp-day {
+    font-size: 0.69rem;
+}
+.dp-panel--compact .dp-footer {
+    padding: 3px 7px 5px;
+}
+.dp-panel--compact .dp-footer-clear,
+.dp-panel--compact .dp-footer-today {
+    font-size: 0.72rem;
+    padding: 2px 7px;
+}
+.dp-panel--compact .dp-year-grid {
+    padding: 6px 8px 2px;
+    gap: 2px;
+}
+.dp-panel--compact .dp-year-btn {
+    padding: 6px 4px;
+    font-size: 0.8rem;
+}
+
+/* ═══════════════════════════════════ */
 /*  Dark mode — blue (default)        */
 /* ═══════════════════════════════════ */

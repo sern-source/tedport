@@ -25,6 +25,9 @@ const QuotesTab = ({
   openQuoteChat, sendQuoteChatMessage, handleDeleteQuote, getFilteredSortedQuotes,
   unreadQuoteIds, navigate,
 }) => {
+  // Enes Doğanay | 8 Mayıs 2026: Search lokal state — hooks koşullu çağrılamaz, early return'dan önce
+  const [quoteSearch, setQuoteSearch] = useState('');
+
   // Enes Doğanay | 7 Mayıs 2026: Aktif teklif varsa inline chat görünümü
   const activeQuote = activeQuoteId ? (myQuotes || []).find(q => q.id === activeQuoteId) : null;
   if (activeQuote) {
@@ -48,8 +51,6 @@ const QuotesTab = ({
   }
 
   const sortedQuotes = getFilteredSortedQuotes(unreadQuoteIds);
-  // Enes Doğanay | 7 Mayıs 2026: Search lokal state — firma adı veya mesaj içindeyse göster
-  const [quoteSearch, setQuoteSearch] = useState('');
   const searchedQuotes = quoteSearch.trim()
     ? sortedQuotes.filter(q => {
         const q2 = quoteSearch.toLowerCase();

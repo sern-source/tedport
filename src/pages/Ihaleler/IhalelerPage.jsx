@@ -1,4 +1,4 @@
-﻿// Enes Doghanay | 6 Mayis 2026: Ihaleler sayfasi — koordinator, tum mantighi hook ve alt bilesenlere delege eder
+﻿// Enes Doğanay | 6 Mayıs 2026: İhaleler sayfası — koordinatör, tüm mantığı hook ve alt bileşenlere delege eder
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./components/IhalelerPage.css";

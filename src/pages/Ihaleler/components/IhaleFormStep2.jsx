@@ -42,11 +42,11 @@ const IhaleFormStep2 = ({
             </div>
             <label className="ihale-field">
                 <span>İhale Açılış Tarihi *</span>
-                <DatePicker value={form.yayin_tarihi} onChange={val => setForm(p => ({ ...p, yayin_tarihi: val }))} />
+                <DatePicker value={form.yayin_tarihi} onChange={val => setForm(p => ({ ...p, yayin_tarihi: val }))} compact />
             </label>
             <label className="ihale-field">
                 <span>İhale Kapanış Tarihi *</span>
-                <DatePicker value={form.son_basvuru_tarihi} onChange={val => setForm(p => ({ ...p, son_basvuru_tarihi: val }))} min={form.yayin_tarihi || undefined} />
+                <DatePicker value={form.son_basvuru_tarihi} onChange={val => setForm(p => ({ ...p, son_basvuru_tarihi: val }))} min={form.yayin_tarihi || undefined} compact />
             </label>
             <label className="ihale-field">
                 <span>Talep Edilen Teslim Süresi *</span>
@@ -59,9 +59,9 @@ const IhaleFormStep2 = ({
                     <input type="text" value={form.referans_no} readOnly className="ihale-field--readonly" tabIndex={-1} />
                     <button type="button" className={`ihale-refno-copy-btn${refNoCopied ? ' ihale-refno-copy-btn--done' : ''}`}
                         onClick={() => { if (!form.referans_no) return; navigator.clipboard.writeText(form.referans_no); setRefNoCopied(true); setTimeout(() => setRefNoCopied(false), 2000); }}
-                        data-tooltip="Referans numarasını kopyala">
+                        aria-label={refNoCopied ? 'Kopyalandı' : 'Referans numarasını kopyala'}
+                        data-tooltip={refNoCopied ? 'Kopyalandı!' : 'Referans numarasını kopyala'}>
                         <span className="material-symbols-outlined">{refNoCopied ? 'check' : 'content_copy'}</span>
-                        {refNoCopied ? 'Kopyalandı' : 'Kopyala'}
                     </button>
                 </div>
             </label>

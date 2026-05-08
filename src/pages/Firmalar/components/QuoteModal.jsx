@@ -6,7 +6,8 @@ import './QuoteModal.css';
 
 const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onClose, onSetField, onSetFile, onSubmit }) => (
   <div className="quote-modal-overlay">
-    <div className="quote-modal" onClick={e => e.stopPropagation()}>
+    {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
+    <div className="quote-modal" role="dialog" aria-modal="true" aria-labelledby="flquote-title" onClick={e => e.stopPropagation()}>
       {sent ? (
         <div className="quote-modal-success">
           <span className="material-symbols-outlined quote-success-icon">check_circle</span>
@@ -17,10 +18,10 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
         <>
           <div className="quote-modal-header">
             <div>
-              <h3>Teklif Talebi</h3>
+              <h3 id="flquote-title">Teklif Talebi</h3>
               <p className="quote-modal-subtitle">{supplier.name}</p>
             </div>
-            <button className="quote-modal-close" onClick={onClose} type="button">
+            <button className="quote-modal-close" onClick={onClose} type="button" aria-label="Kapat">
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>

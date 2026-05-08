@@ -5,11 +5,11 @@ export const IhaleAcceptClosePopup = ({ acceptClosePopup, setAcceptClosePopup, o
     if (!acceptClosePopup) return null;
     return (
         <div className="tom-contact-overlay" onClick={() => setAcceptClosePopup(null)}>
-            <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+            <div className="tom-accept-close-card" role="dialog" aria-modal="true" aria-labelledby="accept-close-title" onClick={e => e.stopPropagation()}>
                 <div className="tom-scoring-info-card__icon" style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}>
                     <span className="material-symbols-outlined">check_circle</span>
                 </div>
-                <h3>Teklif Kabul Edilecek</h3>
+                <h3 id="accept-close-title">Teklif Kabul Edilecek</h3>
                 <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>Bu teklifi kabul ettikten sonra ihaleyi kapatmak ister misiniz?</p>
                 <div className="tom-accept-close-actions">
                     <button className="tom-btn tom-btn--accept" onClick={() => onConfirmAccept(acceptClosePopup, true)}>
@@ -30,11 +30,11 @@ export const IhaleCloseVisibilityPopup = ({ closeState, setCloseState, onConfirm
     const onClose = () => setCloseState(p => ({ ...p, visibilityPopupId: null }));
     return (
         <div className="tom-contact-overlay" onClick={onClose}>
-            <div className="tom-accept-close-card" onClick={e => e.stopPropagation()}>
+            <div className="tom-accept-close-card" role="dialog" aria-modal="true" aria-labelledby="close-visibility-title" onClick={e => e.stopPropagation()}>
                 <div className="tom-scoring-info-card__icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
                     <span className="material-symbols-outlined">visibility</span>
                 </div>
-                <h3>İhale Görünürlüğü</h3>
+                <h3 id="close-visibility-title">İhale Görünürlüğü</h3>
                 <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '8px 0 20px', textAlign: 'center' }}>Kapattığınız ihale, İhaleler sayfasında diğer kullanıcılara gösterilmeye devam etsin mi?</p>
                 <div className="tom-accept-close-actions">
                     <button className="tom-btn tom-btn--accept" onClick={() => onConfirmClose(closeState.visibilityPopupId, 'goster')}>

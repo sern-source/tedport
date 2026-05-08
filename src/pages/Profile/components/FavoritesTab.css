@@ -167,6 +167,65 @@
   transition: border-color 0.2s;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Mobil liste oluşturma butonları */
+.mobile-create-list .btn-add {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.mobile-create-list .btn-add:hover {
+  background: #1a44c2;
+  transform: translateY(-1px);
+}
+
+.mobile-create-list .btn-add .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.mobile-create-list .btn-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: var(--bg-white, #fff);
+  color: var(--text-gray, #64748b);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.mobile-create-list .btn-cancel:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.mobile-create-list .btn-cancel .material-symbols-outlined {
+  font-size: 16px;
+}
+
+[data-theme="dark"] .mobile-create-list .btn-cancel {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-gray);
+}
+
 .mobile-create-list input:focus {
   border-color: var(--primary);
 }

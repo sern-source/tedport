@@ -101,8 +101,7 @@ export function useMopChat({ offers, tenderMap, firmaMap, firmaLogoMap, userProf
             }
             markTeklifNotificationsRead(offer.id).then(() => refreshCounts?.());
         } catch (err) {
-            if (err?.name !== 'AbortError') console.error('Teklif chat mesajları yüklenemedi:', err);
-            setMopChatError(true);
+            if (err?.name !== 'AbortError') setMopChatError(true);
         } finally { setMopChatLoading(false); }
         const channel = supabase.channel(`tender-chat-${offer.id}`)
             .on('broadcast', { event: 'new-tender-message' }, ({ payload }) => {
@@ -130,14 +129,16 @@ export function useMopChat({ offers, tenderMap, firmaMap, firmaLogoMap, userProf
         try {
             const data = await sendChatMessage({ teklif_id: activeMopChat.offer.id, sender_id: senderId, sender_role: 'bidder', mesaj: messageText, okundu_bidder: true });
             setMopChatMessages(prev => [...prev, data]); setMopChatInput(''); setMopChatSending(false); scrollMopChatToBottom();
-            if (mopChatChannelRef.current) mopChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data }).catch(() => {});
+            // Enes Doğanay | 8 Mayıs 2026: Fire-and-forget broadcast — realtime yayın başarısız olsa da mesaj DB'de kaydedildi
+            if (mopChatChannelRef.current) void mopChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data });
             if (tender?.firma_id) {
-                fetchFirmaManagerIds(tender.firma_id).then((managers) => {
+                // Enes Doğanay | 8 Mayıs 2026: Fire-and-forget — bildirim gönderimi kritik değil, hata mesaj gönderimini bloklasın
+                void fetchFirmaManagerIds(tender.firma_id).then((managers) => {
                     if (!managers?.length) return;
                     const userName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || senderId;
                     const notifRows = managers.filter(m => m.user_id !== senderId).map(m => ({ user_id: m.user_id, type: 'tender_offer_message', title: 'İhale teklifinden mesaj', message: `"${activeMopChat.tenderTitle || 'İhale'}" teklifine ${userName} mesaj gönderdi.`, is_read: false, metadata: { ihale_id: activeMopChat.offer.ihale_id, teklif_id: activeMopChat.offer.id, ihale_baslik: activeMopChat.tenderTitle } }));
                     notifyFirmaManagers(tender.firma_id, notifRows);
-                }).catch(() => {});
+                });
             }
         } catch { setMopChatInput(messageText); setMopChatSending(false); }
     }, [mopChatInput, activeMopChat, tenderMap, userProfile, scrollMopChatToBottom, getUserId]);

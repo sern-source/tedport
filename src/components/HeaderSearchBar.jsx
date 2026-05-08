@@ -15,6 +15,7 @@ const HeaderSearchBar = ({
         </div>
         <input
             type="text"
+            aria-label="Firma, ürün ya da kategori ara"
             placeholder="Firma, ürün ya da kategori ara..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -25,7 +26,7 @@ const HeaderSearchBar = ({
             }}
         />
         {search && search.length > 0 && (
-            <button className="shared-search-clear" onClick={() => setSearch('')} type="button">
+            <button className="shared-search-clear" onClick={() => setSearch('')} type="button" aria-label="Aramayı temizle">
                 <span className="material-symbols-outlined shared-search-clear-icon">close</span>
             </button>
         )}

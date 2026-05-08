@@ -27,8 +27,8 @@ const IhaleOfferCard = ({ offer, idx, isExpanded, isCompare, compareCount, isHig
                         </div>
                     </div>
                     <div className="tom-offer-card__actions" onClick={e => e.stopPropagation()}>
-                        <button className={`tom-icon-btn${isShort ? ' tom-icon-btn--starred' : ''}`} onClick={onToggleShortlist} data-tooltip={isShort ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}><span className="material-symbols-outlined">{isShort ? 'star' : 'star_outline'}</span></button>
-                        <button className="tom-icon-btn tom-icon-btn--contact" onClick={onOpenContact} data-tooltip="Profili Görüntüle"><span className="material-symbols-outlined">person_search</span></button>
+                        <button className={`tom-icon-btn${isShort ? ' tom-icon-btn--starred' : ''}`} onClick={onToggleShortlist} aria-label={isShort ? 'Favorilerden Çıkar' : 'Favorilere Ekle'} data-tooltip={isShort ? 'Favorilerden Çıkar' : 'Favorilere Ekle'} data-tooltip-pos="bottom"><span className="material-symbols-outlined">{isShort ? 'star' : 'star_outline'}</span></button>
+                        <button className="tom-icon-btn tom-icon-btn--contact" onClick={onOpenContact} aria-label="Profili Görüntüle" data-tooltip="Profili Görüntüle" data-tooltip-pos="bottom"><span className="material-symbols-outlined">person_search</span></button>
                         {/* Enes Doğanay | 7 Mayıs 2026: Karşılaştır butonu — seçiliyken dolu mor+yazı, limitte disable */}
                         <button
                             className={`tom-compare-btn${isCompare ? ' tom-compare-btn--active' : ''}${!isCompare && !compareHintDismissed ? ' tom-compare-btn--hint' : ''}`}
@@ -56,7 +56,7 @@ const IhaleOfferCard = ({ offer, idx, isExpanded, isCompare, compareCount, isHig
                             <div className="tom-kalemler"><h4><span className="material-symbols-outlined">list_alt</span>Teklif Kalemleri ({kalemler.length})</h4>
                                 <div className="tom-kalemler__wrap">
                                     <table><thead><tr><th>Madde</th><th>Miktar</th><th>Birim Fiyat</th><th>Toplam</th><th>Açıklama</th></tr></thead>
-                                        <tbody>{kalemler.map((k, i) => { const kCur = k.para_birimi || offer.para_birimi || 'TRY'; const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0); return (<tr key={i}><td><strong>{k.madde || '—'}</strong></td><td>{k.miktar || '—'}</td><td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td><td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td><td>{k.aciklama || k.not || '—'}</td></tr>); })}</tbody>
+                                        <tbody>{kalemler.map((k, i) => { const kCur = k.para_birimi || offer.para_birimi || 'TRY'; const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0); return (<tr key={k.madde ? `${i}-${k.madde}` : i}><td><strong>{k.madde || '—'}</strong></td><td>{k.miktar || '—'}</td><td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td><td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td><td>{k.aciklama || k.not || '—'}</td></tr>); })}</tbody>
                                     </table>
                                 </div>
                             </div>

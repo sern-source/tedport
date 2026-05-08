@@ -9,7 +9,7 @@ const FirmalarActiveFilterTags = ({ activeTags, removeFilterTag, setFilters }) =
             {activeTags.map(({ type, value }) => (
                 <span key={`${type}-${value}`} className={`filter-chip filter-chip--${type}`}>
                     {value}
-                    <button onClick={() => removeFilterTag(type, value)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1 }}>
+                    <button onClick={() => removeFilterTag(type, value)} aria-label={`${value} filtresini kaldır`} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1 }}>
                         <span className="material-symbols-outlined" style={{ fontSize: '14px', verticalAlign: 'middle' }}>close</span>
                     </button>
                 </span>

@@ -51,19 +51,22 @@ const FirmaSidebar = ({
       </div>
 
       <nav className="sidebar-nav">
-        <a
+        <button
+          type="button"
           className={`nav-item ${currentTab === 'panel' ? 'active' : ''}`}
           onClick={() => setTab({ tab: 'panel' })}
         >
           <span className="material-symbols-outlined">storefront</span> Firma Paneli
-        </a>
-        <a
+        </button>
+        <button
+          type="button"
           className={`nav-item ${currentTab === 'favoriler' ? 'active' : ''}`}
           onClick={() => setTab({ tab: 'favoriler' })}
         >
           <span className="material-symbols-outlined">collections_bookmark</span> Favorilerim
-        </a>
-        <a
+        </button>
+        <button
+          type="button"
           className={`nav-item ${currentTab === 'teklifler' ? 'active' : ''}`}
           onClick={() => {
             setTab({ tab: 'teklifler' });
@@ -73,8 +76,9 @@ const FirmaSidebar = ({
           <span className="material-symbols-outlined">request_quote</span> Teklif Yönetimi
           {/* Enes Doğanay | 6 Mayıs 2026: Bekleyen + okunmamış teklif badge */}
           {pendingCount > 0 && <span className="nav-item-badge">{pendingCount}</span>}
-        </a>
-        <a
+        </button>
+        <button
+          type="button"
           className={`nav-item ${currentTab === 'ihale-yonetimi' ? 'active' : ''}`}
           onClick={() => {
             if (setActiveQuoteChat) setActiveQuoteChat(null);
@@ -85,17 +89,19 @@ const FirmaSidebar = ({
           {ihaleYonetimiUnreadCount > 0 && (
             <span className="nav-item-badge">{ihaleYonetimiUnreadCount}</span>
           )}
-        </a>
+        </button>
         {/* Enes Doğanay | 6 Mayıs 2026: Ekip Yönetimi — sadece owner ve admin */}
         {(myRole === 'owner' || myRole === 'admin') && (
-          <a
+          <button
+            type="button"
             className={`nav-item ${currentTab === 'ekip' ? 'active' : ''}`}
             onClick={() => setTab({ tab: 'ekip' })}
           >
             <span className="material-symbols-outlined">group</span> Ekip Yönetimi
-          </a>
+          </button>
         )}
-        <a
+        <button
+          type="button"
           className={`nav-item ${currentTab === 'bildirimler' ? 'active' : ''}`}
           onClick={() => setTab({ tab: 'bildirimler' })}
         >
@@ -103,11 +109,11 @@ const FirmaSidebar = ({
           {unreadNotifCount > 0 && (
             <span className="nav-item-badge">{unreadNotifCount}</span>
           )}
-        </a>
+        </button>
         <hr className="sidebar-divider" />
-        <a className="nav-item logout" onClick={handleLogout}>
+        <button type="button" className="nav-item logout" onClick={handleLogout}>
           <span className="material-symbols-outlined">logout</span> Çıkış Yap
-        </a>
+        </button>
       </nav>
 
       {/* Enes Doğanay | 6 Mayıs 2026: Favoriler sekmesinde listeler + istatistik */}

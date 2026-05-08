@@ -19,13 +19,15 @@ const typeConfig = {
   default: { icon: 'notifications', label: 'Bildirim', color: '#137fec' }
 };
 
+// Enes Doğanay | 8 Mayıs 2026: Module seviyesine taşındı — ToastItem her render’da yeniden oluşturulmasını önler
+const LONG_DURATION_TYPES = ['tender_new_offer', 'tender_offer_updated', 'tender_offer_withdrawn', 'tender_offer_status'];
+
 const ToastItem = ({ toast, onDismiss, onClickToast }) => {
   const config = typeConfig[toast.type] || typeConfig.default;
   /* Enes Doğanay | 13 Nisan 2026: ihale_id olan bildirimler de tıklanabilir */
   const isClickable = !!(toast.metadata?.teklif_id || toast.metadata?.ihale_id || toast.firma_id);
 
   /* Enes Doğanay | 15 Nisan 2026: İhale teklif bildirimleri daha uzun süre kalsın (10sn), diğerleri 5sn */
-  const LONG_DURATION_TYPES = ['tender_new_offer', 'tender_offer_updated', 'tender_offer_withdrawn', 'tender_offer_status'];
   const duration = LONG_DURATION_TYPES.includes(toast.type) ? 10000 : 5000;
 
   useEffect(() => {

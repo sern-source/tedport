@@ -28,7 +28,7 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
       <button
         className={`card-fav-btn${isFavorited ? ' card-fav-btn--active' : ''}`}
         onClick={(e) => { e.stopPropagation(); onToggleFavorite(supplier.id); }}
-        data-tooltip={!isLoggedIn ? 'Giriş yapın' : isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+        aria-label={!isLoggedIn ? 'Giriş yapın' : isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
         type="button"
         disabled={!isLoggedIn}
       >
@@ -71,8 +71,8 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
         </h3>
         <div className="meta-info">📍 {supplier.location}</div>
         <div className="tags">
-          {(supplier.tags || []).map((tag, i) => (
-            <span key={i} className="tag" style={{ cursor: 'pointer' }} onClick={() => onTagClick(tag)}>{tag}</span>
+          {(supplier.tags || []).map((tag) => (
+            <span key={tag} className="tag" style={{ cursor: 'pointer' }} onClick={() => onTagClick(tag)}>{tag}</span>
           ))}
         </div>
         <p className="description">{supplier.description}</p>

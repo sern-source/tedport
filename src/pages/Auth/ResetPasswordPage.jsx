@@ -60,7 +60,7 @@ export default function ResetPasswordPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-                    <button type="button" className="toggle-password" onClick={() => setShowPassword((p) => !p)}>
+                    <button type="button" className="toggle-password" onClick={() => setShowPassword((p) => !p)} aria-label={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}>
                       <span className="material-symbols-outlined">{showPassword ? 'visibility' : 'visibility_off'}</span>
                     </button>
                   </div>
@@ -77,7 +77,7 @@ export default function ResetPasswordPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                     />
-                    <button type="button" className="toggle-password" onClick={() => setShowConfirm((p) => !p)}>
+                    <button type="button" className="toggle-password" onClick={() => setShowConfirm((p) => !p)} aria-label={showConfirm ? 'Şifreyi gizle' : 'Şifreyi göster'}>
                       <span className="material-symbols-outlined">{showConfirm ? 'visibility' : 'visibility_off'}</span>
                     </button>
                   </div>

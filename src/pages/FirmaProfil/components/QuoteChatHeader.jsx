@@ -42,6 +42,7 @@ const QuoteChatHeader = ({
                 className="quote-chat-sender-btn"
                 onClick={() => handleOpenQuoteContact(q)}
                 data-tooltip="Profili Görüntüle"
+                aria-label="Profili Görüntüle"
               >
                 {q.ad_soyad}
               </button>

@@ -10,7 +10,8 @@ const ProductAccordion = ({ kategoriler, expandedCategories, onToggle }) => (
                 const categoryKey = `cat-${idx}`;
                 const isExpanded = expandedCategories.has(categoryKey);
                 return (
-                    <div key={idx} className="accordion-item">
+                    // Enes Doğanay | 8 Mayıs 2026: Stabil key — index yerine kategori adı
+                    <div key={kategori.ana_kategori || idx} className="accordion-item">
                         <button
                             className="accordion-button"
                             onClick={() => onToggle(categoryKey)}
@@ -23,13 +24,13 @@ const ProductAccordion = ({ kategoriler, expandedCategories, onToggle }) => (
                                 {kategori.alt_kategoriler && kategori.alt_kategoriler.length > 0 ? (
                                     <div className="accordion-subcategories">
                                         {kategori.alt_kategoriler.map((altKat, altIdx) => (
-                                            <div key={altIdx}>
+                                            <div key={altKat.baslik || altIdx}>
                                                 <h4 className="subcategory-title">• {altKat.baslik}</h4>
                                                 {altKat.urunler && altKat.urunler.length > 0 && (
                                                     <div className="product-tags-wrap">
-                                                        {altKat.urunler.map((urun, urunIdx) => (
+                                                        {altKat.urunler.map((urun) => (
                                                             <a
-                                                                key={urunIdx}
+                                                                key={urun}
                                                                 href={`/firmalar?search=${encodeURIComponent(urun)}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"

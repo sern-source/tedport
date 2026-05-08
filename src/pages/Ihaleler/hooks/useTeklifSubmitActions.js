@@ -1,9 +1,8 @@
 // Enes Doğanay | 7 Mayıs 2026: Teklif mutasyon hook'u — gönder, taslak sil, geri çek
 // useTeklifActions'tan ayrıştırılan submit/delete/withdraw logic
-import { supabase } from '../../../supabaseClient';
 import {
     uploadTeklifDosya, submitTeklif, sendTeklifNotification,
-    deleteDraftTeklif, withdrawTeklif,
+    deleteDraftTeklif, withdrawTeklif, getAuthSession,
 } from '../services/teklifFormService';
 
 const useTeklifSubmitActions = ({ formState, userOffers, setUserOffers, authManagedCompanyId, managedCompanyName, userProfile }) => {
@@ -16,12 +15,13 @@ const useTeklifSubmitActions = ({ formState, userOffers, setUserOffers, authMana
         getTeklifGenelToplam,
     } = formState;
 
-    // Enes Doğanay | 7 Mayıs 2026: Teklif gönder / taslak kaydet
+    // Enes Doğanay | 8 Mayıs 2026: Teklif gönder / taslak kaydet
     const handleTeklifSubmit = async (isDraft = false) => {
         setTeklifSaving(true);
         setTeklifError('');
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            // Enes Doğanay | 8 Mayıs 2026: auth servis katmanından alınır
+            const session = await getAuthSession();
             if (!session?.user) { setTeklifError('Teklif vermek için giriş yapmanız gerekiyor.'); return; }
             if (!isDraft) {
                 if (teklifForm.kalemler.length > 0) {

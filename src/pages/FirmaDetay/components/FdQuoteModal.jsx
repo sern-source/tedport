@@ -12,7 +12,8 @@ const FdQuoteModal = ({
     onClose, onSubmit, onFileWarning
 }) => (
     <div className="quote-modal-overlay">
-        <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
+        <div className="quote-modal" role="dialog" aria-modal="true" aria-labelledby="fdquote-title" onClick={(e) => e.stopPropagation()}>
             {quoteSent ? (
                 <div className="quote-modal-success">
                     <span className="material-symbols-outlined quote-success-icon">check_circle</span>
@@ -23,7 +24,7 @@ const FdQuoteModal = ({
                 <>
                     <div className="quote-modal-header">
                         <div>
-                            <h3>Teklif Talebi</h3>
+                            <h3 id="fdquote-title">Teklif Talebi</h3>
                             <p className="quote-modal-subtitle">{firma?.firma_adi}</p>
                         </div>
                         <button className="quote-modal-close" onClick={() => { onClose(); setQuoteFile(null); }} type="button">

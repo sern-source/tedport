@@ -28,11 +28,14 @@ const SharedReportModal = ({
             <div
                 className="srm-overlay"
                 onClick={e => { if (!sending && e.target === e.currentTarget) onClose(); }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="srm-title"
             >
                 <div className="srm-modal">
                     <div className="srm-modal__header">
                         <span className="material-symbols-outlined srm-flag-icon">flag</span>
-                        <h3>Mesajı Şikayet Et</h3>
+                        <h3 id="srm-title">Mesajı Şikayet Et</h3>
                         <button className="srm-close" onClick={onClose} disabled={sending} aria-label="Kapat">
                             <span className="material-symbols-outlined">close</span>
                         </button>

@@ -19,19 +19,21 @@
     max-width: 620px;
     max-height: 90vh;
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Compact header */
 .ihale-modal__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px 12px;
+    padding: 11px 16px 10px;
     border-bottom: 1px solid var(--border);
 }
 
 .ihale-modal__head h3 {
-    font-size: 15px;
+    font-size: 13.5px;
     font-weight: 700;
     margin: 0;
     color: var(--text-dark);
@@ -50,23 +52,26 @@
     color: #0f172a;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Compact form wrapper */
 .ihale-modal__form {
-    padding: 14px 18px;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Compact grid + field */
 .ihale-modal__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
 }
 
 .ihale-field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
+    min-width: 0;
 }
 
 .ihale-field--full {
@@ -74,18 +79,20 @@
 }
 
 .ihale-field span {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
 }
 
 .ihale-field input,
 .ihale-field select,
 .ihale-field textarea {
-    padding: 7px 11px;
+    padding: 6px 10px;
     border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 7px;
+    font-size: 12.5px;
     color: var(--text-dark);
     background: var(--bg-white);
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
@@ -126,14 +133,14 @@
 .ihale-form-error {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     color: #dc2626;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
-    background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%);
+    background: #fef2f2;
     border: 1px solid #fecaca;
-    border-radius: 10px;
-    padding: 10px 14px;
+    border-radius: 8px;
+    padding: 7px 12px;
     margin: 0;
     animation: ihale-shake 0.35s ease;
 }
@@ -158,17 +165,17 @@
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    padding: 12px 18px;
+    padding: 10px 16px;
     border-top: 1px solid var(--border);
 }
 
 .ihale-btn-cancel {
-    padding: 7px 14px;
+    padding: 6px 12px;
     background: var(--bg-light);
     color: var(--text-muted);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 7px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
@@ -179,12 +186,12 @@
 }
 
 .ihale-btn-save {
-    padding: 7px 18px;
+    padding: 6px 16px;
     background: #2563eb;
     color: #fff;
     border: none;
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 7px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, box-shadow 0.15s;
@@ -204,20 +211,20 @@
 .ihale-btn-draft {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 7px 14px;
+    gap: 4px;
+    padding: 6px 12px;
     background: var(--bg-light);
     color: var(--text-muted);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 7px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
 }
 
 .ihale-btn-draft .material-symbols-outlined {
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .ihale-btn-draft:hover:not(:disabled) {
@@ -250,46 +257,47 @@
     min-width: 0;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Icon-only copy btn */
 .ihale-refno-copy-btn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
     flex-shrink: 0;
-    padding: 0 14px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
     background: var(--bg-light);
     color: var(--text-muted);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: 7px;
     cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
 }
 
 .ihale-refno-copy-btn .material-symbols-outlined {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .ihale-refno-copy-btn:hover {
-    background: #e2e8f0;
-    color: #1e40af;
-    border-color: #cbd5e1;
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+    transform: translateY(-1px);
 }
 
 .ihale-refno-copy-btn--done {
     background: #dcfce7 !important;
     color: #15803d !important;
     border-color: #bbf7d0 !important;
+    transform: none !important;
 }
 
 /* --- Bölüm Başlıkları --- */
 .ihale-section {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 10px 0 0;
+    gap: 6px;
+    padding: 8px 0 0;
     border-top: 1px solid var(--border);
 }
 
@@ -322,10 +330,10 @@
 
 .ihale-req-input-row input {
     flex: 1;
-    padding: 7px 10px;
+    padding: 5px 8px;
     border: 1px solid var(--border);
     border-radius: 7px;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-dark);
     background: var(--bg-light);
     font-family: inherit;
@@ -342,8 +350,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
     border: none;
     border-radius: 7px;
@@ -363,7 +371,7 @@
 }
 
 .ihale-req-add-btn .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .ihale-req-table {
@@ -374,11 +382,11 @@
 
 .ihale-req-table__header {
     display: grid;
-    grid-template-columns: 36px 1fr 1.2fr 36px;
+    grid-template-columns: 28px 1fr 1.2fr 28px;
     gap: 4px;
-    padding: 8px 12px;
+    padding: 5px 10px;
     background: var(--bg-light);
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -387,12 +395,12 @@
 
 .ihale-req-table__row {
     display: grid;
-    grid-template-columns: 36px 1fr 1.2fr 36px;
+    grid-template-columns: 28px 1fr 1.2fr 28px;
     gap: 4px;
-    padding: 10px 12px;
+    padding: 6px 10px;
     align-items: center;
     border-top: 1px solid var(--border);
-    font-size: 13.5px;
+    font-size: 12.5px;
     transition: background 0.1s;
 }
 
@@ -401,16 +409,16 @@
 }
 
 .ihale-req-table__num {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: 5px;
     background: #eff6ff;
     color: #3b82f6;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .ihale-req-table__madde {
@@ -420,20 +428,20 @@
 
 .ihale-req-table__aciklama {
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .ihale-req-table__remove {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border: none;
     background: transparent;
     color: #94a3b8;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: 5px;
     transition: background 0.15s, color 0.15s;
 }
 
@@ -443,6 +451,16 @@
 }
 
 .ihale-req-table__remove .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: DatePicker trigger form içi kompakt override — panel portal'da render edildiği için .dp-panel--compact sınıfı DatePicker.css'te */
+.ihale-step-content .dp-trigger {
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    border-width: 1px;
+}
+.ihale-step-content .dp-icon {
+    font-size: 16px;
+}

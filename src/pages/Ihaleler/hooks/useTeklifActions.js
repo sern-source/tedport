@@ -1,7 +1,6 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Teklif koordinatör hook — popup, iletişim, teklif mutasyonları
 import { useEffect, useState } from 'react';
-import { supabase } from '../../../supabaseClient';
-import { fetchUserOffers, fetchFirmaContactInfo } from '../services/teklifFormService';
+import { fetchUserOffers, fetchFirmaContactInfo, fetchCurrentUserOffersMap } from '../services/teklifFormService';
 import useTeklifSubmitActions from './useTeklifSubmitActions';
 
 // Enes Doğanay | 7 Mayıs 2026: Teklif işlem handler'ları + openTeklifPopup
@@ -16,19 +15,13 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
     const [firmaContactPopup, setFirmaContactPopup] = useState(null);
     const [firmaContactLoading, setFirmaContactLoading] = useState(false);
 
-    // Enes Doğanay | 7 Mayıs 2026: Kullanıcının tekliflerini çek — ihale_id bazlı harita
+    // Enes Doğanay | 8 Mayıs 2026: Kullanıcının tekliflerini çek — servis fonksiyonu ile (auth servis katmanında)
     useEffect(() => {
         let cancelled = false;
         const load = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user || cancelled) return;
             try {
-                const data = await fetchUserOffers(session.user.id);
-                if (!cancelled) {
-                    const map = {};
-                    data.forEach(o => { map[String(o.ihale_id)] = o; });
-                    setUserOffers(map);
-                }
+                const map = await fetchCurrentUserOffersMap();
+                if (!cancelled) setUserOffers(map);
             } catch { /* sessiz */ }
         };
         load();
@@ -75,8 +68,7 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
         try {
             const info = await fetchFirmaContactInfo(tender);
             setFirmaContactPopup(info);
-        } catch (e) {
-            console.error('Firma iletişim bilgisi alınamadı:', e);
+        } catch {
             setFirmaContactPopup({ name: null, firma: tender.firma_adi || null, email: null, phone: null, firmaPhone: null, firmaEmail: null });
         } finally {
             setFirmaContactLoading(false);

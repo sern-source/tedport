@@ -82,8 +82,8 @@ export const useAuthNotifications = ({ authChecked, realtimeUserId, notifPrefsRe
             .channel(`toast-notifications-${userId}`)
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bildirimler', filter: `user_id=eq.${userId}` },
                 payload => handleNewNotification(payload.new))
-            .subscribe((status, err) => {
-                if (status !== 'SUBSCRIBED' && status !== 'CLOSED' && status !== 'CHANNEL_ERROR') console.warn('[Realtime] bildirimler kanal durumu:', status, err);
+            .subscribe((status) => {
+                if (status !== 'SUBSCRIBED' && status !== 'CLOSED' && status !== 'CHANNEL_ERROR') { /* sessiz — realtime durum geçişi */ }
             });
         realtimeChannelRef.current = channel;
         return () => {

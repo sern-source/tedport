@@ -92,13 +92,25 @@ export default function CitySelect({ value, onChange, options, placeholder, icon
         className={`city-select-trigger ${open ? 'city-select-trigger--open' : ''}`}
         ref={triggerRef}
         onClick={handleOpen}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-label={value ? `Seçilen: ${value}, değiştirmek için tıklayın` : placeholderText}
       >
         <span className={value ? 'city-select-value' : 'city-select-placeholder'}>
           {value || placeholderText}
         </span>
         <span className="city-select-actions">
           {value && (
-            <span className="city-select-clear" onClick={handleClear} data-tooltip="Temizle">
+            // Enes Doğanay | 8 Mayıs 2026: span — nested button geçersiz HTML; role+tabIndex+onKeyDown ile keyboard erişimi
+            <span
+              className="city-select-clear"
+              onClick={handleClear}
+              role="button"
+              tabIndex={0}
+              aria-label="Seçimi temizle"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onChange(''); setOpen(false); } }}
+              data-tooltip="Temizle"
+            >
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
             </span>
           )}

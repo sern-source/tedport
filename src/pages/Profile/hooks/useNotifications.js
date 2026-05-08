@@ -1,7 +1,13 @@
 // Enes Doğanay | 6 Mayıs 2026: Bildirimler, hatırlatmalar ve tercihler state + handlers
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../../supabaseClient';
+import { supabase } from '../../../supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: sadece realtime channel için
 import { isMissingRelationError, NOTIF_TYPE_TO_PREF_KEY } from '../utils/profileUtils';
+import {
+    fetchNotifications, fetchReminders,
+    markNotifReadService, markAllNotifsReadService,
+    deleteNotifService, deleteAllNotifsService,
+    deleteReminderService, upsertNotifPrefsService,
+} from '../services/notificationsService';
 
 export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showPrToast) => {
   const [notifications, setNotifications] = useState([]);
@@ -12,30 +18,30 @@ export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifP
   const [notifPrefsOpen, setNotifPrefsOpen] = useState(false);
   const [notifPrefSaved, setNotifPrefSaved] = useState(false);
 
-  // Enes Doğanay | 6 Mayıs 2026: İlk yükleme
+  // Enes Doğanay | 8 Mayıs 2026: İlk yükleme — servis fonksiyonları ile
   useEffect(() => {
     if (!userId) return;
     const load = async () => {
-      const [notifRes, remindersRes] = await Promise.all([
-        supabase.from('bildirimler').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30),
-        supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userId).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true }),
-      ]);
-      if (!notifRes.error || isMissingRelationError(notifRes.error)) setNotifications(notifRes.data || []);
-      if (!remindersRes.error || isMissingRelationError(remindersRes.error)) {
-        setUpcomingReminders((remindersRes.data || []).filter(r => r.status === 'pending'));
-      }
+      try {
+        const [notifs, reminders] = await Promise.all([
+          fetchNotifications(userId),
+          fetchReminders(userId),
+        ]);
+        setNotifications(notifs);
+        setUpcomingReminders(reminders.filter(r => r.status === 'pending'));
+      } catch { /* sessiz */ }
     };
     load();
   }, [userId]);
 
-  // Enes Doğanay | 6 Mayıs 2026: Hatırlatıcı polling — 15s
+  // Enes Doğanay | 8 Mayıs 2026: Hatırlatıcı polling — 15s, servis fonksiyonu ile
   useEffect(() => {
     if (!userId) return;
     const poll = async () => {
       // Enes Doğanay | 7 Mayıs 2026: try/catch — AbortError session'u bozmasın
       try {
-        const { data } = await supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userId).in('status', ['pending', 'sent']).order('reminder_at', { ascending: true });
-        if (data) setUpcomingReminders(data.filter(r => r.status === 'pending'));
+        const data = await fetchReminders(userId);
+        setUpcomingReminders(data.filter(r => r.status === 'pending'));
       } catch { /* sessiz */ }
     };
     const interval = setInterval(poll, 15000);
@@ -53,40 +59,46 @@ export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifP
   }, [userId]);
 
   const handleMarkNotificationRead = useCallback(async (notifId) => {
-    const { error } = await supabase.from('bildirimler').update({ is_read: true }).eq('id', notifId).eq('user_id', userId);
-    if (error && !isMissingRelationError(error)) { showPrToast('error', 'Bildirim güncellenemedi.'); return; }
-    setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_read: true } : n));
+    try {
+      await markNotifReadService(userId, notifId);
+      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_read: true } : n));
+    } catch (err) {
+      if (!isMissingRelationError(err)) showPrToast('error', 'Bildirim güncellenemedi.');
+    }
   }, [userId, showPrToast]);
 
   const handleMarkAllNotificationsRead = useCallback(async () => {
     const unread = notifications.filter(n => !n.is_read);
     if (!unread.length) return;
-    const { error } = await supabase.from('bildirimler').update({ is_read: true }).eq('user_id', userId).in('id', unread.map(n => n.id));
-    if (error && !isMissingRelationError(error)) { showPrToast('error', 'Bildirimler güncellenemedi.'); return; }
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    try {
+      await markAllNotifsReadService(userId, unread.map(n => n.id));
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    } catch (err) {
+      if (!isMissingRelationError(err)) showPrToast('error', 'Bildirimler güncellenemedi.');
+    }
   }, [notifications, userId, showPrToast]);
 
   const handleDeleteNotification = useCallback(async (notifId) => {
-    const { error } = await supabase.from('bildirimler').delete().eq('id', notifId).eq('user_id', userId);
-    if (error) { showPrToast('error', 'Bildirim silinemedi.'); return; }
-    setNotifications(prev => prev.filter(n => n.id !== notifId));
+    try {
+      await deleteNotifService(userId, notifId);
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
+    } catch { showPrToast('error', 'Bildirim silinemedi.'); }
   }, [userId, showPrToast]);
 
   const handleDeleteAllNotifications = useCallback(async () => {
     if (!notifications.length) return;
-    const { error } = await supabase.from('bildirimler').delete().eq('user_id', userId);
-    if (error) { showPrToast('error', 'Bildirimler silinemedi.'); return; }
-    setNotifications([]);
+    try {
+      await deleteAllNotifsService(userId);
+      setNotifications([]);
+    } catch { showPrToast('error', 'Bildirimler silinemedi.'); }
   }, [notifications.length, userId, showPrToast]);
 
   const handleDeleteReminder = useCallback(async (reminder) => {
-    const { error } = await supabase.from('kullanici_hatirlaticilari').delete().eq('id', reminder.id).eq('user_id', userId);
-    if (error) { showPrToast('error', 'Hatırlatıcı silinemedi.'); return; }
-    if (reminder.note_id) {
-      await supabase.from('kisisel_notlar').delete().eq('id', reminder.note_id).eq('user_id', userId);
-    }
-    setUpcomingReminders(prev => prev.filter(r => r.id !== reminder.id));
-    setConfirmDeleteReminder(null);
+    try {
+      await deleteReminderService(userId, reminder.id, reminder.note_id);
+      setUpcomingReminders(prev => prev.filter(r => r.id !== reminder.id));
+      setConfirmDeleteReminder(null);
+    } catch { showPrToast('error', 'Hatırlatıcı silinemedi.'); }
   }, [userId, showPrToast]);
 
   const handleToggleNotifPref = useCallback(async (key) => {
@@ -94,17 +106,12 @@ export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifP
     const updatedPrefs = { ...notifPrefs, [key]: newValue };
     setNotifPrefs(updatedPrefs);
     try {
-      const payload = { user_id: userId, ...updatedPrefs, updated_at: new Date().toISOString() };
-      const { error } = await supabase.from('bildirim_tercihleri').upsert(payload, { onConflict: 'user_id' });
-      if (error) {
-        showPrToast('error', 'Bildirim tercihi kaydedilemedi.');
-        setNotifPrefs(prev => ({ ...prev, [key]: !newValue }));
-        return;
-      }
+      await upsertNotifPrefsService(userId, updatedPrefs);
       updateNotifPrefsCache(updatedPrefs);
       setNotifPrefSaved(true);
       setTimeout(() => setNotifPrefSaved(false), 1500);
     } catch {
+      showPrToast('error', 'Bildirim tercihi kaydedilemedi.');
       setNotifPrefs(prev => ({ ...prev, [key]: !newValue }));
     }
   }, [notifPrefs, userId, showPrToast, setNotifPrefs, updateNotifPrefsCache]);

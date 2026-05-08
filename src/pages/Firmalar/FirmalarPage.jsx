@@ -21,15 +21,16 @@ const FirmalarPage = () => {
   return (
     <>
       {page.toast && (
-        <div className={`fl-toast fl-toast--${page.toast.type || 'info'}`}>
+        // Enes Doğanay | 8 Mayıs 2026: role=alert — screen reader bildirimi
+        <div className={`fl-toast fl-toast--${page.toast.type || 'info'}`} role="alert">
           <span className="material-symbols-outlined">{page.toast.type === 'error' ? 'error' : 'info'}</span>
           {page.toast.message}
-          <button className="fl-toast-close" onClick={() => page.setToast(null)}><span className="material-symbols-outlined">close</span></button>
+          <button className="fl-toast-close" onClick={() => page.setToast(null)} aria-label="Kapat"><span className="material-symbols-outlined">close</span></button>
         </div>
       )}
       <SharedHeader search={page.search} setSearch={page.setSearch} showSearchBar={true} searchHistory={page.searchHistory} onHistoryRemove={page.removeFromHistory} onHistoryClear={page.clearHistory} onHistorySelect={v => page.setSearch(v)} />
       <div className="layout-container">
-        <button className="sidebar-mobile-toggle" onClick={() => setFiltersOpen(o => !o)}>
+        <button className="sidebar-mobile-toggle" aria-expanded={filtersOpen} aria-controls="firma-filter-sidebar" onClick={() => setFiltersOpen(o => !o)}>
           <span className="material-symbols-outlined">tune</span>Filtrele
         </button>
         <div className="firmalar-grid">

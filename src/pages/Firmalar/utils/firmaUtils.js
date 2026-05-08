@@ -27,7 +27,7 @@ export const formatLocation = (raw) => {
   if (!raw) return '';
   const trimmed = raw.trim();
   if (!trimmed) return '';
-  const parts = trimmed.split(/\s*[\/,\-]\s*/).filter(Boolean);
+  const parts = trimmed.split(/\s*[/,-]\s*/).filter(Boolean);
   if (parts.length === 1) return trimmed;
   let cityPart = null;
   const districtParts = [];
@@ -41,7 +41,7 @@ export const formatLocation = (raw) => {
 };
 
 // Enes Doğanay | 6 Mayıs 2026: ilike özel karakterlerini escape et
-export const sanitizeSearch = (input) => input.replace(/[\\"\%#_]/g, '').trim();
+export const sanitizeSearch = (input) => input.replace(/[\\"%#_]/g, '').trim();
 
 // Enes Doğanay | 6 Mayıs 2026: urun_kategorileri JSON'dan ana_kategori listesi çıkar
 export const degerleriDiziyeCevir = (rawData) => {

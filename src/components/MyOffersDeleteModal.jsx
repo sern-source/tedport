@@ -6,11 +6,18 @@ const MyOffersDeleteModal = ({ deleteConfirm, setDeleteConfirm, deleting, handle
     const isDraft = deleteConfirm.durum === 'taslak';
     return (
         <div className="mop-delete-overlay" onClick={() => !deleting && setDeleteConfirm(null)}>
-            <div className="mop-delete-modal" onClick={e => e.stopPropagation()}>
+            {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal — modal semantik erişilebilirlik */}
+            <div
+                className="mop-delete-modal"
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="mop-delete-title"
+            >
                 <div className="mop-delete-modal__icon">
                     <span className="material-symbols-outlined">warning</span>
                 </div>
-                <h3>{isDraft ? 'Taslağı Silmek İstediğinize Emin Misiniz?' : 'Teklifinizi Silmek İstediğinize Emin Misiniz?'}</h3>
+                <h3 id="mop-delete-title">{isDraft ? 'Taslağı Silmek İstediğinize Emin Misiniz?' : 'Teklifinizi Silmek İstediğinize Emin Misiniz?'}</h3>
                 <p>Bu işlem geri alınamaz. {isDraft ? 'Taslak teklifiniz' : 'Teklifiniz'} bu ihaleden tamamen silinecektir.</p>
                 <div className="mop-delete-modal__actions">
                     <button className="mop-delete-modal__btn mop-delete-modal__btn--cancel" onClick={() => setDeleteConfirm(null)} disabled={deleting}>

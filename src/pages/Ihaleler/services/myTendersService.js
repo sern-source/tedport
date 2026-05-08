@@ -1,6 +1,12 @@
 // Enes Doğanay | 7 Mayıs 2026: Kendi ihale yönetimi servis — auth durumu + referans no üretimi
 import { supabase } from '../../../supabaseClient';
 
+// Enes Doğanay | 8 Mayıs 2026: Oturum açmış kullanıcının ID'sini döndür — hook'ların doğrudan supabase çağırmasını engeller
+export const getCurrentUserId = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.user?.id || null;
+};
+
 // Enes Doğanay | 7 Mayıs 2026: Firma onay durumu + kullanıcı rolü — aynı anda sorgu
 export const fetchFirmaAuthStatus = async (firmaId, userId) => {
     const [firmaRes, rolRes] = await Promise.all([

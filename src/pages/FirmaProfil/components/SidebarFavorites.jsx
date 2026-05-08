@@ -18,7 +18,7 @@ const SidebarFavorites = ({
     <div className="sidebar-lists__head">
       <span className="sidebar-lists__label">Listelerim</span>
       {!isCreatingList && (
-        <button className="sidebar-lists__add-btn" onClick={() => setIsCreatingList(true)} data-tooltip="Yeni liste oluştur">
+        <button className="sidebar-lists__add-btn" onClick={() => setIsCreatingList(true)} aria-label="Yeni liste oluştur">
           <span className="material-symbols-outlined">add</span>
         </button>
       )}
@@ -53,7 +53,7 @@ const SidebarFavorites = ({
                   e.stopPropagation();
                   setConfirmDeleteList({ id: liste.id, name: liste.liste_adi, count: listCount });
                 }}
-                data-tooltip="Listeyi sil"
+                aria-label="Listeyi sil"
               >
                 <span className="material-symbols-outlined">delete</span>
               </button>
@@ -75,10 +75,10 @@ const SidebarFavorites = ({
           maxLength={60}
         />
         <div className="cl-form__actions">
-          <button className="cl-form__submit" onClick={handleCreateList} data-tooltip="Oluştur">
+          <button className="cl-form__submit" onClick={handleCreateList} aria-label="Oluştur">
             <span className="material-symbols-outlined">check</span>
           </button>
-          <button className="cl-form__cancel" onClick={() => { setIsCreatingList(false); setNewListName(''); }} data-tooltip="İptal">
+          <button className="cl-form__cancel" onClick={() => { setIsCreatingList(false); setNewListName(''); }} aria-label="İptal">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>

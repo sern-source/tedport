@@ -7,9 +7,9 @@ const QuoteContactPopup = ({ quoteContactPopup, setQuoteContactPopup, qCopied, s
   const close = () => { setQuoteContactPopup(null); setQCopied(null); };
   return (
     <div className="tom-contact-overlay" onClick={close}>
-      <div className="tom-contact-card" onClick={(e) => e.stopPropagation()}>
+      <div className="tom-contact-card" role="dialog" aria-modal="true" aria-labelledby="quote-contact-title" onClick={(e) => e.stopPropagation()}>
         <div className="tom-contact-card__banner" />
-        <button className="tom-contact-card__close" onClick={close}>
+        <button className="tom-contact-card__close" onClick={close} aria-label="Kapat">
           <span className="material-symbols-outlined">close</span>
         </button>
         <div className="tom-contact-card__avatar">
@@ -20,7 +20,7 @@ const QuoteContactPopup = ({ quoteContactPopup, setQuoteContactPopup, qCopied, s
           )}
         </div>
         <div className="tom-contact-card__identity">
-          <h3>{quoteContactPopup.name || 'İsimsiz'}</h3>
+          <h3 id="quote-contact-title">{quoteContactPopup.name || 'İsimsiz'}</h3>
           {quoteContactPopup.companyName || quoteContactPopup.firma ? (
             <p className="tom-contact-card__firma">
               <span className="material-symbols-outlined">business</span>

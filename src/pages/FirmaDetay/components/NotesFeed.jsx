@@ -2,6 +2,10 @@
 import React from 'react';
 import { parseNotePayload } from '../utils/firmaDetayUtils';
 
+// Enes Doğanay | 8 Mayıs 2026: Module-level date/time formatters — her render'da yeniden üretilmesin
+const noteDateFmt = new Intl.DateTimeFormat('tr-TR');
+const noteTimeFmt = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
 const NotesFeed = ({ savedNotes, orderedNoteGroups, groupedSavedNotes, pendingDeleteNoteId, setPendingDeleteNoteId, getReminderForNote, formatReminderLabel, handleEditNote, handleDeleteNote }) => {
     if (!savedNotes.length) return (
         <div className="notes-empty-state">
@@ -27,7 +31,7 @@ const NotesFeed = ({ savedNotes, orderedNoteGroups, groupedSavedNotes, pendingDe
                                     <div className="saved-note-top">
                                         <div className="saved-note-meta">
                                             <p className="saved-note-date">
-                                                {new Date(savedNote.updated_at || savedNote.created_at).toLocaleDateString('tr-TR')} • {new Date(savedNote.updated_at || savedNote.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                                {noteDateFmt.format(new Date(savedNote.updated_at || savedNote.created_at))} • {noteTimeFmt.format(new Date(savedNote.updated_at || savedNote.created_at))}
                                             </p>
                                             {noteReminder && (
                                                 <div className={`saved-note-reminder ${noteReminder.status === 'sent' ? 'sent' : ''}`}>

@@ -50,6 +50,13 @@ export function useMyOffers({ userId, companyId, mopChatTrigger, onChatOpened, o
     const highlightRef = useRef(null);
     const mopToastTimerRef = useRef(null);
 
+    // Enes Doğanay | 8 Mayıs 2026: Unmount cleanup — pending toast timer'ı iptal et
+    useEffect(() => {
+        return () => {
+            if (mopToastTimerRef.current) clearTimeout(mopToastTimerRef.current);
+        };
+    }, []);
+
     const showMopToast = useCallback((type, message) => {
         if (mopToastTimerRef.current) clearTimeout(mopToastTimerRef.current);
         setMopToast({ type, message });
@@ -70,7 +77,7 @@ export function useMyOffers({ userId, companyId, mopChatTrigger, onChatOpened, o
                     const { counts, ids } = await fetchUnreadCounts(myOffers.map(o => o.id));
                     chat.setUnreadMopChatCounts(counts); chat.setUnreadMopChatIds(ids);
                 }
-            } catch (err) { console.error('İhale teklifleri yüklenemedi:', err); setOffers([]); }
+            } catch { setOffers([]); }
             finally { setLoading(false); }
         };
         load();

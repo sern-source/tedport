@@ -50,7 +50,7 @@ export const logConsentRecord = async (userId, { kvkkAccepted, marketingConsent 
             const res = await fetch('https://api.ipify.org?format=json');
             const d = await res.json();
             ip = d.ip;
-        } catch {} // eslint-disable-line no-empty
+        } catch {}
         await supabase.from('consent_logs').insert([{
             user_id: userId,
             kvkk_accepted: kvkkAccepted,
@@ -60,7 +60,7 @@ export const logConsentRecord = async (userId, { kvkkAccepted, marketingConsent 
             ip_address: ip,
             user_agent: navigator.userAgent,
         }]);
-    } catch {} // eslint-disable-line no-empty
+    } catch {}
 };
 
 // Enes Doğanay | 6 Mayıs 2026: Yetkilendirme belgesi yükleme — tax-documents bucket

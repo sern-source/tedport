@@ -9,7 +9,13 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
     if (heroSuggestions.length > 0) return (
         <div className="sc-hero-suggestions">
             {heroSuggestions.map((item) => (
-                <div key={item.id} className="sc-hero-suggestion-item" onClick={() => { handleCloseSuggestions(); navigate(`/firmadetay/${item.id}`); }}>
+                // Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği
+                <div key={item.id} className="sc-hero-suggestion-item"
+                    onClick={() => { handleCloseSuggestions(); navigate(`/firmadetay/${item.id}`); }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); navigate(`/firmadetay/${item.id}`); } }}
+                >
                     <div className="sc-hero-suggestion-avatar">
                         {item.logo ? <img src={item.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} /> : item.name?.charAt(0)}
                     </div>
@@ -19,7 +25,12 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
                     </div>
                 </div>
             ))}
-            <div className="sc-hero-suggestion-all" onClick={() => { handleCloseSuggestions(); handleSearch(); }}>
+            <div className="sc-hero-suggestion-all"
+                onClick={() => { handleCloseSuggestions(); handleSearch(); }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); handleSearch(); } }}
+            >
                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
                 Tüm sonuçları gör
             </div>
@@ -34,7 +45,13 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
                 <span>Sonuç bulunamadı</span>
             </div>
             {heroDidYouMean && (
-                <div className="sc-hero-suggestion-did-you-mean" onClick={() => { setSearchTerm(heroDidYouMean); setHeroDidYouMean(null); }}>
+                // Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği
+                <div className="sc-hero-suggestion-did-you-mean"
+                    onClick={() => { setSearchTerm(heroDidYouMean); setHeroDidYouMean(null); }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setSearchTerm(heroDidYouMean); setHeroDidYouMean(null); } }}
+                >
                     <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>spellcheck</span>
                     Bunu mu demek istediniz? <strong>{heroDidYouMean}</strong>
                 </div>
@@ -51,7 +68,13 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
             </div>
             {searchHistory.map((term) => (
                 <div key={term} className="sc-history-item">
-                    <div className="sc-history-item-main" onClick={() => { handleCloseSuggestions(); navigate(`/firmalar?search=${encodeURIComponent(term)}`); }}>
+                    {/* Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği */}
+                    <div className="sc-history-item-main"
+                        onClick={() => { handleCloseSuggestions(); navigate(`/firmalar?search=${encodeURIComponent(term)}`); }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); navigate(`/firmalar?search=${encodeURIComponent(term)}`); } }}
+                    >
                         <span className="material-symbols-outlined sc-history-icon">history</span>
                         <span>{term}</span>
                     </div>

@@ -1,18 +1,16 @@
-/* Enes Doğanay | 5 Mayıs 2026: TenderDetail — ihale detay modal stilleri */
+/* Enes Doğanay | 8 Mayıs 2026: TenderDetail — cool & compact redesign */
 
 /* === Overlay ve modal === */
-/* Enes Doğanay | 11 Nisan 2026: İhale detay drawer */
-/* Enes Doğanay | 13 Nisan 2026: İhale detay — ortada açılan modal popup */
 .tender-detail-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0.52);
+    backdrop-filter: blur(5px);
     z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: detailOverlayIn 0.25s ease;
+    animation: detailOverlayIn 0.22s ease;
     padding: 24px;
 }
 
@@ -25,22 +23,23 @@
     to { opacity: 1; }
 }
 
-/* Enes Doğanay | 4 Mayıs 2026: compact cool detail modal */
+/* Enes Doğanay | 8 Mayıs 2026: Cool modal — top accent bar + sleek shadow */
 .tender-detail-modal {
-    width: 580px;
+    width: 560px;
     max-width: 92vw;
     max-height: 88vh;
     background: var(--bg-white);
     display: flex;
     flex-direction: column;
     border-radius: 14px;
-    box-shadow: 0 12px 48px rgba(15, 23, 42, 0.18), 0 4px 16px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2), 0 4px 16px rgba(15, 23, 42, 0.08);
     animation: detailModalIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
+    border-top: 3px solid #2563eb;
 }
 
 @keyframes detailModalIn {
-    from { opacity: 0; transform: scale(0.92) translateY(20px); }
+    from { opacity: 0; transform: scale(0.93) translateY(16px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
@@ -50,58 +49,58 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 12px;
-    padding: 14px 16px 12px;
+    padding: 13px 16px 11px;
     border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, var(--bg-light), var(--bg-white));
+    background: var(--bg-white);
 }
 
 .tender-detail__head h2 {
-    margin: 5px 0 4px;
-    font-size: 1.05rem;
+    margin: 4px 0 3px;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--text-dark);
-    line-height: 1.3;
+    line-height: 1.35;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Company link — pill style */
 .tender-detail__company-link {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     background: none;
     border: none;
-    padding: 3px 6px 3px 3px;
+    padding: 2px 6px 2px 2px;
     border-radius: 6px;
     color: #2563eb;
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, color 0.15s;
 }
 
 .tender-detail__company-link:hover { background: #eff6ff; }
-.tender-detail__company-link .material-symbols-outlined { font-size: 14px; }
+.tender-detail__company-link .material-symbols-outlined { font-size: 13px; }
 
 /* Enes Doğanay | 2 Mayıs 2026: Anonim ihale firma linki */
 .tender-detail__company-link--anonim {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     color: #94a3b8;
-    font-size: 0.9rem;
+    font-size: 0.74rem;
     font-style: italic;
     cursor: default;
 }
-.tender-detail__company-link--anonim .material-symbols-outlined {
-    font-size: 18px;
-}
+.tender-detail__company-link--anonim .material-symbols-outlined { font-size: 13px; }
 
 .tender-detail__close {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border: none;
-    background: var(--bg-light);
+    background: transparent;
     border-radius: 7px;
     color: var(--text-muted);
     cursor: pointer;
@@ -109,12 +108,8 @@
     transition: background 0.15s, color 0.15s;
 }
 
-.tender-detail__close:hover {
-    background: var(--border);
-    color: var(--text-dark);
-}
-
-.tender-detail__close .material-symbols-outlined { font-size: 17px; }
+.tender-detail__close:hover { background: var(--bg-light); color: var(--text-dark); }
+.tender-detail__close .material-symbols-outlined { font-size: 16px; }
 
 /* === Body === */
 .tender-detail__body {
@@ -123,102 +118,140 @@
     padding: 14px 16px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Section başlıkları — small caps + extending line */
 .tender-detail__section h3 {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 0.82rem;
+    gap: 6px;
+    font-size: 0.67rem;
     font-weight: 700;
-    color: var(--text-dark);
-    margin: 0 0 7px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px;
+}
+
+.tender-detail__section h3::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
 }
 
 .tender-detail__section h3 .material-symbols-outlined {
-    font-size: 15px;
+    font-size: 13px;
     color: #3b82f6;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Açıklama — subtle left accent */
 .tender-detail__section p {
     margin: 0;
     font-size: 0.82rem;
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--text-muted);
+    padding-left: 10px;
+    border-left: 2px solid #bfdbfe;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Info grid — single bordered container, internal dividers */
 .tender-detail__grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .tender-detail__grid-item {
     display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    padding: 8px 10px;
-    border-radius: 9px;
-    background: var(--bg-light);
-    border: 1px solid var(--border);
+    align-items: center;
+    gap: 9px;
+    padding: 9px 11px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-white);
+    transition: background 0.12s;
 }
 
+.tender-detail__grid-item:nth-child(2n) { border-right: none; }
+.tender-detail__grid-item:nth-last-child(-n+2) { border-bottom: none; }
+/* Odd last child (when total is odd) */
+.tender-detail__grid-item:last-child:nth-child(odd) {
+    grid-column: span 2;
+    border-right: none;
+}
+
+/* Enes Doğanay | 8 Mayıs 2026: Icon pill inside grid item */
 .tender-detail__grid-item .material-symbols-outlined {
-    font-size: 15px;
-    color: #3b82f6;
+    font-size: 14px;
+    color: #2563eb;
     flex-shrink: 0;
-    margin-top: 1px;
+    background: #eff6ff;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
 }
 
 .tender-detail__grid-item strong {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
     margin-bottom: 1px;
 }
 
 .tender-detail__grid-item span {
     display: block;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--text-dark);
-    font-weight: 500;
+    font-weight: 600;
 }
 
+/* Enes Doğanay | 8 Mayıs 2026: Gereksinimler listesi — accent left border */
 .tender-detail__req-list {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 }
 
 .tender-detail__req-list li {
-    padding: 7px 10px;
-    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    padding: 7px 10px 7px 12px;
+    border-radius: 7px;
     background: var(--bg-light);
-    border: 1px solid var(--border);
+    border-left: 3px solid #2563eb;
+    gap: 1px;
 }
 
 .tender-detail__req-list li strong {
     display: block;
-    font-size: 0.8rem;
+    font-size: 0.79rem;
+    font-weight: 700;
     color: var(--text-dark);
-    margin-bottom: 1px;
 }
 
 .tender-detail__req-list li span {
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     color: var(--text-muted);
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 .tender-detail__files {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 /* Enes Doğanay | 15 Nisan 2026: button olarak değiştirildi */
@@ -230,25 +263,26 @@
     border-radius: 7px;
     background: #eff6ff;
     color: #1d4ed8;
-    font-size: 0.76rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-decoration: none;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.1s;
     border: 1px solid #bfdbfe;
     cursor: pointer;
     font-family: inherit;
 }
 
-.tender-detail__file-link:hover { background: #dbeafe; border-color: #93c5fd; }
+.tender-detail__file-link:hover { background: #dbeafe; border-color: #93c5fd; transform: translateY(-1px); }
 .tender-detail__file-link .material-symbols-outlined { font-size: 13px; }
 
 /* === Footer === */
+/* Enes Doğanay | 8 Mayıs 2026: Footer — cleaner, borderless bg */
 .tender-detail__footer {
     display: flex;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 10px 14px;
     border-top: 1px solid var(--border);
-    background: var(--bg-light);
+    background: var(--bg-white);
 }
 
 .tender-detail__footer .tender-action {
@@ -319,21 +353,18 @@
 .tender-detail-auth-gate__btn {
     display: inline-block;
     padding: 10px 28px;
-    background: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: #fff;
     border: none;
     border-radius: 9px;
     font-size: 0.93rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.18s, transform 0.1s;
+    transition: opacity 0.18s, transform 0.1s;
     font-family: 'Inter', sans-serif;
 }
 
-.tender-detail-auth-gate__btn:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-}
+.tender-detail-auth-gate__btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
 .tender-detail-auth-gate__register {
     display: block;
@@ -352,9 +383,7 @@
     font-family: 'Inter', sans-serif;
 }
 
-.tender-detail-auth-gate__register button:hover {
-    text-decoration: underline;
-}
+.tender-detail-auth-gate__register button:hover { text-decoration: underline; }
 
 /* === Responsive === */
 @media (max-width: 640px) {
@@ -363,26 +392,33 @@
         max-width: 100vw;
         max-height: 100vh;
         border-radius: 0;
+        border-top: 3px solid #2563eb;
     }
-
-    .tender-detail__head { border-radius: 0; }
-    .tender-detail__footer { border-radius: 0; }
 
     .tender-detail__grid {
         grid-template-columns: 1fr;
     }
 
+    .tender-detail__grid-item:nth-child(2n) { border-right: none; }
+    .tender-detail__grid-item:nth-last-child(-n+1) { border-bottom: none; }
+    .tender-detail__grid-item:last-child:nth-child(odd) { grid-column: span 1; }
+
     .tender-detail__head,
     .tender-detail__body,
     .tender-detail__footer {
-        padding-left: 18px;
-        padding-right: 18px;
+        padding-left: 14px;
+        padding-right: 14px;
     }
 }
 
 /* === Dark mode === */
+/* Enes Doğanay | 8 Mayıs 2026: Dark mode redesign variants */
+[data-theme="dark"] .tender-detail-modal { border-top-color: #3b82f6; }
+[data-theme="dark"] .tender-detail__grid-item .material-symbols-outlined { background: #1e3a5f; color: #60a5fa; }
+[data-theme="dark"] .tender-detail__section p { border-left-color: #1e3a8a; }
+[data-theme="dark"] .tender-detail__req-list li { border-left-color: #3b82f6; background: var(--bg-light); }
 [data-theme="dark"] .tender-detail__company-link:hover { background: #1e3a5f; }
-[data-theme="dark"] .tender-detail__file-link { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .tender-detail__file-link { background: #1e3a5f; color: #93c5fd; border-color: #1e3a8a; }
 [data-theme="dark"] .tender-detail__file-link:hover { background: #1e3a8a; }
 [data-theme="dark"] .tender-detail-auth-gate { background: rgba(15, 23, 42, 0.35); }
 [data-theme="dark"] .tender-detail-auth-gate__register { color: var(--text-light); }

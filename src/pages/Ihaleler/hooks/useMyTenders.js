@@ -1,9 +1,8 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Kurumsal ihale yönetimi hook — CRUD, kapat, toast
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '../../../supabaseClient';
 import { getManagedCompanyId } from '../../../services/companyManagementApi';
 import { listMyTenders, updateTender, deleteTender } from '../../../services/ihaleManagementApi';
-import { fetchFirmaAuthStatus, generateTenderRefNo } from '../services/myTendersService';
+import { fetchFirmaAuthStatus, generateTenderRefNo, getCurrentUserId } from '../services/myTendersService';
 
 const useMyTenders = ({ fetchPublicTenders }) => {
     const [managedFirmaId, setManagedFirmaId] = useState(null);
@@ -29,9 +28,8 @@ const useMyTenders = ({ fetchPublicTenders }) => {
         getManagedCompanyId().then(async (id) => {
             setManagedFirmaId(id || null);
             if (!id) return;
-            // Enes Doğanay | 7 Mayıs 2026: auth.getSession kabul edilebilir hook içinde
-            const { data: { session } } = await supabase.auth.getSession();
-            const userId = session?.user?.id;
+            // Enes Doğanay | 8 Mayıs 2026: auth.getSession servis katmanına taşındı
+            const userId = await getCurrentUserId();
             if (!userId) return;
             const { isVerified, isOwner: ownerFlag } = await fetchFirmaAuthStatus(id, userId);
             setIsVerifiedUser(isVerified);

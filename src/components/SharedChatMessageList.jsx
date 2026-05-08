@@ -1,5 +1,12 @@
 // Enes Doğanay | 7 Mayıs 2026: Mesaj listesi + scroll yönetimi — SharedChatModal sub-component
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+
+// Enes Doğanay | 8 Mayıs 2026: Module seviyesi formatçı — her render’da yeni Intl nesnesi üretmez
+const msgTimeFormatter = new Intl.DateTimeFormat('tr-TR', {
+    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
+});
+
+const formatMsgTime = (created_at) => msgTimeFormatter.format(new Date(created_at));
 
 const SharedChatMessageList = ({ messages, loading, error, endRef, title, onReport }) => {
     // Enes Doğanay | 7 Mayıs 2026: Scroll-to-bottom butonu görünürlüğü
@@ -58,9 +65,8 @@ const SharedChatMessageList = ({ messages, loading, error, endRef, title, onRepo
                     </div>
                 )}
                 {!loading && !error && messages.map((msg) => {
-                    const timeStr = new Date(msg.created_at).toLocaleString('tr-TR', {
-                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
-                    });
+                    // Enes Doğanay | 8 Mayıs 2026: Module seviyesi formatter kullanılır — her mesaj render’ında new Date() + toLocaleString tekrarı önlendi
+                    const timeStr = formatMsgTime(msg.created_at);
                     return (
                         <div key={msg.id} className={`scm-bubble ${msg._isMine ? 'mine' : 'theirs'}`}>
                             <div className="scm-bubble__meta">
@@ -70,8 +76,7 @@ const SharedChatMessageList = ({ messages, loading, error, endRef, title, onRepo
                             <p className="scm-bubble__text">{msg.mesaj}</p>
                             {!msg._isMine && onReport && (
                                 <button
-                                    className="scm-report-btn"
-                                    data-tooltip="Mesajı şikayet et"
+                                    className="scm-report-btn"                                    aria-label="Mesajı Şikayet et"                                    data-tooltip="Mesajı şikayet et"
                                     onClick={() => onReport(msg.id)}
                                 >
                                     <span className="material-symbols-outlined">flag</span>
@@ -83,7 +88,7 @@ const SharedChatMessageList = ({ messages, loading, error, endRef, title, onRepo
                 <div ref={endRef} />
             </div>
             {showScrollBtn && (
-                <button className="scm-scroll-btn" onClick={scrollToBottom} data-tooltip="En alta git">
+                <button className="scm-scroll-btn" onClick={scrollToBottom} aria-label="En alta git" data-tooltip="En alta git">
                     <span className="material-symbols-outlined">keyboard_arrow_down</span>
                 </button>
             )}

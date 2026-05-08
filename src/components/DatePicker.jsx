@@ -1,5 +1,5 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: DatePicker koordinatör — portal tabanlı, yıl/ay seçimi
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { toStr, toDisplay, buildCells } from './datePickerUtils';
 import DatePickerMonthView from './DatePickerMonthView';
@@ -7,9 +7,10 @@ import DatePickerYearView from './DatePickerYearView';
 import './DatePicker.css';
 import './DatePicker.dark.css';
 
-export default function DatePicker({ value, onChange, min, placeholder = 'gg.aa.yyyy', variant, className }) {
-    const today    = new Date();
-    const todayStr = toStr(today.getFullYear(), today.getMonth() + 1, today.getDate());
+export default function DatePicker({ value, onChange, min, placeholder = 'gg.aa.yyyy', variant, className, compact }) {
+    // Enes Doğanay | 8 Mayıs 2026: useMemo — her render’da new Date() + string manipülasyonu tekrarını önler
+    const today    = useMemo(() => new Date(), []);
+    const todayStr = useMemo(() => toStr(today.getFullYear(), today.getMonth() + 1, today.getDate()), [today]);
 
     const [open, setOpen]             = useState(false);
     const [yearView, setYearView]     = useState(false);
@@ -26,7 +27,7 @@ export default function DatePicker({ value, onChange, min, placeholder = 'gg.aa.
     const calcPosition = useCallback(() => {
         if (!triggerRef.current) return;
         const rect   = triggerRef.current.getBoundingClientRect();
-        const panelW = Math.max(rect.width, 280);
+        const panelW = Math.max(rect.width, compact ? 220 : 280);
         const panelH = 320;
         const vw     = window.innerWidth;
         const vh     = window.innerHeight;
@@ -78,13 +79,30 @@ export default function DatePicker({ value, onChange, min, placeholder = 'gg.aa.
 
     return (
         <div className={outerCls} ref={triggerRef}>
-            <button type="button" className={`dp-trigger${open ? ' dp-trigger--open' : ''}`} onClick={handleOpen}>
+            <button
+                type="button"
+                className={`dp-trigger${open ? ' dp-trigger--open' : ''}`}
+                onClick={handleOpen}
+                aria-expanded={open}
+                aria-haspopup="dialog"
+                aria-label={value ? `Seçilen tarih: ${toDisplay(value)}, değiştirmek için tıklayın` : placeholder}
+            >
                 <span className="material-symbols-outlined dp-icon">calendar_month</span>
                 <span className={value ? 'dp-value' : 'dp-placeholder'}>{value ? toDisplay(value) : placeholder}</span>
-                {value && <span className="material-symbols-outlined dp-clear" onClick={(e) => { e.stopPropagation(); onChange(''); }}>close</span>}
+                {value && (
+                    // Enes Doğanay | 8 Mayıs 2026: span — nested button geçersiz HTML; role+tabIndex+onKeyDown ile keyboard erişimi
+                    <span
+                        className="material-symbols-outlined dp-clear"
+                        onClick={(e) => { e.stopPropagation(); onChange(''); }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Tarihi temizle"
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onChange(''); } }}
+                    >close</span>
+                )}
             </button>
             {open && createPortal(
-                <div className={`dp-panel${variantCls}`} style={panelStyle} ref={panelRef}>
+                <div className={`dp-panel${variantCls}${compact ? ' dp-panel--compact' : ''}`} style={panelStyle} ref={panelRef}>
                     {!yearView && <DatePickerMonthView viewYear={viewYear} viewMonth={viewMonth} prevMonth={prevMonth} nextMonth={nextMonth} cells={cells} value={value} min={min} todayStr={todayStr} selectDay={selectDay} goToday={goToday} onChange={onChange} setOpen={setOpen} setYearView={setYearView} />}
                     {yearView && <DatePickerYearView yearRangeStart={yearRangeStart} setYearRangeStart={setYearRangeStart} viewYear={viewYear} todayYear={today.getFullYear()} years={years} selectYear={selectYear} goToday={goToday} setYearView={setYearView} />}
                 </div>,

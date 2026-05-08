@@ -167,3 +167,19 @@ export async function fetchLatestNotificationIds(userId, limit = 20) {
     .limit(limit);
   return (data || []).map(n => n.id);
 }
+
+// Enes Doğanay | 8 Mayıs 2026: Auth session'ı al — hook'larda doğrudan supabase çağrısını engeller
+export async function getAuthSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session;
+}
+
+// Enes Doğanay | 8 Mayıs 2026: Realtime token güncelle — lifecycle servis katmanında
+export function setRealtimeAuth(accessToken) {
+  supabase.realtime.setAuth(accessToken);
+}
+
+// Enes Doğanay | 8 Mayıs 2026: Oturumu kapat (global scope) — hook'larda doğrudan supabase çağrısını engeller
+export async function signOutGlobal() {
+  try { await supabase.auth.signOut({ scope: 'global' }); } catch { /* sessiz */ }
+}

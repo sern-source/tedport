@@ -52,7 +52,7 @@ const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handler
                                     <span className="material-symbols-outlined">add</span>
                                     Alt Kategori
                                 </button>
-                                <button type="button" className="cmp-btn cmp-btn--danger cmp-btn--icon" onClick={() => removeCategory(cat.id)} data-tooltip="Kategoriyi Sil">
+                                <button type="button" className="cmp-btn cmp-btn--danger cmp-btn--icon" onClick={() => removeCategory(cat.id)} data-tooltip="Kategoriyi Sil" aria-label="Kategoriyi sil">
                                     <span className="material-symbols-outlined">delete</span>
                                 </button>
                             </div>
@@ -71,7 +71,7 @@ const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handler
                                                 onChange={e => setSubName(cat.id, sub.id, e.target.value)}
                                                 placeholder={`Alt kategori ${subIdx + 1} adı (örn. Boru Ürünleri)`}
                                             />
-                                            <button type="button" className="cmp-btn cmp-btn--danger cmp-btn--icon cmp-btn--sm" onClick={() => removeSub(cat.id, sub.id)} data-tooltip="Alt Kategoriyi Sil">
+                                            <button type="button" className="cmp-btn cmp-btn--danger cmp-btn--icon cmp-btn--sm" onClick={() => removeSub(cat.id, sub.id)} data-tooltip="Alt Kategoriyi Sil" aria-label="Alt kategoriyi sil">
                                                 <span className="material-symbols-outlined">close</span>
                                             </button>
                                         </div>
@@ -79,7 +79,8 @@ const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handler
                                             {sub.products.map(prod => (
                                                 <span key={prod.id} className="cmp-pill">
                                                     {prod.name}
-                                                    <button type="button" className="cmp-pill__x" onClick={() => removeProduct(cat.id, sub.id, prod.id)} data-tooltip="Ürünü Kaldır">×</button>
+                                                    {/* Enes Doğanay | 8 Mayıs 2026: aria-label — × işareti screen reader için anlamsız */}
+                                                    <button type="button" className="cmp-pill__x" onClick={() => removeProduct(cat.id, sub.id, prod.id)} data-tooltip="Ürünü Kaldır" aria-label={`${prod.name} ürününü kaldır`}>×</button>
                                                 </span>
                                             ))}
                                             <label className="cmp-pill-add">
@@ -96,6 +97,7 @@ const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handler
                                                     className="cmp-pill-add__btn"
                                                     onClick={() => addProduct(cat.id, sub.id, productDraft[sub.id])}
                                                     disabled={!(productDraft[sub.id] || '').trim()}
+                                                    aria-label="Ürün ekle"
                                                 >
                                                     <span className="material-symbols-outlined">add</span>
                                                 </button>

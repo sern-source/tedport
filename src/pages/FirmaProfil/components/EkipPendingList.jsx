@@ -32,6 +32,7 @@ const EkipPendingList = ({ bekleyenDavetler, handleDavetIptal }) => {
               className="ekip-remove-btn"
               onClick={() => handleDavetIptal(d.id)}
               data-tooltip="Daveti iptal et"
+              aria-label="Daveti iptal et"
             >
               <span className="material-symbols-outlined">close</span>
             </button>

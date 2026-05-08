@@ -14,7 +14,7 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
                     <h2>İhale Listesi</h2>
                     <span className="tom-sidebar__count">{filteredTenders.length}</span>
                 </div>
-                <button className="tom-sidebar__add-btn" onClick={onNewTender} data-tooltip="Yeni ihale oluştur" data-tooltip-pos="bottom">
+                <button className="tom-sidebar__add-btn" onClick={onNewTender} aria-label="Yeni ihale oluştur" data-tooltip="Yeni ihale oluştur" data-tooltip-pos="bottom">
                     <span className="material-symbols-outlined">add</span>
                 </button>
             </div>

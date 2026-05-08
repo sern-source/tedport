@@ -5,14 +5,7 @@ import MyOfferCardDetail from './MyOfferCardDetail';
 import './MyOfferCard.css';
 import './MyOfferCard.dark.css';
 
-const ALL_CURRENCIES = [
-    { code: 'TRY', symbol: '₺' }, { code: 'USD', symbol: '$' }, { code: 'EUR', symbol: '€' },
-    { code: 'GBP', symbol: '£' }, { code: 'CHF', symbol: 'CHF' }, { code: 'JPY', symbol: '¥' },
-    { code: 'CNY', symbol: '¥' }, { code: 'RUB', symbol: '₽' }, { code: 'SAR', symbol: 'SR' },
-    { code: 'AED', symbol: 'د.إ' }, { code: 'AUD', symbol: 'A$' }, { code: 'CAD', symbol: 'C$' },
-    { code: 'SEK', symbol: 'kr' }, { code: 'NOK', symbol: 'kr' }, { code: 'DKK', symbol: 'kr' },
-    { code: 'PLN', symbol: 'zł' }, { code: 'INR', symbol: '₹' }, { code: 'KRW', symbol: '₩' }, { code: 'BRL', symbol: 'R$' },
-];
+// Enes Doğanay | 8 Mayıs 2026: ALL_CURRENCIES kaldırıldı — bu dosyada kullanılmıyordu (ölü kod)
 const formatMoney = (amount, currency) => {
     const v = Number(amount || 0);
     if (!v) return '—';
@@ -56,7 +49,15 @@ const MyOfferCard = ({
     return (
         <div className={`mop-card${isExpanded ? ' mop-card--expanded' : ''}${isHighlight ? ' mop-card--highlight' : ''}`}
             ref={isHighlight ? highlightRef : undefined}>
-            <div className={`mop-card__main${unreadMopChatIds.has(offer.id) ? ' mop-card__main--has-unread' : ''}`} onClick={onToggle}>
+            {/* Enes Doğanay | 8 Mayıs 2026: role="button" + aria-expanded + onKeyDown — klavye erişilebilirliği */}
+            <div
+                className={`mop-card__main${unreadMopChatIds.has(offer.id) ? ' mop-card__main--has-unread' : ''}`}
+                onClick={onToggle}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
+            >
                 <div className="mop-card__tender">
                     <h3>{tender?.baslik || 'İhale bulunamadı'}</h3>
                     <div className="mop-card__meta">
@@ -65,7 +66,14 @@ const MyOfferCard = ({
                                 <span className="material-symbols-outlined">apartment</span>Anonim Firma
                             </span>
                         ) : (
-                            <span className="mop-card__firma" onClick={e => { e.stopPropagation(); if (tender?.firma_id) navigate(`/firmadetay/${tender.firma_id}`); }}>
+                            // Enes Doğanay | 8 Mayıs 2026: role="button" + klavye desteği
+                            <span
+                                className="mop-card__firma"
+                                onClick={e => { e.stopPropagation(); if (tender?.firma_id) navigate(`/firmadetay/${tender.firma_id}`); }}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); if (tender?.firma_id) navigate(`/firmadetay/${tender.firma_id}`); } }}
+                            >
                                 <span className="material-symbols-outlined">apartment</span>{firmaAdi}
                             </span>
                         )}
@@ -93,7 +101,7 @@ const MyOfferCard = ({
                     </span>
                     <span className="mop-card__time">{timeAgo(offer.created_at)}</span>
                 </div>
-                <span className="material-symbols-outlined mop-card__chevron">{isExpanded ? 'expand_less' : 'expand_more'}</span>
+                <span className="material-symbols-outlined mop-card__chevron" aria-hidden="true">{isExpanded ? 'expand_less' : 'expand_more'}</span>
             </div>
             {isExpanded && (
                 <MyOfferCardDetail

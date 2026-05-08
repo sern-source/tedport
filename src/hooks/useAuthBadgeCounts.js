@@ -17,7 +17,7 @@ export const useAuthBadgeCounts = ({ managedCompanyId, setUnreadNotifCount, noti
                 setPendingQuoteCount(counts.pendingQuoteCount);
                 setIhaleYonetimiUnreadCount(counts.ihaleYonetimiUnreadCount);
             } catch (err) {
-                if (err?.name !== 'AbortError') console.warn('[Badge] Kurumsal badge yüklenemedi:', err);
+                if (err?.name !== 'AbortError') { /* sessiz — badge yükleme başarısız, kritik değil */ }
             }
         } else {
             setManagedCompanyName(null);
@@ -26,7 +26,7 @@ export const useAuthBadgeCounts = ({ managedCompanyId, setUnreadNotifCount, noti
                 setPendingQuoteCount(counts.pendingQuoteCount);
                 setMyOffersUnreadCount(counts.myOffersUnreadCount);
             } catch (err) {
-                if (err?.name !== 'AbortError') console.warn('[Badge] Bireysel badge yüklenemedi:', err);
+                if (err?.name !== 'AbortError') { /* sessiz — badge yükleme başarısız, kritik değil */ }
             }
         }
     }, []);
@@ -55,7 +55,7 @@ export const useAuthBadgeCounts = ({ managedCompanyId, setUnreadNotifCount, noti
                 setMyOffersUnreadCount(counts.myOffersUnreadCount);
             }
         } catch (err) {
-            if (err?.name !== 'AbortError') console.warn('[Auth] refreshBadges hatası:', err);
+            if (err?.name !== 'AbortError') { /* sessiz — badge yenileme başarısız, kritik değil */ }
         }
     }, [managedCompanyId, setUnreadNotifCount, notifPrefsRef]);
 

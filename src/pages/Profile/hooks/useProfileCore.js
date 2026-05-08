@@ -1,12 +1,12 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Profil core koordinatör — yükleme, avatar, davet, marketing + email sub-hook
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '../../../supabaseClient';
 import { useTheme } from '../../../hooks/useTheme';
 import {
     fetchSession, fetchProfileData, fetchCompanyMembership,
     fetchFirmaById, fetchPendingInvites, saveMarketingConsent,
     uploadAvatar, acceptFirmaDavetiService, rejectFirmaDavetiService,
+    signOutService,
 } from '../services/profileService';
 import { fetchNotifPrefsService } from '../services/notificationsService';
 import { useProfileEmailHandlers } from './useProfileEmailHandlers';
@@ -72,7 +72,7 @@ export const useProfileCore = () => {
                 const prefsData = await fetchNotifPrefsService(currentUser.id);
                 if (prefsData) setNotifPrefs(prev => ({ ...prev, ...Object.fromEntries(Object.keys(DEFAULT_NOTIF_PREFS).map(k => [k, prefsData[k] ?? true])) }));
                 if (!cancelled) setLoading(false);
-            } catch (err) { if (!cancelled) { console.error('Profile init error:', err); setLoading(false); } }
+            } catch { if (!cancelled) setLoading(false); }
         };
         fetchInitial();
         return () => { cancelled = true; };
@@ -91,7 +91,7 @@ export const useProfileCore = () => {
         fetchPendingInvites(user.id).then(invites => setPendingInvites(invites)).catch(() => {});
     }, [searchParams, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const handleLogout = useCallback(async () => { await supabase.auth.signOut(); navigate('/'); }, [navigate]);
+    const handleLogout = useCallback(async () => { await signOutService(); navigate('/'); }, [navigate]);
 
     const handleAvatarUpload = useCallback(async (event) => {
         const file = event.target.files[0]; if (!file) return;
@@ -113,7 +113,7 @@ export const useProfileCore = () => {
                 if (firmaRes) setMyCompanyFirma(firmaRes);
             }
             setPendingInvites(prev => prev.filter(d => d.id !== davetId));
-        } catch (err) { console.error('Davet kabul hatası:', err); }
+        } catch { /* sessiz */ }
     }, [pendingInvites]);
 
     const handleDavetRed = useCallback(async (davetId) => {

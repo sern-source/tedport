@@ -24,8 +24,9 @@ const CompanyGeneralInfoCard = ({ fields, set, logoPreview, logoUploading, pendi
                 <span>Web Sitesi</span>
                 <div className="cmp-field-web">
                     <input type="text" value={fields.web_sitesi} onChange={e => set('web_sitesi', e.target.value)} placeholder="www.ornekfirma.com" />
+                    {/* Enes Doğanay | 8 Mayıs 2026: aria-label — data-tooltip screen reader için yeterli değil */}
                     {fields.web_sitesi?.trim() && (
-                        <a href={/^https?:\/\//i.test(fields.web_sitesi.trim()) ? fields.web_sitesi.trim() : `https://${fields.web_sitesi.trim()}`} target="_blank" rel="noopener noreferrer" className="cmp-field-web__link" data-tooltip="Web sitesini aç">
+                        <a href={/^https?:\/\//i.test(fields.web_sitesi.trim()) ? fields.web_sitesi.trim() : `https://${fields.web_sitesi.trim()}`} target="_blank" rel="noopener noreferrer" className="cmp-field-web__link" data-tooltip="Web sitesini aç" aria-label="Web sitesini yeni sekmede aç">
                             <span className="material-symbols-outlined">open_in_new</span>
                         </a>
                     )}

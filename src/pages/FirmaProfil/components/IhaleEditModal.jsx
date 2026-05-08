@@ -10,8 +10,8 @@ const IhaleEditModal = ({ editModal, editForm, editError, editSaving, editReqSta
         <div className="tom-edit-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
             <div className="tom-edit-modal">
                 <div className="tom-edit-modal__header">
-                    <h2><span className="material-symbols-outlined">edit</span>İhaleyi Düzenle</h2>
-                    <button className="tom-edit-modal__close" onClick={onClose}><span className="material-symbols-outlined">close</span></button>
+                    <h2 id="ihale-edit-title"><span className="material-symbols-outlined">edit</span>İhaleyi Düzenle</h2>
+                    <button className="tom-edit-modal__close" onClick={onClose} aria-label="Kapat"><span className="material-symbols-outlined">close</span></button>
                 </div>
                 <div className="tom-edit-modal__body">
                     {editError && <div className="tom-form-error"><span className="material-symbols-outlined">error</span>{editError}</div>}

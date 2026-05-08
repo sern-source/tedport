@@ -1,15 +1,11 @@
 // Enes Doğanay | 7 Mayıs 2026: İhale form servis — email kontrolü, firma arama, dosya yükleme
 import { supabase } from '../../../supabaseClient';
 
-// Enes Doğanay | 7 Mayıs 2026: Profil tablosunda e-posta var mı kontrolü
+// Enes Doğanay | 8 Mayıs 2026: check_email_availability RPC — JSONB döner: {available:false} = kayıtlı, {available:true} = yok
 export const checkEmailInDb = async (email) => {
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email.trim().toLowerCase())
-        .maybeSingle();
-    if (error) throw new Error(error.message);
-    return Boolean(data);
+    const { data, error } = await supabase.rpc('check_email_availability', { p_email: email.trim().toLowerCase() });
+    if (error) return false;
+    return data?.available === false;
 };
 
 // Enes Doğanay | 7 Mayıs 2026: Firma adına göre firmalar tablosunu ara

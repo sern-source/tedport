@@ -34,14 +34,15 @@ const QuoteReportModal = ({
         className="msg-report-overlay"
         onClick={() => !reportSending && setReportModal(null)}
       >
-        <div className="msg-report-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="msg-report-modal" role="dialog" aria-modal="true" aria-labelledby="quote-report-title" onClick={(e) => e.stopPropagation()}>
           <div className="msg-report-modal__header">
             <span className="material-symbols-outlined">flag</span>
-            <h3>Mesajı Şikayet Et</h3>
+            <h3 id="quote-report-title">Mesajı Şikayet Et</h3>
             <button
               className="msg-report-close"
               onClick={() => setReportModal(null)}
               disabled={reportSending}
+              aria-label="Kapat"
             >
               <span className="material-symbols-outlined">close</span>
             </button>

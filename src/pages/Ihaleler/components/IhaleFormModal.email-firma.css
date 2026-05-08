@@ -8,10 +8,11 @@
 
 .ihale-email-input-row input {
     flex: 1;
-    padding: 9px 12px;
+    min-width: 0;
+    padding: 6px 10px;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13.5px;
+    border-radius: 7px;
+    font-size: 12.5px;
     color: var(--text-dark);
     background: var(--bg-light);
     font-family: inherit;
@@ -126,11 +127,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
     border: none;
-    border-radius: 8px;
+    border-radius: 7px;
     background: #3b82f6;
     color: #fff;
     cursor: pointer;
@@ -147,7 +148,7 @@
 }
 
 .ihale-email-add-btn .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 17px;
 }
 
 .ihale-email-tags {
@@ -380,13 +381,13 @@
 .ihale-file-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 9px 16px;
+    gap: 5px;
+    padding: 5px 12px;
     background: var(--bg-light);
     color: var(--text-muted);
     border: 1px dashed var(--border);
-    border-radius: 8px;
-    font-size: 13.5px;
+    border-radius: 7px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
@@ -399,7 +400,7 @@
 }
 
 .ihale-file-btn .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .ihale-file-list {

@@ -50,7 +50,7 @@ const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, deleteConfirmId, se
                             <h4><span className="material-symbols-outlined">attach_file</span> Ek Dokümanlar ({ekDosyalar.length})</h4>
                             <div className="tom-info-card__files-list">
                                 {ekDosyalar.map((f, i) => (
-                                    <button key={i} type="button" className="tom-info-card__file-btn" onClick={async () => {
+                                    <button key={f.path || f.name || i} type="button" className="tom-info-card__file-btn" onClick={async () => {
                                         if (f.url?.startsWith('http')) { window.open(f.url, '_blank', 'noopener,noreferrer'); return; }
                                         if (f.path) { const url = await getIhaleFileSignedUrl(f.path).catch(() => null); if (url) window.open(url, '_blank', 'noopener,noreferrer'); }
                                     }}>

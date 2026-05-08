@@ -24,13 +24,13 @@ const IletisimForm = ({ formData, status, handleChange, handleSubmit }) => (
                 </div>
             </div>
             {status === 'success' && (
-                <div className="contact-alert contact-alert-success">
+                <div className="contact-alert contact-alert-success" role="alert">
                     <span className="material-symbols-outlined">check_circle</span>
                     Mesajınız başarıyla gönderildi. En kısa sürede size dönüş yapacağız.
                 </div>
             )}
             {status === 'error' && (
-                <div className="contact-alert contact-alert-error">
+                <div className="contact-alert contact-alert-error" role="alert">
                     <span className="material-symbols-outlined">error</span>
                     Mesaj gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.
                 </div>

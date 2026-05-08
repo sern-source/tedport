@@ -49,6 +49,15 @@ const useChatbot = () => {
     const [unread, setUnread] = useState(0);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
+    // Enes Doğanay | 8 Mayıs 2026: Bot cevap timer ref — rapid gönderimde önceki timeout iptal edilir, unmount'ta cleanup
+    const typingTimerRef = useRef(null);
+
+    // Enes Doğanay | 8 Mayıs 2026: Unmount cleanup — pending bot cevabı varsa iptal et
+    useEffect(() => {
+        return () => {
+            if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+        };
+    }, []);
 
     // Enes Doğanay | 6 Mayıs 2026: Q&A ve hızlı sorular yükle
     useEffect(() => {
@@ -74,12 +83,15 @@ const useChatbot = () => {
         setMessages(prev => [...prev, { id: Date.now(), from: 'user', text: trimmed, html: false }]);
         setInput('');
         setTyping(true);
+        // Enes Doğanay | 8 Mayıs 2026: Önceki pending bot cevabını iptal et — rapid gönderimde çifte cevap önlenir
+        if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
         const delay = 600 + Math.random() * 600;
-        setTimeout(() => {
+        typingTimerRef.current = setTimeout(() => {
             const answer = findAnswer(trimmed, qaList);
             setTyping(false);
             setMessages(prev => [...prev, { id: Date.now() + 1, from: 'bot', text: answer, html: true }]);
             if (!open) setUnread(u => u + 1);
+            typingTimerRef.current = null;
         }, delay);
     };
 

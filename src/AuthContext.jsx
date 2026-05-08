@@ -1,6 +1,7 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: AuthContext — slim provider, yükler iki hook'a delege eder
 import React, { createContext, useContext, useEffect, useCallback, useMemo } from 'react';
-import { supabase, supabaseUrl } from './supabaseClient';
+import { supabase, supabaseUrl } from './supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: onAuthStateChange için
+import { setRealtimeAuth, signOutGlobal } from './services/authService';
 import { useAuthLoader } from './hooks/useAuthLoader';
 import { useAuthNotifications } from './hooks/useAuthNotifications';
 
@@ -20,7 +21,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const authFallbackTimer = setTimeout(() => {
-      loader.setAuthChecked(prev => { if (!prev) console.warn('[Auth] loadUserData timeout'); return true; });
+      loader.setAuthChecked(prev => { if (!prev) return true; return prev; });
     }, 5000);
     loader.loadUserData().catch(() => {}).finally(() => clearTimeout(authFallbackTimer));
 
@@ -33,7 +34,7 @@ export function AuthProvider({ children }) {
         return;
       }
       if (event === 'TOKEN_REFRESHED') {
-        if (session?.access_token) supabase.realtime.setAuth(session.access_token);
+        if (session?.access_token) setRealtimeAuth(session.access_token);
         return;
       }
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
@@ -41,7 +42,7 @@ export function AuthProvider({ children }) {
         const currentUserId = loader.userIdRef.current;
         const incomingUserId = session?.user?.id;
         if (currentUserId && incomingUserId && currentUserId !== incomingUserId) return;
-        if (session?.access_token) supabase.realtime.setAuth(session.access_token);
+        if (session?.access_token) setRealtimeAuth(session.access_token);
         loader.loadUserData().catch(() => {});
       }
     });
@@ -51,7 +52,7 @@ export function AuthProvider({ children }) {
   // Enes Doğanay | 7 Mayıs 2026: useCallback — context consumer'lar yeniden render edilmesin
   const logout = useCallback(async () => {
     loader.isLoggingOutRef.current = true;
-    try { await supabase.auth.signOut({ scope: 'global' }); } catch {}
+    await signOutGlobal();
     try {
       const projectRef = new URL(supabaseUrl).host.split('.')[0];
       window.localStorage.removeItem(`sb-${projectRef}-auth-token`);

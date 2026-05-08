@@ -23,9 +23,15 @@ const HeaderUserMenu = ({
 
     return (
         <div className="shared-user-dropdown" ref={dropdownRef}>
-            <button className="shared-user-btn" onClick={() => setIsDropdownOpen(!isDropdownOpen)} type="button">
+            <button
+                className="shared-user-btn"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                type="button"
+                aria-expanded={isDropdownOpen}
+                aria-haspopup="menu"
+            >
                 <span className="shared-user-btn-label">
-                    {managedCompanyName || `${userProfile.first_name} ${userProfile.last_name}`.trim()}
+                    {managedCompanyName || `${userProfile.first_name ?? ''} ${userProfile.last_name ?? ''}`.trim() || 'Hesabım'}
                 </span>
                 <span className="material-symbols-outlined shared-user-btn-icon">
                     {isDropdownOpen ? 'expand_less' : 'expand_more'}

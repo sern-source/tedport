@@ -1,5 +1,8 @@
 import { supabase, supabaseAnonKey, supabaseUrl } from '../supabaseClient';
 
+// Enes Doğanay | 8 Mayıs 2026: Magic number sabit — fallback DB sorgusunda maksimum başvuru sayısı
+const MAX_APPLICATIONS_FETCH = 200;
+
 // Enes Doğanay | 6 Nisan 2026: Frontend ve server payload'lari ayni alan adlariyla eslenir
 // Enes Doğanay | 8 Nisan 2026: selectedFirmaId varsa metadata.requested_firma_id olarak eklenir
 // Enes Doğanay | 8 Nisan 2026: companyName kaldırıldı (listedCompanyName ile aynı), companyPhone eklendi
@@ -138,7 +141,7 @@ export const listCorporateApplications = async (accessToken) => {
       .from('kurumsal_basvurular')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(200);
+      .limit(MAX_APPLICATIONS_FETCH);
 
     if (selectError) {
       throw new Error(selectError.message || 'Başvurular alınamadı.');

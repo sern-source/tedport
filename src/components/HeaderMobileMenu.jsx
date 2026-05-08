@@ -20,9 +20,9 @@ const HeaderMobileMenu = ({
     const close = () => setIsMobileMenuOpen(false);
 
     return (
-        <div className="shared-mobile-menu">
-            {items.map((item, idx) => (
-                <Link key={idx} to={item.href} onClick={close}>{item.label}</Link>
+        <div className="shared-mobile-menu" id="mobile-menu">
+            {items.map((item) => (
+                <Link key={item.href} to={item.href} onClick={close}>{item.label}</Link>
             ))}
             {authChecked && !userProfile && locationPathname !== '/login' && <Link to="/login" onClick={close}>Giriş Yap</Link>}
             {authChecked && !userProfile && locationPathname !== '/register' && <Link to="/register" onClick={close} className="shared-mobile-register">Kayıt Ol</Link>}

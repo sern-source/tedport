@@ -2,7 +2,8 @@
 import React from 'react';
 
 const ChatbotWindow = ({ messages, typing, quickQuestions, input, setInput, messagesEndRef, inputRef, sendMessage, handleSubmit, onClose }) => (
-    <div className="cb-window" role="dialog" aria-label="Yardım Asistanı">
+    // Enes Doğanay | 8 Mayıs 2026: aria-modal eklendi — role=dialog tek başına yeterli değil
+    <div className="cb-window" role="dialog" aria-modal="true" aria-label="Yardım Asistanı">
         <div className="cb-header">
             <div className="cb-header-info">
                 <div className="cb-avatar">
@@ -48,7 +49,9 @@ const ChatbotWindow = ({ messages, typing, quickQuestions, input, setInput, mess
             ))}
         </div>
         <form className="cb-form" onSubmit={handleSubmit}>
+            {/* Enes Doğanay | 8 Mayıs 2026: aria-label — görünür label olmayan input */}
             <input ref={inputRef} className="cb-input" value={input} onChange={e => setInput(e.target.value)}
+                aria-label="Sorunuzu yazın"
                 placeholder="Bir soru sorun..." autoComplete="off" maxLength={300} />
             <button className="cb-send" type="submit" aria-label="Gönder" disabled={!input.trim()}>
                 <svg viewBox="0 0 24 24" fill="none" width="18" height="18">

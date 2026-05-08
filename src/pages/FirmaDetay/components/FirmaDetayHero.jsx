@@ -8,7 +8,8 @@ const FirmaDetayHero = ({
     isVerified,
     isCurrentUserCompanyManager,
     firmaEkip,
-    onShowEkipModal
+    onShowEkipModal,
+    isLoggedIn,
 }) => {
     const navigate = useNavigate();
 
@@ -82,7 +83,7 @@ const FirmaDetayHero = ({
                             </div>
                         </div>
 
-                        {firma.show_ekip_public !== false && firmaEkip.length > 0 && (
+                        {firma.show_ekip_public !== false && firmaEkip.length > 0 && isLoggedIn && (
                             <div className="hero-ekip-preview">
                                 <div className="hero-ekip-stack">
                                     {firmaEkip.slice(0, 3).map((uye, i) => (

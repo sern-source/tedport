@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import * as ihaleService from '../services/ihaleService';
 import { enrichMessagesWithSender, fetchSenderAvatarUrl } from '../services/ihaleService';
-import { supabase } from '../../../supabaseClient';
+import { getAuthSession } from '../services/firmaService';
+import { supabase } from '../../../supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: sadece realtime channel için
 
 const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refreshCounts }) => {
     const [activeTenderChat, setActiveTenderChat] = useState(null);
@@ -107,7 +108,7 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
             .on('broadcast', { event: 'new-tender-message' }, ({ payload }) => {
                 setTenderChatMessages(prev => { if (prev.some(m => m.id === payload.id)) return prev; return [...prev, { ...payload, _isMine: payload.sender_role === 'company' }]; });
                 scrollToBottom();
-                if (payload.sender_role === 'bidder') { supabase.from('ihale_teklif_mesajlari').update({ okundu_firma: true }).eq('id', payload.id).then(() => {}); }
+                if (payload.sender_role === 'bidder') { ihaleService.markChatMessagesRead([payload.id]).catch(() => {}); }
             })
             .subscribe();
         tenderChatChannelRef.current = channel;
@@ -148,7 +149,8 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
     const submitReport = useCallback(async () => {
         if (!reportState.modal || reportState.sending) return;
         setReportState(p => ({ ...p, sending: true }));
-        const { data: { session } } = await supabase.auth.getSession();
+        // Enes Doğanay | 8 Mayıs 2026: auth servis katmanından alınır
+        const session = await getAuthSession();
         const reporterId = session?.user?.id;
         if (!reporterId) { setReportState(p => ({ ...p, sending: false })); return; }
         try {

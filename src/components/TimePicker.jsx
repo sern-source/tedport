@@ -72,12 +72,24 @@ export default function TimePicker({ value, onChange, placeholder = '--:--' }) {
 
     return (
         <div className="tp" ref={triggerRef}>
-            <button type="button" className={'tp-trigger' + (open ? ' tp-trigger--open' : '')} onClick={handleOpen}>
+            {/* Enes Doğanay | 8 Mayıs 2026: aria-expanded + aria-haspopup + aria-label — trigger erişilebilirlik */}
+            <button type="button" className={'tp-trigger' + (open ? ' tp-trigger--open' : '')} onClick={handleOpen}
+                aria-expanded={open}
+                aria-haspopup="dialog"
+                aria-label={value ? `Seçili saat: ${value}, değiştirmek için tıklayın` : 'Saat seç'}
+            >
                 <span className="material-symbols-outlined tp-icon">schedule</span>
                 <span className={value ? 'tp-value' : 'tp-placeholder'}>{value || placeholder}</span>
                 {value && (
-                    <span className="material-symbols-outlined tp-clear"
-                        onClick={(e) => { e.stopPropagation(); onChange(''); }}>close</span>
+                    // Enes Doğanay | 8 Mayıs 2026: role=button + tabIndex + aria-label + onKeyDown — DatePicker/CitySelect ile aynı pattern
+                    <span
+                        className="material-symbols-outlined tp-clear"
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Saati temizle"
+                        onClick={(e) => { e.stopPropagation(); onChange(''); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); onChange(''); } }}
+                    >close</span>
                 )}
             </button>
 

@@ -32,7 +32,7 @@ const IhaleContactPopup = ({ contactState, setContactState }) => {
 
     return (
         <div className="tom-contact-overlay" onClick={e => { if (e.target === e.currentTarget) setContactState(p => ({ ...p, popup: null })); }}>
-            <div className="tom-contact-card">
+            <div className="tom-contact-card" role="dialog" aria-modal="true" aria-labelledby="ihale-contact-title">
                 {loading && !popup ? (
                     <div style={{ padding: 40, textAlign: 'center' }}>
                         <span className="material-symbols-outlined tom-spin" style={{ fontSize: 32 }}>progress_activity</span>
@@ -41,7 +41,7 @@ const IhaleContactPopup = ({ contactState, setContactState }) => {
                 ) : popup ? (
                     <>
                         <div className="tom-contact-card__banner">
-                            <button className="tom-contact-card__close" onClick={() => setContactState(p => ({ ...p, popup: null }))}>
+                            <button className="tom-contact-card__close" onClick={() => setContactState(p => ({ ...p, popup: null }))} aria-label="Kapat">
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
@@ -54,7 +54,7 @@ const IhaleContactPopup = ({ contactState, setContactState }) => {
                         </div>
 
                         <div className="tom-contact-card__identity">
-                            <h3>{popup.name || 'İsimsiz'}</h3>
+                            <h3 id="ihale-contact-title">{popup.name || 'İsimsiz'}</h3>
                             {(popup.firma || popup.companyName) && (
                                 <p className="tom-contact-card__firma">
                                     <span className="material-symbols-outlined">business</span>

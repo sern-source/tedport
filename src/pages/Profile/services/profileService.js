@@ -98,3 +98,14 @@ export const saveMarketingConsent = async (userId, value) => {
   const { error } = await supabase.from('profiles').update({ marketing_consent: value }).eq('id', userId);
   if (error) throw new Error(error.message);
 };
+
+// Enes Doğanay | 8 Mayıs 2026: Oturumu kapat — hook'larda doğrudan supabase çağrısını engeller
+export const signOutService = async () => {
+  await supabase.auth.signOut();
+};
+
+// Enes Doğanay | 8 Mayıs 2026: Mevcut auth kullanıcısını döndür — hook'larda doğrudan supabase çağrısını engeller
+export const getAuthUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+};

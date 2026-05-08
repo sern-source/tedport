@@ -7,9 +7,10 @@ export const IhalePublishSuccessPopup = ({ publishState, setPublishState }) => {
     const link = `https://tedport.com/ihaleler?ihale=${publishState.successId}`;
     return (
         <div className="teklif-success-overlay" onClick={onClose}>
-            <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+            {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
+            <div className="teklif-success-card" role="dialog" aria-modal="true" aria-labelledby="publish-success-title" onClick={e => e.stopPropagation()}>
                 <div className="teklif-success-card__icon"><span className="material-symbols-outlined">check_circle</span></div>
-                <h3>İhaleniz Yayınlandı!</h3>
+                <h3 id="publish-success-title">İhaleniz Yayınlandı!</h3>
                 <p>İhaleniz başarıyla yayınlanmıştır. Tedarikçiler artık ihalenizi görebilir ve teklif verebilir.</p>
                 <div className="ihale-publish-link-row">
                     <span className="material-symbols-outlined ihale-publish-link-row__icon">link</span>
@@ -30,9 +31,10 @@ export const IhaleEditSavedPopup = ({ publishState, setPublishState }) => {
     if (!publishState.editSaved) return null;
     return (
         <div className="teklif-success-overlay" onClick={() => setPublishState(p => ({ ...p, editSaved: false }))}>
-            <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+            {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
+            <div className="teklif-success-card" role="dialog" aria-modal="true" aria-labelledby="edit-saved-title" onClick={e => e.stopPropagation()}>
                 <div className="teklif-success-card__icon"><span className="material-symbols-outlined">check_circle</span></div>
-                <h3>Değişiklikler Kaydedildi!</h3>
+                <h3 id="edit-saved-title">Değişiklikler Kaydedildi!</h3>
                 <p>İhaleniz başarıyla güncellendi. Tedarikçiler yeni bilgileri görebilir.</p>
                 <button className="teklif-success-card__btn" onClick={() => setPublishState(p => ({ ...p, editSaved: false }))}>Tamam</button>
             </div>
@@ -44,10 +46,11 @@ export const IhaleScoringInfoPopup = ({ showScoringInfo, setShowScoringInfo }) =
     if (!showScoringInfo) return null;
     return (
         <div className="tom-contact-overlay" onClick={() => setShowScoringInfo(false)}>
-            <div className="tom-scoring-info-card" onClick={e => e.stopPropagation()}>
-                <button className="tom-contact-card__close" onClick={() => setShowScoringInfo(false)}><span className="material-symbols-outlined">close</span></button>
+            {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
+            <div className="tom-scoring-info-card" role="dialog" aria-modal="true" aria-labelledby="scoring-info-title" onClick={e => e.stopPropagation()}>
+                <button className="tom-contact-card__close" onClick={() => setShowScoringInfo(false)} aria-label="Kapat"><span className="material-symbols-outlined">close</span></button>
                 <div className="tom-scoring-info-card__icon"><span className="material-symbols-outlined">psychology</span></div>
-                <h3>Akıllı Puanlama Nasıl Çalışır?</h3>
+                <h3 id="scoring-info-title">Akıllı Puanlama Nasıl Çalışır?</h3>
                 <div className="tom-scoring-info-card__body">
                     <p>Akıllı puanlama sistemi, gelen teklifleri otomatik olarak değerlendirerek size en uygun teklifi hızlıca bulmanıza yardımcı olur.</p>
                     <div className="tom-scoring-info-item">

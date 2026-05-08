@@ -48,7 +48,7 @@ const IhaleOffersSection = ({ displayOffers, compareList, compareIds, compareHin
                         <strong>{compareIds.length} teklif seçildi</strong>
                         <p>Karşılaştırma tablosunu aşağıda görebilirsiniz.</p>
                     </div>
-                    <button type="button" onClick={() => { sessionStorage.setItem('tom_compare_hint_dismissed', '1'); setCompareHintDismissed(true); }} className="tom-compare-hint__dismiss" data-tooltip="Kapat"><span className="material-symbols-outlined">close</span></button>
+                    <button type="button" onClick={() => { sessionStorage.setItem('tom_compare_hint_dismissed', '1'); setCompareHintDismissed(true); }} className="tom-compare-hint__dismiss" aria-label="Kapat"><span className="material-symbols-outlined">close</span></button>
                 </div>
             )}
 
