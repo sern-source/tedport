@@ -15,9 +15,9 @@ const IhaleFormStep3 = ({
         <div className="ihale-section ihale-section--no-border">
             <span className="ihale-section__title">
                 <span className="material-symbols-outlined">checklist</span>
-                İhale Gereksinimleri *
+                Talep Kalemleri *
             </span>
-            <p className="ihale-section__desc">Kalem kalem gereksinimlerinizi ekleyin.</p>
+            <p className="ihale-section__desc">Teklif alacağınız ürün ve malzemeleri adet ile birlikte ekleyin.</p>
             <div className="ihale-req-input-row">
                 {/* Enes Doğanay | 9 Mayıs 2026: Adet — öne taşındı, etiketli grup */}
                 <div className="ihale-req-adet-group">
@@ -27,7 +27,7 @@ const IhaleFormStep3 = ({
                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addGereksinim(); } }}
                         className="ihale-req-adet-input" />
                 </div>
-                <input type="text" placeholder="Gereksinim maddesi *" value={yeniGereksinimMadde}
+                <input type="text" placeholder="Ürün / Malzeme adı *" value={yeniGereksinimMadde}
                     onChange={e => setYeniGereksinimMadde(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addGereksinim(); } }} />
                 <input type="text" placeholder="Açıklama (opsiyonel)" value={yeniGereksinimAciklama}
@@ -39,15 +39,16 @@ const IhaleFormStep3 = ({
             </div>
             {form.gereksinimler.length > 0 && (
                 <div className="ihale-req-table">
+                    {/* Enes Doğanay | 11 Mayıs 2026: Kolon sırası → # | Adet | Kalem | Açıklama | X */}
                     <div className="ihale-req-table__header">
-                        <span>#</span><span>Madde</span><span>Açıklama</span><span>Adet</span><span></span>
+                        <span>#</span><span>Adet</span><span>Kalem</span><span>Açıklama</span><span></span>
                     </div>
                     {form.gereksinimler.map((g, i) => (
                         <div key={g.id} className="ihale-req-table__row">
                             <span className="ihale-req-table__num">{i + 1}</span>
+                            <span className="ihale-req-table__adet">{g.adet || 1}</span>
                             <span className="ihale-req-table__madde">{g.madde}</span>
                             <span className="ihale-req-table__aciklama">{g.aciklama || '—'}</span>
-                            <span className="ihale-req-table__adet">{g.adet || 1}</span>
                             <button type="button" className="ihale-req-table__remove" onClick={() => removeGereksinim(g.id)}>
                                 <span className="material-symbols-outlined">close</span>
                             </button>

@@ -1,4 +1,5 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: İhale detay modalı — koordinatör
+// Enes Doğanay | 11 Mayıs 2026: Header redesign — hero banner, status+close üst satır, büyük başlık
 import React from 'react';
 import './TenderDetail.css';
 import { getTenderStatusMeta } from '../../../constants/tenderUtils';
@@ -11,23 +12,26 @@ const TenderDetail = ({ tender, userOffer, isOwnTender, userProfile, onClose, on
     return (
         <div className="tender-detail-overlay tender-detail-overlay--center" onClick={onClose}>
             <div className="tender-detail-modal" onClick={e => e.stopPropagation()}>
+                {/* Enes Doğanay | 11 Mayıs 2026: Hero header — üst satır status+close, başlık+firma altta */}
                 <div className="tender-detail__head">
-                    <div>
+                    <div className="tender-detail__head-toprow">
                         <span className={`tender-card-status tender-card-status-${statusMeta.className}`}>{statusMeta.label}</span>
-                        <h2>{dt.baslik}</h2>
-                        {dt.anonim ? (
-                            <span className="tender-detail__company-link tender-detail__company-link--anonim">
-                                <span className="material-symbols-outlined">visibility_off</span>Anonim Firma
-                            </span>
-                        ) : (
-                            <button type="button" className="tender-detail__company-link" onClick={onNavigateFirma}>
-                                <span className="material-symbols-outlined">apartment</span>{dt.firma_adi}
-                            </button>
-                        )}
+                        <button type="button" className="tender-detail__close" onClick={onClose}>
+                            <span className="material-symbols-outlined">close</span>
+                        </button>
                     </div>
-                    <button type="button" className="tender-detail__close" onClick={onClose}>
-                        <span className="material-symbols-outlined">close</span>
-                    </button>
+                    {/* Enes Doğanay | 12 Mayıs 2026: İhale Başlığı etiketi */}
+                    <span className="tender-detail__head-label">İhale Başlığı</span>
+                    <h2 className="tender-detail__title">{dt.baslik}</h2>
+                    {dt.anonim ? (
+                        <span className="tender-detail__company-link tender-detail__company-link--anonim">
+                            <span className="material-symbols-outlined">visibility_off</span>Anonim Firma
+                        </span>
+                    ) : (
+                        <button type="button" className="tender-detail__company-link" onClick={onNavigateFirma}>
+                            <span className="material-symbols-outlined">apartment</span>{dt.firma_adi}
+                        </button>
+                    )}
                 </div>
                 <div className={`tender-detail__content${!userProfile ? ' tender-detail__content--locked' : ''}`}>
                     <TenderDetailBody dt={dt} />

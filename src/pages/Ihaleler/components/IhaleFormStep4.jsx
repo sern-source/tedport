@@ -44,17 +44,21 @@ const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, h
             </div>
             {form.gereksinimler.length > 0 && (
                 <div className="ihale-preview__section">
-                    <strong><span className="material-symbols-outlined">checklist</span> Gereksinimler ({form.gereksinimler.length})</strong>
-                    <ul>
+                    {/* Enes Doğanay | 12 Mayıs 2026: Talep Kalemleri — form adım 3 ile aynı tablo tasarımı */}
+                    <strong><span className="material-symbols-outlined">checklist</span> Talep Kalemleri ({form.gereksinimler.length})</strong>
+                    <div className="ihale-preview__req-table">
+                        <div className="ihale-preview__req-table-head">
+                            <span>#</span><span>Adet</span><span>Kalem</span><span>Açıklama</span>
+                        </div>
                         {form.gereksinimler.map((g, i) => (
-                            // Enes Doğanay | 9 Mayıs 2026: Önizlemede adet badge göster
-                            <li key={g.id}>
-                                <span>{i + 1}.</span>
-                                {g.madde}{g.aciklama ? ` — ${g.aciklama}` : ''}
-                                <span className="ihale-preview__adet-badge">{g.adet || 1} adet</span>
-                            </li>
+                            <div key={g.id} className="ihale-preview__req-table-row">
+                                <span className="ihale-preview__req-num">{i + 1}</span>
+                                <span className="ihale-preview__req-adet">{g.adet || 1}</span>
+                                <span className="ihale-preview__req-madde">{g.madde}</span>
+                                <span className="ihale-preview__req-aciklama">{g.aciklama || '—'}</span>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 </div>
             )}
             {form.davet_emailleri.length > 0 && (

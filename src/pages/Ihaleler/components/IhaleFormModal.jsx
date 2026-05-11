@@ -43,7 +43,7 @@ const IhaleFormModal = ({
             if (!form.teslim_suresi.trim()) { setFormError('Talep edilen teslim süresi zorunludur.'); return; }
         }
         if (stepperStep === 2) {
-            if (form.gereksinimler.length === 0) { setFormError('En az bir ihale gereksinimi eklemelisiniz.'); return; }
+            if (form.gereksinimler.length === 0) { setFormError('En az bir talep kalemi eklemelisiniz.'); return; }
         }
         setFormError('');
         setStepperStep(s => s + 1);

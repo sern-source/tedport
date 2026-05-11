@@ -110,6 +110,7 @@
 [data-theme="dark"] .ihale-file-item button:hover { background: #450a0a; color: #f87171; }
 
 /* Enes Doğanay | 11 Mayıs 2026: Adet grup dark */
+[data-theme="dark"] .ihale-req-adet-prefix { background: #1e293b; border-right-color: #334155; color: #94a3b8; }
 [data-theme="dark"] .ihale-req-adet-group { background: #0f172a; border-color: #334155; }
 [data-theme="dark"] .ihale-req-adet-group:focus-within { border-color: #3b82f6; background: #1e293b; }
 [data-theme="dark"] .ihale-req-adet-input { color: #e2e8f0; }

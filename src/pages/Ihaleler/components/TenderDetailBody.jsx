@@ -21,7 +21,7 @@ const TenderDetailBody = ({ dt }) => {
         <div className="tender-detail__body">
             {dt.aciklama && (
                 <div className="tender-detail__section">
-                    <h3><span className="material-symbols-outlined">description</span> Açıklama</h3>
+                    <h3><span className="material-symbols-outlined">description</span> İhale Açıklaması</h3>
                     <p>{dt.aciklama}</p>
                 </div>
             )}
@@ -36,10 +36,21 @@ const TenderDetailBody = ({ dt }) => {
             </div>
             {gereksinimler.length > 0 && (
                 <div className="tender-detail__section">
-                    <h3><span className="material-symbols-outlined">checklist</span> Gereksinimler ({gereksinimler.length})</h3>
-                    <ul className="tender-detail__req-list">
-                        {gereksinimler.map(g => <li key={g.id}><strong>{g.madde}</strong>{g.aciklama && <span>{g.aciklama}</span>}</li>)}
-                    </ul>
+                    {/* Enes Doğanay | 11 Mayıs 2026: Talep Kalemleri — form ile aynı isimlendirme + tablo görünümü */}
+                    <h3><span className="material-symbols-outlined">checklist</span> Talep Kalemleri ({gereksinimler.length})</h3>
+                    <div className="tender-detail__req-table">
+                        <div className="tender-detail__req-table-head">
+                            <span>#</span><span>Adet</span><span>Kalem</span><span>Açıklama</span>
+                        </div>
+                        {gereksinimler.map((g, i) => (
+                            <div key={g.id || i} className="tender-detail__req-table-row">
+                                <span className="tender-detail__req-num">{i + 1}</span>
+                                <span className="tender-detail__req-adet">{g.adet || 1}</span>
+                                <span className="tender-detail__req-madde">{g.madde}</span>
+                                <span className="tender-detail__req-aciklama">{g.aciklama || '—'}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
             {ekDosyalar.length > 0 && (
