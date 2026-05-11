@@ -1,6 +1,8 @@
 // Enes Doğanay | 6 Mayıs 2026: FirmaDetay hero bölümü + claim banner
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+// Enes Doğanay | 12 Mayıs 2026: Sertifika badge renk meta
+import { SERTIFIKA_META } from '../../../constants/sertifikaConstants';
 import './FirmaDetayHero.css';
 
 const FirmaDetayHero = ({
@@ -10,6 +12,8 @@ const FirmaDetayHero = ({
     firmaEkip,
     onShowEkipModal,
     isLoggedIn,
+    // Enes Doğanay | 12 Mayıs 2026: Admin onaylı sertifika listesi
+    sertifikalar,
 }) => {
     const navigate = useNavigate();
 
@@ -70,6 +74,28 @@ const FirmaDetayHero = ({
                                         )}
                                     </h1>
                                     <p className="hero-meta">• {firma.category_name} • 📍 {firma.il_ilce}</p>
+                                    {/* Enes Doğanay | 12 Mayıs 2026: Onaylı sertifika rozet satırı */}
+                                    {sertifikalar && sertifikalar.length > 0 && (
+                                        <div className="cert-badges">
+                                            {sertifikalar.map(s => {
+                                                const label = s.sertifika_turu === 'Diger'
+                                                    ? (s.sertifika_turu_diger || 'Sertifika')
+                                                    : s.sertifika_turu;
+                                                const meta = SERTIFIKA_META[s.sertifika_turu] || SERTIFIKA_META['Diger'];
+                                                return (
+                                                    <span
+                                                        key={s.id}
+                                                        className="cert-badge"
+                                                        style={{ '--cb-color': meta.color, '--cb-bg': meta.bg, '--cb-border': meta.border }}
+                                                        data-tooltip={meta.desc}
+                                                    >
+                                                        <span className="material-symbols-outlined cert-badge-icon">workspace_premium</span>
+                                                        {label}
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                     {isCurrentUserCompanyManager && (
                                         <button
                                             className="firma-edit-hero-btn"

@@ -5,6 +5,8 @@ import {
     fetchFirmaById, fetchFirmaTenders, fetchFirmaEkip,
     fetchUserSessionData, sendQuoteRequestService, fetchSuggestionsService,
 } from '../services/firmaDetayService';
+// Enes Doğanay | 12 Mayıs 2026: Sertifika servisi — onaylı rozet verileri
+import { fetchFirmaSertifikalari } from '../../../services/sertifikaService';
 import { isMissingRelationError, parseHiyerarsikKategoriler } from '../utils/firmaDetayUtils';
 import { useFirmaDetayNotes } from './useFirmaDetayNotes';
 import { useFirmaDetayFavorites } from './useFirmaDetayFavorites';
@@ -32,6 +34,8 @@ export function useFirmaDetay(id) {
     const [noResults, setNoResults] = useState(false);
     // Enes Doğanay | 11 Mayıs 2026: Gelişmiş arama modu — firmalar sayfasına yönlendirmede kullanılır
     const [detaySearchMode, setDetaySearchMode] = useState('all');
+    // Enes Doğanay | 12 Mayıs 2026: Onaylı sertifika rozet listesi
+    const [sertifikalar, setSertifikalar] = useState([]);
     const [showQuoteModal, setShowQuoteModal] = useState(false);
     const [quoteForm, setQuoteFormState] = useState(EMPTY_QUOTE_FORM);
     const [quoteSending, setQuoteSending] = useState(false);
@@ -59,13 +63,15 @@ export function useFirmaDetay(id) {
     const fetchFirma = async () => {
         setLoading(true); setTendersLoading(true);
         try {
-            const [firmaData, tendersData] = await Promise.all([
+            const [firmaData, tendersData, sertData] = await Promise.all([
                 fetchFirmaById(id).catch(() => null),
                 fetchFirmaTenders(id).catch(err => ({ __error: err })),
+                fetchFirmaSertifikalari(id).catch(() => []),
             ]);
             if (firmaData) { setFirma(firmaData); setIsVerified(firmaData?.onayli_hesap === true); fetchFirmaEkip(id).then(notes.setSavedNotes && (ekip => setFirmaEkip(ekip))); }
             if (Array.isArray(tendersData)) { setTenders(tendersData); setIsTendersTableMissing(false); }
             else if (tendersData?.__error) { if (isMissingRelationError(tendersData.__error)) setIsTendersTableMissing(true); setTenders([]); }
+            setSertifikalar(Array.isArray(sertData) ? sertData : []);
         } finally { setLoading(false); setTendersLoading(false); }
     };
 
@@ -136,6 +142,7 @@ export function useFirmaDetay(id) {
         detaySearch, setDetaySearch, suggestions, noResults,
         detaySearchMode, setDetaySearchMode,
         handleSuggestionClick, handleSearchSubmit,
+        sertifikalar,
         showQuoteModal, setShowQuoteModal, quoteForm, setQuoteField,
         quoteSending, quoteSent, quoteFile, setQuoteFile, handleSendQuoteRequest,
         showEkipModal, setShowEkipModal,

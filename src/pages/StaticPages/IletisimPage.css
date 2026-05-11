@@ -137,16 +137,17 @@
   }
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Paragraf boyutu küçültüldü */
 .contact-page-wrapper .contact-hero-content p {
   color: #cbd5e1;
-  font-size: 1rem;
+  font-size: 0.9rem;
   margin: 0;
   line-height: 1.75;
 }
 
 @media (min-width: 640px) {
   .contact-page-wrapper .contact-hero-content p {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 }
 
@@ -341,8 +342,9 @@
   }
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Paragraf boyutu küçültüldü */
 .contact-page-wrapper .contact-info-header p {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-gray);
   line-height: 1.75;
   margin: 0;
@@ -350,7 +352,7 @@
 
 @media (min-width: 640px) {
   .contact-page-wrapper .contact-info-header p {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 }
 
@@ -413,9 +415,10 @@
   margin: 0 0 0.25rem 0;
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Paragraf boyutu küçültüldü */
 .contact-page-wrapper .contact-info-text p {
   color: var(--text-gray);
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1.5;
   margin: 0;
 }

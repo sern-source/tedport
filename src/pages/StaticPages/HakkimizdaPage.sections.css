@@ -72,7 +72,9 @@
   }
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Paragraf boyutu 0.9rem — diğer sayfalarla uyum */
 .about-page-wrapper .about-feature-text p {
+  font-size: 0.9rem;
   color: var(--text-gray);
   margin: 0;
 }

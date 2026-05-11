@@ -6,6 +6,7 @@ import CompanyGeneralInfoCard from './CompanyGeneralInfoCard';
 import CompanyContactCard from './CompanyContactCard';
 import CompanyCatalogSection from './CompanyCatalogSection';
 import CompanyTagSection from './CompanyTagSection';
+import CompanyCertificateSection from './CompanyCertificateSection';
 import CompanyModals from './CompanyModals';
 
 const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDelete, isAdmin }) => {
@@ -84,6 +85,10 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                 )}
                 {!isNew && (
                     <CompanyTagSection approvedTags={approvedTags} pendingTagRequest={pendingTagRequest} tagInput={tagInput} setTagInput={setTagInput} tagSending={tagSending} tagFeedback={tagFeedback} handleTagSubmit={handleTagSubmit} isAdmin={isAdmin} />
+                )}
+                {/* Enes Doğanay | 12 Mayıs 2026: Sertifika yükleme kartı — sadece mevcut firmalar için */}
+                {!isNew && (
+                    <CompanyCertificateSection company={company} />
                 )}
                 <div className="cmp-actions">
                     <p className="cmp-actions__hint">{isNew ? 'Tüm bilgileri doldurduktan sonra firmayı ekleyebilirsiniz.' : 'Değişiklikler kaydedildikten hemen sonra firma bilgileriniz güncellenecektir.'}</p>

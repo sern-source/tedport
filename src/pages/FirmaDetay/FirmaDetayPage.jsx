@@ -35,7 +35,8 @@ const FirmaDetayPage = () => {
         <>
             <FdToast toast={fd.fdToast} onClose={() => fd.setFdToast(null)} />
             <SharedHeader search={fd.detaySearch} setSearch={fd.setDetaySearch} showSearchBar={true} suggestions={fd.suggestions} onSuggestionClick={fd.handleSuggestionClick} onSearchSubmit={fd.handleSearchSubmit} noResults={fd.noResults} navItems={NAV_ITEMS} searchMode={fd.detaySearchMode} onSearchModeChange={fd.setDetaySearchMode} />
-            <FirmaDetayHero firma={fd.firma} isVerified={fd.isVerified} isCurrentUserCompanyManager={fd.isCurrentUserCompanyManager} firmaEkip={fd.firmaEkip} onShowEkipModal={() => fd.setShowEkipModal(true)} isLoggedIn={!!fd.userProfile} />
+            {/* Enes Doğanay | 12 Mayıs 2026: sertifikalar prop — admin onaylı rozetler */}
+            <FirmaDetayHero firma={fd.firma} isVerified={fd.isVerified} isCurrentUserCompanyManager={fd.isCurrentUserCompanyManager} firmaEkip={fd.firmaEkip} onShowEkipModal={() => fd.setShowEkipModal(true)} isLoggedIn={!!fd.userProfile} sertifikalar={fd.sertifikalar} />
             <FirmaDetayMain fd={fd} firmaId={id} />
             <FirmaDetayModals fd={fd} />
         </>

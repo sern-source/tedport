@@ -1,0 +1,237 @@
+/* Enes Doğanay | 12 Mayıs 2026: CompanyCertificateSection — firma paneli sertifika kartı */
+
+/* ── KART BAŞLIĞI OVERRIDE (cmp-card içinde özel spacing) ─────────────────── */
+.cmp-cert-section { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── ONAYLANAN SERTİFİKALAR ───────────────────────────────────────────────── */
+.cmp-cert-approved-head {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+}
+
+.cmp-cert-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cmp-cert-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--cb-border);
+    background: var(--cb-bg);
+    color: var(--cb-color);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.cmp-cert-badge .material-symbols-outlined { font-size: 14px; }
+
+/* ── BEKLEYEN TALEPLERİ LİSTESİ ──────────────────────────────────────────── */
+.cmp-cert-talep-list { display: flex; flex-direction: column; gap: 6px; }
+
+.cmp-cert-talep-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+}
+
+.cmp-cert-talep-item .material-symbols-outlined { font-size: 16px; flex-shrink: 0; }
+
+.cmp-cert-talep-tur { font-weight: 700; color: var(--text-dark); }
+.cmp-cert-talep-status { margin-left: auto; font-size: 0.74rem; font-weight: 600; }
+.cmp-cert-talep-status--bekliyor { color: #b45309; }
+.cmp-cert-talep-status--onaylandi { color: #15803d; }
+.cmp-cert-talep-status--reddedildi { color: #b91c1c; }
+
+.cmp-cert-talep-red-note {
+    font-size: 0.74rem;
+    color: #b91c1c;
+    margin-top: 2px;
+}
+
+/* ── FORM BÖLÜMÜ ──────────────────────────────────────────────────────────── */
+.cmp-cert-form-head {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+}
+
+.cmp-cert-form { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── CUSTOM DROPDOWN ──────────────────────────────────────────────────────── */
+.cert-tur-wrap { position: relative; }
+
+.cert-tur-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-white);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.15s;
+}
+
+.cert-tur-trigger:hover { border-color: #2563eb; }
+.cert-tur-trigger.cert-tur-trigger--open { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.12); }
+
+.cert-tur-label { font-size: 0.84rem; color: var(--text-dark); }
+.cert-tur-label--placeholder { color: var(--text-muted); }
+
+.cert-tur-chevron {
+    font-size: 20px;
+    color: var(--text-muted);
+    transition: transform 0.18s;
+    flex-shrink: 0;
+}
+.cert-tur-chevron--open { transform: rotate(180deg); }
+
+.cert-tur-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    z-index: 200;
+    overflow: hidden;
+    animation: certTurFadeIn 0.15s ease;
+}
+
+@keyframes certTurFadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.cert-tur-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 14px;
+    font-size: 0.83rem;
+    cursor: pointer;
+    color: var(--text-dark);
+    transition: background 0.12s;
+}
+
+.cert-tur-option:hover { background: var(--bg-soft); }
+.cert-tur-option--active { color: #2563eb; font-weight: 600; }
+.cert-tur-option__desc { font-size: 0.73rem; color: var(--text-muted); }
+.cert-tur-option .material-symbols-outlined { font-size: 16px; color: #2563eb; }
+
+/* ── DIGER TÜR INPUT ──────────────────────────────────────────────────────── */
+.cmp-cert-diger-input {
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-white);
+    font-size: 0.84rem;
+    color: var(--text-dark);
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+.cmp-cert-diger-input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.12); }
+
+/* ── DOSYA UPLOAD ─────────────────────────────────────────────────────────── */
+.cmp-cert-file-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.81rem;
+    color: var(--text-muted);
+}
+
+.cmp-cert-file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 7px;
+    border: 1px dashed var(--border);
+    background: var(--bg-soft);
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    transition: border-color 0.15s, background 0.15s;
+    white-space: nowrap;
+}
+.cmp-cert-file-label:hover { border-color: #2563eb; background: #eff6ff; }
+.cmp-cert-file-label .material-symbols-outlined { font-size: 16px; }
+.cmp-cert-file-label input { display: none; }
+
+.cmp-cert-file-name { font-size: 0.78rem; color: var(--text-muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── FEEDBACK ─────────────────────────────────────────────────────────────── */
+.cmp-cert-feedback {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.81rem;
+    font-weight: 500;
+}
+.cmp-cert-feedback .material-symbols-outlined { font-size: 17px; flex-shrink: 0; }
+.cmp-cert-feedback--ok { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+.cmp-cert-feedback--err { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+
+/* ── LOADING ──────────────────────────────────────────────────────────────── */
+.cmp-cert-loading {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.82rem; color: var(--text-muted);
+    padding: 12px 0;
+}
+.cmp-cert-loading .material-symbols-outlined { font-size: 18px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── DARK MODE ────────────────────────────────────────────────────────────── */
+[data-theme="dark"] .cert-tur-trigger { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+[data-theme="dark"] .cert-tur-trigger:hover { border-color: #60a5fa; }
+[data-theme="dark"] .cert-tur-trigger.cert-tur-trigger--open { border-color: #60a5fa; box-shadow: 0 0 0 2px rgba(96,165,250,0.15); }
+[data-theme="dark"] .cert-tur-label { color: #f1f5f9; }
+[data-theme="dark"] .cert-tur-label--placeholder { color: #94a3b8; }
+[data-theme="dark"] .cert-tur-chevron { color: #94a3b8; }
+[data-theme="dark"] .cert-tur-menu { background: #1e293b; border-color: #334155; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+[data-theme="dark"] .cert-tur-option { color: #f1f5f9; }
+[data-theme="dark"] .cert-tur-option:hover { background: #273549; }
+[data-theme="dark"] .cert-tur-option__desc { color: #94a3b8; }
+[data-theme="dark"] .cert-tur-option--active { color: #60a5fa; }
+[data-theme="dark"] .cert-tur-option .material-symbols-outlined { color: #60a5fa; }
+[data-theme="dark"] .cmp-cert-diger-input { background: #1e293b; border-color: #334155; color: #f1f5f9; }
+[data-theme="dark"] .cmp-cert-diger-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px rgba(96,165,250,0.15); }
+[data-theme="dark"] .cmp-cert-file-label { background: #273549; border-color: #334155; color: #cbd5e1; }
+[data-theme="dark"] .cmp-cert-file-label:hover { border-color: #60a5fa; background: rgba(96,165,250,0.08); }
+[data-theme="dark"] .cmp-cert-talep-item { background: #1e293b; border-color: #334155; }
+[data-theme="dark"] .cmp-cert-talep-tur { color: #f1f5f9; }
+[data-theme="dark"] .cmp-cert-feedback--ok { background: rgba(21,128,61,0.12); border-color: rgba(21,128,61,0.3); color: #86efac; }
+[data-theme="dark"] .cmp-cert-feedback--err { background: rgba(185,28,28,0.12); border-color: rgba(185,28,28,0.3); color: #fca5a5; }
+
+/* ── MOBILE ───────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .cmp-cert-file-row { flex-wrap: wrap; }
+    .cmp-cert-badge { font-size: 0.75rem; padding: 3px 8px; }
+}

@@ -1,6 +1,5 @@
 // Enes Doğanay | 6 Mayıs 2026: FirmaDetay Supabase servis katmanı
 import { supabase } from '../../../supabaseClient';
-import { getManagedCompanyId } from '../../../services/companyManagementApi';
 
 export async function fetchFirmaById(id) {
     const { data, error } = await supabase
@@ -43,7 +42,8 @@ export async function fetchUserSessionData(firmaId) {
         supabase.from('kullanici_listeleri').select('*').eq('user_id', session.user.id).order('created_at', { ascending: true }),
         supabase.from('kullanici_favorileri').select('*').eq('user_id', session.user.id).eq('firma_id', firmaId).maybeSingle(),
         supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', session.user.id).eq('firma_id', String(firmaId)).neq('status', 'cancelled').order('reminder_at', { ascending: true }),
-        getManagedCompanyId()
+        // Enes Doğanay | 12 Mayıs 2026: Sadece owner rolü — manager/editor butonu görmez
+        supabase.from('kurumsal_firma_yoneticileri').select('firma_id').eq('user_id', session.user.id).eq('role', 'owner').maybeSingle().then(r => r.data?.firma_id || null),
     ]);
 
     return {

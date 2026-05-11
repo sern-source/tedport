@@ -307,7 +307,9 @@
   }
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Paragraf boyutu 0.9rem */
 .about-page-wrapper .about-section-header p {
+  font-size: 0.9rem;
   color: var(--text-gray);
   margin: 0;
 }
@@ -382,7 +384,9 @@
   margin: 0;
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Paragraf boyutu 0.9rem */
 .about-page-wrapper .about-value-card p {
+  font-size: 0.9rem;
   color: var(--text-gray);
   line-height: 1.6;
   margin: 0;

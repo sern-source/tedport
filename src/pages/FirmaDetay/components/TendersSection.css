@@ -1,25 +1,35 @@
 /* Enes Doganay | 6 Mayis 2026: TendersSection bilesen stilleri */
 /* ========== TENDER/-�HALE STYLES-� ========== */
 /* Enes Do-sanay | 4 Nisan 2026: Firma ihalelerini listelemek i+gin stiller */
+/* Enes Doğanay | 19 Mayıs 2026: Kart-tipi tender listesi */
 .tenders-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
+  gap: 6px;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
-/* Enes Do-sanay | 4 May-�s 2026: Kompakt tek sat-�r ihale kart-� */
+/* Enes Doğanay | 19 Mayıs 2026: Mini-kart ihale satırı */
 .tender-item {
-  padding: 11px 16px;
-  background: var(--bg-white);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  border-radius: 10px;
+  border-left: 3px solid transparent;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(3px);
+  transition: box-shadow 0.18s, border-color 0.18s, transform 0.15s;
 }
-.tender-item:last-child { border-bottom: none; }
+.tender-item:last-child { border-bottom: 1px solid rgba(226, 232, 240, 0.85); }
 
-.tender-item:hover { background: var(--bg-hover, #f8fafc); }
+.tender-item:hover {
+  background: rgba(248, 250, 255, 0.95);
+  border-left-color: var(--primary, #137fec);
+  box-shadow: 0 3px 14px rgba(19, 127, 236, 0.1), 0 1px 4px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
 
 .tender-item--clickable { cursor: pointer; }
 .tender-item--clickable:hover .tender-item-title { color: var(--primary, #137fec); }
@@ -347,8 +357,17 @@
 }
 
 /* Tender skeleton */
-[data-theme="dark"] .tender-item { background: var(--bg-white); }
-[data-theme="dark"] .tender-item:hover { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .tender-item {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(51, 65, 85, 0.8);
+  border-left-color: transparent;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+[data-theme="dark"] .tender-item:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-left-color: var(--primary, #137fec);
+  box-shadow: 0 3px 14px rgba(19, 127, 236, 0.18), 0 1px 4px rgba(0,0,0,0.2);
+}
 [data-theme="dark"] .tender-item-title { color: #e2e8f0; }
 [data-theme="dark"] .tender-item-skeleton {
   background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);

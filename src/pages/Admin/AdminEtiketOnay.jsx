@@ -4,12 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
 import { isAdminEmail } from './adminAccess';
 import { resolveIsAdminUser } from '../../services/corporateApplicationsApi';
+// Enes Doğanay | 12 Mayıs 2026: Sertifika servis fonksiyonları
+import { fetchSertifikaTalepleri, approveSertifikaTalebi, rejectSertifikaTalebi } from '../../services/sertifikaService';
+// Enes Doğanay | 12 Mayıs 2026: Sertifika türü renk meta
+import { SERTIFIKA_META } from '../../constants/sertifikaConstants';
 import PageLoader from '../../components/PageLoader';
 import './AdminEtiketOnay.css';
 
 const TABS = [
-  { key: 'etiket', label: 'Etiket Talepleri',  icon: 'label' },
-  { key: 'logo',   label: 'Logo Talepleri',     icon: 'image' },
+  { key: 'etiket',     label: 'Etiket Talepleri',     icon: 'label'              },
+  { key: 'logo',       label: 'Logo Talepleri',         icon: 'image'              },
+  // Enes Doğanay | 12 Mayıs 2026: Sertifika talepleri onay tabı
+  { key: 'sertifika',  label: 'Sertifika Talepleri',   icon: 'workspace_premium'  },
 ];
 
 export default function AdminEtiketOnay() {
@@ -23,6 +29,12 @@ export default function AdminEtiketOnay() {
   // ── Logo talepleri state ──
   const [logolar, setLogolar]         = useState([]);
   const [logoLoad, setLogoLoad]       = useState(true);
+
+  // Enes Doğanay | 12 Mayıs 2026: Sertifika talepleri state
+  const [sertifikaTalepleri, setSertifikaTalepleri] = useState([]);
+  const [sertifikaLoad, setSertifikaLoad]           = useState(true);
+  // Geçerlilik tarihi her talep için ayrı saklanır
+  const [gecerlilikTarihleri, setGecerlilikTarihleri] = useState({});
 
   const [tab, setTab]                 = useState('etiket');
   const [actionId, setActionId]       = useState(null); // talep id işleniyor
@@ -64,11 +76,25 @@ export default function AdminEtiketOnay() {
     setLogoLoad(false);
   }, []);
 
+  // Enes Doğanay | 12 Mayıs 2026: Sertifika taleplerini çek
+  const fetchSertifikalar = useCallback(async () => {
+    setSertifikaLoad(true);
+    try {
+      const data = await fetchSertifikaTalepleri();
+      setSertifikaTalepleri(data);
+    } catch (err) {
+      console.error('Sertifika talepleri yüklenemedi:', err.message);
+    } finally {
+      setSertifikaLoad(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!authChecked) return;
     fetchEtiketler();
     fetchLogolar();
-  }, [authChecked, fetchEtiketler, fetchLogolar]);
+    fetchSertifikalar();
+  }, [authChecked, fetchEtiketler, fetchLogolar, fetchSertifikalar]);
 
   if (!authChecked) return <PageLoader />;
 
@@ -150,8 +176,47 @@ export default function AdminEtiketOnay() {
     setRejectNote('');
   };
 
+  // Enes Doğanay | 12 Mayıs 2026: Sertifika onayla
+  const approveSertifika = async (talep) => {
+    setActionId(talep.id);
+    try {
+      await approveSertifikaTalebi(talep.id, gecerlilikTarihleri[talep.id] || null);
+      setSertifikaTalepleri(prev =>
+        prev.map(t => t.id === talep.id
+          ? { ...t, durum: 'onaylandi', gecerlilik_tarihi: gecerlilikTarihleri[talep.id] || null }
+          : t
+        )
+      );
+    } catch (err) {
+      alert('Sertifika onaylanamıyor: ' + err.message);
+    } finally {
+      setActionId(null);
+    }
+  };
+
+  // Enes Doğanay | 12 Mayıs 2026: Sertifika reddet
+  const rejectSertifika = async () => {
+    if (!rejectTargetId) return;
+    setActionId(rejectTargetId);
+    try {
+      await rejectSertifikaTalebi(rejectTargetId, rejectNote);
+      setSertifikaTalepleri(prev =>
+        prev.map(t => t.id === rejectTargetId
+          ? { ...t, durum: 'reddedildi', admin_notu: rejectNote }
+          : t
+        )
+      );
+    } finally {
+      setActionId(null);
+      setRejectTargetId(null);
+      setRejectNote('');
+    }
+  };
+
   const pendingEtiket = etiketler.filter(t => t.durum === 'bekliyor').length;
   const pendingLogo   = logolar.length;
+  // Enes Doğanay | 12 Mayıs 2026: Bekleyen sertifika sayısı
+  const pendingSertifika = sertifikaTalepleri.filter(t => t.durum === 'bekliyor').length;
 
   return (
     <div className="aeo-page">
@@ -177,11 +242,14 @@ export default function AdminEtiketOnay() {
           >
             <span className="material-symbols-outlined">{t.icon}</span>
             {t.label}
-            {t.key === 'etiket' && pendingEtiket > 0 && (
+            {t.key === 'etiket'    && pendingEtiket    > 0 && (
               <span className="aeo-badge">{pendingEtiket}</span>
             )}
-            {t.key === 'logo' && pendingLogo > 0 && (
+            {t.key === 'logo'      && pendingLogo      > 0 && (
               <span className="aeo-badge">{pendingLogo}</span>
+            )}
+            {t.key === 'sertifika' && pendingSertifika > 0 && (
+              <span className="aeo-badge">{pendingSertifika}</span>
             )}
           </button>
         ))}
@@ -351,6 +419,139 @@ export default function AdminEtiketOnay() {
             </div>
           )
         )}
+
+        {/* Enes Doğanay | 12 Mayıs 2026: SERTIFIKA TALEPLERI ── */}
+        {tab === 'sertifika' && (
+          sertifikaLoad ? (
+            <div className="aeo-loading">
+              <span className="material-symbols-outlined aeo-spin">progress_activity</span>
+              Yükleniyor…
+            </div>
+          ) : sertifikaTalepleri.length === 0 ? (
+            <div className="aeo-empty">
+              <span className="material-symbols-outlined">workspace_premium</span>
+              <p>Henüz sertifika talebi yok.</p>
+            </div>
+          ) : (
+            <div className="aeo-list">
+              {sertifikaTalepleri.map(talep => {
+                const certLabel = talep.sertifika_turu === 'Diger'
+                  ? (talep.sertifika_turu_diger || 'Diğer')
+                  : talep.sertifika_turu;
+                const certMeta = SERTIFIKA_META[talep.sertifika_turu] || SERTIFIKA_META['Diger'];
+                return (
+                  <div key={talep.id} className={`aeo-card aeo-card--${talep.durum}`}>
+                    <div className="aeo-card-head">
+                      <div className="aeo-card-firm">
+                        <span className="material-symbols-outlined">business</span>
+                        <strong>{talep.firma_adi || `Firma #${talep.firma_id}`}</strong>
+                      </div>
+                      <span className={`aeo-status aeo-status--${talep.durum}`}>
+                        {talep.durum === 'bekliyor'   && <><span className="material-symbols-outlined">schedule</span> Bekliyor</>}
+                        {talep.durum === 'onaylandi'  && <><span className="material-symbols-outlined">check_circle</span> Onaylanıldı</>}
+                        {talep.durum === 'reddedildi' && <><span className="material-symbols-outlined">cancel</span> Reddedildi</>}
+                      </span>
+                    </div>
+
+                    {/* Sertifika türü badge */}
+                    <div className="aeo-sertifika-tur-row">
+                      <span
+                        className="aeo-sertifika-tur-badge"
+                        style={{ background: certMeta.bg, color: certMeta.color, border: `1px solid ${certMeta.border}` }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 15, fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+                        {certLabel}
+                      </span>
+                      <span className="aeo-cert-desc">{certMeta.desc}</span>
+                    </div>
+
+                    {/* Belge linki (varsa) */}
+                    {talep.belge_url && (
+                      <div className="aeo-card-note">
+                        <span className="material-symbols-outlined">description</span>
+                        <button
+                          type="button"
+                          className="aeo-cert-doc-link"
+                          onClick={async () => {
+                            const { data, error } = await supabase.storage
+                              .from('sertifika-belgeleri')
+                              .createSignedUrl(talep.belge_url, 3600);
+                            if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                            else alert('Dosya açılamadı: ' + (error?.message || 'Bilinmeyen hata'));
+                          }}
+                        >
+                          Belgeyi Görüntüle
+                        </button>
+                      </div>
+                    )}
+
+                    {talep.admin_notu && (
+                      <div className="aeo-card-note">
+                        <span className="material-symbols-outlined">sticky_note_2</span>
+                        {talep.admin_notu}
+                      </div>
+                    )}
+
+                    <div className="aeo-card-meta">
+                      {new Date(talep.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      {talep.gecerlilik_tarihi && (
+                        <> &middot; Geçerlilik: {new Date(talep.gecerlilik_tarihi).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' })}</>
+                      )}
+                    </div>
+
+                    {talep.durum === 'bekliyor' && (
+                      <>
+                        <div className="aeo-sertifika-approve-row">
+                          <label className="aeo-sertifika-date-label">
+                            <span className="material-symbols-outlined">calendar_today</span>
+                            Geçerlilik tarihi (isteğe bağlı)
+                          </label>
+                          <input
+                            type="date"
+                            className="aeo-sertifika-date-input"
+                            value={gecerlilikTarihleri[talep.id] || ''}
+                            onChange={e => setGecerlilikTarihleri(prev => ({ ...prev, [talep.id]: e.target.value }))}
+                          />
+                        </div>
+                        <div className="aeo-card-actions">
+                          <button
+                            className="aeo-btn aeo-btn--approve"
+                            onClick={() => approveSertifika(talep)}
+                            disabled={actionId === talep.id}
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined">
+                              {actionId === talep.id ? 'progress_activity' : 'check'}
+                            </span>
+                            Onayla
+                          </button>
+                          <button
+                            className="aeo-btn aeo-btn--reject"
+                            onClick={() => openReject(talep.id, 'sertifika')}
+                            disabled={!!actionId}
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined">close</span>
+                            Reddet
+                          </button>
+                          <button
+                            className="aeo-btn aeo-btn--ghost"
+                            onClick={() => navigate(`/firmadetay/${talep.firma_id}`)}
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined">open_in_new</span>
+                            Firmayı Görüntüle
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )
+        )}
+
       </div>
 
       {/* ── Reddetme Modal ── */}
@@ -374,7 +575,7 @@ export default function AdminEtiketOnay() {
               </button>
               <button
                 className="aeo-btn aeo-btn--reject"
-                onClick={rejectType === 'etiket' ? rejectEtiket : rejectLogo}
+                onClick={rejectType === 'etiket' ? rejectEtiket : rejectType === 'logo' ? rejectLogo : rejectSertifika}
                 disabled={!!actionId}
                 type="button"
               >
