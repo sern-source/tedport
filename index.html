@@ -24,9 +24,15 @@
       } catch (e) {}
     })();
   </script>
+  <!-- Enes Doğanay | 11 Mayıs 2026: preconnect ile Google Fonts bağlantısı önceden kurulur, font daha hızlı yüklenir -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+  <!-- Enes Doğanay | 11 Mayıs 2026: display=swap → display=block — ikon fontunda swap kullanmak ligature isimleri
+       (dark_mode, arrow_forward vb.) yükleme öncesi ham metin olarak gösterir. block ile ikon kısa süre görünmez
+       kalır (blank), bu metin gösteriminden çok daha az göze batar. -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
     rel="stylesheet" />
 </head>
 

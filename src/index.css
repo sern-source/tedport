@@ -77,6 +77,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Enes Doğanay | 11 Mayıs 2026: Material Symbols global base — tüm sayfalarda tutarlı ikon davranışı.
+   user-select:none → ikon metni seçilemesin, pointer-events:none → click'i parent'a bırak (gerektiğinde override et),
+   font-variation-settings → Google Fonts varsayılanı açıkça sabitle */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+  vertical-align: middle;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 /* Enes Doğanay | 9 Mayıs 2026: Herhangi bir modal/popup açıkken arka plan scroll engelle */
 body:has(.teklif-popup-overlay),
 body:has(.ekip-modal-overlay),
