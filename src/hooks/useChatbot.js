@@ -34,12 +34,9 @@ const useChatbot = () => {
         mq.addEventListener('change', handler);
         return () => mq.removeEventListener('change', handler);
     }, []);
-    // Enes Doğanay | 8 Mayıs 2026: Admin her zaman, firma profil tab'ları sadece mobilde gizlenir
-    const isFirmaProfil = location.pathname.startsWith('/firma-profil');
-    const currentTab = chatSearchParams.get('tab');
-    const isIhaleYonetimi = isFirmaProfil && currentTab === 'ihale-yonetimi';
-    const isTeklifYonetimi = isFirmaProfil && currentTab === 'teklifler';
-    const isHidden = location.pathname.startsWith('/admin') || (isMobile && (isIhaleYonetimi || isTeklifYonetimi));
+    // Enes Doğanay | 11 Mayıs 2026: Admin her zaman gizli, mobilde ana sayfa ('/') dışında gizli
+    const isHomePage = location.pathname === '/';
+    const isHidden = location.pathname.startsWith('/admin') || (isMobile && !isHomePage);
     const [open, setOpen] = useState(false);
     const [qaList, setQaList] = useState([]);
     const [quickQuestions, setQuickQuestions] = useState([]);

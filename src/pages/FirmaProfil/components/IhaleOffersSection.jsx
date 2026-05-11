@@ -1,14 +1,17 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklifler bölümü — toolbar + kart listesi + karşılaştırma
-import React from 'react';
+import React, { useState } from 'react';
 import IhaleOffersToolbar from './IhaleOffersToolbar';
 import IhaleOfferCard from './IhaleOfferCard';
 import IhaleCompareTable from './IhaleCompareTable';
+import OncekiTekliflerPopup from './OncekiTekliflerPopup';
 
 const IhaleOffersSection = ({ displayOffers, compareList, compareIds, compareHintDismissed, setCompareHintDismissed, selectedTender, displayState, setDisplayState, sortState, setSortState, sortDropdownRef, unread, shortlist, notes, highlightRef, highlightState, statusDropdownId, setStatusDropdownId, showScoringInfo, setShowScoringInfo, offerModals }) => {
     const handleToggleExpand = (id) => setDisplayState(p => ({ ...p, expandedId: p.expandedId === id ? null : id }));
     const handleBalanceChange = (val) => setDisplayState(p => ({ ...p, weights: { price: val, delivery: 100 - val } }));
     // Enes Doğanay | 7 Mayıs 2026: Karşılaştırma temizle — offerModals üzerinden hook'a ilet
     const handleClearCompare = () => offerModals.clearCompare?.();
+    // Enes Doğanay | 9 Mayıs 2026: Önceki teklifler popup state
+    const [revisionOffer, setRevisionOffer] = useState(null);
 
     // Enes Doğanay | 7 Mayıs 2026: Hiç teklif yoksa (filtre yokken de boş) toolbar olmadan boş state göster
     const hasAnyOffer = offerModals.rawOfferCount > 0;
@@ -104,6 +107,7 @@ const IhaleOffersSection = ({ displayOffers, compareList, compareIds, compareHin
                         onReject={() => offerModals.handleRejectOffer(offer.id)}
                         onStatusConfirm={offerModals.statusConfirm}
                         onNoteChange={offerModals.handleNoteChange}
+                        onOpenRevisions={setRevisionOffer}
                     />
                 ))}
             </div>
@@ -113,6 +117,14 @@ const IhaleOffersSection = ({ displayOffers, compareList, compareIds, compareHin
                     compareList={compareList}
                     weights={displayState.weights}
                     onClear={handleClearCompare}
+                />
+            )}
+
+            {/* Enes Doğanay | 9 Mayıs 2026: Önceki teklifler popup */}
+            {revisionOffer && (
+                <OncekiTekliflerPopup
+                    offer={revisionOffer}
+                    onClose={() => setRevisionOffer(null)}
                 />
             )}
         </>

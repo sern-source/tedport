@@ -8,18 +8,27 @@ const readSavedState = () => {
     catch { return null; }
 };
 
-// Enes Doğanay | 7 Mayıs 2026: Arama, filtre, sayfalama state + URL/sessionStorage senkron
+// Enes Doğanay | 11 Mayıs 2026: ?sector= URL paramı okunup sidebar Sektör filtresi pre-select edilir
 export const useFirmalarState = ({ currentUserId }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const savedState = readSavedState();
     const urlSearch = searchParams.get('search') || '';
+    const urlSector = searchParams.get('sector') || '';
     const urlPage = Number(searchParams.get('page')) || null;
+    const urlSearchMode = searchParams.get('searchMode') || '';
 
     const [search, setSearch] = useState(urlSearch || savedState?.search || '');
     const [debouncedSearch, setDebouncedSearch] = useState(urlSearch || savedState?.search || '');
-    const [filters, setFilters] = useState(savedState?.filters || { cities: [], categories: [], sectors: [] });
+    // Enes Doğanay | 11 Mayıs 2026: ?sector= varsa sektörü önceden seç — sessionStorage'a öncelik üstünde
+    const [filters, setFilters] = useState(() => {
+        const base = savedState?.filters || { cities: [], categories: [], sectors: [] };
+        if (urlSector) return { ...base, sectors: [decodeURIComponent(urlSector)] };
+        return base;
+    });
     const [page, setPage] = useState(urlPage || 1);
     const [sortMode, setSortMode] = useState(savedState?.sortMode || 'default');
+    const validModes = ['firma', 'urun'];
+    const [searchMode, setSearchMode] = useState(validModes.includes(urlSearchMode) ? urlSearchMode : 'all');
     const [viewMode, setViewMode] = useState('grid');
     const [toast, setToast] = useState(null);
     const { history: searchHistory, addToHistory, removeFromHistory, clearHistory } = useSearchHistory();
@@ -65,7 +74,7 @@ export const useFirmalarState = ({ currentUserId }) => {
 
     return {
         search, setSearch, debouncedSearch, filters, setFilters, page, setPage,
-        sortMode, setSortMode, viewMode, toggleViewMode,
+        sortMode, setSortMode, searchMode, setSearchMode, viewMode, toggleViewMode,
         searchHistory, addToHistory, removeFromHistory, clearHistory,
         activeTags, removeFilterTag, toast, setToast,
     };

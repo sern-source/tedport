@@ -98,12 +98,13 @@ body {
 .filter-chip--categories { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
 
 /* ── Paylaşımlı butonlar ─────────────────────────────────────────────── */
+/* Enes Doğanay | 11 Mayıs 2026: İletişime Geç butonu büyütüldü */
 .btn-outline, .btn-primary {
-  height: 26px;
-  padding: 0 0.6rem;
+  height: 30px;
+  padding: 0 0.75rem;
   border-radius: 6px;
   font-weight: 600;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
@@ -112,7 +113,7 @@ body {
 }
 
 @media (min-width: 540px) {
-  .btn-outline, .btn-primary { height: 28px; padding: 0 0.7rem; font-size: 0.68rem; }
+  .btn-outline, .btn-primary { height: 32px; padding: 0 0.85rem; font-size: 0.75rem; }
 }
 
 .btn-outline {

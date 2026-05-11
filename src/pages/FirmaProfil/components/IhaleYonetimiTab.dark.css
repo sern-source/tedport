@@ -94,6 +94,18 @@
 [data-theme="dark"] .tom-deadline--urgent { color: #f87171 !important; }
 [data-theme="dark"] .tom-deadline--past   { color: #94a3b8 !important; }
 
+/* Enes Doğanay | 9 Mayıs 2026: Sidebar sıralama dropdown dark */
+[data-theme="dark"] .tom-sidebar-sort-trigger { background: #0f172a; border-color: #334155; color: #64748b; }
+[data-theme="dark"] .tom-sidebar-sort-trigger:hover { background: #1e293b; border-color: #3b9eff; color: #93c5fd; }
+[data-theme="dark"] .tom-sidebar-sort-menu { background: #1e293b; border-color: #334155; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+[data-theme="dark"] .tom-sidebar-sort-option { color: #94a3b8; }
+[data-theme="dark"] .tom-sidebar-sort-option .material-symbols-outlined { color: #475569; }
+[data-theme="dark"] .tom-sidebar-sort-option:hover { background: #1a2f4e; color: #93c5fd; }
+[data-theme="dark"] .tom-sidebar-sort-option:hover .material-symbols-outlined { color: #60a5fa; }
+[data-theme="dark"] .tom-sidebar-sort-option.active { background: rgba(37,99,235,0.12); color: #60a5fa; }
+[data-theme="dark"] .tom-sidebar-sort-option.active .material-symbols-outlined { color: #3b82f6; }
+[data-theme="dark"] .tom-sidebar-sort-check { color: #3b82f6 !important; }
+
 /* Main area */
 [data-theme="dark"] .tom-main {
   background: #0f172a;

@@ -3,26 +3,43 @@ import React, { useState } from 'react';
 import { SEKTORLER } from '../utils/firmaUtils';
 import './FirmaFilterSidebar.css';
 
+// Enes Doğanay | 11 Mayıs 2026: Pill chip filtreler — checkbox yerine modern pill toggle
 const FilterSection = ({ title, items, selected, search, onSearch, expandedCount, onExpand, onToggle }) => {
   const filtered = items.filter(item =>
     item.toLocaleLowerCase('tr-TR').includes(search.toLocaleLowerCase('tr-TR'))
   );
+  const selectedCount = selected.length;
   return (
     <details>
-      <summary>{title} <span className="material-symbols-outlined">expand_more</span></summary>
+      <summary>
+        <span className="fs-summary-left">
+          {title}
+          {selectedCount > 0 && <span className="fs-count-badge">{selectedCount}</span>}
+        </span>
+        <span className="material-symbols-outlined">expand_more</span>
+      </summary>
       <div className="filter-content">
         <input
           type="text" placeholder={`${title} ara...`} value={search}
           onChange={e => onSearch(e.target.value)} className="filter-search-input"
         />
-        {filtered.slice(0, expandedCount).map(item => (
-          <label key={item}>
-            <input type="checkbox" checked={selected.includes(item)} onChange={() => onToggle(item)} />
-            {item}
-          </label>
-        ))}
+        <div className="fs-pills">
+          {filtered.slice(0, expandedCount).map(item => (
+            <button
+              key={item}
+              type="button"
+              className={`fs-pill${selected.includes(item) ? ' fs-pill--on' : ''}`}
+              onClick={() => onToggle(item)}
+            >
+              {selected.includes(item) && <span className="material-symbols-outlined">check</span>}
+              {item}
+            </button>
+          ))}
+        </div>
         {filtered.length > expandedCount && (
-          <button onClick={() => onExpand(filtered.length)} className="filter-show-more-btn">Daha fazla göster</button>
+          <button onClick={() => onExpand(filtered.length)} className="filter-show-more-btn">
+            +{filtered.length - expandedCount} daha göster
+          </button>
         )}
       </div>
     </details>

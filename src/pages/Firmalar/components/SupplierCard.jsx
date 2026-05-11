@@ -25,15 +25,21 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
 
   return (
     <div className="supplier-card">
-      <button
-        className={`card-fav-btn${isFavorited ? ' card-fav-btn--active' : ''}`}
-        onClick={(e) => { e.stopPropagation(); onToggleFavorite(supplier.id); }}
-        aria-label={!isLoggedIn ? 'Giriş yapın' : isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
-        type="button"
-        disabled={!isLoggedIn}
-      >
-        <span className="material-symbols-outlined">{isFavorited ? 'bookmark_added' : 'bookmark_add'}</span>
-      </button>
+      {/* Enes Doğanay | 11 Mayıs 2026: Fav wrapper — tooltip pozisyonlaması için */}
+      <div className="card-fav-wrap">
+        <button
+          className={`card-fav-btn${isFavorited ? ' card-fav-btn--active' : ''}`}
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(supplier.id); }}
+          aria-label={!isLoggedIn ? 'Giriş yapın' : isFavorited ? 'Favorilerden Çıkar' : 'Favorilere Ekle'}
+          type="button"
+          disabled={!isLoggedIn}
+        >
+          <span className="material-symbols-outlined">{isFavorited ? 'bookmark_added' : 'bookmark_add'}</span>
+        </button>
+        <span className="card-fav-tooltip">
+          {!isLoggedIn ? 'Favori için giriş yapın' : isFavorited ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+        </span>
+      </div>
 
       <a href={`/firmadetay/${supplier.id}`} className="card-images" onClick={handleNavigate}>
         <div className="main-image">

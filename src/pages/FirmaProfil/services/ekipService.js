@@ -24,7 +24,7 @@ export const fetchEkip = async (companyId) => {
 
   const { data: rawEkip } = await supabase
     .from('kurumsal_firma_yoneticileri')
-    .select('user_id, role, title, created_at, is_public, page_permissions')
+    .select('user_id, role, title, created_at, is_public, show_email, page_permissions')
     .eq('firma_id', String(companyId));
 
   let ekipList = [];
@@ -32,14 +32,16 @@ export const fetchEkip = async (companyId) => {
     const userIds = rawEkip.map((r) => r.user_id);
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, first_name, last_name')
+      .select('id, first_name, last_name, email')
       .in('id', userIds);
     const profileMap = Object.fromEntries((profiles || []).map((p) => [p.id, p]));
     ekipList = rawEkip.map((r) => ({
       ...r,
       first_name: profileMap[r.user_id]?.first_name || '',
       last_name: profileMap[r.user_id]?.last_name || '',
+      email: profileMap[r.user_id]?.email || '',
       is_public: r.is_public !== false,
+      show_email: r.show_email === true,
       page_permissions: r.page_permissions || DEFAULT_PERMS,
     }));
   }
@@ -141,6 +143,16 @@ export const updateMemberPermissions = async (targetUserId, companyId, permissio
   const { error } = await supabase
     .from('kurumsal_firma_yoneticileri')
     .update({ page_permissions: permissions })
+    .eq('user_id', targetUserId)
+    .eq('firma_id', String(companyId));
+  if (error) throw new Error(error.message);
+};
+
+/* Enes Doğanay | 9 Mayıs 2026: Üye e-posta görünürlük toggle */
+export const toggleMemberEmailVisibility = async (targetUserId, companyId, newValue) => {
+  const { error } = await supabase
+    .from('kurumsal_firma_yoneticileri')
+    .update({ show_email: newValue })
     .eq('user_id', targetUserId)
     .eq('firma_id', String(companyId));
   if (error) throw new Error(error.message);

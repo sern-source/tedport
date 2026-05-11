@@ -6,6 +6,8 @@ import IhaleEditModal from './IhaleEditModal';
 import SharedReportModal from '../../../components/SharedReportModal';
 import IhaleFormModal from '../../Ihaleler/components/IhaleFormModal';
 import IhalePopups from './IhalePopups';
+// Enes Doğanay | 11 Mayıs 2026: Şablon modal
+import IhaleTemplateModal from './IhaleTemplateModal';
 
 const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offerActions, selectedTender, isTenderClosed, getUserId }) => (
     <>
@@ -49,6 +51,7 @@ const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offer
             stepperStep={create.stepperStep} setStepperStep={create.setStepperStep}
             yeniGereksinimMadde={create.yeniGereksinimMadde} setYeniGereksinimMadde={create.setYeniGereksinimMadde}
             yeniGereksinimAciklama={create.yeniGereksinimAciklama} setYeniGereksinimAciklama={create.setYeniGereksinimAciklama}
+            yeniGereksinimAdet={create.yeniGereksinimAdet} setYeniGereksinimAdet={create.setYeniGereksinimAdet}
             emailInput={create.emailInput} emailStatus={create.emailStatus}
             firmaSearchTerm={create.firmaSearchTerm} firmaSearchResults={create.firmaSearchResults}
             firmaSearching={create.firmaSearching} fileInputRef={create.fileInputRef}
@@ -59,6 +62,7 @@ const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offer
             addEmail={create.addEmail} removeEmail={create.removeEmail}
             handleFirmaSearch={create.handleFirmaSearch} addDavetliFirma={create.addDavetliFirma} removeDavetliFirma={create.removeDavetliFirma}
             handleFileAdd={create.handleFileAdd} removeFile={create.removeFile} handleFormSubmit={create.handleFormSubmit}
+            templateHook={create.templateHook}
         />
         <IhalePopups
             rejectNoteState={offerModals.rejectNoteState} setRejectNoteState={offerModals.setRejectNoteState}
@@ -76,6 +80,25 @@ const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offer
             publishState={create.publishState} setPublishState={create.setPublishState}
             showScoringInfo={offerActions.showScoringInfo} setShowScoringInfo={offerActions.setShowScoringInfo}
             selectedTender={selectedTender}
+        />
+        {/* Enes Doğanay | 11 Mayıs 2026: Şablon seç / kaydet modalı */}
+        <IhaleTemplateModal
+            showModal={create.templateHook?.showModal}
+            modalMode={create.templateHook?.modalMode}
+            templates={create.templateHook?.templates || []}
+            loading={create.templateHook?.loading}
+            error={create.templateHook?.error}
+            saveName={create.templateHook?.saveName}
+            setSaveName={create.templateHook?.setSaveName}
+            saving={create.templateHook?.saving}
+            saveSuccess={create.templateHook?.saveSuccess}
+            deleteConfirmId={create.templateHook?.deleteConfirmId}
+            setDeleteConfirmId={create.templateHook?.setDeleteConfirmId}
+            currentForm={create.form}
+            onClose={create.templateHook?.closeModal}
+            onApplyTemplate={create.applyTemplate}
+            onSaveTemplate={create.templateHook?.handleSaveTemplate}
+            onDeleteTemplate={create.templateHook?.handleDeleteTemplate}
         />
     </>
 );

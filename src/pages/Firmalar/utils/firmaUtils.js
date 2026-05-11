@@ -1,12 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Firmalar sayfası yardımcı sabitler ve saf fonksiyonlar
 import { TURKEY_DISTRICTS } from '../../../constants/turkeyDistricts';
-
-export const SEKTORLER = [
-  'Makine', 'Metal', 'Otomasyon', 'Elektrik', 'Elektronik', 'Enerji',
-  'Mekanik', 'Hırdavat', 'İnşaat', 'Kimya', 'Plastik', 'Ambalaj',
-  'Lojistik', 'Tekstil', 'Gıda', 'Otomotiv', 'Medikal', 'Bilişim',
-  'Güvenlik', 'Hizmet'
-];
+// Enes Doğanay | 11 Mayıs 2026: Sektör verisi ayrı dosyaya taşındı — firmaUtils saf fonksiyonlara odaklanır
+export { SEKTORLER, getSektorKeywords } from './sektorData';
 
 export const ISTANBUL_AVRUPA = [
   'Arnavutköy', 'Avcılar', 'Bağcılar', 'Bahçelievler', 'Bakırköy', 'Başakşehir',

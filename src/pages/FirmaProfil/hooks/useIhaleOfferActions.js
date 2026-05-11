@@ -6,7 +6,7 @@ import { calculateOfferScore, getOfferStatus, formatMoney } from '../constants/i
 const useIhaleOfferActions = ({ rawOffers, selectedTender }) => {
     const [sortState, setSortState] = useState({ open: false, value: 'score' });
     const [compareState, setCompareState] = useState({ ids: [], hintDismissed: localStorage.getItem('tom_compare_hint_never') === '1' || sessionStorage.getItem('tom_compare_hint_dismissed') === '1' });
-    const [displayState, setDisplayState] = useState({ filter: 'all', expandedId: null, showScorePanel: false, weights: { price: 55, delivery: 45 } });
+    const [displayState, setDisplayState] = useState({ filter: 'all', expandedId: null, showScorePanel: false, weights: { price: 50, delivery: 50 } });
     const [shortlist, setShortlist] = useState(() => { try { return JSON.parse(localStorage.getItem('tedport_shortlist_offer_ids') || '[]'); } catch { return []; } });
     const [notes, setNotes] = useState({});
     const [showScoringInfo, setShowScoringInfo] = useState(false);

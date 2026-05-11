@@ -30,6 +30,8 @@ export function useFirmaDetay(id) {
     const [detaySearch, setDetaySearch] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [noResults, setNoResults] = useState(false);
+    // Enes Doğanay | 11 Mayıs 2026: Gelişmiş arama modu — firmalar sayfasına yönlendirmede kullanılır
+    const [detaySearchMode, setDetaySearchMode] = useState('all');
     const [showQuoteModal, setShowQuoteModal] = useState(false);
     const [quoteForm, setQuoteFormState] = useState(EMPTY_QUOTE_FORM);
     const [quoteSending, setQuoteSending] = useState(false);
@@ -99,7 +101,13 @@ export function useFirmaDetay(id) {
     }, [detaySearch]);
 
     const handleSuggestionClick = (item) => { setSuggestions([]); setNoResults(false); if (!item) return; setDetaySearch(''); navigate(`/firmadetay/${item.id}`); };
-    const handleSearchSubmit = (term) => { setSuggestions([]); setNoResults(false); if (term.trim().length >= 2) navigate(`/firmalar?search=${encodeURIComponent(term.trim())}`); };
+    const handleSearchSubmit = (term) => {
+        setSuggestions([]); setNoResults(false);
+        if (term.trim().length < 2) return;
+        // Enes Doğanay | 11 Mayıs 2026: searchMode URL param olarak firmalar sayfasına taşınır
+        const modeParam = detaySearchMode !== 'all' ? `&searchMode=${detaySearchMode}` : '';
+        navigate(`/firmalar?search=${encodeURIComponent(term.trim())}${modeParam}`);
+    };
     const toggleCategory = (categoryKey) => { const next = new Set(expandedCategories); if (next.has(categoryKey)) next.delete(categoryKey); else next.add(categoryKey); setExpandedCategories(next); };
     const setQuoteField = (field, value) => setQuoteFormState(prev => ({ ...prev, [field]: value }));
 
@@ -126,6 +134,7 @@ export function useFirmaDetay(id) {
         tenders, tendersLoading, isTendersTableMissing, showAllTenders, setShowAllTenders, TENDERS_PREVIEW,
         expandedCategories, toggleCategory, parseHiyerarsikKategoriler,
         detaySearch, setDetaySearch, suggestions, noResults,
+        detaySearchMode, setDetaySearchMode,
         handleSuggestionClick, handleSearchSubmit,
         showQuoteModal, setShowQuoteModal, quoteForm, setQuoteField,
         quoteSending, quoteSent, quoteFile, setQuoteFile, handleSendQuoteRequest,

@@ -19,7 +19,7 @@ const PreviewSection = ({ icon, label, tags }) => (
 
 const formatDate = d => d ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
 
-const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, handleFormSubmit }) => (
+const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, handleFormSubmit, onOpenSaveTemplate }) => (
     <div className="ihale-step-content ihale-preview">
         <div className="ihale-preview__card">
             <div className="ihale-preview__header">
@@ -47,7 +47,12 @@ const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, h
                     <strong><span className="material-symbols-outlined">checklist</span> Gereksinimler ({form.gereksinimler.length})</strong>
                     <ul>
                         {form.gereksinimler.map((g, i) => (
-                            <li key={g.id}><span>{i + 1}.</span> {g.madde}{g.aciklama ? ` — ${g.aciklama}` : ''}</li>
+                            // Enes Doğanay | 9 Mayıs 2026: Önizlemede adet badge göster
+                            <li key={g.id}>
+                                <span>{i + 1}.</span>
+                                {g.madde}{g.aciklama ? ` — ${g.aciklama}` : ''}
+                                <span className="ihale-preview__adet-badge">{g.adet || 1} adet</span>
+                            </li>
                         ))}
                     </ul>
                 </div>
@@ -65,6 +70,13 @@ const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, h
         {formError && <p className="ihale-form-error">{formError}</p>}
         <div className="ihale-modal__footer ihale-modal__footer--preview">
             <button type="button" className="ihale-btn-cancel" onClick={onClose}>İptal</button>
+            {/* Enes Doğanay | 11 Mayıs 2026: Şablon kaydet butonu — context varsa her zaman göster */}
+            {onOpenSaveTemplate && (
+                <button type="button" className="ihale-btn-template" onClick={onOpenSaveTemplate}>
+                    <span className="material-symbols-outlined">bookmark_add</span>
+                    Şablon Kaydet
+                </button>
+            )}
             <button type="button" className="ihale-btn-draft" disabled={formSaving} onClick={() => handleFormSubmit(null, 'draft')}>
                 <span className="material-symbols-outlined">save</span>
                 {formSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}

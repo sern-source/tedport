@@ -1,10 +1,31 @@
 // Enes Doğanay | 6 Mayıs 2026: Sol panel — ihale listesi, arama, filtreler, sayfalama
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { getTenderStatus, daysUntil, TOM_PAGE_SIZE } from '../constants/ihaleConstants';
 
-const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnreadSet, tenderSearch, setTenderSearch, tenderFilter, setTenderFilter, tenderPage, setTenderPage, onSelectTender, onNewTender }) => {
+// Enes Doğanay | 9 Mayıs 2026: Sidebar sıralama seçenekleri
+const SIDEBAR_SORT_OPTIONS = [
+    { value: 'date',         label: 'En Yeni',         icon: 'schedule' },
+    { value: 'name-asc',    label: 'A → Z',           icon: 'sort_by_alpha' },
+    { value: 'name-desc',   label: 'Z → A',           icon: 'sort_by_alpha' },
+    { value: 'deadline',    label: 'Son Başvuru',      icon: 'event_busy' },
+    { value: 'offers-desc', label: 'Teklif Sayısı',   icon: 'mail' },
+];
+
+const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnreadSet, tenderSearch, setTenderSearch, tenderFilter, setTenderFilter, tenderPage, setTenderPage, sidebarSort, setSidebarSort, onSelectTender, onNewTender }) => {
     const totalPages = Math.ceil(filteredTenders.length / TOM_PAGE_SIZE);
     const visibleTenders = filteredTenders.slice((tenderPage - 1) * TOM_PAGE_SIZE, tenderPage * TOM_PAGE_SIZE);
+
+    // Enes Doğanay | 9 Mayıs 2026: Sıralama dropdown — dışarı tıklayınca kapansın
+    const [sortOpen, setSortOpen] = useState(false);
+    const sortRef = useRef(null);
+    useEffect(() => {
+        if (!sortOpen) return;
+        const handler = (e) => { if (sortRef.current && !sortRef.current.contains(e.target)) setSortOpen(false); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [sortOpen]);
+
+    const activeSortLabel = SIDEBAR_SORT_OPTIONS.find(o => o.value === sidebarSort)?.label || 'Sırala';
 
     return (
         <aside className="tom-sidebar">
@@ -36,6 +57,28 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
                         <span className="material-symbols-outlined">{f.icon}</span>{f.label}
                     </button>
                 ))}
+            </div>
+
+            {/* Enes Doğanay | 9 Mayıs 2026: Sıralama dropdown */}
+            <div className="tom-sidebar-sort-wrap" ref={sortRef}>
+                <button type="button" className="tom-sidebar-sort-trigger" onClick={() => setSortOpen(p => !p)}>
+                    <span className="material-symbols-outlined">sort</span>
+                    <span className="tom-sidebar-sort-label">{activeSortLabel}</span>
+                    <span className={`material-symbols-outlined tom-sidebar-sort-chevron${sortOpen ? ' open' : ''}`}>expand_more</span>
+                </button>
+                {sortOpen && (
+                    <div className="tom-sidebar-sort-menu">
+                        {SIDEBAR_SORT_OPTIONS.map(opt => (
+                            <button key={opt.value} type="button"
+                                className={`tom-sidebar-sort-option${sidebarSort === opt.value ? ' active' : ''}`}
+                                onClick={() => { setSidebarSort(opt.value); setSortOpen(false); setTenderPage(1); }}>
+                                <span className="material-symbols-outlined">{opt.icon}</span>
+                                {opt.label}
+                                {sidebarSort === opt.value && <span className="material-symbols-outlined tom-sidebar-sort-check">check</span>}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="tom-sidebar__list">

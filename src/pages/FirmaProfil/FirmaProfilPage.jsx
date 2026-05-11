@@ -56,6 +56,9 @@ const FirmaProfilPage = () => {
     if (currentTab !== 'ihale-yonetimi') setActiveViewingTeklifId(null);
   }, [currentTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Enes Doğanay | 11 Mayıs 2026: Sayfa unmount — ref sıfırla (sayfadan çıkış toast'ları bastırmasın)
+  useEffect(() => { return () => { setActiveViewingTeklifId(null); }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (loading) return <PageLoader />;
 
   return (

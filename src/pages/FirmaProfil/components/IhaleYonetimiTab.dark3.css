@@ -178,6 +178,18 @@
 [data-theme="dark"] .tom-status-dropdown button { color: #94a3b8; }
 [data-theme="dark"] .tom-status-dropdown button:hover { background: #253347; color: #e2e8f0; }
 
+/* Enes Doğanay | 9 Mayıs 2026: Önceki teklifler butonu dark */
+[data-theme="dark"] .tom-btn--revisions {
+    background: rgba(99,102,241,0.1);
+    border-color: rgba(99,102,241,0.25);
+    color: #a5b4fc;
+}
+[data-theme="dark"] .tom-btn--revisions:hover {
+    background: rgba(99,102,241,0.2);
+    border-color: #818cf8;
+}
+[data-theme="dark"] .tom-btn-revisions__count { background: #6366f1; }
+
 /* ══════════════════════════════════════════════════
    DARK MODE — OKUNMAMIŞ MESAJ GÖSTERGELERİ
    ══════════════════════════════════════════════════ */

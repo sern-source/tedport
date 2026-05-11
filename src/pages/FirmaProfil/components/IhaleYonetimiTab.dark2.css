@@ -142,6 +142,9 @@
 [data-theme="dark"] .tom-score-panel__head p { color: #94a3b8; }
 [data-theme="dark"] .tom-slider-row__label span { color: #94a3b8; }
 [data-theme="dark"] .tom-slider-row input[type="range"] { background: #334155; }
+/* Enes Doğanay | 9 Mayıs 2026: Sıfırla butonu dark */
+[data-theme="dark"] .tom-score-reset-btn { border-color: #334155; color: #64748b; }
+[data-theme="dark"] .tom-score-reset-btn:hover { background: #1e293b; border-color: #475569; color: #94a3b8; }
 
 /* ══════════════════════════════════════════════════
    DARK MODE — GENİŞLETİLMİŞ DETAY (detail.css)
@@ -168,6 +171,9 @@
 [data-theme="dark"] .tom-kalemler__wrap th { background: #0f172a; color: #64748b; border-bottom-color: #334155; }
 [data-theme="dark"] .tom-kalemler__wrap td { color: #cbd5e1; border-bottom-color: #1e293b; }
 [data-theme="dark"] .tom-kalemler__wrap td strong { color: #f1f5f9; }
+/* Enes Doğanay | 9 Mayıs 2026: Zebra stripe dark */
+[data-theme="dark"] .tom-kalemler__wrap tbody tr:nth-child(odd)  { background: #1e293b; }
+[data-theme="dark"] .tom-kalemler__wrap tbody tr:nth-child(even) { background: #162030; }
 [data-theme="dark"] .tom-kalemler__wrap tbody tr:hover { background: #1a2f4e; }
 [data-theme="dark"] .tom-kalemler__grouped-total {
     background: linear-gradient(135deg, #1a2744, #14532d22);

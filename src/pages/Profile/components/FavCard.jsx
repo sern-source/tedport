@@ -1,17 +1,12 @@
-﻿// Enes Doğanay | 6 Mayıs 2026: FavCard — tek favori kart bileşeni (notlar dahil)
+﻿// Enes Doğanay | 6 Mayıs 2026: FavCard — tek favori kart bileşeni
 import React from 'react';
-import FavNoteSection from './FavNoteSection';
 import './FavCard.css';
-import './FavCard.notes.css';
 import './FavCard.dark.css';
+import './FavCard.notes.css';
 
 const FavCard = ({
-  fav, myLists, navigate, editingNoteId, editingSavedNoteId, tempNoteTitle, setTempNoteTitle,
-  tempNoteText, setTempNoteText, isSavingNote, expandedNoteIds, setExpandedNoteIds,
-  pendingDeleteNoteId, setPendingDeleteNoteId, saveFeedbackFavoriteId, openMenuId, setOpenMenuId,
-  assigningListId, setAssigningListId, setConfirmDelete,
-  handleInlineNoteSave, handleDeleteSavedNote, handleStartEditingSavedNote, handleAssignList,
-  setEditingNoteId, setEditingSavedNoteId, resetInlineNoteEditor,
+  fav, myLists, navigate, openMenuId, setOpenMenuId,
+  assigningListId, setAssigningListId, setConfirmDelete, handleAssignList,
 }) => (
   <div className="fav-card">
     <div className="fav-menu-wrapper">
@@ -64,7 +59,6 @@ const FavCard = ({
           <span className="fav-meta-text">{myLists.find(l => l.id === fav.liste_id)?.liste_adi || 'Liste'}</span>
         </div>
       )}
-      <FavNoteSection fav={fav} editingNoteId={editingNoteId} editingSavedNoteId={editingSavedNoteId} tempNoteTitle={tempNoteTitle} setTempNoteTitle={setTempNoteTitle} tempNoteText={tempNoteText} setTempNoteText={setTempNoteText} isSavingNote={isSavingNote} expandedNoteIds={expandedNoteIds} setExpandedNoteIds={setExpandedNoteIds} pendingDeleteNoteId={pendingDeleteNoteId} setPendingDeleteNoteId={setPendingDeleteNoteId} saveFeedbackFavoriteId={saveFeedbackFavoriteId} handleInlineNoteSave={handleInlineNoteSave} handleDeleteSavedNote={handleDeleteSavedNote} handleStartEditingSavedNote={handleStartEditingSavedNote} resetInlineNoteEditor={resetInlineNoteEditor} setEditingNoteId={setEditingNoteId} setEditingSavedNoteId={setEditingSavedNoteId} />
     </div>
     <div className="fav-actions">
       <button className="fav-btn-primary" onClick={() => navigate(`/firmadetay/${fav.firma_id}`)}>

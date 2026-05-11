@@ -5,6 +5,8 @@ const IhaleFormStep3 = ({
     form,
     yeniGereksinimMadde, setYeniGereksinimMadde,
     yeniGereksinimAciklama, setYeniGereksinimAciklama,
+    // Enes Doğanay | 9 Mayıs 2026: Adet alanı — default 1
+    yeniGereksinimAdet, setYeniGereksinimAdet,
     fileInputRef,
     addGereksinim, removeGereksinim,
     handleFileAdd, removeFile,
@@ -17,6 +19,14 @@ const IhaleFormStep3 = ({
             </span>
             <p className="ihale-section__desc">Kalem kalem gereksinimlerinizi ekleyin.</p>
             <div className="ihale-req-input-row">
+                {/* Enes Doğanay | 9 Mayıs 2026: Adet — öne taşındı, etiketli grup */}
+                <div className="ihale-req-adet-group">
+                    <span className="ihale-req-adet-prefix">Adet</span>
+                    <input type="number" min="1" value={yeniGereksinimAdet}
+                        onChange={e => setYeniGereksinimAdet(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addGereksinim(); } }}
+                        className="ihale-req-adet-input" />
+                </div>
                 <input type="text" placeholder="Gereksinim maddesi *" value={yeniGereksinimMadde}
                     onChange={e => setYeniGereksinimMadde(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addGereksinim(); } }} />
@@ -30,13 +40,14 @@ const IhaleFormStep3 = ({
             {form.gereksinimler.length > 0 && (
                 <div className="ihale-req-table">
                     <div className="ihale-req-table__header">
-                        <span>#</span><span>Madde</span><span>Açıklama</span><span></span>
+                        <span>#</span><span>Madde</span><span>Açıklama</span><span>Adet</span><span></span>
                     </div>
                     {form.gereksinimler.map((g, i) => (
                         <div key={g.id} className="ihale-req-table__row">
                             <span className="ihale-req-table__num">{i + 1}</span>
                             <span className="ihale-req-table__madde">{g.madde}</span>
                             <span className="ihale-req-table__aciklama">{g.aciklama || '—'}</span>
+                            <span className="ihale-req-table__adet">{g.adet || 1}</span>
                             <button type="button" className="ihale-req-table__remove" onClick={() => removeGereksinim(g.id)}>
                                 <span className="material-symbols-outlined">close</span>
                             </button>

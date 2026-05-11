@@ -83,7 +83,12 @@ export function useMopChat({ offers, tenderMap, firmaMap, firmaLogoMap, userProf
 
     useEffect(() => { onUnreadCountChange?.(unreadMopChatIds.size); }, [unreadMopChatIds, onUnreadCountChange]);
 
-    useEffect(() => { return () => { if (mopChatChannelRef.current) supabase.removeChannel(mopChatChannelRef.current); }; }, []);
+    useEffect(() => { return () => {
+        // Enes Doğanay | 11 Mayıs 2026: Unmount cleanup — stale activeViewingTeklifId ref'ini temizle
+        // Temizlenmezse başka sayfadaki toast bildirimleri bastırılır (isViewingThisChat yanlış true)
+        if (mopChatChannelRef.current) supabase.removeChannel(mopChatChannelRef.current);
+        setActiveViewingTeklifId?.(null);
+    }; }, []);
 
     const handleOpenMopChat = useCallback(async (offer, tenderTitle, firmaAdi, anonim, firmaLogo = null) => {
         if (mopChatChannelRef.current) { supabase.removeChannel(mopChatChannelRef.current); mopChatChannelRef.current = null; }

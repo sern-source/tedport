@@ -51,7 +51,7 @@ const TeklifMainPopup = ({
                         <h3><span className="material-symbols-outlined">local_shipping</span> Teslimat</h3>
                         <div className="teklif-popup__inline-row">
                             <div className="teklif-popup__inline-field"><label>Tahmini Teslim Süresi (gün)</label><input type="number" min="1" placeholder="ör: 15" value={teklifForm.teslim_suresi_gun} onChange={e => setTeklifForm(p => ({ ...p, teslim_suresi_gun: e.target.value }))} /></div>
-                            <div className="teklif-popup__inline-field teklif-popup__inline-field--grow"><label>Teslim Açıklaması</label><input type="text" placeholder="ör: Fabrikadan teslim, kargo dahil" value={teklifForm.teslim_aciklamasi} onChange={e => setTeklifForm(p => ({ ...p, teslim_aciklamasi: e.target.value }))} /></div>
+                            <div className="teklif-popup__inline-field teklif-popup__inline-field--grow"><label>Teslim Açıklaması <small className="teklif-popup__optional">(opsiyonel)</small></label><input type="text" placeholder="ör: Fabrikadan teslim, kargo dahil" value={teklifForm.teslim_aciklamasi} onChange={e => setTeklifForm(p => ({ ...p, teslim_aciklamasi: e.target.value }))} /></div>
                         </div>
                     </div>
                     <div className="teklif-popup__section">

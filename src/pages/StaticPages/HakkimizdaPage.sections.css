@@ -218,9 +218,11 @@
   }
 }
 
+/* Enes Doğanay | 11 Mayıs 2026: margin auto ile ortalandı */
 .about-page-wrapper .about-cta-inner {
   text-align: center;
   max-width: 800px;
+  margin: 0 auto;
 }
 
 .about-page-wrapper .about-cta-inner h2 {
@@ -264,12 +266,33 @@
   }
 }
 
+/* Enes Doğanay | 11 Mayıs 2026: icon+text flex desteği eklendi */
 .about-page-wrapper .about-btn-white {
   background-color: white;
   color: var(--primary);
   padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
   width: 100%;
+}
+
+.about-page-wrapper .about-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.18s;
+}
+
+.about-page-wrapper .about-btn-icon:hover {
+  opacity: 0.88;
+}
+
+.about-page-wrapper .about-btn-icon .material-symbols-outlined {
+  font-size: 18px;
 }
 
 @media (min-width: 640px) {

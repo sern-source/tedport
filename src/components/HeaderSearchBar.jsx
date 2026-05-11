@@ -1,5 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Arama çubuğu alt bileşeni — öneriler + arama geçmişi
 import React from 'react';
+import SearchModeToggle from './SearchModeToggle';
 
 const HeaderSearchBar = ({
     search, setSearch, onSearchSubmit,
@@ -8,28 +9,35 @@ const HeaderSearchBar = ({
     noResults,
     searchHistory, onHistorySelect, onHistoryRemove, onHistoryClear,
     searchBarRef,
+    // Enes Doğanay | 11 Mayıs 2026: Gelişmiş arama — sadece FirmalarPage'den gelir
+    searchMode = null, onSearchModeChange = null,
 }) => (
-    <div className="shared-search-bar" ref={searchBarRef}>
-        <div className="shared-search-icon">
-            <span className="material-symbols-outlined">search</span>
+    <div className={`shared-search-bar${searchMode ? ' shared-search-bar--advanced' : ''}`} ref={searchBarRef}>
+        {/* Enes Doğanay | 11 Mayıs 2026: Input row — ikon, input ve temizle butonu bir arada */}
+        <div className="shared-search-input-row">
+            <div className="shared-search-icon">
+                <span className="material-symbols-outlined">search</span>
+            </div>
+            <input
+                type="text"
+                aria-label="Firma, ürün ya da kategori ara"
+                placeholder="Firma, ürün ya da kategori ara..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' && onSearchSubmit) { onSearchSubmit(search); setSearchFocused(false); }
+                    if (e.key === 'Escape') setSearchFocused(false);
+                }}
+            />
+            {search && search.length > 0 && (
+                <button className="shared-search-clear" onClick={() => setSearch('')} type="button" aria-label="Aramayı temizle">
+                    <span className="material-symbols-outlined shared-search-clear-icon">close</span>
+                </button>
+            )}
         </div>
-        <input
-            type="text"
-            aria-label="Firma, ürün ya da kategori ara"
-            placeholder="Firma, ürün ya da kategori ara..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' && onSearchSubmit) { onSearchSubmit(search); setSearchFocused(false); }
-                if (e.key === 'Escape') setSearchFocused(false);
-            }}
-        />
-        {search && search.length > 0 && (
-            <button className="shared-search-clear" onClick={() => setSearch('')} type="button" aria-label="Aramayı temizle">
-                <span className="material-symbols-outlined shared-search-clear-icon">close</span>
-            </button>
-        )}
+        {/* Enes Doğanay | 11 Mayıs 2026: Mod toggle — input row'un altında ayrı satır */}
+        <SearchModeToggle searchMode={searchMode} onSearchModeChange={onSearchModeChange} />
         {suggestions.length > 0 && (
             <div className="shared-search-suggestions">
                 {suggestions.map((item) => (

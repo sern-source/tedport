@@ -498,6 +498,36 @@
 .ekip-visibility-btn--hidden { border-color: #e2e8f0; color: #94a3b8; }
 .ekip-visibility-btn--hidden:hover { background: #f8fafc; color: #64748b; }
 
+/* Enes Doğanay | 9 Mayıs 2026: E-posta görünürlük toggle butonu */
+.ekip-email-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ekip-email-btn .material-symbols-outlined { font-size: 16px; }
+.ekip-email-btn:hover { background: #f8fafc; color: #64748b; }
+.ekip-email-btn--on { border-color: #bfdbfe; color: #2563eb; }
+.ekip-email-btn--on:hover { background: #eff6ff; }
+
+/* Enes Doğanay | 9 Mayıs 2026: E-posta bilgisi — yönetim panelinde her zaman görünür */
+.ekip-card__email {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+.ekip-card__email .material-symbols-outlined { font-size: 13px; color: #94a3b8; }
+
 .ekip-card--hidden { opacity: 0.65; }
 
 .ekip-hidden-chip {

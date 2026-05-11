@@ -28,7 +28,7 @@ const FirmalarPage = () => {
           <button className="fl-toast-close" onClick={() => page.setToast(null)} aria-label="Kapat"><span className="material-symbols-outlined">close</span></button>
         </div>
       )}
-      <SharedHeader search={page.search} setSearch={page.setSearch} showSearchBar={true} searchHistory={page.searchHistory} onHistoryRemove={page.removeFromHistory} onHistoryClear={page.clearHistory} onHistorySelect={v => page.setSearch(v)} />
+      <SharedHeader search={page.search} setSearch={page.setSearch} showSearchBar={true} searchHistory={page.searchHistory} onHistoryRemove={page.removeFromHistory} onHistoryClear={page.clearHistory} onHistorySelect={v => page.setSearch(v)} searchMode={page.searchMode} onSearchModeChange={page.setSearchMode} />
       <div className="layout-container">
         <button className="sidebar-mobile-toggle" aria-expanded={filtersOpen} aria-controls="firma-filter-sidebar" onClick={() => setFiltersOpen(o => !o)}>
           <span className="material-symbols-outlined">tune</span>Filtrele
@@ -43,7 +43,14 @@ const FirmalarPage = () => {
             ) : page.suppliers.length === 0 ? (
               <div className="empty-results">
                 <p>Aradığınız kriterlere uygun firma bulunamadı.</p>
-                {page.didYouMean && (
+                {/* Enes Doğanay | 11 Mayıs 2026: Firma modu — DB firma adı önerisi */}
+                {page.firmaSmartSuggestion && (
+                  <button className="did-you-mean" onClick={() => page.setSearch(page.firmaSmartSuggestion)}>
+                    <span className="material-symbols-outlined">business</span>
+                    Şunu mu demek istediniz: <strong>{page.firmaSmartSuggestion}</strong>
+                  </button>
+                )}
+                {page.didYouMean && !page.firmaSmartSuggestion && (
                   <button className="did-you-mean" onClick={() => page.setSearch(page.didYouMean)}>
                     <span className="material-symbols-outlined">search</span>
                     Şunu mu demek istediniz: <strong>{page.didYouMean}</strong>

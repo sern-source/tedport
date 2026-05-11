@@ -33,20 +33,23 @@ export const updateOfferNote = async (offerId, note) => {
 
 /* ─── Okunmamış Mesaj Sayısı ─── */
 export const fetchUnreadChatCounts = async (offerIds) => {
-    if (!offerIds.length) return { counts: {}, ids: new Set() };
+    if (!offerIds.length) return { counts: {}, ids: new Set(), msgIds: new Set() };
     const { data } = await supabase
         .from('ihale_teklif_mesajlari')
-        .select('teklif_id')
+        .select('id, teklif_id')
         .in('teklif_id', offerIds)
         .eq('sender_role', 'bidder')
         .eq('okundu_firma', false);
     const counts = {};
     const ids = new Set();
+    // Enes Doğanay | 11 Mayıs 2026: msgIds — realtime duplicate guard için başlangıç mesaj ID'leri
+    const msgIds = new Set();
     (data || []).forEach(m => {
         counts[m.teklif_id] = (counts[m.teklif_id] || 0) + 1;
         ids.add(m.teklif_id);
+        msgIds.add(m.id);
     });
-    return { counts, ids };
+    return { counts, ids, msgIds };
 };
 
 export const markChatMessagesRead = async (messageIds) => {
@@ -178,6 +181,18 @@ export const checkEmailInDb = async (email) => {
 
 export const searchFirmalar = async (term) => {
     const { data } = await supabase.from('firmalar').select('firmaID, firma_adi, onayli_hesap').ilike('firma_adi', `%${term}%`).limit(8);
+    return data || [];
+};
+
+/* ─── Revize Geçmişi ─── */
+// Enes Doğanay | 9 Mayıs 2026: Teklife ait önceki revizeleri getir
+export const fetchTeklifGecmisi = async (teklifId) => {
+    const { data, error } = await supabase
+        .from('ihale_teklif_gecmisi')
+        .select('*')
+        .eq('teklif_id', teklifId)
+        .order('revize_no', { ascending: false });
+    if (error) throw new Error(error.message);
     return data || [];
 };
 

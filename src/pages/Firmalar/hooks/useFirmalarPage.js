@@ -1,6 +1,6 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Firmalar ana sayfa koordinatör — veri çekme + state + auth + quote
 import { useState, useEffect } from 'react';
-import { fetchFirmalar } from '../services/firmaService';
+import { fetchFirmalar, fetchFirmaNameSuggestion } from '../services/firmaService';
 import { suggestCorrection } from '../../../constants/synonyms';
 import { formatLocation, degerleriDiziyeCevir } from '../utils/firmaUtils';
 import { useFirmaAuth } from './useFirmaAuth';
@@ -37,17 +37,27 @@ export const useFirmalarPage = () => {
     const [loading, setLoading] = useState(true);
     const [totalCount, setTotalCount] = useState(0);
     const [didYouMean, setDidYouMean] = useState(null);
+    // Enes Doğanay | 11 Mayıs 2026: Firma modu — DB'deki gerçek firma adı önerisi
+    const [firmaSmartSuggestion, setFirmaSmartSuggestion] = useState(null);
 
     useEffect(() => {
         const fallback = setTimeout(() => setLoading(false), 12000);
         const load = async () => {
             setLoading(true);
             try {
-                const { data, count } = await fetchFirmalar({ page: state.page, search: state.debouncedSearch, filters: state.filters, sortMode: state.sortMode });
+                const { data, count } = await fetchFirmalar({ page: state.page, search: state.debouncedSearch, filters: state.filters, sortMode: state.sortMode, searchMode: state.searchMode });
                 let mapped = data.map(mapFirmaData);
                 if (state.debouncedSearch.trim().length >= 2 && state.sortMode === 'default') mapped = sortByRelevance(mapped, state.debouncedSearch.trim());
                 setSuppliers(mapped); setTotalCount(count);
-                setDidYouMean(mapped.length === 0 && state.debouncedSearch.trim().length >= 2 ? suggestCorrection(state.debouncedSearch.trim()) : null);
+                const isZeroResults = mapped.length === 0 && state.debouncedSearch.trim().length >= 2;
+                setDidYouMean(isZeroResults ? suggestCorrection(state.debouncedSearch.trim()) : null);
+                // Enes Doğanay | 11 Mayıs 2026: Firma modunda 0 sonuç — DB firma adı önerisi
+                if (isZeroResults && state.searchMode === 'firma') {
+                    const suggestion = await fetchFirmaNameSuggestion(state.debouncedSearch.trim());
+                    setFirmaSmartSuggestion(suggestion);
+                } else {
+                    setFirmaSmartSuggestion(null);
+                }
             } catch (err) {
                 if (!err?.message?.includes('abort')) console.error('Firmalar yüklenemedi:', err);
                 setSuppliers([]); setTotalCount(0);
@@ -55,10 +65,10 @@ export const useFirmalarPage = () => {
         };
         load();
         return () => clearTimeout(fallback);
-    }, [state.page, state.debouncedSearch, state.filters, state.sortMode]);
+    }, [state.page, state.debouncedSearch, state.filters, state.sortMode, state.searchMode]);
 
     return {
         ...state, ...auth, quote,
-        suppliers, loading, totalCount, totalPages: Math.ceil(totalCount / 10), didYouMean,
+        suppliers, loading, totalCount, totalPages: Math.ceil(totalCount / 10), didYouMean, firmaSmartSuggestion,
     };
 };

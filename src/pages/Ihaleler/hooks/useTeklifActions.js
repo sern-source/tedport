@@ -54,7 +54,8 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
             setTeklifForm({ kalemler: loadedKalemler, genel_toplam: existing.toplam_tutar ? String(existing.toplam_tutar) : '', para_birimi: existing.para_birimi || 'TRY', kdv_dahil: existing.kdv_dahil || false, teslim_suresi_gun: existing.teslim_suresi_gun ? String(existing.teslim_suresi_gun) : '', teslim_aciklamasi: existing.teslim_aciklamasi || '', not: existing.not_field || '' });
         } else {
             const gereksinimler = Array.isArray(tender.gereksinimler) ? tender.gereksinimler : [];
-            const kalemler = gereksinimler.map(g => ({ gereksinim_id: g.id, madde: g.madde, birim_fiyat: '', miktar: '1', aciklama: '', para_birimi: 'TRY' }));
+            // Enes Doğanay | 9 Mayıs 2026: Miktar varsayılanı gereksinim adetinden gelir
+            const kalemler = gereksinimler.map(g => ({ gereksinim_id: g.id, madde: g.madde, birim_fiyat: '', miktar: String(g.adet || 1), aciklama: '', para_birimi: 'TRY' }));
             setTeklifForm({ kalemler, genel_toplam: '', para_birimi: 'TRY', kdv_dahil: tender.kdv_durumu === 'dahil', teslim_suresi_gun: '', teslim_aciklamasi: '', not: '' });
         }
         setTeklifDosya(null);

@@ -52,6 +52,48 @@
     color: #0f172a;
 }
 
+/* Enes Doğanay | 11 Mayıs 2026: Şablonlarım butonu — modal başlığında */
+.ihale-modal__template-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 7px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    margin-left: auto;
+    margin-right: 8px;
+}
+
+.ihale-modal__template-btn .material-symbols-outlined { font-size: 15px; }
+
+.ihale-modal__template-btn:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+.ihale-modal__template-count {
+    background: #2563eb;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.ihale-modal__template-btn:hover .ihale-modal__template-count {
+    background: rgba(255,255,255,0.25);
+}
+
 /* Enes Doğanay | 8 Mayıs 2026: Compact form wrapper */
 .ihale-modal__form {
     padding: 0;
@@ -237,6 +279,32 @@
     cursor: not-allowed;
 }
 
+/* Enes Doğanay | 11 Mayıs 2026: Şablon Kaydet butonu — önizleme footer */
+.ihale-btn-template {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+}
+
+.ihale-btn-template .material-symbols-outlined { font-size: 14px; }
+
+.ihale-btn-template:hover {
+    background: #16a34a;
+    color: #fff;
+    border-color: #16a34a;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(22, 163, 74, 0.2);
+}
+
 /* Enes Doğanay | 10 Nisan 2026: Readonly alanlar */
 .ihale-field--readonly {
     background: var(--bg-light) !important;
@@ -346,6 +414,40 @@
     background: var(--bg-white);
 }
 
+/* Enes Doğanay | 11 Mayıs 2026: Adet grup — etiket kaldırıldı, sadece input */
+.ihale-req-adet-group {
+    display: flex;
+    align-items: stretch;
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    background: var(--bg-light);
+    transition: border-color 0.15s;
+}
+
+.ihale-req-adet-group:focus-within {
+    border-color: #3b82f6;
+    background: var(--bg-white);
+}
+
+.ihale-req-adet-input {
+    width: 44px;
+    min-width: 0;
+    border: none !important;
+    border-radius: 7px !important;
+    background: transparent !important;
+    padding: 5px 6px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dark);
+    outline: none;
+}
+
+.ihale-req-adet-input:focus {
+    outline: none;
+}
+
 .ihale-req-add-btn {
     display: flex;
     align-items: center;
@@ -382,7 +484,7 @@
 
 .ihale-req-table__header {
     display: grid;
-    grid-template-columns: 28px 1fr 1.2fr 28px;
+    grid-template-columns: 40px 28px 1fr 1.2fr 28px;
     gap: 4px;
     padding: 5px 10px;
     background: var(--bg-light);
@@ -395,7 +497,7 @@
 
 .ihale-req-table__row {
     display: grid;
-    grid-template-columns: 28px 1fr 1.2fr 28px;
+    grid-template-columns: 40px 28px 1fr 1.2fr 28px;
     gap: 4px;
     padding: 6px 10px;
     align-items: center;

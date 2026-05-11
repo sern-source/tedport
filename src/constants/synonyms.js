@@ -584,7 +584,8 @@ export function expandSearchTerms(query) {
 }
 
 // Enes Doğanay | 2 Mayıs 2026: Levenshtein mesafesi — yazım hatası tespiti için edit distance hesabı
-function levenshtein(a, b) {
+// Enes Doğanay | 11 Mayıs 2026: levenshtein export edildi — firmaService'te firma adı öneri için kullanılır
+export function levenshtein(a, b) {
   const m = a.length, n = b.length;
   const dp = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
   for (let j = 0; j <= n; j++) dp[0][j] = j;

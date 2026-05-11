@@ -6,6 +6,7 @@ import IhaleOffersSection from './IhaleOffersSection';
 
 const IhaleYonetimiBody = ({
     core, chat, create, tenderActions, offerActions, combinedModals, sortedFilteredTenders,
+    sidebarSort, setSidebarSort,
 }) => {
     const selectedTender = core.selectedTender;
     // Enes Doğanay | 8 Mayıs 2026: Mobil liste/detay geçiş state'i
@@ -31,6 +32,7 @@ const IhaleYonetimiBody = ({
                 tenderSearch={core.tenderSearch} setTenderSearch={core.setTenderSearch}
                 tenderFilter={core.tenderFilter} setTenderFilter={core.setTenderFilter}
                 tenderPage={core.tenderPage} setTenderPage={core.setTenderPage}
+                sidebarSort={sidebarSort} setSidebarSort={setSidebarSort}
                 onSelectTender={handleSelectTender} onNewTender={create.openCreateModal}
             />
             <main className="tom-main">

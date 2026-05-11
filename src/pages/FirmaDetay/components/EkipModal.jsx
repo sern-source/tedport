@@ -28,6 +28,13 @@ const EkipModal = ({ firmaEkip, onClose }) => (
                             <span className={`ekip-role-badge ekip-role-badge--${uye.role}`}>
                                 {uye.role === 'owner' ? 'Yetkili' : uye.role === 'admin' ? 'Yönetici' : 'Üye'}
                             </span>
+                            {/* Enes Doğanay | 9 Mayıs 2026: show_email=true ise e-posta göster */}
+                            {uye.email && (
+                                <a className="fd-ekip-email" href={`mailto:${uye.email}`}>
+                                    <span className="material-symbols-outlined">mail</span>
+                                    {uye.email}
+                                </a>
+                            )}
                         </div>
                     </div>
                 ))}

@@ -3,13 +3,15 @@ import { useState, useRef, useCallback } from 'react';
 import * as ihaleService from '../services/ihaleService';
 import { CREATE_EMPTY_FORM } from '../constants/ihaleConstants';
 import { useIhaleCreateHandlers } from './useIhaleCreateHandlers';
+// Enes Doğanay | 11 Mayıs 2026: Şablon hook entegrasyonu
+import useIhaleTemplates from './useIhaleTemplates';
 
 const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editTenderId, setEditTenderId] = useState(null);
     const [createForm, setCreateForm] = useState(CREATE_EMPTY_FORM);
     const [stepperState, setStepperState] = useState({ step: 0, error: '', saving: false });
-    const [createReqState, setCreateReqState] = useState({ madde: '', aciklama: '' });
+    const [createReqState, setCreateReqState] = useState({ madde: '', aciklama: '', adet: '1' });
     const [emailState, setEmailState] = useState({ input: '', status: null });
     const [firmaState, setFirmaState] = useState({ term: '', results: [], searching: false });
     const [publishState, setPublishState] = useState({ verifiedUser: false, successId: null, linkCopied: false, refNoCopied: false });
@@ -26,7 +28,7 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
 
     const resetFormState = useCallback((refNo, isVerified) => {
         setStepperState({ step: 0, error: '', saving: false });
-        setCreateReqState({ madde: '', aciklama: '' });
+        setCreateReqState({ madde: '', aciklama: '', adet: '1' });
         setEmailState({ input: '', status: null });
         setFirmaState({ term: '', results: [], searching: false });
         setPublishState(p => ({ ...p, verifiedUser: isVerified }));
@@ -58,6 +60,25 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
         setShowCreateModal(true);
     }, [companyId, resetFormState]);
 
+    // Enes Doğanay | 11 Mayıs 2026: Şablon hook — fetch, save, delete, modal state
+    const templateHook = useIhaleTemplates({ companyId });
+
+    // Enes Doğanay | 11 Mayıs 2026: Şablonu forma uygula → step 0'a dön
+    const applyTemplate = useCallback((template) => {
+        setCreateForm(prev => ({
+            ...prev,
+            baslik: template.baslik || prev.baslik,
+            aciklama: template.aciklama || prev.aciklama,
+            ihale_tipi: template.ihale_tipi || prev.ihale_tipi,
+            kdv_durumu: template.kdv_durumu || prev.kdv_durumu,
+            teslim_suresi: template.teslim_suresi || prev.teslim_suresi,
+            teslim_il: template.teslim_il || prev.teslim_il,
+            teslim_ilce: template.teslim_ilce || prev.teslim_ilce,
+            gereksinimler: template.gereksinimler?.length ? template.gereksinimler : prev.gereksinimler,
+        }));
+        setStepperState(p => ({ ...p, step: 0, error: '' }));
+    }, []);
+
     // Enes Doğanay | 7 Mayıs 2026: IhaleFormModal flat adapter'lar
     const showModal = showCreateModal;
     const editingTender = editTenderId ? { id: editTenderId } : null;
@@ -68,6 +89,8 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const setStepperStep = (valOrFn) => setStepperState(p => ({ ...p, step: typeof valOrFn === 'function' ? valOrFn(p.step) : valOrFn, error: '' }));
     const yeniGereksinimMadde = createReqState.madde; const setYeniGereksinimMadde = (val) => setCreateReqState(p => ({ ...p, madde: val }));
     const yeniGereksinimAciklama = createReqState.aciklama; const setYeniGereksinimAciklama = (val) => setCreateReqState(p => ({ ...p, aciklama: val }));
+    // Enes Doğanay | 9 Mayıs 2026: Adet adapter
+    const yeniGereksinimAdet = createReqState.adet; const setYeniGereksinimAdet = (val) => setCreateReqState(p => ({ ...p, adet: val }));
     const emailInput = emailState.input; const emailStatus = emailState.status;
     const firmaSearchTerm = firmaState.term; const firmaSearchResults = firmaState.results; const firmaSearching = firmaState.searching;
     const fileInputRef = createFileInputRef; const firmaResultsRef = createFirmaResultsRef;
@@ -81,10 +104,11 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
         openCreateModal, openEditInCreateModal, openRepeatModal,
         showModal, editingTender, form, setForm,
         formSaving, formError, setFormError, stepperStep, setStepperStep,
-        yeniGereksinimMadde, setYeniGereksinimMadde, yeniGereksinimAciklama, setYeniGereksinimAciklama,
+        yeniGereksinimMadde, setYeniGereksinimMadde, yeniGereksinimAciklama, setYeniGereksinimAciklama, yeniGereksinimAdet, setYeniGereksinimAdet,
         emailInput, emailStatus, firmaSearchTerm, firmaSearchResults, firmaSearching,
         fileInputRef, firmaResultsRef, isVerifiedUser, refNoCopied, setRefNoCopied,
         handleFormSubmit,
+        templateHook, applyTemplate,
         ...handlers,
     };
 };

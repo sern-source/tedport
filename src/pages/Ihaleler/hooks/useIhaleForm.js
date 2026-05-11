@@ -4,6 +4,8 @@ import { createTender, updateTender } from '../../../services/ihaleManagementApi
 import { uploadIhaleFiles } from '../services/ihaleFormService';
 import { EMPTY_FORM, toDateInput } from '../IhalelerUtils';
 import { useIhaleFormInvites } from './useIhaleFormInvites';
+// Enes Doğanay | 11 Mayıs 2026: Şablon hook entegrasyonu
+import useIhaleTemplates from '../../FirmaProfil/hooks/useIhaleTemplates';
 
 const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetchPublicTenders, yeniIhaleParam, duzenleParam, searchParams, setSearchParams, myTenders }) => {
     const [showModal, setShowModal] = useState(false);
@@ -14,12 +16,34 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
     const [stepperStep, setStepperStep] = useState(0);
     const [yeniGereksinimMadde, setYeniGereksinimMadde] = useState('');
     const [yeniGereksinimAciklama, setYeniGereksinimAciklama] = useState('');
+    // Enes Doğanay | 9 Mayıs 2026: Gereksinim adet alanı — default 1
+    const [yeniGereksinimAdet, setYeniGereksinimAdet] = useState('1');
     const [ihalePublishSuccess, setIhalePublishSuccess] = useState(null);
     const [publishedLinkCopied, setPublishedLinkCopied] = useState(false);
     const [refNoCopied, setRefNoCopied] = useState(false);
     const fileInputRef = useRef(null);
 
     const invites = useIhaleFormInvites({ form, setForm });
+
+    // Enes Doğanay | 11 Mayıs 2026: Şablon hook — managedFirmaId ile beslenir
+    const templateHook = useIhaleTemplates({ companyId: managedFirmaId });
+
+    // Enes Doğanay | 11 Mayıs 2026: Şablon uygula — form alanlarını doldur, stepper'ı sıfırla
+    const applyTemplate = useCallback((template) => {
+        setForm(prev => ({
+            ...prev,
+            baslik: template.baslik || prev.baslik,
+            aciklama: template.aciklama || prev.aciklama,
+            ihale_tipi: template.ihale_tipi || prev.ihale_tipi,
+            kdv_durumu: template.kdv_durumu || prev.kdv_durumu,
+            teslim_suresi: template.teslim_suresi || prev.teslim_suresi,
+            teslim_il: template.teslim_il || prev.teslim_il,
+            teslim_ilce: template.teslim_ilce || prev.teslim_ilce,
+            gereksinimler: template.gereksinimler?.length ? template.gereksinimler : prev.gereksinimler,
+        }));
+        setStepperStep(0);
+        setFormError('');
+    }, []);
 
     const openCreate = useCallback(async () => {
         setEditingTender(null);
@@ -55,8 +79,10 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
 
     const addGereksinim = () => {
         if (!yeniGereksinimMadde.trim()) return;
-        setForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: yeniGereksinimMadde.trim(), aciklama: yeniGereksinimAciklama.trim() }] }));
-        setYeniGereksinimMadde(''); setYeniGereksinimAciklama('');
+        // Enes Doğanay | 9 Mayıs 2026: Adet alanı eklendi
+        const adet = Math.max(1, parseInt(yeniGereksinimAdet) || 1);
+        setForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: yeniGereksinimMadde.trim(), aciklama: yeniGereksinimAciklama.trim(), adet }] }));
+        setYeniGereksinimMadde(''); setYeniGereksinimAciklama(''); setYeniGereksinimAdet('1');
     };
     const removeGereksinim = (id) => setForm(p => ({ ...p, gereksinimler: p.gereksinimler.filter(g => g.id !== id) }));
     const handleFileAdd = (e) => {
@@ -105,11 +131,13 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
         stepperStep, setStepperStep,
         yeniGereksinimMadde, setYeniGereksinimMadde,
         yeniGereksinimAciklama, setYeniGereksinimAciklama,
+        yeniGereksinimAdet, setYeniGereksinimAdet,
         fileInputRef, ihalePublishSuccess, setIhalePublishSuccess,
         publishedLinkCopied, setPublishedLinkCopied, refNoCopied, setRefNoCopied,
         openCreate, openEdit, handleClone,
         addGereksinim, removeGereksinim,
         handleFileAdd, removeFile, handleFormSubmit,
+        templateHook, applyTemplate,
         ...invites,
     };
 };

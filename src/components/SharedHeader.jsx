@@ -22,6 +22,8 @@ const SharedHeader = ({
     suggestions = [], onSuggestionClick = null, onSearchSubmit = null,
     noResults = false, searchHistory = [], onHistorySelect = null,
     onHistoryRemove = null, onHistoryClear = null,
+    // Enes Doğanay | 11 Mayıs 2026: Gelişmiş arama modu — sadece FirmalarPage'den gelir
+    searchMode = null, onSearchModeChange = null,
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -84,6 +86,7 @@ const SharedHeader = ({
                         noResults={noResults} searchHistory={searchHistory}
                         onHistorySelect={onHistorySelect} onHistoryRemove={onHistoryRemove}
                         onHistoryClear={onHistoryClear} searchBarRef={searchBarRef}
+                        searchMode={searchMode} onSearchModeChange={onSearchModeChange}
                     />
                 )}
 

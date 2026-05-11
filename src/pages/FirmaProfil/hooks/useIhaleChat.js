@@ -22,13 +22,25 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
     // Enes Doğanay | 7 Mayıs 2026: Aynı mesaj ID'si için tekrar sayım önle — Supabase bazen duplicate event gönderir
     const seenMsgIdsRef = useRef(new Set());
 
+    // Enes Doğanay | 11 Mayıs 2026: Hook unmount cleanup — başka sayfaya geçilince
+    // activeViewingTeklifId sıfırlanmazsa toast bildirimleri suppress olur
+    useEffect(() => {
+        return () => {
+            if (tenderChatChannelRef.current) { supabase.removeChannel(tenderChatChannelRef.current); tenderChatChannelRef.current = null; }
+            setActiveViewingTeklifId?.(null);
+        };
+    }, []); // eslint-disable-line
+
     // Enes Doğanay | 6 Mayıs 2026: İlk yüklemede okunmamış sayılarını çek
     useEffect(() => {
         if (loading) return;
         const allOfferIds = Object.values(offersByTender).flat().map(o => o.id);
         if (!allOfferIds.length) return;
-        ihaleService.fetchUnreadChatCounts(allOfferIds).then(({ counts, ids }) => {
+        ihaleService.fetchUnreadChatCounts(allOfferIds).then(({ counts, ids, msgIds }) => {
             setUnread({ ids, counts });
+            // Enes Doğanay | 11 Mayıs 2026: Başlangıçta okunan mesaj ID'leri seenMsgIdsRef'e ekle
+            // Böylece realtime INSERT aynı mesajı tekrar saymaz
+            msgIds.forEach(id => seenMsgIdsRef.current.add(id));
         }).catch(() => {});
     }, [loading, offersByTender]);
 

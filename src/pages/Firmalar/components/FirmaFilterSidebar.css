@@ -84,17 +84,70 @@ details[open] summary .material-symbols-outlined { transform: rotate(180deg); }
 .filter-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 .filter-content::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
 
-.filter-content label {
+/* Enes Doğanay | 11 Mayıs 2026: Pill chip filtreler */
+.fs-summary-left {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.78rem;
-  color: var(--text-dark);
-  cursor: pointer;
-  padding: 3px;
+  gap: 6px;
 }
 
-.filter-content input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--primary); cursor: pointer; }
+.fs-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.fs-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.fs-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  color: var(--text-dark);
+  font-size: 0.72rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.fs-pill .material-symbols-outlined { font-size: 11px; }
+
+.fs-pill:hover {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.fs-pill--on {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #1d4ed8;
+  color: #fff;
+  font-weight: 700;
+}
+
+.fs-pill--on:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  border-color: #1e40af;
+  color: #fff;
+}
 
 .filter-search-input {
   width: 100%;
@@ -130,3 +183,26 @@ details[open] summary .material-symbols-outlined { transform: rotate(180deg); }
 [data-theme="dark"] details { background: var(--bg-card, #1e293b); }
 [data-theme="dark"] summary { background: rgba(255,255,255,0.04); }
 [data-theme="dark"] .filter-search-input { background: var(--bg-card, #1e293b); }
+[data-theme="dark"] .fs-count-badge { background: #3b82f6; }
+
+[data-theme="dark"] .fs-pill {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .fs-pill:hover {
+  border-color: #3b82f6;
+  color: #93c5fd;
+  background: #1a2d45;
+}
+
+[data-theme="dark"] .fs-pill--on {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #1d4ed8;
+  color: #fff;
+}
+
+[data-theme="dark"] .fs-pill--on:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}

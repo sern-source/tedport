@@ -6,14 +6,29 @@ import {
     saveInlineNote, deleteNoteService,
 } from '../services/favoritesService';
 
+// Enes Doğanay | 9 Mayıs 2026: Sayfa değişimlerinde filtre kaybolmasin
+const FAV_SEARCH_KEY = 'tedport_fav_search';
+const FAV_SORT_KEY   = 'tedport_fav_sort';
+
 export const useFavorites = (userId, showPrToast) => {
     const [myLists, setMyLists] = useState([]);
     const [favorites, setFavorites] = useState([]);
     const [selectedListId, setSelectedListId] = useState(null);
     const [isCreatingList, setIsCreatingList] = useState(false);
     const [newListName, setNewListName] = useState('');
-    const [favSearch, setFavSearch] = useState('');
-    const [favSort, setFavSort] = useState('newest');
+    // Enes Doğanay | 9 Mayıs 2026: sessionStorage'dan başlangıç değeri al
+    const [favSearch, setFavSearchState] = useState(() => sessionStorage.getItem(FAV_SEARCH_KEY) || '');
+    const [favSort, setFavSortState] = useState(() => sessionStorage.getItem(FAV_SORT_KEY) || 'newest');
+
+    const setFavSearch = useCallback((v) => {
+        setFavSearchState(v);
+        sessionStorage.setItem(FAV_SEARCH_KEY, v);
+    }, []);
+
+    const setFavSort = useCallback((v) => {
+        setFavSortState(v);
+        sessionStorage.setItem(FAV_SORT_KEY, v);
+    }, []);
     const [openMenuId, setOpenMenuId] = useState(null);
     const [assigningListId, setAssigningListId] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);

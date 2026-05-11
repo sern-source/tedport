@@ -27,13 +27,50 @@
 }
 
 /* ── Favori butonu ────────────────────────────────────────────────────── */
-.card-fav-btn {
+/* Enes Doğanay | 11 Mayıs 2026: Wrapper — tooltip absolute pozisyonlaması için */
+.card-fav-wrap {
   position: absolute;
   top: 7px;
   right: 7px;
   z-index: 2;
-  width: 28px;
-  height: 28px;
+}
+
+/* Enes Doğanay | 11 Mayıs 2026: Tooltip */
+.card-fav-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.68rem;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s, transform 0.18s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+}
+
+.card-fav-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 10px;
+  border: 5px solid transparent;
+  border-top-color: #1e293b;
+}
+
+.card-fav-wrap:hover .card-fav-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-fav-btn {
+  width: 34px;
+  height: 34px;
   border: 1.5px solid #fbbf24;
   border-radius: 50%;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
@@ -46,7 +83,7 @@
 }
 
 .card-fav-btn .material-symbols-outlined {
-  font-size: 16px;
+  font-size: 20px;
   color: #d97706;
   transition: color 0.2s, transform 0.25s;
 }
@@ -232,3 +269,10 @@
 [data-theme="dark"] .tag { background: rgba(255,255,255,0.05); }
 [data-theme="dark"] .platform-badge-text { background: #292007; color: #fbbf24; border-color: #92400e; }
 [data-theme="dark"] .platform-badge-icon { color: #fbbf24; }
+/* Enes Doğanay | 11 Mayıs 2026: dark modda tooltip rengi */
+[data-theme="dark"] .card-fav-tooltip {
+  background: #0f172a;
+  color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] .card-fav-tooltip::after { border-top-color: #0f172a; }

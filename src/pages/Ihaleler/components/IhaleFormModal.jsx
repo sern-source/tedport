@@ -17,9 +17,12 @@ const IhaleFormModal = ({
     stepperStep, setStepperStep,
     yeniGereksinimMadde, setYeniGereksinimMadde,
     yeniGereksinimAciklama, setYeniGereksinimAciklama,
+    yeniGereksinimAdet, setYeniGereksinimAdet,
     emailInput, emailStatus,
     firmaSearchTerm, firmaSearchResults, firmaSearching,
     fileInputRef, firmaResultsRef, refNoCopied, setRefNoCopied, isVerifiedUser,
+    // Enes Doğanay | 11 Mayıs 2026: Opsiyonel şablon hook — sadece FirmaProfil context'inde gelir
+    templateHook,
     onClose, addGereksinim, removeGereksinim,
     handleEmailInputChange, handleEmailKeyDown, addEmail, removeEmail,
     handleFirmaSearch, addDavetliFirma, removeDavetliFirma,
@@ -52,6 +55,16 @@ const IhaleFormModal = ({
             <div className="ihale-modal ihale-modal--stepper">
                 <div className="ihale-modal__head">
                     <h3>{editingTender ? 'İhaleyi Düzenle' : 'Yeni İhale Oluştur'}</h3>
+                    {/* Enes Doğanay | 11 Mayıs 2026: Şablonlarım butonu — sadece yeni ihale + templateHook varsa */}
+                    {!editingTender && templateHook && (
+                        <button type="button" className="ihale-modal__template-btn" onClick={templateHook.openSelectModal}>
+                            <span className="material-symbols-outlined">bookmarks</span>
+                            Şablonlarım
+                            {templateHook.templates.length > 0 && (
+                                <span className="ihale-modal__template-count">{templateHook.templates.length}</span>
+                            )}
+                        </button>
+                    )}
                     <button type="button" className="ihale-modal__close" onClick={onClose}>
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -94,6 +107,7 @@ const IhaleFormModal = ({
                         <IhaleFormStep3
                             form={form} yeniGereksinimMadde={yeniGereksinimMadde} setYeniGereksinimMadde={setYeniGereksinimMadde}
                             yeniGereksinimAciklama={yeniGereksinimAciklama} setYeniGereksinimAciklama={setYeniGereksinimAciklama}
+                            yeniGereksinimAdet={yeniGereksinimAdet} setYeniGereksinimAdet={setYeniGereksinimAdet}
                             fileInputRef={fileInputRef} addGereksinim={addGereksinim} removeGereksinim={removeGereksinim}
                             handleFileAdd={handleFileAdd} removeFile={removeFile}
                         />
@@ -102,6 +116,7 @@ const IhaleFormModal = ({
                         <IhaleFormStep4
                             form={form} formError={formError} formSaving={formSaving}
                             editingTender={editingTender} onClose={onClose} handleFormSubmit={handleFormSubmit}
+                            onOpenSaveTemplate={templateHook?.openSaveModal}
                         />
                     )}
                     {stepperStep < 3 && (

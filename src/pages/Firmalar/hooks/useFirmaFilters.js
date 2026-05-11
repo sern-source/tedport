@@ -1,4 +1,4 @@
-// Enes Doğanay | 6 Mayıs 2026: Sidebar filtre verisi + seçim yönetimi
+// Enes Doğanay | 11 Mayıs 2026: Sidebar filtre verisi + seçim yönetimi (şehir, sektör, kategori)
 import { useState, useEffect } from 'react';
 import { fetchSidebarData } from '../services/firmaService';
 import { SEKTORLER } from '../utils/firmaUtils';

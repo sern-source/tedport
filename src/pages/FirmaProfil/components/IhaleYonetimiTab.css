@@ -364,6 +364,77 @@
 
 .tom-pill--on .material-symbols-outlined { color: #fff; }
 
+/* Enes Doğanay | 9 Mayıs 2026: Sidebar sıralama dropdown */
+.tom-sidebar-sort-wrap {
+    position: relative;
+    padding: 6px 12px 0;
+}
+
+.tom-sidebar-sort-trigger {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 5px 9px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.tom-sidebar-sort-trigger .material-symbols-outlined { font-size: 14px; }
+.tom-sidebar-sort-trigger:hover { border-color: #93c5fd; color: #1d4ed8; background: #f0f7ff; }
+
+.tom-sidebar-sort-label { flex: 1; text-align: left; }
+
+.tom-sidebar-sort-chevron { font-size: 14px !important; transition: transform 0.2s; }
+.tom-sidebar-sort-chevron.open { transform: rotate(180deg); }
+
+@keyframes tomSidebarSortIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tom-sidebar-sort-menu {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 12px;
+    right: 12px;
+    background: var(--bg-white);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(15,23,42,0.12);
+    z-index: 200;
+    overflow: hidden;
+    animation: tomSidebarSortIn 0.18s ease;
+}
+
+.tom-sidebar-sort-option {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 7px 11px;
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-size: 0.74rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s;
+}
+.tom-sidebar-sort-option .material-symbols-outlined { font-size: 14px; color: #94a3b8; }
+.tom-sidebar-sort-option:hover { background: #f0f7ff; color: #1d4ed8; }
+.tom-sidebar-sort-option:hover .material-symbols-outlined { color: #3b82f6; }
+.tom-sidebar-sort-option.active { color: #2563eb; font-weight: 700; background: #eff6ff; }
+.tom-sidebar-sort-option.active .material-symbols-outlined { color: #2563eb; }
+
+.tom-sidebar-sort-check { margin-left: auto; font-size: 13px !important; color: #2563eb !important; }
+
 /* İhale listesi */
 .tom-sidebar__list {
     flex: 1;

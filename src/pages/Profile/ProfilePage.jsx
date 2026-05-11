@@ -68,6 +68,9 @@ const ProfilePage = () => {
     if (currentTab !== 'quotes') quotesData.setActiveQuoteId(null);
   }, [currentTab]);
 
+  // Enes Doğanay | 11 Mayıs 2026: Sayfa unmount — stale ref temizle
+  useEffect(() => { return () => { setActiveViewingTeklifId(null); }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (loading) return <PageLoader />;
 
   return (

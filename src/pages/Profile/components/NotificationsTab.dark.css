@@ -103,9 +103,11 @@
   color: #94a3b8;
 }
 
+/* Enes Doğanay | 9 Mayıs 2026: Dark — okunmamış daha belirgin sol-koyu gradient */
 [data-theme="dark"] .notification-feed-card.unread {
-  border-color: rgba(59, 130, 246, 0.35);
-  background: linear-gradient(180deg, rgba(30, 58, 95, 0.3) 0%, rgba(15, 23, 42, 0.4) 100%);
+  border-color: rgba(59, 130, 246, 0.5);
+  background: linear-gradient(90deg, rgba(30, 58, 95, 0.7) 0%, rgba(30, 58, 95, 0.35) 30%, rgba(15, 23, 42, 0.3) 100%);
+  border-left: 6px solid #3b82f6;
 }
 
 [data-theme="dark"] .notification-feed-card.unread h4 {

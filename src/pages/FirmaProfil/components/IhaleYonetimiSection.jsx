@@ -1,5 +1,5 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: IhaleYonetimiSection — tüm ihale yönetimi hook'larını birleştirir
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useAuth } from '../../../AuthContext';
 import useIhaleCore from '../hooks/useIhaleCore';
 import useIhaleChat from '../hooks/useIhaleChat';
@@ -91,12 +91,31 @@ const IhaleYonetimiSection = ({ companyId, onUnreadCountChange }) => {
         }
     }, [core.loading, core.tenders.length]); // eslint-disable-line
 
+    // Enes Doğanay | 9 Mayıs 2026: İhale listesi sıralama — unread önce + kullanıcı seçimi
+    const [sidebarSort, setSidebarSort] = useState('date');
+
     // Enes Doğanay | 6 Mayıs 2026: Okunmadık ihale önce sort
     const sortedFilteredTenders = useMemo(() => {
         const list = [...core.filteredTenders];
-        list.sort((a, b) => (chat.tenderUnreadSet.has(String(a.id)) ? 0 : 1) - (chat.tenderUnreadSet.has(String(b.id)) ? 0 : 1));
+        list.sort((a, b) => {
+            // Okunmamış her zaman en önce
+            const aUnread = chat.tenderUnreadSet.has(String(a.id)) ? 0 : 1;
+            const bUnread = chat.tenderUnreadSet.has(String(b.id)) ? 0 : 1;
+            if (aUnread !== bUnread) return aUnread - bUnread;
+            switch (sidebarSort) {
+                case 'name-asc':  return (a.baslik || '').localeCompare(b.baslik || '', 'tr');
+                case 'name-desc': return (b.baslik || '').localeCompare(a.baslik || '', 'tr');
+                case 'deadline':  return new Date(a.son_basvuru_tarihi || 0) - new Date(b.son_basvuru_tarihi || 0);
+                case 'offers-desc': {
+                    const aC = (core.offersByTender[String(a.id)] || []).length;
+                    const bC = (core.offersByTender[String(b.id)] || []).length;
+                    return bC - aC;
+                }
+                default: return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+            }
+        });
         return list;
-    }, [core.filteredTenders, chat.tenderUnreadSet]);
+    }, [core.filteredTenders, chat.tenderUnreadSet, sidebarSort, core.offersByTender]);
 
     // Enes Doğanay | 6 Mayıs 2026: Teklif aksiyon + modal kombine
     const combinedModals = useMemo(() => ({
@@ -128,7 +147,8 @@ const IhaleYonetimiSection = ({ companyId, onUnreadCountChange }) => {
                 </div>
             ) : (
                 <IhaleYonetimiBody core={core} chat={chat} create={create} tenderActions={tenderActions}
-                    offerActions={offerActions} combinedModals={combinedModals} sortedFilteredTenders={sortedFilteredTenders} />
+                    offerActions={offerActions} combinedModals={combinedModals} sortedFilteredTenders={sortedFilteredTenders}
+                    sidebarSort={sidebarSort} setSidebarSort={setSidebarSort} />
             )}
             <IhaleYonetimiOverlays chat={chat} offerModals={offerModals} tenderActions={tenderActions}
                 create={create} offerActions={offerActions} selectedTender={selectedTender}

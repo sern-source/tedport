@@ -29,6 +29,21 @@
 .fd-ekip-info { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
 .fd-ekip-info strong { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
 .fd-ekip-title { font-size: 0.76rem; color: var(--text-muted); }
+/* Enes Doğanay | 9 Mayıs 2026: E-posta linki — modal içi */
+.fd-ekip-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: #2563eb;
+  text-decoration: none;
+  margin-top: 2px;
+  transition: color 0.15s;
+}
+.fd-ekip-email:hover { color: #1d4ed8; text-decoration: underline; }
+.fd-ekip-email .material-symbols-outlined { font-size: 13px; }
+[data-theme="dark"] .fd-ekip-email { color: #60a5fa; }
+[data-theme="dark"] .fd-ekip-email:hover { color: #93c5fd; }
 
 /* Role badges (shared ´┐¢ used in FirmaDetay + Profile) */
 .ekip-role-badge { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 99px; font-size: 0.68rem; font-weight: 700; }

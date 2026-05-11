@@ -71,8 +71,33 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enes Doğanay | 9 Mayıs 2026: Herhangi bir modal/popup açıkken arka plan scroll engelle */
+body:has(.teklif-popup-overlay),
+body:has(.ekip-modal-overlay),
+body:has(.ihale-modal-overlay),
+body:has(.tender-detail-overlay),
+body:has(.teklif-success-overlay),
+body:has(.firma-contact-overlay),
+body:has(.tom-edit-overlay),
+body:has(.tom-contact-overlay),
+body:has(.quote-modal-overlay),
+body:has(.confirm-overlay),
+body:has(.srm-overlay),
+body:has(.mop-delete-overlay),
+body:has(.msg-report-overlay),
+body:has(.reg-modal-overlay),
+body:has(.cmp-success-overlay),
+body:has(.act-modal-overlay),
+body:has(.aeo-modal-overlay),
+body:has(.afd-purge-overlay),
+body:has(.otp-overlay) {
+  overflow: hidden;
 }
 
 /* Enes Doğanay | 8 Nisan 2026: PageLoader nokta animasyonu — inline style ile birlikte çalışır */

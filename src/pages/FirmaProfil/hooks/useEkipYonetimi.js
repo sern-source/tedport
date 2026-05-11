@@ -7,6 +7,7 @@ import {
   removeEkipMember,
   updateMemberRole,
   toggleMemberVisibility,
+  toggleMemberEmailVisibility,
   updateMemberPermissions,
 } from '../services/ekipService';
 
@@ -111,6 +112,20 @@ export const useEkipYonetimi = ({ companyId, userId, firmaAdi, showFpToast }) =>
     [companyId, showFpToast]
   );
 
+  // Enes Doğanay | 9 Mayıs 2026: E-posta görünürlük toggle
+  const handleEmailVisibilityToggle = useCallback(
+    async (targetUserId, currentValue) => {
+      const newValue = !currentValue;
+      try {
+        await toggleMemberEmailVisibility(targetUserId, companyId, newValue);
+        setEkip((prev) => prev.map((m) => (m.user_id === targetUserId ? { ...m, show_email: newValue } : m)));
+      } catch {
+        showFpToast('error', 'E-posta görünürlüğü güncellenemedi.');
+      }
+    },
+    [companyId, showFpToast]
+  );
+
   const handlePermissionsUpdate = useCallback(
     async (targetUserId, key, value) => {
       const member = ekip.find((m) => m.user_id === targetUserId);
@@ -151,6 +166,7 @@ export const useEkipYonetimi = ({ companyId, userId, firmaAdi, showFpToast }) =>
     handleUyeCikar,
     handleRolGuncelle,
     handleVisibilityToggle,
+    handleEmailVisibilityToggle,
     handlePermissionsUpdate,
   };
 };

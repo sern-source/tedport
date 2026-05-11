@@ -3,13 +3,13 @@ import React from 'react';
 
 const SORT_OPTIONS = [
     { value: 'score', label: 'Puana Göre', icon: 'workspace_premium' },
-    { value: 'price-asc', label: 'Fiyat ↑', icon: 'arrow_upward' },
-    { value: 'price-desc', label: 'Fiyat ↓', icon: 'arrow_downward' },
+    { value: 'price-asc', label: 'Fiyat ↑ (Artan)', icon: 'arrow_upward' },
+    { value: 'price-desc', label: 'Fiyat ↓ (Azalan)', icon: 'arrow_downward' },
     { value: 'delivery', label: 'Teslim Süresi', icon: 'local_shipping' },
     { value: 'date', label: 'Tarih (Yeni)', icon: 'schedule' },
 ];
 
-const SORT_LABEL_MAP = { score: 'Puana Göre', 'price-asc': 'Fiyat ↑', 'price-desc': 'Fiyat ↓', delivery: 'Teslim Süresi', date: 'Tarih (Yeni)' };
+const SORT_LABEL_MAP = { score: 'Puana Göre', 'price-asc': 'Fiyat ↑ (Artan)', 'price-desc': 'Fiyat ↓ (Azalan)', delivery: 'Teslim Süresi', date: 'Tarih (Yeni)' };
 
 const IhaleOffersToolbar = ({ displayCount, offerFilter, setOfferFilter, sortState, setSortState, sortDropdownRef, showScorePanel, setShowScorePanel, weights, onBalanceChange, setShowScoringInfo, onExportCSV }) => (
     <div className="tom-offers-section">
@@ -55,7 +55,15 @@ const IhaleOffersToolbar = ({ displayCount, offerFilter, setOfferFilter, sortSta
         {showScorePanel && (
             <div className="tom-score-panel">
                 <div className="tom-score-panel__head">
-                    <h4><span className="material-symbols-outlined">tune</span> Akıllı Puanlama Ağırlıkları</h4>
+                    <div className="tom-score-panel__head-row">
+                        <h4><span className="material-symbols-outlined">tune</span> Akıllı Puanlama Ağırlıkları</h4>
+                        {/* Enes Doğanay | 9 Mayıs 2026: Sıfırlama butonu — varsayılan 50/50 ağırlığına döner */}
+                        {(weights.price !== 50 || weights.delivery !== 50) && (
+                            <button type="button" className="tom-score-reset-btn" onClick={() => onBalanceChange(50)} data-tooltip="Başlangıç konumuna getir" data-tooltip-pos="bottom">
+                                <span className="material-symbols-outlined">restart_alt</span>Sıfırla
+                            </button>
+                        )}
+                    </div>
                     <p>Kriterlerin ağırlığını kaydırarak teklifleri kendi önceliklerinize göre sıralayın.</p>
                 </div>
                 <div className="tom-balance-slider">

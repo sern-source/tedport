@@ -6,6 +6,8 @@ import IhaleFormModal from './IhaleFormModal';
 import TenderDetail from './TenderDetail';
 import TeklifPopup from './TeklifPopup';
 import IhalePublishSuccess from './IhalePublishSuccess';
+// Enes Doğanay | 11 Mayıs 2026: Şablon modal
+import IhaleTemplateModal from '../../FirmaProfil/components/IhaleTemplateModal';
 
 const IhalelerModals = ({
     myTendersHook, ihaleFormHook, teklifHook,
@@ -39,6 +41,7 @@ const IhalelerModals = ({
             stepperStep={ihaleFormHook.stepperStep} setStepperStep={ihaleFormHook.setStepperStep}
             yeniGereksinimMadde={ihaleFormHook.yeniGereksinimMadde} setYeniGereksinimMadde={ihaleFormHook.setYeniGereksinimMadde}
             yeniGereksinimAciklama={ihaleFormHook.yeniGereksinimAciklama} setYeniGereksinimAciklama={ihaleFormHook.setYeniGereksinimAciklama}
+            yeniGereksinimAdet={ihaleFormHook.yeniGereksinimAdet} setYeniGereksinimAdet={ihaleFormHook.setYeniGereksinimAdet}
             emailInput={ihaleFormHook.emailInput} setEmailInput={ihaleFormHook.setEmailInput} emailStatus={ihaleFormHook.emailStatus}
             firmaSearchTerm={ihaleFormHook.firmaSearchTerm} setFirmaSearchTerm={ihaleFormHook.setFirmaSearchTerm}
             firmaSearchResults={ihaleFormHook.firmaSearchResults} firmaSearching={ihaleFormHook.firmaSearching}
@@ -52,6 +55,26 @@ const IhalelerModals = ({
             handleFirmaSearch={ihaleFormHook.handleFirmaSearch} addDavetliFirma={ihaleFormHook.addDavetliFirma} removeDavetliFirma={ihaleFormHook.removeDavetliFirma}
             handleFileAdd={ihaleFormHook.handleFileAdd} removeFile={ihaleFormHook.removeFile}
             handleFormSubmit={ihaleFormHook.handleFormSubmit}
+            templateHook={ihaleFormHook.templateHook}
+        />
+        {/* Enes Doğanay | 11 Mayıs 2026: Şablon seçim/kaydetme modalı */}
+        <IhaleTemplateModal
+            showModal={ihaleFormHook.templateHook?.showModal}
+            modalMode={ihaleFormHook.templateHook?.modalMode}
+            templates={ihaleFormHook.templateHook?.templates || []}
+            loading={ihaleFormHook.templateHook?.loading}
+            error={ihaleFormHook.templateHook?.error}
+            saveName={ihaleFormHook.templateHook?.saveName}
+            setSaveName={ihaleFormHook.templateHook?.setSaveName}
+            saving={ihaleFormHook.templateHook?.saving}
+            saveSuccess={ihaleFormHook.templateHook?.saveSuccess}
+            deleteConfirmId={ihaleFormHook.templateHook?.deleteConfirmId}
+            setDeleteConfirmId={ihaleFormHook.templateHook?.setDeleteConfirmId}
+            currentForm={ihaleFormHook.form}
+            onClose={ihaleFormHook.templateHook?.closeModal}
+            onApplyTemplate={ihaleFormHook.applyTemplate}
+            onSaveTemplate={ihaleFormHook.templateHook?.handleSaveTemplate}
+            onDeleteTemplate={ihaleFormHook.templateHook?.handleDeleteTemplate}
         />
         {/* Enes Doğanay | 11 Nisan 2026: İhale detay drawer */}
         {detailTender && (

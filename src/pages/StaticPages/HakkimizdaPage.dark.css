@@ -65,6 +65,31 @@
   background-color: var(--primary);
 }
 
+/* Enes Doğanay | 11 Mayıs 2026: CTA buton dark mode */
+[data-theme="dark"] .about-page-wrapper .about-btn-white {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-white:hover {
+  background-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-transparent {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-transparent:hover {
+  background-color: rgba(255, 255, 255, 0.13);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
 /* Footer */
 /* Enes Doğanay | 4 Mayıs 2026: footer padding azaltıldı */
 .about-page-wrapper .about-footer {

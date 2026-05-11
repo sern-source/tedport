@@ -351,12 +351,29 @@
     font-size: 12px;
     color: var(--text-dark);
     line-height: 1.45;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
 }
 
 .ihale-preview__section li span {
     color: var(--text-muted);
     font-weight: 600;
     margin-right: 3px;
+}
+
+/* Enes Doğanay | 9 Mayıs 2026: Önizlemede adet badge */
+.ihale-preview__adet-badge {
+    margin-left: auto;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .ihale-preview__tags {
@@ -431,6 +448,13 @@
     background: #1e3a5f;
     color: #93c5fd;
     border-color: #2563eb;
+}
+
+/* Enes Doğanay | 9 Mayıs 2026: Önizleme adet badge dark */
+[data-theme="dark"] .ihale-preview__adet-badge {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #1d4ed8;
 }
 
 

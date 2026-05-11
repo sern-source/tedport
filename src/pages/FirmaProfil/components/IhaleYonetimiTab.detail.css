@@ -92,6 +92,9 @@
     font-size: 0.78rem;
     color: #334155;
     line-height: 1.5;
+    /* Enes Doğanay | 11 Mayıs 2026: Uzun kesintisiz metin taşmasını önle */
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 /* Teklif Kalemleri */
@@ -141,7 +144,10 @@
 }
 
 .tom-kalemler__wrap td strong { font-weight: 600; color: #0f172a; }
-.tom-kalemler__wrap tbody tr:hover { background: #fafbfc; }
+/* Enes Doğanay | 9 Mayıs 2026: Zebra stripe — okunurluğu artırır */
+.tom-kalemler__wrap tbody tr:nth-child(odd)  { background: #ffffff; }
+.tom-kalemler__wrap tbody tr:nth-child(even) { background: #f4f8ff; }
+.tom-kalemler__wrap tbody tr:hover { background: #eaf1ff; }
 
 .tom-kalemler__grouped-total {
     display: flex;

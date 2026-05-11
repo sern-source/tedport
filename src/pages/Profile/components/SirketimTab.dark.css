@@ -35,6 +35,11 @@
 }
 [data-theme="dark"] .ekip-visibility-btn { background: #0f172a; border-color: #334155; color: #4ade80; }
 [data-theme="dark"] .ekip-visibility-btn--hidden { color: #475569; border-color: #1e293b; }
+/* Enes Doğanay | 9 Mayıs 2026: E-posta toggle dark mode */
+[data-theme="dark"] .ekip-email-btn { background: #0f172a; border-color: #1e293b; color: #475569; }
+[data-theme="dark"] .ekip-email-btn--on { border-color: #1e40af; color: #60a5fa; }
+[data-theme="dark"] .ekip-email-btn--on:hover { background: #172554; }
+[data-theme="dark"] .ekip-card__email { color: #64748b; }
 [data-theme="dark"] .ekip-hidden-chip { background: #1e293b; color: #475569; border-color: #334155; }
 [data-theme="dark"] .ekip-permissions { border-top-color: #253347; }
 [data-theme="dark"] .ekip-permissions-label { color: #475569; }

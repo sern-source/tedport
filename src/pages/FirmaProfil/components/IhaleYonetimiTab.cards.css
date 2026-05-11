@@ -11,6 +11,14 @@
     box-shadow: 0 2px 10px rgba(37,99,235,0.05);
 }
 
+/* Enes Doğanay | 9 Mayıs 2026: Score panel head row — h4 + reset butonu yan yana */
+.tom-score-panel__head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
 .tom-score-panel__head h4 {
     margin: 0;
     font-size: 0.8rem;
@@ -22,6 +30,29 @@
 }
 
 .tom-score-panel__head h4 .material-symbols-outlined { font-size: 16px; color: #3b82f6; }
+
+/* Enes Doğanay | 9 Mayıs 2026: Sıfırlama butonu — compact outline */
+.tom-score-reset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 7px;
+    border: 1px solid #cbd5e1;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+.tom-score-reset-btn .material-symbols-outlined { font-size: 13px; }
+.tom-score-reset-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #334155;
+}
 
 .tom-score-panel__head p {
     margin: 3px 0 0;

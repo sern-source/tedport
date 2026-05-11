@@ -1,24 +1,42 @@
 // Enes Doğanay | 6 Mayıs 2026: Firmalar sayfası — tüm Supabase sorguları
 import { supabase } from '../../../supabaseClient';
 import { getManagedCompanyId } from '../../../services/companyManagementApi';
-import { expandSearchTerms } from '../../../constants/synonyms';
-import { sanitizeSearch, ISTANBUL_AVRUPA, ISTANBUL_ANADOLU } from '../utils/firmaUtils';
+import { expandSearchTerms, levenshtein } from '../../../constants/synonyms';
+import { sanitizeSearch, ISTANBUL_AVRUPA, ISTANBUL_ANADOLU, getSektorKeywords } from '../utils/firmaUtils';
 
 const PAGE_SIZE = 10;
 
 /* ── Yardımcı sorgu oluşturucular ──────────────────────────────────────── */
-const buildSearchQuery = (query, search) => {
+// Enes Doğanay | 11 Mayıs 2026: searchMode: 'all' | 'firma' | 'urun'
+const buildSearchQuery = (query, search, searchMode = 'all') => {
   const trimmed = search?.trim() || '';
   if (trimmed.length < 2) return query;
   const safe = sanitizeSearch(trimmed);
   if (safe.length < 2) return query;
-  const orParts = expandSearchTerms(safe).flatMap(term => [
-    `firma_adi.ilike."%${term}%"`,
-    `description.ilike."%${term}%"`,
-    `ana_sektor.ilike."%${term}%"`,
-    `urun_kategorileri.ilike."%${term}%"`,
-    `arama_etiketleri.ilike."%${term}%"`,
-  ]);
+  const terms = expandSearchTerms(safe);
+  let orParts;
+  if (searchMode === 'firma') {
+    orParts = terms.flatMap(term => [
+      `firma_adi.ilike."%${term}%"`,
+      `description.ilike."%${term}%"`,
+      `ana_sektor.ilike."%${term}%"`,
+    ]);
+  } else if (searchMode === 'urun') {
+    orParts = terms.flatMap(term => [
+      `urun_kategorileri.ilike."%${term}%"`,
+      `arama_etiketleri.ilike."%${term}%"`,
+      `description.ilike."%${term}%"`,
+      `category_name.ilike."%${term}%"`,
+    ]);
+  } else {
+    orParts = terms.flatMap(term => [
+      `firma_adi.ilike."%${term}%"`,
+      `description.ilike."%${term}%"`,
+      `ana_sektor.ilike."%${term}%"`,
+      `urun_kategorileri.ilike."%${term}%"`,
+      `arama_etiketleri.ilike."%${term}%"`,
+    ]);
+  }
   return query.or(orParts.join(','));
 };
 
@@ -31,10 +49,31 @@ const buildFilterQuery = (query, filters) => {
     });
     query = query.or(parts.join(','));
   }
-  if (filters.sectors?.length > 0)
-    query = query.or(filters.sectors.map(s => `ana_sektor.ilike."%${sanitizeSearch(s)}%"`).join(','));
-  if (filters.categories?.length > 0)
-    query = query.or(filters.categories.map(c => `category_name.ilike."%${sanitizeSearch(c)}%"`).join(','));
+  if (filters.sectors?.length > 0) {
+    // Enes Doğanay | 11 Mayıs 2026: Her sektör → keyword listesi → ana_sektor + urun_kategorileri + arama_etiketleri OR araması
+    // Spesifik kategori adları genellikle urun_kategorileri / arama_etiketleri'nde geçer
+    const sectorParts = filters.sectors.flatMap(s => {
+      const keywords = getSektorKeywords(s);
+      return keywords.flatMap(k => [
+        `ana_sektor.ilike."%${sanitizeSearch(k)}%"`,
+        `urun_kategorileri.ilike."%${sanitizeSearch(k)}%"`,
+        `arama_etiketleri.ilike."%${sanitizeSearch(k)}%"`,
+      ]);
+    });
+    query = query.or(sectorParts.join(','));
+  }
+  // Enes Doğanay | 11 Mayıs 2026: Sektör gibi keyword bazlı OR araması — category_name + urun_kategorileri + arama_etiketleri
+  if (filters.categories?.length > 0) {
+    const catParts = filters.categories.flatMap(c => {
+      const keywords = getSektorKeywords(c);
+      return keywords.flatMap(k => [
+        `category_name.ilike."%${sanitizeSearch(k)}%"`,
+        `urun_kategorileri.ilike."%${sanitizeSearch(k)}%"`,
+        `arama_etiketleri.ilike."%${sanitizeSearch(k)}%"`,
+      ]);
+    });
+    query = query.or(catParts.join(','));
+  }
   return query;
 };
 
@@ -64,19 +103,47 @@ export const fetchSidebarData = async () => {
   return { cityData, categoryData: catData };
 };
 
-export const fetchFirmalar = async ({ page, search, filters, sortMode }) => {
+export const fetchFirmalar = async ({ page, search, filters, sortMode, searchMode = 'all' }) => {
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   let query = supabase.from('firmalar').select(
     'firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres, onayli_hesap',
     { count: 'exact' }
   );
-  query = buildSearchQuery(query, search);
+  // Enes Doğanay | 11 Mayıs 2026: searchMode'a göre farklı alanlar aranır
+  query = buildSearchQuery(query, search, searchMode);
   query = buildFilterQuery(query, filters);
   query = applySorting(query, sortMode);
   const { data, error, count } = await query.range(from, to);
   if (error) throw new Error(error.message);
   return { data, count };
+};
+
+// Enes Doğanay | 11 Mayıs 2026: Firma modu 0 sonuç — DB firma adlarında Levenshtein öneri
+export const fetchFirmaNameSuggestion = async (query) => {
+  const safe = sanitizeSearch(query?.trim() || '');
+  if (safe.length < 2) return null;
+  const firstChar = safe.charAt(0);
+  const { data, error } = await supabase
+    .from('firmalar')
+    .select('firma_adi')
+    .ilike('firma_adi', `${firstChar}%`)
+    .limit(150);
+  if (error || !data?.length) return null;
+  const lower = safe.toLocaleLowerCase('tr');
+  const maxDist = Math.max(3, Math.floor(lower.length / 2));
+  let best = null;
+  let bestDist = Infinity;
+  for (const row of data) {
+    const name = (row.firma_adi || '').toLocaleLowerCase('tr');
+    if (Math.abs(name.length - lower.length) > maxDist + 2) continue;
+    const d = levenshtein(lower, name);
+    if (d < bestDist && d <= maxDist && d > 0) {
+      bestDist = d;
+      best = row.firma_adi;
+    }
+  }
+  return best;
 };
 
 export const fetchFavorites = async (userId) => {

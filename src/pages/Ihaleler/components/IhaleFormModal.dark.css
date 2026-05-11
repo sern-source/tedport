@@ -1,5 +1,27 @@
 [data-theme="dark"] .ihale-modal__close { color: var(--text-light); }
 [data-theme="dark"] .ihale-modal__close:hover { color: var(--text-dark); }
+/* Enes Doğanay | 11 Mayıs 2026: Şablonlarım butonu dark mode */
+[data-theme="dark"] .ihale-modal__template-btn {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.35);
+    color: #93c5fd;
+}
+[data-theme="dark"] .ihale-modal__template-btn:hover {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+/* Enes Doğanay | 11 Mayıs 2026: Şablon Kaydet butonu dark mode */
+[data-theme="dark"] .ihale-btn-template {
+    background: rgba(22, 163, 74, 0.12);
+    color: #4ade80;
+    border-color: rgba(22, 163, 74, 0.3);
+}
+[data-theme="dark"] .ihale-btn-template:hover {
+    background: #16a34a;
+    color: #fff;
+    border-color: #16a34a;
+}
 [data-theme="dark"] .ihale-field select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 }
@@ -86,6 +108,11 @@
 [data-theme="dark"] .ihale-req-table__num { background: #1e3a5f; color: #93c5fd; }
 [data-theme="dark"] .ihale-req-table__remove:hover { background: #450a0a; color: #f87171; }
 [data-theme="dark"] .ihale-file-item button:hover { background: #450a0a; color: #f87171; }
+
+/* Enes Doğanay | 11 Mayıs 2026: Adet grup dark */
+[data-theme="dark"] .ihale-req-adet-group { background: #0f172a; border-color: #334155; }
+[data-theme="dark"] .ihale-req-adet-group:focus-within { border-color: #3b82f6; background: #1e293b; }
+[data-theme="dark"] .ihale-req-adet-input { color: #e2e8f0; }
 
 /* === Önizleme ek === */
 [data-theme="dark"] .ihale-preview__anonim-badge {

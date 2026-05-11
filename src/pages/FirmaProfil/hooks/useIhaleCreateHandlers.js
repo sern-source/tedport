@@ -64,8 +64,10 @@ export const useIhaleCreateHandlers = ({
 
     const addGereksinim = () => {
         if (!createReqState.madde.trim()) return;
-        setCreateForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: createReqState.madde.trim(), aciklama: createReqState.aciklama.trim() }] }));
-        setCreateReqState({ madde: '', aciklama: '' });
+        // Enes Doğanay | 9 Mayıs 2026: Adet alanı eklendi
+        const adet = Math.max(1, parseInt(createReqState.adet) || 1);
+        setCreateForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: createReqState.madde.trim(), aciklama: createReqState.aciklama.trim(), adet }] }));
+        setCreateReqState({ madde: '', aciklama: '', adet: '1' });
     };
     const removeGereksinim = (id) => setCreateForm(p => ({ ...p, gereksinimler: p.gereksinimler.filter(g => g.id !== id) }));
 

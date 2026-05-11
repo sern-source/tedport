@@ -81,6 +81,25 @@ export const submitTeklif = async ({ session, teklifForm, teklifTender, existing
     };
 
     if (isUpdate) {
+        // Enes Doğanay | 9 Mayıs 2026: Revize öncesi mevcut değerleri geçmiş tablosuna kaydet
+        if (!isDraft && existingOffer.durum !== 'taslak') {
+            const newRevizeNo = (existingOffer.revize_sayisi || 0) + 1;
+            await supabase.from('ihale_teklif_gecmisi').insert({
+                teklif_id: existingOffer.id,
+                revize_no: newRevizeNo,
+                kalemler: existingOffer.kalemler || null,
+                toplam_tutar: existingOffer.toplam_tutar,
+                para_birimi: existingOffer.para_birimi || 'TRY',
+                kdv_dahil: existingOffer.kdv_dahil,
+                teslim_suresi_gun: existingOffer.teslim_suresi_gun || null,
+                teslim_aciklamasi: existingOffer.teslim_aciklamasi || null,
+                not_field: existingOffer.not_field || null,
+                ek_dosya_url: existingOffer.ek_dosya_url || null,
+                ek_dosya_adi: existingOffer.ek_dosya_adi || null,
+                olusturulma_tarihi: existingOffer.updated_at || existingOffer.created_at,
+            });
+            payload.revize_sayisi = newRevizeNo;
+        }
         const { data: updatedRows, error: updateErr } = await supabase
             .from('ihale_teklifleri')
             .update({ ...payload, updated_at: new Date().toISOString() })

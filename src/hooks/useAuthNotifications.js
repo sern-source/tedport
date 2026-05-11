@@ -40,14 +40,24 @@ export const useAuthNotifications = ({ authChecked, realtimeUserId, notifPrefsRe
             return;
         }
         const prefs = notifPrefsRef.current;
+        // Enes Doğanay | 11 Mayıs 2026: Chat tipi bildirimler — isChatNotif önceden belirlenmeli (pref check'te kullanılıyor)
+        const isChatNotif = ['quote_reply', 'quote_message', 'quote_received', 'tender_offer_message'].includes(n.type);
+        // Enes Doğanay | 11 Mayıs 2026: Per-tip pref kontrolü
+        // Chat olmayan bildirimler: pref kapalıysa tamamen bastır (toast + badge)
+        // Chat bildirimleri: pref kapalıysa sadece toast bastır — badge (onNewNotification) her zaman güncellenir
+        let suppressToast = false;
         if (prefs) {
             const prefKey = NOTIF_TYPE_TO_PREF_KEY[n.type];
-            if (prefKey && prefs[prefKey] === false) return;
+            if (prefKey && prefs[prefKey] === false) {
+                if (!isChatNotif) return; // chat değil → tamamen bastır
+                suppressToast = true;    // chat → sadece toast bastır, badge güncelle
+            }
         }
-        const isChatNotif = ['quote_reply', 'quote_message', 'quote_received', 'tender_offer_message'].includes(n.type);
         const isViewingThisChat = isChatNotif && n.metadata?.teklif_id && String(activeViewingTeklifIdRef.current) === String(n.metadata.teklif_id);
         if (!isViewingThisChat) {
-            if (!prefs || prefs.anlik_bildirimler !== false) {
+            // Enes Doğanay | 11 Mayıs 2026: Chat mesajları anlik_bildirimler=false olsa bile toast göster
+            // (direkt mesajlar kritik; global "sessiz" ayarından muaf)
+            if (!suppressToast && (isChatNotif || !prefs || prefs.anlik_bildirimler !== false)) {
                 setToasts(prev => {
                     if (prev.some(t => t.id === n.id)) return prev;
                     // Enes Doğanay | 5 Mayıs 2026: Max 5 toast

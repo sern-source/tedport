@@ -23,6 +23,8 @@ const RowActions = ({ tender, isOwnTender, userOffers, onEdit, onTeklif, onConta
     const isAccepted = hasOffer && offer.durum === 'kabul';
     const isRejected = hasOffer && offer.durum === 'red';
     const isDraft = hasOffer && offer.durum === 'taslak';
+    // Enes Doğanay | 9 Mayıs 2026: Kapalı ihalede teklif yoksa buton gösterme
+    const isClosed = ['kapali', 'iptal'].includes(getTenderStatusMeta(tender).key);
     return (
         <>
             {isAccepted ? (
@@ -35,14 +37,14 @@ const RowActions = ({ tender, isOwnTender, userOffers, onEdit, onTeklif, onConta
                         <span className="material-symbols-outlined">contact_phone</span>
                     </button>
                 </>
-            ) : (
+            ) : (!isClosed || hasOffer) ? (
                 <button type="button"
                     className={`tenders-list-action-btn ${hasOffer ? (isDraft ? 'tenders-list-action-btn--draft' : (isRejected ? 'tenders-list-action-btn--rejected' : 'tenders-list-action-btn--update')) : 'tenders-list-action-btn--join'}`}
                     data-tooltip={hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Reddedildi — Güncelle' : 'Teklifi Güncelle')) : 'Teklif Ver'}
                     onClick={(e) => onTeklif(tender, e)}>
                     <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
                 </button>
-            )}
+            ) : null}
             <button type="button" className="tenders-list-action-btn tenders-list-action-btn--detail" data-tooltip="Detay" onClick={() => onDetail(tender)}>
                 <span className="material-symbols-outlined">visibility</span>
             </button>

@@ -34,7 +34,7 @@ const MyOfferChatView = ({
     return (
         <SharedChatModal
             title={displayName}
-            subtitle={offer.gonderen_email}
+            subtitle={tender.referans_no || null}
             avatarUrl={anonim ? null : firmaLogo}
             tenderTag={tenderTitle}
             messages={normalizedMessages}

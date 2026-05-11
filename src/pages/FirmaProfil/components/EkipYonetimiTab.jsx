@@ -34,6 +34,7 @@ const EkipYonetimiTab = ({
   handleUyeCikar,
   handleRolGuncelle,
   handleVisibilityToggle,
+  handleEmailVisibilityToggle,
   handlePermissionsUpdate,
 }) => (
   <div className="ekip-panel">
@@ -119,6 +120,7 @@ const EkipYonetimiTab = ({
               confirmRemoveMember={confirmRemoveMember}
               setConfirmRemoveMember={setConfirmRemoveMember}
               handleVisibilityToggle={handleVisibilityToggle}
+              handleEmailVisibilityToggle={handleEmailVisibilityToggle}
               handleRolGuncelle={handleRolGuncelle}
               handleUyeCikar={handleUyeCikar}
               handlePermissionsUpdate={handlePermissionsUpdate}

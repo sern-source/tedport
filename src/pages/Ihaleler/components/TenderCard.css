@@ -59,8 +59,9 @@
     gap: 4px;
     padding: 3px 10px;
     border-radius: 999px;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: #fff;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1.5px solid #bfdbfe;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.3px;
@@ -168,18 +169,18 @@
 .tender-chip .material-symbols-outlined { font-size: 12px; }
 
 .tender-chip--type {
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: #f1f5f9;
+    color: #64748b;
 }
 
 .tender-chip--kdv {
-    background: #f0fdf4;
-    color: #15803d;
+    background: #f1f5f9;
+    color: #64748b;
 }
 
 .tender-chip--location {
-    background: #fef3c7;
-    color: #92400e;
+    background: #f1f5f9;
+    color: #64748b;
 }
 
 /* === Bilgi satırları === */
@@ -338,34 +339,42 @@
     transform: none;
 }
 
-/* Enes Doğanay | 13 Nisan 2026: Teklifi Güncelle butonu */
+/* Enes Doğanay | 11 Mayıs 2026: Teklifi Güncelle — soft outline yesil (Teklif Ver ile aynı stil) */
 .tender-action--update {
-    background: linear-gradient(135deg, #059669, #34d399);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.18);
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1.5px solid #bbf7d0;
 }
 
 .tender-action--update:hover {
-    box-shadow: 0 6px 18px rgba(5, 150, 105, 0.28);
+    background: #16a34a;
+    color: #fff;
+    border-color: #16a34a;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.22);
     transform: translateY(-1px);
 }
 
 .tender-action--update:disabled {
-    background: #94a3b8;
+    background: var(--bg-light);
+    color: #94a3b8;
+    border-color: var(--border);
     cursor: default;
     box-shadow: none;
     transform: none;
 }
 
-/* Enes Doğanay | 15 Temmuz 2025: Taslağı Görüntüle */
+/* Enes Doğanay | 11 Mayıs 2026: Taslağı Görüntüle — soft outline turuncu */
 .tender-action--draft {
-    background: linear-gradient(135deg, #d97706, #fbbf24);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.18);
+    background: #fffbeb;
+    color: #d97706;
+    border: 1.5px solid #fde68a;
 }
 
 .tender-action--draft:hover {
-    box-shadow: 0 6px 18px rgba(217, 119, 6, 0.28);
+    background: #d97706;
+    color: #fff;
+    border-color: #d97706;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.22);
     transform: translateY(-1px);
 }
 
@@ -481,35 +490,34 @@
 }
 
 /* === Durum badge'leri === */
+/* Enes Doğanay | 9 Mayıs 2026: Outline stil — arka plan renksiz, sadece yazı ve border renkli */
 .tender-card-status {
     display: inline-flex;
     align-items: center;
     height: fit-content;
-    padding: 5px 10px;
+    padding: 4px 9px;
     border-radius: 8px;
     font-size: 0.72rem;
-    font-weight: 800;
+    font-weight: 700;
     white-space: nowrap;
     letter-spacing: 0.02em;
+    border: 1.5px solid currentColor;
+    background: transparent;
 }
 
 .tender-card-status-canli {
-    background: #dcfce7;
-    color: #15803d;
+    color: #16a34a;
 }
 
 .tender-card-status-yaklasan {
-    background: #fef3c7;
     color: #b45309;
 }
 
 .tender-card-status-kapali {
-    background: #fee2e2;
     color: #b91c1c;
 }
 
 .tender-card-status-draft {
-    background: #f1f5f9;
     color: #64748b;
 }
 
@@ -521,18 +529,25 @@
     border-color: #2563eb;
     box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15), inset 0 1px 0 rgba(255,255,255,0.05);
 }
+/* Enes Doğanay | 11 Mayıs 2026: Dark modda badge soft */
+[data-theme="dark"] .tender-card--own .tender-card__header::after {
+    background: rgba(37, 99, 235, 0.18);
+    color: #93c5fd;
+    border-color: rgba(147, 197, 253, 0.3);
+}
 [data-theme="dark"] .tender-card-skeleton {
     background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
     background-size: 200% 100%;
 }
-[data-theme="dark"] .tender-chip--type { background: #1e3a5f; color: #93c5fd; }
-[data-theme="dark"] .tender-chip--kdv { background: #14532d; color: #86efac; }
-[data-theme="dark"] .tender-chip--location { background: #451a03; color: #fde68a; }
+[data-theme="dark"] .tender-chip--type { background: #1e293b; color: #94a3b8; }
+[data-theme="dark"] .tender-chip--kdv { background: #1e293b; color: #94a3b8; }
+[data-theme="dark"] .tender-chip--location { background: #1e293b; color: #94a3b8; }
 
-[data-theme="dark"] .tender-card-status-canli { background: #14532d; color: #86efac; }
-[data-theme="dark"] .tender-card-status-yaklasan { background: #451a03; color: #fde68a; }
-[data-theme="dark"] .tender-card-status-kapali { background: #450a0a; color: #fca5a5; }
-[data-theme="dark"] .tender-card-status-draft { background: #1e293b; color: var(--text-muted); }
+/* Enes Doğanay | 9 Mayıs 2026: Outline badge dark mode */
+[data-theme="dark"] .tender-card-status-canli { color: #86efac; }
+[data-theme="dark"] .tender-card-status-yaklasan { color: #fde68a; }
+[data-theme="dark"] .tender-card-status-kapali { color: #fca5a5; }
+[data-theme="dark"] .tender-card-status-draft { color: var(--text-muted); }
 
 /* Enes Doğanay | 4 Mayıs 2026: outline→fill butonlar dark */
 [data-theme="dark"] .tender-action--join {
@@ -555,7 +570,28 @@
     color: #fff;
     border-color: #2563eb;
 }
+/* Enes Doğanay | 11 Mayıs 2026: Soft butonlar dark mode */
+[data-theme="dark"] .tender-action--update {
+    background: rgba(22, 163, 74, 0.12);
+    color: #86efac;
+    border-color: rgba(22, 163, 74, 0.3);
+}
+[data-theme="dark"] .tender-action--update:hover {
+    background: #16a34a;
+    color: #fff;
+    border-color: #16a34a;
+}
 [data-theme="dark"] .tender-action--update:disabled { background: #334155; color: var(--text-muted); border-color: #334155; }
+[data-theme="dark"] .tender-action--draft {
+    background: rgba(217, 119, 6, 0.12);
+    color: #fde68a;
+    border-color: rgba(217, 119, 6, 0.3);
+}
+[data-theme="dark"] .tender-action--draft:hover {
+    background: #d97706;
+    color: #fff;
+    border-color: #d97706;
+}
 [data-theme="dark"] .tender-action--own-edit:disabled { background: #334155; color: var(--text-muted); border-color: #334155; }
 [data-theme="dark"] .tender-action--firma { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }
 
