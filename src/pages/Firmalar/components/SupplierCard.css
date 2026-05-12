@@ -185,10 +185,11 @@
 
 .verified-icon { color: var(--primary); font-size: 16px; }
 
-.verified-badge-inline { display: inline-flex; align-items: center; gap: 2px; vertical-align: middle; }
+/* Enes Doğanay | 12 Mayıs 2026: margin-left — şirket adından boşluk */
+.verified-badge-inline { display: inline-flex; align-items: center; gap: 2px; vertical-align: middle; margin-left: 6px; }
 .verified-text { font-size: 0.7rem; font-weight: 600; color: var(--primary); }
 
-.platform-badge-inline { display: inline-flex; align-items: center; gap: 2px; vertical-align: middle; }
+.platform-badge-inline { display: inline-flex; align-items: center; gap: 2px; vertical-align: middle; margin-left: 6px; }
 .platform-badge-icon { color: #92400e; font-size: 14px; }
 .platform-badge-text {
   font-size: 0.65rem; font-weight: 500; color: #92400e;
