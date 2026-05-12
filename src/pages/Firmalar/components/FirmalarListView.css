@@ -89,8 +89,25 @@
 .firmalar-list-col--name:hover .firmalar-list-name-text { color: var(--primary); }
 .firmalar-list-col--name .verified-icon { color: #137fec; }
 
-.firmalar-list-col--sector { font-size: 0.82rem; color: var(--text-muted); }
+/* Enes Doğanay | 12 Mayıs 2026: Sektör pill — grid meta-sector ile aynı stil */
+.firmalar-list-col--sector { font-size: 0.82rem; }
 .firmalar-list-col--location { font-size: 0.82rem; color: var(--text-muted); }
+
+.list-sector-pill {
+  display: inline-block;
+  background: rgba(37, 99, 235, 0.07);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #2563eb;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+}
 
 .firmalar-list-col--action {
   display: flex;
@@ -196,3 +213,9 @@
 [data-theme="dark"] .firmalar-list-header { background: rgba(255,255,255,0.03); }
 [data-theme="dark"] .firmalar-list-row:hover { background: rgba(255,255,255,0.03); }
 [data-theme="dark"] .firmalar-list-avatar-img { background: #0f172a; border-color: var(--border); }
+/* Enes Doğanay | 12 Mayıs 2026: Sektör pill dark mode */
+[data-theme="dark"] .list-sector-pill {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+}

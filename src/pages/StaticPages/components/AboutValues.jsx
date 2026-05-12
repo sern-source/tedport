@@ -1,34 +1,29 @@
 // Enes Doğanay | 11 Mayıs 2026: Hakkımızda — misyon & vizyon kartları
+// Enes Doğanay | 12 Mayıs 2026: Kısaltıldı — uzun paragraflar okunmuyor
 import React from 'react';
 
 const AboutValues = () => (
     <section className="about-section">
         <div className="about-container">
             <div className="about-section-header">
-                <h2>Değerlerimiz &amp; Hedeflerimiz</h2>
-                <p>Bizi biz yapan temel prensiplerimiz ve geleceğe bakış açımız.</p>
+                <h2>Misyon &amp; Vizyon</h2>
+                <p>Bizi bu işe iten neden ve hedeflediğimiz yer.</p>
             </div>
             <div className="about-values-grid">
-                {/* Mission */}
                 <div className="about-value-card">
                     <div className="about-value-icon">
                         <span className="material-symbols-outlined">target</span>
                     </div>
                     <h3>Misyonumuz</h3>
-                    <p>Tedport'un misyonu; firmaların doğru tedarikçi, doğru müşteri ve doğru iş fırsatlarına daha kısa sürede ulaşmasını sağlayarak satınalma ve satış süreçlerini dijitalleştirmek ve ticari verimliliği artırmaktır.</p>
-                    <p>Birçok şirket için tedarikçi araştırması yapmak, teklif toplamak, müşteri bulmak ve güvenilir firmalara ulaşmak ciddi zaman ve operasyon maliyeti oluşturur. Tedport, bu süreçleri merkezi bir yapıda toplayarak işletmelerin daha hızlı, daha doğru ve daha verimli ticari kararlar almasına yardımcı olur.</p>
-                    <p>Platformumuz sayesinde firmalar; satınalma taleplerini kolayca yayınlayabilir, birden fazla tedarikçiden teklif alabilir, tedarikçi karşılaştırmaları yapabilir, hedef müşterilere ve tedarikçilere ulaşabilir, satış ve pazarlama süreçlerini geliştirebilir, firma görünürlüğünü artırabilir ve yeni iş bağlantıları kurabilir.</p>
+                    <p>Türkiye'deki firmaların doğru tedarikçiye, doğru müşteriye ve doğru iş fırsatına daha kısa sürede ulaşmasını sağlamak. Satınalma ve satış süreçlerini merkezi, şeffaf ve ölçülebilir hale getirmek.</p>
                     <div className="about-value-glow glow-blue"></div>
                 </div>
-                {/* Vision */}
                 <div className="about-value-card">
                     <div className="about-value-icon">
                         <span className="material-symbols-outlined">visibility</span>
                     </div>
                     <h3>Vizyonumuz</h3>
-                    <p>Tedport olarak vizyonumuz; firmaların satınalma, tedarikçi bulma, müşteri kazanma ve satış geliştirme süreçlerini tek bir dijital platform üzerinden yönetebildiği güçlü bir B2B ekosistemi oluşturmaktır.</p>
-                    <p>Tedport'un uzun vadeli hedefi; satınalma profesyonelleri, satış ekipleri ve tedarikçi firmalar için Türkiye'nin en çok tercih edilen dijital iş ağı haline gelmektir. Firmaların klasik arama motorları ve farklı platformlarda saatler süren firma araştırması süreçlerini azaltarak, ihtiyaç duydukları şirketlere ve ürünlere doğrudan erişebilecekleri merkezi bir yapı sunmayı amaçlıyoruz.</p>
-                    <p>Vizyonumuz yalnızca firmaları listeleyen bir platform olmak değil; satınalma ve satış süreçlerinde aktif değer üreten, ticari iş birliklerini hızlandıran ve şirketlerin büyümesine katkı sağlayan dijital bir iş geliştirme merkezi olmaktır.</p>
+                    <p>Türkiye'nin en çok tercih edilen B2B dijital ticaret ağı olmak. Satınalma profesyonelleri, satış ekipleri ve tedarikçi firmalar için tek adres — yazılım şirketi değil, ekosistem kurucusu.</p>
                     <div className="about-value-glow glow-purple"></div>
                 </div>
             </div>

@@ -93,9 +93,13 @@ body {
   font-weight: 500;
 }
 
-.filter-chip--cities  { background: #e0e7ff; color: #4f46e5; border: 1px solid #c7d2fe; }
-.filter-chip--sectors { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+.filter-chip--cities    { background: #e0e7ff; color: #4f46e5; border: 1px solid #c7d2fe; }
+.filter-chip--sectors   { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
 .filter-chip--categories { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+/* Enes Doğanay | 12 Mayıs 2026: Onaylı firma filtre tag */
+.filter-chip--verified  { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+[data-theme="dark"] .filter-chip--verified { background: rgba(59,130,246,0.15); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
 
 /* ── Paylaşımlı butonlar ─────────────────────────────────────────────── */
 /* Enes Doğanay | 11 Mayıs 2026: İletişime Geç butonu büyütüldü */

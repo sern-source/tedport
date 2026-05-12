@@ -1,4 +1,5 @@
 // Enes Doğanay | 11 Mayıs 2026: Hakkımızda — hero section
+// Enes Doğanay | 12 Mayıs 2026: Sorun odaklı framing — "Neyi değiştiriyoruz?"
 import React from 'react';
 
 const AboutHero = ({ onContact }) => (
@@ -6,18 +7,15 @@ const AboutHero = ({ onContact }) => (
         <div className="about-container about-hero-inner">
             <div className="about-hero-content">
                 <span className="about-badge">Hakkımızda</span>
-                <h1 className="about-hero-title">Biz Kimiz?</h1>
+                <h1 className="about-hero-title">Türkiye&apos;nin Dijital Ticaret Altyapısını Kuruyoruz</h1>
                 <p className="about-hero-desc">
-                    Tedport, firmaların satınalma, tedarikçi bulma, müşteri kazanma ve satış süreçlerini
-                    dijital ortamda daha hızlı, verimli ve güvenilir şekilde yönetebilmesi için
-                    geliştirilmiş yeni nesil bir B2B iş platformudur.
+                    Firmalar birbirini bulamıyor. Satınalma süreçleri yavaş. Güven problemi çözülmemiş.
+                    Tedport, bu döngüyü kırmak için kuruldu.
                 </p>
                 <p className="about-hero-desc">
-                    Günümüzde şirketler için doğru tedarikçiye ulaşmak, güvenilir iş ortakları bulmak
-                    ve satınalma operasyonlarını etkin yönetmek ciddi zaman ve maliyet gerektirmektedir.
-                    Tedport, bu süreci kolaylaştırmak amacıyla binlerce firmayı tek platform altında
-                    buluşturarak şirketlerin ticari bağlantılarını güçlendirmesine ve yeni iş fırsatlarına
-                    daha hızlı ulaşmasına yardımcı olur.
+                    B2B satınalma, tedarikçi keşfi ve ihale süreçlerini tek platformda toplayarak
+                    Türkiye&apos;deki firmaların birbirine doğrudan, güvenli ve hızlı bağlandığı
+                    bir ticaret ağı inşa ediyoruz.
                 </p>
                 <div className="about-hero-buttons">
                     <button className="about-btn-primary" onClick={onContact}>İletişime Geçin</button>

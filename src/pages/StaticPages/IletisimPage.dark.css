@@ -32,3 +32,74 @@
   background-color: #1e293b;
   border-top-color: #334155;
 }
+
+/* Enes Doğanay | 12 Mayıs 2026: Amaç kartları dark mode */
+[data-theme="dark"] .contact-page-wrapper .contact-purpose-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-purpose-card:hover {
+  border-color: #3b82f6;
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-purpose-card.active {
+  background: rgba(37, 99, 235, 0.15);
+  border-color: #3b82f6;
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-purpose-card .material-symbols-outlined {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-purpose-label {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-purpose-desc {
+  color: #64748b;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Güven sinyalleri dark mode */
+[data-theme="dark"] .contact-page-wrapper .contact-trust-item {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-trust-item .material-symbols-outlined {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-trust-item strong {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-trust-item p {
+  color: #64748b;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Alert dark mode */
+[data-theme="dark"] .contact-alert-success {
+  background: rgba(22, 163, 74, 0.15);
+  color: #4ade80;
+  border-color: rgba(22, 163, 74, 0.25);
+}
+
+[data-theme="dark"] .contact-alert-error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Form label dark mode */
+[data-theme="dark"] .contact-page-wrapper .contact-form-group label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-form-card h2 {
+  color: var(--text-dark);
+}
+
+[data-theme="dark"] .contact-page-wrapper .contact-info-header h2 {
+  color: var(--text-dark);
+}

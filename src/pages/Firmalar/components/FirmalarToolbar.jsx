@@ -8,7 +8,8 @@ const SORT_OPTIONS = [
   { value: 'z-a', label: "Z'den A'ya", icon: 'arrow_upward' },
 ];
 
-const FirmalarToolbar = ({ totalCount, hasSearch, loading, page, totalPages, onPageChange, sortMode, onSortChange, viewMode, onViewToggle }) => {
+// Enes Doğanay | 12 Mayıs 2026: onlyVerified quick-filter prop eklendi
+const FirmalarToolbar = ({ totalCount, hasSearch, loading, page, totalPages, onPageChange, sortMode, onSortChange, viewMode, onViewToggle, onlyVerified, onVerifiedToggle }) => {
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = useRef(null);
 
@@ -50,6 +51,16 @@ const FirmalarToolbar = ({ totalCount, hasSearch, loading, page, totalPages, onP
       )}
 
       <div className="firmalar-toolbar-actions">
+        {/* Enes Doğanay | 12 Mayıs 2026: Onaylı firma quick-filter */}
+        <button
+          type="button"
+          className={`firmalar-verified-btn${onlyVerified ? ' firmalar-verified-btn--active' : ''}`}
+          onClick={onVerifiedToggle}
+          aria-pressed={onlyVerified}
+        >
+          <span className="material-symbols-outlined">verified</span>
+          Onaylı
+        </button>
         <div className="firmalar-sort-wrap" ref={sortRef}>
           <button type="button" className="firmalar-sort-trigger"
             onClick={() => setSortOpen(o => !o)}

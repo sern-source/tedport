@@ -181,3 +181,51 @@
 [data-theme="dark"] .firmalar-view-toggle { background: var(--bg-card, #1e293b); }
 [data-theme="dark"] .firmalar-view-toggle:hover { background: #1e2d4a; border-color: var(--primary); color: #93c5fd; }
 
+/* Enes Doğanay | 12 Mayıs 2026: Onaylı firma quick-filter butonu */
+.firmalar-verified-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-light);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.firmalar-verified-btn .material-symbols-outlined { font-size: 16px; }
+
+.firmalar-verified-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.firmalar-verified-btn--active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #1d4ed8;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.firmalar-verified-btn--active:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+@media (max-width: 480px) {
+  .firmalar-verified-btn { height: 30px; padding: 0 8px; border-radius: 8px; font-size: 11px; }
+}
+
+[data-theme="dark"] .firmalar-verified-btn { background: var(--bg-card, #1e293b); border-color: var(--border); color: var(--text-muted); }
+[data-theme="dark"] .firmalar-verified-btn:hover { border-color: #2563eb; color: #93c5fd; background: #1e2d4a; }
+[data-theme="dark"] .firmalar-verified-btn--active { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border-color: #1d4ed8; }
+

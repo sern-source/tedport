@@ -528,3 +528,184 @@
 [data-theme="dark"] .cmp-field textarea {
     background: #0c1626;
 }
+
+/* ── Ana Sektör Custom Dropdown ─────────────────────────────────────────
+   Enes Doğanay | 12 Mayıs 2026: cmp-sektor-* — combobox: listeden seç veya serbest yaz
+   ──────────────────────────────────────────────────────────────────────── */
+.cmp-sektor-wrap {
+    position: relative;
+}
+
+.cmp-sektor-trigger {
+    display: flex;
+    align-items: center;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fafbfd;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    overflow: hidden;
+}
+
+.cmp-sektor-trigger:focus-within,
+.cmp-sektor-trigger--open {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.12);
+    background: #fff;
+}
+
+.cmp-sektor-input {
+    flex: 1;
+    height: 100%;
+    padding: 0 10px;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.84rem;
+    color: var(--text-dark);
+    outline: none;
+    min-width: 0;
+}
+
+.cmp-sektor-input::placeholder {
+    color: #9ca3af;
+}
+
+.cmp-sektor-chevron {
+    font-size: 18px;
+    color: #6b7280;
+    flex-shrink: 0;
+    padding-right: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+}
+
+.cmp-sektor-trigger--open .cmp-sektor-chevron {
+    transform: rotate(180deg);
+}
+
+@keyframes cmpSektorFadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.cmp-sektor-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    max-height: 240px;
+    overflow-y: auto;
+    animation: cmpSektorFadeIn 0.15s ease;
+}
+
+.cmp-sektor-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 0.82rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s;
+}
+
+.cmp-sektor-option:hover {
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.cmp-sektor-option--active {
+    color: #2563eb;
+    font-weight: 600;
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.cmp-sektor-check {
+    font-size: 16px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.cmp-sektor-empty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    font-size: 0.78rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.cmp-sektor-empty .material-symbols-outlined {
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+/* Dark mode */
+[data-theme="dark"] .cmp-sektor-trigger {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .cmp-sektor-trigger:focus-within,
+[data-theme="dark"] .cmp-sektor-trigger--open {
+    border-color: #3b9eff;
+    background: #1e293b;
+}
+
+[data-theme="dark"] .cmp-sektor-input {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .cmp-sektor-input::placeholder {
+    color: #475569;
+}
+
+[data-theme="dark"] .cmp-sektor-chevron {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .cmp-sektor-menu {
+    background: #0f172a;
+    border-color: #334155;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .cmp-sektor-option {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .cmp-sektor-option:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .cmp-sektor-option--active {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .cmp-sektor-check {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .cmp-sektor-empty {
+    color: #64748b;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .cmp-sektor-menu {
+        max-height: 200px;
+    }
+}

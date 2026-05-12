@@ -15,25 +15,22 @@ const AboutFeatures = () => (
     <section className="about-section about-gray-bg">
         <div className="about-container">
             <div className="about-section-header">
+                <span className="about-badge">Platform Özellikleri</span>
                 <h2>Tedport&apos;ta Neler Yapabilirsiniz?</h2>
                 <p>Satınalma, tedarik ve satış süreçlerinizi tek platformda yönetin.</p>
             </div>
-            <div className="about-why-inner">
-                <div className="about-why-content">
-                    <div className="about-feature-list">
-                        {FEATURES.map(f => (
-                            <div key={f.icon} className="about-feature-item">
-                                <div className="about-feature-icon">
-                                    <span className="material-symbols-outlined">{f.icon}</span>
-                                </div>
-                                <div className="about-feature-text">
-                                    <h4>{f.title}</h4>
-                                    <p>{f.desc}</p>
-                                </div>
-                            </div>
-                        ))}
+            <div className="about-feature-grid">
+                {FEATURES.map(f => (
+                    <div key={f.icon} className="about-feature-item">
+                        <div className="about-feature-icon">
+                            <span className="material-symbols-outlined">{f.icon}</span>
+                        </div>
+                        <div className="about-feature-text">
+                            <h4>{f.title}</h4>
+                            <p>{f.desc}</p>
+                        </div>
                     </div>
-                </div>
+                ))}
             </div>
         </div>
     </section>

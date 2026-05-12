@@ -113,6 +113,37 @@
     border-left: 3px solid #3b82f6;
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Urgency satırı — 2 günden az kalan canlı ihale */
+.tenders-list-row--urgent {
+    border-left: 3px solid #f97316;
+    background: linear-gradient(90deg, #fff7ed, var(--bg-white)) !important;
+}
+.tenders-list-row--urgent:hover {
+    background: linear-gradient(90deg, #ffedd5, var(--bg-light)) !important;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Yeni badge — liste başlık sütunu */
+.tenders-list-new-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-right: 5px;
+    vertical-align: middle;
+    animation: newBadgePulseList 2s ease-in-out infinite;
+}
+
+@keyframes newBadgePulseList {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+    50%       { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0); }
+}
+
 @keyframes tenderHighlightPulse {
     0%, 100% { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5); }
     50% { box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.25), 0 0 20px rgba(37, 99, 235, 0.1); }
@@ -402,6 +433,17 @@
 [data-theme="dark"] .tenders-list-row--own {
     background: linear-gradient(90deg, #1e3a5f, #1e293b) !important;
     border-left-color: #3b82f6;
+}
+/* Enes Doğanay | 12 Mayıs 2026: Urgency + badge dark mode */
+[data-theme="dark"] .tenders-list-row--urgent {
+    border-left-color: #f97316;
+    background: linear-gradient(90deg, rgba(249, 115, 22, 0.08), transparent) !important;
+}
+[data-theme="dark"] .tenders-list-row--urgent:hover {
+    background: linear-gradient(90deg, rgba(249, 115, 22, 0.14), rgba(30, 41, 59, 0.6)) !important;
+}
+[data-theme="dark"] .tenders-list-new-badge {
+    background: #1d4ed8;
 }
 [data-theme="dark"] .tenders-list-col--firma { color: #60a5fa; }
 [data-theme="dark"] .tenders-list-col--firma:hover { color: #93c5fd; }

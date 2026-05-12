@@ -63,7 +63,15 @@ const useIhaleler = (firmaFilter) => {
             const q = searchTerm.trim().toLocaleLowerCase('tr-TR');
             const matchesQuery = !q || [tender.baslik, tender.aciklama, tender.kategori, tender.ihale_tipi, tender.firma_adi, tender.firma_konum, tender.referans_no]
                 .some(v => (v || '').toLocaleLowerCase('tr-TR').includes(q));
-            const matchesStatus = statusFilter === 'all' || statusMeta.key === statusFilter;
+            // Enes Doğanay | 12 Mayıs 2026: 'acil' filtresi — canlı + 3 günden az kalan
+            let matchesStatus;
+            if (statusFilter === 'acil') {
+                const now = new Date();
+                const deadline = tender.son_basvuru_tarihi ? new Date(tender.son_basvuru_tarihi) : null;
+                matchesStatus = statusMeta.key === 'canli' && deadline && (deadline - now) < 3 * 24 * 60 * 60 * 1000 && (deadline - now) > 0;
+            } else {
+                matchesStatus = statusFilter === 'all' || statusMeta.key === statusFilter;
+            }
             return matchesQuery && matchesStatus;
         })
         .sort((a, b) => {

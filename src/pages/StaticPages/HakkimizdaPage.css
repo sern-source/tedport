@@ -144,6 +144,7 @@
 }
 
 .about-page-wrapper .about-badge {
+  display: inline-block;
   width: fit-content;
   background-color: #eff6ff;
   color: #1d4ed8;
@@ -153,6 +154,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
 }
 
 /* Enes Doğanay | 4 Mayıs 2026: hero title küçültüldü */

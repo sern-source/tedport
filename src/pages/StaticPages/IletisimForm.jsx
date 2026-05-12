@@ -11,6 +11,10 @@ const IletisimForm = ({ formData, status, handleChange, handleSubmit }) => (
                     <input id="name" name="name" placeholder="Adınız ve Soyadınız" type="text" required className="contact-form-control" value={formData.name} onChange={handleChange} />
                 </div>
                 <div className="contact-form-group">
+                    <label htmlFor="company">Şirket Adı</label>
+                    <input id="company" name="company" placeholder="Şirketinizin adı" type="text" className="contact-form-control" value={formData.company} onChange={handleChange} />
+                </div>
+                <div className="contact-form-group full-width">
                     <label htmlFor="email">E-posta</label>
                     <input id="email" name="email" placeholder="ornek@sirket.com" type="email" required className="contact-form-control" value={formData.email} onChange={handleChange} />
                 </div>

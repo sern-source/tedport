@@ -67,15 +67,21 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
                 <span className="verified-text">Onaylı Firma</span>
               </span>
             )}
+            {/* Enes Doğanay | 12 Mayıs 2026: Otomatik Profil → Firma Onayı Bekleniyor */}
             {!supplier.isVerified && (
               <span className="platform-badge-inline">
-                <span className="material-symbols-outlined platform-badge-icon">public</span>
-                <span className="platform-badge-text">Otomatik Profil</span>
+                <span className="platform-badge-text">Firma Onayı Bekleniyor</span>
+                <span className="material-symbols-outlined platform-badge-icon">schedule</span>
               </span>
             )}
           </a>
         </h3>
-        <div className="meta-info">📍 {supplier.location}</div>
+        {/* Enes Doğanay | 12 Mayıs 2026: 📍 emoji → material icon + sektör pill */}
+        <div className="meta-info">
+          <span className="material-symbols-outlined" style={{ fontSize: '13px', flexShrink: 0 }}>location_on</span>
+          {supplier.location}
+          {supplier.sector && <span className="meta-sector" title={supplier.sector}>{supplier.sector}</span>}
+        </div>
         <div className="tags">
           {(supplier.tags || []).map((tag) => (
             <span key={tag} className="tag" style={{ cursor: 'pointer' }} onClick={() => onTagClick(tag)}>{tag}</span>

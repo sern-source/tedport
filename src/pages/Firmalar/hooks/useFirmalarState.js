@@ -21,7 +21,7 @@ export const useFirmalarState = ({ currentUserId }) => {
     const [debouncedSearch, setDebouncedSearch] = useState(urlSearch || savedState?.search || '');
     // Enes Doğanay | 11 Mayıs 2026: ?sector= varsa sektörü önceden seç — sessionStorage'a öncelik üstünde
     const [filters, setFilters] = useState(() => {
-        const base = savedState?.filters || { cities: [], categories: [], sectors: [] };
+        const base = savedState?.filters || { cities: [], categories: [], sectors: [], onlyVerified: false };
         if (urlSector) return { ...base, sectors: [decodeURIComponent(urlSector)] };
         return base;
     });
@@ -65,11 +65,17 @@ export const useFirmalarState = ({ currentUserId }) => {
         if (currentUserId) { try { localStorage.setItem(`tedport_firmalar_view_${currentUserId}`, next); } catch {} }
     };
 
-    const removeFilterTag = (type, value) => setFilters(prev => ({ ...prev, [type]: prev[type].filter(x => x !== value) }));
+    // Enes Doğanay | 12 Mayıs 2026: verified type → boolean toggle, diğerleri array filtre
+    const removeFilterTag = (type, value) => {
+        if (type === 'verified') { setFilters(prev => ({ ...prev, onlyVerified: false })); return; }
+        setFilters(prev => ({ ...prev, [type]: prev[type].filter(x => x !== value) }));
+    };
+    // Enes Doğanay | 12 Mayıs 2026: verified tag eklendi
     const activeTags = [
         ...(filters.cities || []).map(c => ({ type: 'cities', value: c })),
         ...(filters.sectors || []).map(s => ({ type: 'sectors', value: s })),
         ...(filters.categories || []).map(c => ({ type: 'categories', value: c })),
+        ...(filters.onlyVerified ? [{ type: 'verified', value: 'Onaylı Firma' }] : []),
     ];
 
     return {

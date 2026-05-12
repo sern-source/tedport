@@ -24,6 +24,7 @@ export const fetchPublicTenders = async (firmaFilter) => {
     }
 
     const firmaIds = [...new Set((tenderData || []).map(t => t.firma_id).filter(Boolean))];
+    // Enes Doğanay | 12 Mayıs 2026: firma adı, sektör ve konum için firmalar join
     const { data: firmsData, error: firmsError } = firmaIds.length > 0
         ? await supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
         : { data: [], error: null };

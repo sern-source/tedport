@@ -118,6 +118,15 @@
     transform: translateY(-1px);
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Acil pill — turuncu/kırmızı aktif renk */
+.tenders-filter-pill--acil.active,
+.tenders-filter-pill--acil:hover {
+    color: #c2410c;
+    border-color: #fdba74;
+    background: #fff7ed;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.12);
+}
+
 /* === Sıralama dropdown === */
 .tenders-sort-box {
     position: relative;
@@ -309,6 +318,14 @@
     border-color: #2563eb;
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Acil pill dark mode */
+[data-theme="dark"] .tenders-filter-pill--acil.active,
+[data-theme="dark"] .tenders-filter-pill--acil:hover {
+    color: #fb923c;
+    border-color: rgba(249, 115, 22, 0.4);
+    background: rgba(249, 115, 22, 0.1);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.12);
+}
 [data-theme="dark"] .tenders-filter-pill.active,
 [data-theme="dark"] .tenders-filter-pill:hover {
     background: #1e3a5f;

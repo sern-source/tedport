@@ -8,10 +8,12 @@ const RowActions = ({ tender, isOwnTender, userOffers, onEdit, onTeklif, onConta
         const isClosed = ['kapali', 'iptal'].includes(getTenderStatusMeta(tender).key);
         return (
             <>
-                <button type="button" className="tenders-list-action-btn tenders-list-action-btn--own-edit" data-tooltip="İhaleyi Düzenle"
-                    onClick={(e) => { e.stopPropagation(); onEdit(tender); }} disabled={isClosed}>
-                    <span className="material-symbols-outlined">edit_square</span>
-                </button>
+                {!isClosed && (
+                    <button type="button" className="tenders-list-action-btn tenders-list-action-btn--own-edit" data-tooltip="İhaleyi Düzenle"
+                        onClick={(e) => { e.stopPropagation(); onEdit(tender); }}>
+                        <span className="material-symbols-outlined">edit_square</span>
+                    </button>
+                )}
                 <button type="button" className="tenders-list-action-btn tenders-list-action-btn--detail" data-tooltip="Detay" onClick={() => onDetail(tender)}>
                     <span className="material-symbols-outlined">visibility</span>
                 </button>
@@ -70,9 +72,14 @@ const TendersListView = ({
             const statusMeta = getTenderStatusMeta(tender);
             const isHighlighted = highlightTenderId === tender.id;
             const isOwnTender = !!(authManagedCompanyId && String(tender.firma_id) === String(authManagedCompanyId));
+            // Enes Doğanay | 12 Mayıs 2026: Grid ile uyumluluk — Yeni badge + urgency satır rengi
+            const now = new Date();
+            const isNew = tender.yayin_tarihi && (now - new Date(tender.yayin_tarihi)) < 24 * 60 * 60 * 1000;
+            const deadline = tender.son_basvuru_tarihi ? new Date(tender.son_basvuru_tarihi) : null;
+            const isUrgent = deadline && statusMeta.key === 'canli' && (deadline - now) < 2 * 24 * 60 * 60 * 1000 && (deadline - now) > 0;
             return (
                 <div key={tender.id} ref={isHighlighted ? highlightTenderRef : null}
-                    className={`tenders-list-row${isHighlighted ? ' tenders-list-row--highlight' : ''}${isOwnTender ? ' tenders-list-row--own' : ''}`}
+                    className={`tenders-list-row${isHighlighted ? ' tenders-list-row--highlight' : ''}${isOwnTender ? ' tenders-list-row--own' : ''}${isUrgent ? ' tenders-list-row--urgent' : ''}`}
                     onClick={() => onDetail(tender)}>
                     <span className="tenders-list-col tenders-list-col--firma"
                         onClick={(e) => { if (tender.anonim) return; e.stopPropagation(); onNavigateFirma(tender); }}>
@@ -80,7 +87,10 @@ const TendersListView = ({
                             <span className="tenders-list-anonim"><span className="material-symbols-outlined">visibility_off</span>Anonim</span>
                         ) : tender.firma_adi}
                     </span>
-                    <span className="tenders-list-col tenders-list-col--baslik">{tender.baslik}</span>
+                    <span className="tenders-list-col tenders-list-col--baslik">
+                        {isNew && <span className="tenders-list-new-badge">Yeni</span>}
+                        {tender.baslik}
+                    </span>
                     <span className="tenders-list-col tenders-list-col--konum">{[tender.teslim_il, tender.teslim_ilce].filter(Boolean).join(' / ') || '—'}</span>
                     <span className="tenders-list-col tenders-list-col--tarih">{formatTenderDate(tender.yayin_tarihi)}</span>
                     <span className="tenders-list-col tenders-list-col--tarih">{formatTenderDate(tender.son_basvuru_tarihi)}</span>

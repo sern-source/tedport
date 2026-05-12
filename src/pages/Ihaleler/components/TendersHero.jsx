@@ -1,4 +1,5 @@
 // Enes Doğanay | 5 Mayıs 2026: Kompakt hero — başlık + canlı/yaklaşan/kapanmış sayaçları
+// Enes Doğanay | 12 Mayıs 2026: Copy güncellendi — canlı B2B fırsat ağı hissi
 import React from 'react';
 import './TendersHero.css';
 
@@ -10,7 +11,7 @@ const TendersHero = ({ selectedFirmaName, liveCount, upcomingCount, closedCount 
             <p>
                 {selectedFirmaName
                     ? 'Bu firmaya ait aktif, yaklaşan ve kapanmış ihaleleri takip edin.'
-                    : 'Canlı satın alma fırsatlarını, yaklaşan talepleri ve kapanmış ihaleleri inceleyin.'}
+                    : 'Canlı B2B satın alma fırsatlarını keşfedin. Teklif verin, yeni müşteri kazanın.'}
             </p>
         </div>
         <div className="tenders-hero-compact__stats">

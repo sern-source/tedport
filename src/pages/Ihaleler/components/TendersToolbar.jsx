@@ -38,15 +38,16 @@ const TendersToolbar = ({
 
         <div className="tenders-filter-pills">
             {[
-                { key: 'all', label: 'Tümü', icon: 'apps' },
-                { key: 'canli', label: 'Canlı', icon: 'bolt' },
-                { key: 'yaklasan', label: 'Yaklaşan', icon: 'schedule' },
-                { key: 'kapali', label: 'Kapalı', icon: 'lock' }
+                { key: 'all',      label: 'Tümü',     icon: 'apps' },
+                { key: 'canli',    label: 'Canlı',     icon: 'bolt' },
+                { key: 'acil',     label: 'Acil',      icon: 'local_fire_department' },
+                { key: 'yaklasan', label: 'Yaklaşan',  icon: 'schedule' },
+                { key: 'kapali',   label: 'Kapalı',    icon: 'lock' }
             ].map((filterOption) => (
                 <button
                     key={filterOption.key}
                     type="button"
-                    className={`tenders-filter-pill ${statusFilter === filterOption.key ? 'active' : ''}`}
+                    className={`tenders-filter-pill${filterOption.key === 'acil' ? ' tenders-filter-pill--acil' : ''} ${statusFilter === filterOption.key ? 'active' : ''}`}
                     onClick={() => setStatusFilter(filterOption.key)}
                 >
                     <span className="material-symbols-outlined">{filterOption.icon}</span>

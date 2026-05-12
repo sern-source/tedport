@@ -41,6 +41,10 @@ const buildSearchQuery = (query, search, searchMode = 'all') => {
 };
 
 const buildFilterQuery = (query, filters) => {
+  // Enes Doğanay | 12 Mayıs 2026: Onaylı firma quick-filter
+  if (filters.onlyVerified) {
+    query = query.eq('onayli_hesap', true);
+  }
   if (filters.cities?.length > 0) {
     const parts = filters.cities.flatMap(city => {
       if (city === 'İstanbul (Avrupa)') return ISTANBUL_AVRUPA.map(d => `il_ilce.ilike."%${sanitizeSearch(d)}%"`);

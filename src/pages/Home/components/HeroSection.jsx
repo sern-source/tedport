@@ -90,13 +90,14 @@ const HeroSection = ({
 
                         <HeroSearchDropdown heroSuggestions={heroSuggestions} heroNoResults={heroNoResults} heroDidYouMean={heroDidYouMean} setSearchTerm={setSearchTerm} setHeroDidYouMean={setHeroDidYouMean} heroHistoryVisible={heroHistoryVisible} searchHistory={searchHistory} searchTerm={searchTerm} removeFromHistory={removeFromHistory} clearHistory={clearHistory} handleCloseSuggestions={handleCloseSuggestions} handleSearch={handleSearch} />
 
-                        {/* Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği — popüler etiket kısayolları */}
+                        {/* Enes Doğanay | 12 Mayıs 2026: Popüler etiketler — arama terimi label ile tam eşleşir */}
                         <div className="sc-popular-tags">
                             <span>Popüler:</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=çelik')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=çelik'); }}>Çelik Borular</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=pamuk')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=pamuk'); }}>Pamuklu Kumaş</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=ambalaj')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=ambalaj'); }}>Ambalaj</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=elektronik')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=elektronik'); }}>Elektronik</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Çelik%20Boru')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Çelik%20Boru'); }}>Çelik Boru</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Ambalaj')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Ambalaj'); }}>Ambalaj</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Elektronik')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Elektronik'); }}>Elektronik</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Makine')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Makine'); }}>Makine</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Tekstil')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Tekstil'); }}>Tekstil</span>
                         </div>
                     </div>
                 </div>

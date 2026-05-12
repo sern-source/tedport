@@ -7,7 +7,7 @@ import { useCompanyActionsManagement } from './useCompanyActionsManagement';
 import { parseLocation, buildLocation, serializeCatalog, ALL_CITIES } from '../utils/companyPanelUtils';
 
 const EMPTY_FIELDS = {
-    firma_adi: '', category_name: '', city: '', district: '',
+    firma_adi: '', category_name: '', ana_sektor: '', city: '', district: '',
     web_sitesi: '', telefon: '', eposta: '', logo_url: '',
     latitude: '', longitude: '', adres: '', description: ''
 };
@@ -27,6 +27,8 @@ export const useCompanyManagement = ({ company, onCompanyUpdated, onSave, onDele
         if (!company) return;
         const nextFields = {
             firma_adi: company.firma_adi || '', category_name: company.category_name || '',
+            // Enes Doğanay | 12 Mayıs 2026: ana_sektor artık state'e yükleniyor
+            ana_sektor: company.ana_sektor || '',
             city: parsedLoc.city, district: parsedLoc.district,
             web_sitesi: company.web_sitesi || '', telefon: company.telefon || '',
             eposta: company.eposta || '', logo_url: company.logo_url || '',
@@ -72,6 +74,8 @@ export const useCompanyManagement = ({ company, onCompanyUpdated, onSave, onDele
         try {
             const payload = {
                 firma_adi: fields.firma_adi, category_name: fields.category_name,
+                // Enes Doğanay | 12 Mayıs 2026: ana_sektor payload'a eklendi
+                ana_sektor: fields.ana_sektor || null,
                 il_ilce: buildLocation({ city: fields.city, district: fields.district }),
                 web_sitesi: fields.web_sitesi, telefon: fields.telefon, eposta: fields.eposta,
                 latitude: fields.latitude === '' ? null : Number(fields.latitude),

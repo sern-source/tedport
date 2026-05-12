@@ -11,6 +11,7 @@ import SEO from '../../components/SEO';
 import AboutHero from './components/AboutHero';
 import AboutStats from './components/AboutStats';
 import AboutValues from './components/AboutValues';
+import AboutProblem from './components/AboutProblem';
 import AboutFeatures from './components/AboutFeatures';
 import AboutTimeline from './components/AboutTimeline';
 import AboutCTA from './components/AboutCTA';
@@ -34,6 +35,7 @@ const About = () => {
                 <main className="about-main">
                     <AboutHero onContact={() => navigate('/iletisim')} />
                     <AboutStats />
+                    <AboutProblem />
                     <AboutValues />
                     <AboutFeatures />
                     <AboutTimeline />

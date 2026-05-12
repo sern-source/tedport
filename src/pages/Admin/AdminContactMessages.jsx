@@ -221,8 +221,7 @@ const AdminContactMessages = () => {
                       <div className="acm-card-left">
                         <div className="acm-card-avatar">{(msg.name || '?').charAt(0).toUpperCase()}</div>
                         <div className="acm-card-info">
-                          <span className="acm-card-name">{msg.name || 'İsimsiz'}</span>
-                          <span className="acm-card-email">{msg.email}</span>
+                          <span className="acm-card-name">{msg.name || 'İsimsiz'}</span>                            {msg.company && <span className="acm-card-company">{msg.company}</span>}                          <span className="acm-card-email">{msg.email}</span>
                         </div>
                       </div>
                       <div className="acm-card-right">
@@ -239,6 +238,12 @@ const AdminContactMessages = () => {
                           <div className="acm-card-subject">
                             <span className="material-symbols-outlined">subject</span>
                             <strong>{msg.subject}</strong>
+                          </div>
+                        )}
+                        {msg.company && (
+                          <div className="acm-card-detail-row">
+                            <span className="material-symbols-outlined">apartment</span>
+                            <span>{msg.company}</span>
                           </div>
                         )}
                         <div className="acm-card-message">{msg.message}</div>

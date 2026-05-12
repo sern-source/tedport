@@ -7,9 +7,12 @@ import { useFirmaAuth } from './useFirmaAuth';
 import { useQuoteRequest } from './useQuoteRequest';
 import { useFirmalarState } from './useFirmalarState';
 
+// Enes Doğanay | 12 Mayıs 2026: sector eklendi — kart meta-info'da gösterilir
 const mapFirmaData = (item) => ({
     id: item.firmaID, name: item.firma_adi, isBest: item.best,
     isVerified: item.onayli_hesap === true, location: formatLocation(item.il_ilce),
+    // Enes Doğanay | 12 Mayıs 2026: ana_sektor yoksa category_name'e fall back — panel "Ana Sektör" alanı category_name'i yazar
+    sector: item.ana_sektor || item.category_name || '',
     tags: degerleriDiziyeCevir(item.urun_kategorileri), description: item.description,
     images: item.logo_url?.includes('firma-logolari') ? item.logo_url : null,
     telefon: item.telefon || '', eposta: item.eposta || '', web_sitesi: item.web_sitesi || '', adres: item.adres || '',

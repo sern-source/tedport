@@ -11,7 +11,9 @@ const TIMELINE = [
 const AboutTimeline = () => (
     <section className="about-section">
         <div className="about-container">
-            <h2 className="about-timeline-title">Tarihçemiz</h2>
+            <div className="about-section-header">
+                <h2>Tarihçemiz</h2>
+            </div>
             <div className="about-timeline">
                 <div className="about-timeline-line"></div>
                 {TIMELINE.map((item, idx) => (

@@ -35,7 +35,8 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                         </span>
                         <div>
                             <h2>{fields.firma_adi || 'Firma Paneli'}</h2>
-                            <p>{fields.ana_sektor ? `${fields.ana_sektor} · Firma bilgilerini düzenle` : 'Firma bilgilerini düzenle ve yönet'}</p>
+                            {/* Enes Doğanay | 12 Mayıs 2026: ana_sektor yoksa category_name göster */}
+                            <p>{(fields.ana_sektor || fields.category_name) ? `${fields.ana_sektor || fields.category_name} · Firma bilgilerini düzenle` : 'Firma bilgilerini düzenle ve yönet'}</p>
                         </div>
                     </div>
                     <div className="cmp-hero__kpis">

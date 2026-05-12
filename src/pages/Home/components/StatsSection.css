@@ -4,7 +4,7 @@
     background: var(--bg-white);
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
-    padding: 24px 0 28px;
+    padding: 16px 0 20px;
     position: relative;
     overflow: hidden;
 }
@@ -21,11 +21,7 @@
 .supplier-connect-wrapper .sc-stats-header {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
-}
-
-.supplier-connect-wrapper .sc-stats-badge {
-    display: inline-flex;
+    margin-bottom: 14px;
     align-items: center;
     gap: 5px;
     background: rgba(37, 99, 235, 0.07);
@@ -57,7 +53,7 @@
 
 @media (min-width: 768px) {
     .supplier-connect-wrapper .sc-stats {
-        padding: 28px 0 32px;
+        padding: 20px 0 24px;
     }
     .supplier-connect-wrapper .sc-stats-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -99,24 +95,24 @@
 
 /* Enes Doğanay | 12 Mayıs 2026: İkon çemberi */
 .supplier-connect-wrapper .sc-stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
     background: color-mix(in srgb, var(--stat-color) 10%, transparent);
     border: 1px solid color-mix(in srgb, var(--stat-color) 22%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .supplier-connect-wrapper .sc-stat-icon .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 18px;
     color: var(--stat-color);
 }
 
 .supplier-connect-wrapper .sc-stat-num {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 900;
     line-height: 1.1;
     margin-bottom: 3px;
@@ -131,7 +127,7 @@
 
 @media (min-width: 540px) {
     .supplier-connect-wrapper .sc-stat-num {
-        font-size: 26px;
+        font-size: 22px;
     }
     .supplier-connect-wrapper .sc-stat-label {
         font-size: 12px;

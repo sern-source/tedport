@@ -55,20 +55,24 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
                 <span className="verified-text">Onaylı Firma</span>
               </span>
             )}
+            {/* Enes Doğanay | 12 Mayıs 2026: Otomatik Profil → Firma Onayı Bekleniyor */}
             {!supplier.isVerified && (
               <span className="platform-badge-inline">
-                <span className="material-symbols-outlined platform-badge-icon" style={{ fontSize: '13px' }}>public</span>
-                <span className="platform-badge-text">Otomatik Profil</span>
+                <span className="platform-badge-text">Firma Onayı Bekleniyor</span>
+                <span className="material-symbols-outlined platform-badge-icon" style={{ fontSize: '13px' }}>schedule</span>
               </span>
             )}
           </a>
 
+          {/* Enes Doğanay | 12 Mayıs 2026: Grid ile uyumluluk — supplier.sector pill */}
           <span className="firmalar-list-col firmalar-list-col--sector"
             onClick={() => navigate(`/firmadetay/${supplier.id}`)}
             role="button" tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${supplier.id}`); }}
           >
-            {(supplier.tags || []).slice(0, 2).join(', ') || '—'}
+            {supplier.sector
+              ? <span className="list-sector-pill" title={supplier.sector}>{supplier.sector}</span>
+              : <span style={{ color: 'var(--text-muted)' }}>—</span>}
           </span>
           <span className="firmalar-list-col firmalar-list-col--location"
             onClick={() => navigate(`/firmadetay/${supplier.id}`)}

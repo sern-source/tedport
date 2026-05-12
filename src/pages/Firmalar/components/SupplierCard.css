@@ -15,10 +15,11 @@
   position: relative;
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Premium hover — glow ring + daha güçlü shadow */
 .supplier-card:hover {
-  border-color: rgba(19, 127, 236, 0.25);
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.11), 0 2px 6px rgba(15, 23, 42, 0.06);
-  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(15, 23, 42, 0.08), 0 0 0 3px rgba(37, 99, 235, 0.08);
+  transform: translateY(-3px);
   z-index: 60;
 }
 
@@ -211,6 +212,30 @@
 
 @media (min-width: 640px) { .meta-info { font-size: 0.72rem; } }
 
+/* Enes Doğanay | 12 Mayıs 2026: Sektör pill — meta-info içinde */
+/* Enes Doğanay | 12 Mayıs 2026: max-width artırıldı — uzun sektör adları için */
+.meta-sector {
+  display: inline-block;
+  background: rgba(37, 99, 235, 0.07);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #2563eb;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+}
+
+[data-theme="dark"] .meta-sector {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -272,8 +297,8 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 [data-theme="dark"] .supplier-card:hover {
-  border-color: rgba(19, 127, 236, 0.3);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.22), 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 /* Enes Doğanay | 7 Mayıs 2026: dark modda logo alanı — logosuz kartlarda da koyu zemin yok */
 [data-theme="dark"] .main-image { background: var(--bg-card, #1e293b); }
