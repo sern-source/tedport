@@ -88,6 +88,13 @@
     box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Başarı overlay dark mode */
+[data-theme="dark"] .teklif-success-overlay { background: rgba(0, 0, 0, 0.72); }
+[data-theme="dark"] .teklif-success-card { background: var(--bg-white); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6); }
+[data-theme="dark"] .teklif-success-card h3 { color: #34d399; }
+[data-theme="dark"] .teklif-success-card p { color: var(--text-muted); }
+[data-theme="dark"] .teklif-success-card__btn { background: linear-gradient(135deg, #059669, #34d399); }
+
 /* Enes Doğanay | 1 Mayıs 2026: İhale yayınlama modalındaki paylaşım linki */
 .ihale-publish-link-row {
     display: flex;
@@ -242,3 +249,39 @@
 
 /* === Dark mode === */
 /* Enes Doğanay | 4 Mayıs 2026: compact cool dark mode teklif popup */
+
+/* Enes Doğanay | 12 Mayıs 2026: Mobil responsive */
+@media (max-width: 480px) {
+    .teklif-success-card {
+        padding: 28px 20px 24px;
+        border-radius: 18px;
+    }
+
+    .teklif-success-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .teklif-success-card__btn {
+        width: 100%;
+        padding: 11px 20px;
+    }
+
+    .teklif-withdraw-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .teklif-withdraw-modal-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 20px;
+    }
+
+    .ihale-publish-link-row {
+        flex-wrap: wrap;
+    }
+
+    .ihale-publish-link-row__copy {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -17,7 +17,7 @@ const TeklifPopup = ({
     teklifDosya, setTeklifDosya, teklifDosyaRef,
     teklifSaving, teklifError,
     teklifSuccess, setTeklifSuccess,
-    userOffers,
+    userOffers, isTeklifDirty,
     withdrawConfirm, setWithdrawConfirm, withdrawing,
     draftDeleteConfirm, setDraftDeleteConfirm, draftDeleting,
     currencyModalIdx, setCurrencyModalIdx,
@@ -34,6 +34,7 @@ const TeklifPopup = ({
             setCurrencyModalIdx={setCurrencyModalIdx} setCurrencySearch={setCurrencySearch}
             setWithdrawConfirm={setWithdrawConfirm} setDraftDeleteConfirm={setDraftDeleteConfirm}
             onClose={onClose} onSubmit={onSubmit} onUpdateKalem={onUpdateKalem} getGroupedTotals={getGroupedTotals}
+            isTeklifDirty={isTeklifDirty}
         />
         {/* Enes Doğanay | 14 Nisan 2026: Para birimi seçim modal */}
         <TeklifCurrencyModal

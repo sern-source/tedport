@@ -1,10 +1,42 @@
 // Enes Doğanay | 5 Mayıs 2026: İhale yayınlama başarı modalı bileşeni
+// Enes Doğanay | 12 Mayıs 2026: type='update' desteği eklendi
 import React from 'react';
 import './IhalePublishSuccess.css';
 
 // Enes Doğanay | 5 Mayıs 2026: Yalnızca UI — state props ile gelir
-const IhalePublishSuccess = ({ ihalePublishSuccess, publishedLinkCopied, setPublishedLinkCopied, onClose }) => {
+const IhalePublishSuccess = ({ ihalePublishSuccess, publishedLinkCopied, setPublishedLinkCopied, onClose, type }) => {
     if (!ihalePublishSuccess) return null;
+
+    if (type === 'update') {
+        return (
+            <div className="teklif-success-overlay" onClick={onClose}>
+                <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+                    <div className="teklif-success-card__icon">
+                        <span className="material-symbols-outlined">edit_note</span>
+                    </div>
+                    <h3>İhale Güncellendi!</h3>
+                    <p>Değişiklikleriniz başarıyla kaydedildi.</p>
+                    <button className="teklif-success-card__btn" onClick={onClose}>Tamam</button>
+                </div>
+            </div>
+        );
+    }
+
+    // Enes Doğanay | 12 Mayıs 2026: Taslak kaydedildi modalı
+    if (type === 'draft') {
+        return (
+            <div className="teklif-success-overlay" onClick={onClose}>
+                <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+                    <div className="teklif-success-card__icon">
+                        <span className="material-symbols-outlined">save</span>
+                    </div>
+                    <h3>Taslak Kaydedildi!</h3>
+                    <p>Değişiklikleriniz taslak olarak kaydedildi.</p>
+                    <button className="teklif-success-card__btn" onClick={onClose}>Tamam</button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="teklif-success-overlay" onClick={onClose}>

@@ -1,5 +1,5 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Teklif koordinatör hook — popup, iletişim, teklif mutasyonları
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { fetchUserOffers, fetchFirmaContactInfo, fetchCurrentUserOffersMap } from '../services/teklifFormService';
 import useTeklifSubmitActions from './useTeklifSubmitActions';
 
@@ -8,7 +8,7 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
     const {
         setTeklifForm, setTeklifDosya, setTeklifError, setTeklifTender,
         setLoginPromptTenderId, setLoginPromptPos,
-        teklifSuccess,
+        teklifSuccess, setOriginalTeklifForm,
     } = formState;
 
     const [userOffers, setUserOffers] = useState({});
@@ -51,12 +51,16 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
         const existing = userOffers[String(tender.id)];
         if (existing) {
             const loadedKalemler = Array.isArray(existing.kalemler) ? existing.kalemler.map(k => ({ ...k, para_birimi: k.para_birimi || existing.para_birimi || 'TRY' })) : [];
-            setTeklifForm({ kalemler: loadedKalemler, genel_toplam: existing.toplam_tutar ? String(existing.toplam_tutar) : '', para_birimi: existing.para_birimi || 'TRY', kdv_dahil: existing.kdv_dahil || false, teslim_suresi_gun: existing.teslim_suresi_gun ? String(existing.teslim_suresi_gun) : '', teslim_aciklamasi: existing.teslim_aciklamasi || '', not: existing.not_field || '' });
+            // Enes Doğanay | 12 Mayıs 2026: formData — snapshot + state aynı nesne ile başlat
+            const formData = { kalemler: loadedKalemler, genel_toplam: existing.toplam_tutar ? String(existing.toplam_tutar) : '', para_birimi: existing.para_birimi || 'TRY', kdv_dahil: existing.kdv_dahil || false, teslim_suresi_gun: existing.teslim_suresi_gun ? String(existing.teslim_suresi_gun) : '', teslim_aciklamasi: existing.teslim_aciklamasi || '', not: existing.not_field || '' };
+            setTeklifForm(formData);
+            setOriginalTeklifForm(formData);
         } else {
             const gereksinimler = Array.isArray(tender.gereksinimler) ? tender.gereksinimler : [];
             // Enes Doğanay | 9 Mayıs 2026: Miktar varsayılanı gereksinim adetinden gelir
             const kalemler = gereksinimler.map(g => ({ gereksinim_id: g.id, madde: g.madde, birim_fiyat: '', miktar: String(g.adet || 1), aciklama: '', para_birimi: 'TRY' }));
             setTeklifForm({ kalemler, genel_toplam: '', para_birimi: 'TRY', kdv_dahil: tender.kdv_durumu === 'dahil', teslim_suresi_gun: '', teslim_aciklamasi: '', not: '' });
+            setOriginalTeklifForm(null);
         }
         setTeklifDosya(null);
         setTeklifError('');
@@ -79,12 +83,20 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
     // Enes Doğanay | 7 Mayıs 2026: Submit / silme / geri çekme — ayrı hook
     const submitActions = useTeklifSubmitActions({ formState, userOffers, setUserOffers, authManagedCompanyId, managedCompanyName, userProfile });
 
+    // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — tüm form değişikliklerini izler
+    const isTeklifDirty = useMemo(() => {
+        if (!formState.originalTeklifForm) return true;
+        const formChanged = JSON.stringify(formState.teklifForm) !== JSON.stringify(formState.originalTeklifForm);
+        return formChanged || formState.teklifDosya !== null;
+    }, [formState.teklifForm, formState.originalTeklifForm, formState.teklifDosya]);
+
     return {
         userOffers, setUserOffers,
         firmaContactPopup, setFirmaContactPopup,
         firmaContactLoading,
         openTeklifPopup,
         openFirmaContact,
+        isTeklifDirty,
         ...submitActions,
     };
 };

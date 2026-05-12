@@ -10,7 +10,7 @@ const GroupedTotals = ({ getGroupedTotals }) => {
         : <strong>{formatCurrency(0, 'TRY')}</strong>;
 };
 
-const TeklifPopupFooter = ({ getGroupedTotals, teklifForm, teklifSaving, isUpdateMode, isDraftMode, setWithdrawConfirm, setDraftDeleteConfirm, onSubmit }) => (
+const TeklifPopupFooter = ({ getGroupedTotals, teklifForm, teklifSaving, isUpdateMode, isDraftMode, setWithdrawConfirm, setDraftDeleteConfirm, onSubmit, isTeklifDirty }) => (
     <div className="teklif-popup__footer">
         <div className="teklif-popup__footer-total">
             <span>Toplam Teklif</span>
@@ -34,7 +34,7 @@ const TeklifPopupFooter = ({ getGroupedTotals, teklifForm, teklifSaving, isUpdat
                     <span className="material-symbols-outlined">save</span>{teklifSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}
                 </button>
             )}
-            <button type="button" className="teklif-btn teklif-btn--submit" disabled={teklifSaving} onClick={() => onSubmit(false)}>
+            <button type="button" className="teklif-btn teklif-btn--submit" disabled={teklifSaving || (isUpdateMode && !isDraftMode && !isTeklifDirty)} onClick={() => onSubmit(false)}>
                 <span className="material-symbols-outlined">{isUpdateMode && !isDraftMode ? 'edit' : 'send'}</span>
                 {teklifSaving ? 'Gönderiliyor…' : (isUpdateMode && !isDraftMode ? 'Teklifi Güncelle' : 'Teklifi Gönder')}
             </button>

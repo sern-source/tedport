@@ -65,29 +65,35 @@ const MyTendersPanel = ({
                                     <strong>{t.baslik}</strong>
                                     {t.son_basvuru_tarihi && <span className="my-tender-row__date">Son: {formatTenderDate(t.son_basvuru_tarihi)}</span>}
                                 </div>
-                                {/* Enes Doğanay | 15 Nisan 2026: Butonlar TOM stiliyle yeniden tasarlandı */}
+                                {/* Enes Doğanay | 12 Mayıs 2026: Butonlar — draft farklı aksiyon setine sahip */}
                                 <div className="my-tender-row__actions">
-                                    <button type="button" className="my-tender-btn my-tender-btn--edit" onClick={() => onEdit(t)} disabled={sm.key === 'kapali' || sm.key === 'iptal'}>
-                                        <span className="material-symbols-outlined">edit</span>
-                                        Düzenle
+                                {/* Enes Doğanay | 12 Mayıs 2026: Kapalı/iptal için Düzenle gizlenir */}
+                                {sm.key !== 'kapali' && sm.key !== 'iptal' && (
+                                    <button type="button" className="my-tender-btn my-tender-btn--edit" onClick={() => onEdit(t)}>
+                                        <span className="material-symbols-outlined">{sm.key === 'draft' ? 'edit_note' : 'edit'}</span>
+                                        {sm.key === 'draft' ? 'Taslağı Düzenle' : 'Düzenle'}
                                     </button>
-                                    {(sm.key === 'kapali' || sm.key === 'iptal') ? (
-                                        <button type="button" className="my-tender-btn my-tender-btn--repeat" onClick={() => onClone(t)}>
-                                            <span className="material-symbols-outlined">replay</span>
-                                            İhaleyi Tekrarla
-                                        </button>
-                                    ) : (
-                                        closeConfirmId === t.id ? (
-                                            <div className="my-tender-confirm-inline">
-                                                <span>Kapatmak istediğinize emin misiniz?</span>
-                                                <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => { setCloseConfirmId(null); onClose(t.id); }}>Evet</button>
-                                                <button type="button" className="my-tender-btn my-tender-btn--cancel" onClick={() => setCloseConfirmId(null)}>İptal</button>
-                                            </div>
-                                        ) : (
-                                            <button type="button" className="my-tender-btn my-tender-btn--close" onClick={() => setCloseConfirmId(t.id)}>
-                                                <span className="material-symbols-outlined">lock</span>
-                                                İhaleyi Kapat
+                                )}
+                                    {/* Enes Doğanay | 12 Mayıs 2026: draft/yaklaşan için İhaleyi Kapat gizle */}
+                                    {sm.key !== 'draft' && sm.key !== 'yaklasan' && (
+                                        (sm.key === 'kapali' || sm.key === 'iptal') ? (
+                                            <button type="button" className="my-tender-btn my-tender-btn--repeat" onClick={() => onClone(t)}>
+                                                <span className="material-symbols-outlined">replay</span>
+                                                İhaleyi Tekrarla
                                             </button>
+                                        ) : (
+                                            closeConfirmId === t.id ? (
+                                                <div className="my-tender-confirm-inline">
+                                                    <span>Kapatmak istediğinize emin misiniz?</span>
+                                                    <button type="button" className="my-tender-btn my-tender-btn--confirm" onClick={() => { setCloseConfirmId(null); onClose(t.id); }}>Evet</button>
+                                                    <button type="button" className="my-tender-btn my-tender-btn--cancel" onClick={() => setCloseConfirmId(null)}>İptal</button>
+                                                </div>
+                                            ) : (
+                                                <button type="button" className="my-tender-btn my-tender-btn--close" onClick={() => setCloseConfirmId(t.id)}>
+                                                    <span className="material-symbols-outlined">lock</span>
+                                                    İhaleyi Kapat
+                                                </button>
+                                            )
                                         )
                                     )}
                                     {deleteConfirmId === t.id ? (

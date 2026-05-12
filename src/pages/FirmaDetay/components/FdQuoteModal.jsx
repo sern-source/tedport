@@ -22,10 +22,21 @@ const FdQuoteModal = ({
                 </div>
             ) : (
                 <>
+                    {/* Enes Doğanay | 12 Mayıs 2026: Modern gradient header — logo + firma kimliği */}
                     <div className="quote-modal-header">
-                        <div>
-                            <h3 id="fdquote-title">Teklif Talebi</h3>
-                            <p className="quote-modal-subtitle">{firma?.firma_adi}</p>
+                        <div className="quote-modal-header__identity">
+                            <div className="quote-modal-logo">
+                                {firma?.logo_url?.includes('firma-logolari')
+                                    ? <img src={firma.logo_url} alt={firma.firma_adi} className="quote-modal-logo__img" />
+                                    : <span className="quote-modal-logo__fallback">{(firma?.firma_adi || '?')[0].toUpperCase()}</span>
+                                }
+                            </div>
+                            <div className="quote-modal-header__text">
+                                <span className="quote-modal-header__label">
+                                    <span className="material-symbols-outlined">request_quote</span>Teklif Talebi
+                                </span>
+                                <h3 id="fdquote-title">{firma?.firma_adi}</h3>
+                            </div>
                         </div>
                         <button className="quote-modal-close" onClick={() => { onClose(); setQuoteFile(null); }} type="button">
                             <span className="material-symbols-outlined">close</span>

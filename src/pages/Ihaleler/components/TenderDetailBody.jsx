@@ -28,6 +28,8 @@ const TenderDetailBody = ({ dt }) => {
             <div className="tender-detail__grid">
                 <div className="tender-detail__grid-item"><span className="material-symbols-outlined">category</span><div><strong>İhale Tipi</strong><span>{dt.ihale_tipi || '—'}</span></div></div>
                 <div className="tender-detail__grid-item"><span className="material-symbols-outlined">receipt_long</span><div><strong>KDV Durumu</strong><span>{dt.kdv_durumu === 'dahil' ? 'Dahil' : 'Hariç'}</span></div></div>
+                {/* Enes Doğanay | 12 Mayıs 2026: Sektör — kategori kolonundan okunur */}
+                {dt.kategori && <div className="tender-detail__grid-item"><span className="material-symbols-outlined">domain</span><div><strong>Sektör</strong><span>{dt.kategori}</span></div></div>}
                 <div className="tender-detail__grid-item"><span className="material-symbols-outlined">event</span><div><strong>Açılış Tarihi</strong><span>{formatTenderDate(dt.yayin_tarihi)}</span></div></div>
                 <div className="tender-detail__grid-item"><span className="material-symbols-outlined">event_busy</span><div><strong>Kapanış Tarihi</strong><span>{formatTenderDate(dt.son_basvuru_tarihi)}</span></div></div>
                 {dt.teslim_suresi && <div className="tender-detail__grid-item"><span className="material-symbols-outlined">local_shipping</span><div><strong>Teslim Süresi</strong><span>{dt.teslim_suresi}</span></div></div>}

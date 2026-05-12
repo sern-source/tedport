@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Yayın başarı, düzenleme başarı ve puanlama bilgi popup'ları
 import React from 'react';
+// Enes Doğanay | 12 Mayıs 2026: teklif-success-overlay/card stilleri bu dosyadan gelir
+import '../../Ihaleler/components/TeklifPopup.overlay.css';
 
 export const IhalePublishSuccessPopup = ({ publishState, setPublishState }) => {
     const onClose = () => setPublishState(p => ({ ...p, successId: null, linkCopied: false }));
@@ -33,10 +35,25 @@ export const IhaleEditSavedPopup = ({ publishState, setPublishState }) => {
         <div className="teklif-success-overlay" onClick={() => setPublishState(p => ({ ...p, editSaved: false }))}>
             {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
             <div className="teklif-success-card" role="dialog" aria-modal="true" aria-labelledby="edit-saved-title" onClick={e => e.stopPropagation()}>
-                <div className="teklif-success-card__icon"><span className="material-symbols-outlined">check_circle</span></div>
-                <h3 id="edit-saved-title">Değişiklikler Kaydedildi!</h3>
-                <p>İhaleniz başarıyla güncellendi. Tedarikçiler yeni bilgileri görebilir.</p>
+                <div className="teklif-success-card__icon"><span className="material-symbols-outlined">edit_note</span></div>
+                <h3 id="edit-saved-title">İhale Güncellendi!</h3>
+                <p>Değişiklikleriniz başarıyla kaydedildi.</p>
                 <button className="teklif-success-card__btn" onClick={() => setPublishState(p => ({ ...p, editSaved: false }))}>Tamam</button>
+            </div>
+        </div>
+    );
+};
+
+// Enes Doğanay | 12 Mayıs 2026: Taslak kaydedildi popup'ı
+export const IhaleDraftSavedPopup = ({ publishState, setPublishState }) => {
+    if (!publishState.draftSaved) return null;
+    return (
+        <div className="teklif-success-overlay" onClick={() => setPublishState(p => ({ ...p, draftSaved: false }))}>
+            <div className="teklif-success-card" role="dialog" aria-modal="true" aria-labelledby="draft-saved-title" onClick={e => e.stopPropagation()}>
+                <div className="teklif-success-card__icon"><span className="material-symbols-outlined">save</span></div>
+                <h3 id="draft-saved-title">Taslak Kaydedildi!</h3>
+                <p>Değişiklikleriniz taslak olarak kaydedildi.</p>
+                <button className="teklif-success-card__btn" onClick={() => setPublishState(p => ({ ...p, draftSaved: false }))}>Tamam</button>
             </div>
         </div>
     );

@@ -10,7 +10,7 @@
 
 .quote-modal {
   background: var(--bg-white);
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
   width: 100%; max-width: 500px;
   max-height: 90vh; overflow-y: auto;
@@ -18,26 +18,56 @@
 }
 
 /* ── Modal header ─────────────────────────────────────────────────────── */
+/* Enes Doğanay | 12 Mayıs 2026: Gradient header — logo + firma kimliği */
 .quote-modal-header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  padding: 1.25rem 1.5rem 1rem;
-  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.1rem 1.25rem 1rem;
+  background: linear-gradient(145deg, #f0f7ff 0%, #e8f2ff 100%);
+  border-bottom: 1px solid #dbeafe;
+  gap: 12px;
 }
 
-.quote-modal-header h3 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.quote-modal-header__identity {
+  display: flex; align-items: center; gap: 12px; min-width: 0;
+}
 
-.quote-modal-subtitle {
-  font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0;
+.quote-modal-logo {
+  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+  background: #fff; border: 1.5px solid #dbeafe;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.quote-modal-logo__img {
+  width: 100%; height: 100%; object-fit: contain; border-radius: 8px;
+}
+
+.quote-modal-logo__fallback {
+  font-size: 1.2rem; font-weight: 800; color: #2563eb; letter-spacing: -0.5px;
+}
+
+.quote-modal-header__text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+
+.quote-modal-header__label {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 0.7rem; font-weight: 600; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+.quote-modal-header__label .material-symbols-outlined { font-size: 13px; }
+
+.quote-modal-header__text h3 {
+  font-size: 0.96rem; font-weight: 700; color: var(--text-dark);
+  margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 .quote-modal-close {
   width: 30px; height: 30px; border-radius: 8px;
-  background: var(--bg-light); border: 1px solid var(--border);
+  background: rgba(255,255,255,0.7); border: 1px solid #dbeafe;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text-muted); flex-shrink: 0;
+  cursor: pointer; color: #64748b; flex-shrink: 0;
   transition: background 0.15s;
 }
-.quote-modal-close:hover { background: var(--border); }
+.quote-modal-close:hover { background: #fff; color: #2563eb; }
 .quote-modal-close .material-symbols-outlined { font-size: 17px; }
 
 /* ── Modal body ───────────────────────────────────────────────────────── */
@@ -139,6 +169,13 @@
 
 /* ── Dark mode ────────────────────────────────────────────────────────── */
 [data-theme="dark"] .quote-modal { background: var(--bg-card, #1e293b); }
+[data-theme="dark"] .quote-modal-header { background: linear-gradient(145deg, #1e3a5f 0%, #172554 100%); border-bottom-color: #1e40af; }
+[data-theme="dark"] .quote-modal-header__label { color: #93c5fd; }
+[data-theme="dark"] .quote-modal-header__text h3 { color: #f1f5f9; }
+[data-theme="dark"] .quote-modal-logo { background: #1e293b; border-color: #1e40af; }
+[data-theme="dark"] .quote-modal-logo__fallback { color: #60a5fa; }
+[data-theme="dark"] .quote-modal-close { background: rgba(30,58,95,0.7); border-color: #1e40af; color: #93c5fd; }
+[data-theme="dark"] .quote-modal-close:hover { background: #1e3a5f; color: #bfdbfe; }
 
 [data-theme="dark"] .quote-form-group input,
 [data-theme="dark"] .quote-form-group textarea {

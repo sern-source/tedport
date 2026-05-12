@@ -27,6 +27,8 @@ const IhaleFormModal = ({
     handleEmailInputChange, handleEmailKeyDown, addEmail, removeEmail,
     handleFirmaSearch, addDavetliFirma, removeDavetliFirma,
     handleFileAdd, removeFile, handleFormSubmit,
+    // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — edit modunda değişiklik yapılmadıysa Güncelle devre dışı
+    isFormDirty,
 }) => {
     if (!showModal) return null;
 
@@ -117,6 +119,7 @@ const IhaleFormModal = ({
                             form={form} formError={formError} formSaving={formSaving}
                             editingTender={editingTender} onClose={onClose} handleFormSubmit={handleFormSubmit}
                             onOpenSaveTemplate={templateHook?.openSaveModal}
+                            isFormDirty={isFormDirty}
                         />
                     )}
                     {stepperStep < 3 && (

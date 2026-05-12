@@ -1,6 +1,8 @@
 // Enes Doğanay | 6 Mayıs 2026: Sol panel — ihale listesi, arama, filtreler, sayfalama
 import React, { useState, useRef, useEffect } from 'react';
 import { getTenderStatus, daysUntil, TOM_PAGE_SIZE } from '../constants/ihaleConstants';
+// Enes Doğanay | 12 Mayıs 2026: Tarih temelli durum için (yaklaşan)
+import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 
 // Enes Doğanay | 9 Mayıs 2026: Sidebar sıralama seçenekleri
 const SIDEBAR_SORT_OPTIONS = [
@@ -48,10 +50,11 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
 
             <div className="tom-sidebar__filters">
                 {[
-                    { key: 'all',    label: 'Tümü',    icon: 'apps' },
-                    { key: 'active', label: 'Aktif',   icon: 'check_circle' },
-                    { key: 'closed', label: 'Kapandı', icon: 'lock' },
-                    { key: 'draft',  label: 'Taslak',  icon: 'edit_note' },
+                    { key: 'all',       label: 'Tümü',     icon: 'apps' },
+                    { key: 'active',    label: 'Canlı',     icon: 'check_circle' },
+                    { key: 'yaklasan',  label: 'Yaklaşan',  icon: 'schedule' },
+                    { key: 'closed',    label: 'Kapalı',   icon: 'lock' },
+                    { key: 'draft',     label: 'Taslak',    icon: 'edit_note' },
                 ].map(f => (
                     <button key={f.key} className={`tom-pill${tenderFilter === f.key ? ' tom-pill--on' : ''}`} onClick={() => { setTenderFilter(f.key); setTenderPage(1); }}>
                         <span className="material-symbols-outlined">{f.icon}</span>{f.label}
@@ -89,7 +92,11 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
                     </div>
                 ) : (
                     visibleTenders.map(t => {
-                        const st = getTenderStatus(t.durum);
+                        // Enes Doğanay | 12 Mayıs 2026: getTenderStatusMeta tarih bazı (yaklaşan), tone/icon dönüşümü
+                        const meta = getTenderStatusMeta(t);
+                        const KEY_TO_TONE = { canli: 'active', yaklasan: 'yaklasan', kapali: 'closed', draft: 'draft', iptal: 'cancelled' };
+                        const KEY_TO_ICON = { canli: 'radio_button_checked', yaklasan: 'schedule', kapali: 'lock', draft: 'edit_note', iptal: 'cancel' };
+                        const st = { tone: KEY_TO_TONE[meta.key] || 'unknown', icon: KEY_TO_ICON[meta.key] || 'help', label: meta.label };
                         const cnt = (offersByTender[String(t.id)] || []).length;
                         const isActive = String(selectedId) === String(t.id);
                         const dl = daysUntil(t.son_basvuru_tarihi);

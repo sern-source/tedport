@@ -10,7 +10,7 @@ const TeklifMainPopup = ({
     teklifSaving, teklifError, userOffers,
     setCurrencyModalIdx, setCurrencySearch,
     setWithdrawConfirm, setDraftDeleteConfirm,
-    onClose, onSubmit, onUpdateKalem, getGroupedTotals,
+    onClose, onSubmit, onUpdateKalem, getGroupedTotals, isTeklifDirty,
 }) => {
     if (!teklifTender) return null;
     const tt = teklifTender;

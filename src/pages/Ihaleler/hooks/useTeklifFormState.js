@@ -20,6 +20,8 @@ const useTeklifFormState = () => {
     const [teklifSaving, setTeklifSaving] = useState(false);
     const [teklifError, setTeklifError] = useState('');
     const [teklifSuccess, setTeklifSuccess] = useState(false);
+    // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — güncelleme modunda orijinal formu saklar
+    const [originalTeklifForm, setOriginalTeklifForm] = useState(null);
     const [withdrawConfirm, setWithdrawConfirm] = useState(false);
     const [withdrawing, setWithdrawing] = useState(false);
     const [draftDeleteConfirm, setDraftDeleteConfirm] = useState(false);
@@ -76,6 +78,7 @@ const useTeklifFormState = () => {
         teklifSaving, setTeklifSaving,
         teklifError, setTeklifError,
         teklifSuccess, setTeklifSuccess,
+        originalTeklifForm, setOriginalTeklifForm,
         withdrawConfirm, setWithdrawConfirm,
         withdrawing, setWithdrawing,
         draftDeleteConfirm, setDraftDeleteConfirm,

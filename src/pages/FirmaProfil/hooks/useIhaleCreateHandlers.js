@@ -50,9 +50,19 @@ export const useIhaleCreateHandlers = ({
             const existingFiles = createForm.ek_dosyalar.filter(f => !(f instanceof File));
             const payload = { ...createForm, durum: forceDurum || createForm.durum, il_ilce: [createForm.teslim_il, createForm.teslim_ilce].filter(Boolean).join(' / '), ek_dosyalar: editTenderId ? [...existingFiles, ...uploadedFiles] : uploadedFiles, davet_emailleri: finalEmails };
             if (editTenderId) {
-                await ihaleService.updateTender(editTenderId, payload);
+                // Enes Doğanay | 12 Mayıs 2026: setEditTenderId(null) öncesinde id'yi sakla
+                const currentEditId = editTenderId;
+                await ihaleService.updateTender(currentEditId, payload);
                 setEditTenderId(null); setShowCreateModal(false); await reloadTenders();
-                setPublishState(p => ({ ...p, editSaved: true }));
+                // Enes Doğanay | 12 Mayıs 2026: Taslak kayıt, taslak→yayın ve normal güncelleme ayrı mesajlar
+                const savedDurum = forceDurum || createForm.durum;
+                if (savedDurum === 'draft') {
+                    setPublishState(p => ({ ...p, draftSaved: true }));
+                } else if (createForm.durum === 'draft') {
+                    setPublishState(p => ({ ...p, successId: currentEditId, linkCopied: false }));
+                } else {
+                    setPublishState(p => ({ ...p, editSaved: true }));
+                }
             } else {
                 const created = await ihaleService.createTender(payload);
                 setShowCreateModal(false); await reloadTenders();

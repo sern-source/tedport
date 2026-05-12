@@ -1,5 +1,5 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: İhale form koordinatör — supabase kaldırıldı, davet sub-hook ayrıldı
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createTender, updateTender } from '../../../services/ihaleManagementApi';
 import { uploadIhaleFiles } from '../services/ihaleFormService';
 import { EMPTY_FORM, toDateInput } from '../IhalelerUtils';
@@ -19,9 +19,13 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
     // Enes Doğanay | 9 Mayıs 2026: Gereksinim adet alanı — default 1
     const [yeniGereksinimAdet, setYeniGereksinimAdet] = useState('1');
     const [ihalePublishSuccess, setIhalePublishSuccess] = useState(null);
+    // Enes Doğanay | 12 Mayıs 2026: Güncelleme başarı modalı
+    const [ihaleUpdateSuccess, setIhaleUpdateSuccess] = useState(false);
     const [publishedLinkCopied, setPublishedLinkCopied] = useState(false);
     const [refNoCopied, setRefNoCopied] = useState(false);
     const fileInputRef = useRef(null);
+    // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — edit modunda orijinal formu saklar
+    const originalFormRef = useRef(null);
 
     const invites = useIhaleFormInvites({ form, setForm });
 
@@ -58,7 +62,10 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
         setEditingTender(tender);
         let teslimIl = tender.teslim_il || ''; let teslimIlce = tender.teslim_ilce || '';
         if (!teslimIl && tender.il_ilce) { const parts = tender.il_ilce.split('/').map(s => s.trim()); teslimIl = parts[0] || ''; teslimIlce = parts[1] || ''; }
-        setForm({ baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: toDateInput(tender.yayin_tarihi), son_basvuru_tarihi: toDateInput(tender.son_basvuru_tarihi), teslim_suresi: tender.teslim_suresi || '', durum: tender.durum || 'canli', referans_no: tender.referans_no || '', teslim_il: teslimIl, teslim_ilce: teslimIlce, gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: tender.ek_dosyalar || [], anonim: tender.anonim === true });
+        // Enes Doğanay | 12 Mayıs 2026: Snapshot — dirty tracking için orijinal formu sakla
+        const formSnapshot = { baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: toDateInput(tender.yayin_tarihi), son_basvuru_tarihi: toDateInput(tender.son_basvuru_tarihi), teslim_suresi: tender.teslim_suresi || '', durum: tender.durum || 'canli', referans_no: tender.referans_no || '', teslim_il: teslimIl, teslim_ilce: teslimIlce, sektor: tender.kategori || '', gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: tender.ek_dosyalar || [], anonim: tender.anonim === true };
+        setForm(formSnapshot);
+        originalFormRef.current = formSnapshot;
         setFormError(''); setStepperStep(0); invites.resetInvites(); setShowModal(true);
     }, []);
 
@@ -73,7 +80,7 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
             const diffDays = Math.round((new Date(tender.son_basvuru_tarihi) - new Date(tender.yayin_tarihi)) / 86400000);
             if (diffDays > 0) { const endDate = new Date(todayDate); endDate.setDate(endDate.getDate() + diffDays); sonBasvuruTarihi = toYMD(endDate); }
         }
-        setForm({ baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: toYMD(todayDate), son_basvuru_tarihi: sonBasvuruTarihi, teslim_suresi: tender.teslim_suresi || '', durum: 'draft', referans_no: refNo, teslim_il: teslimIl, teslim_ilce: teslimIlce, gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: [], anonim: false });
+        setForm({ baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: toYMD(todayDate), son_basvuru_tarihi: sonBasvuruTarihi, teslim_suresi: tender.teslim_suresi || '', durum: 'draft', referans_no: refNo, teslim_il: teslimIl, teslim_ilce: teslimIlce, sektor: tender.kategori || '', gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: [], anonim: false });
         setFormError(''); setStepperStep(0); setShowModal(true);
     }, [generateReferansNo]);
 
@@ -107,7 +114,18 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
             const finalEmails = (pendingEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pendingEmail) && invites.emailStatus === 'valid' && !form.davet_emailleri.includes(pendingEmail))
                 ? [...form.davet_emailleri, pendingEmail] : form.davet_emailleri;
             const payload = { ...form, durum: forceDurum || form.durum, il_ilce: [form.teslim_il, form.teslim_ilce].filter(Boolean).join(' / '), ek_dosyalar: uploadedFiles, davet_emailleri: finalEmails };
-            if (editingTender) { await updateTender(editingTender.id, payload); }
+            // Enes Doğanay | 12 Mayıs 2026: Draft kayıt ve taslak→yayın durumlarına göre farklı başarı mesajı
+            if (editingTender) {
+                await updateTender(editingTender.id, payload);
+                const savedDurum = forceDurum || form.durum;
+                if (savedDurum === 'draft') {
+                    setIhaleUpdateSuccess('draft');
+                } else if (editingTender.durum === 'draft') {
+                    setPublishedLinkCopied(false); setIhalePublishSuccess(editingTender.id);
+                } else {
+                    setIhaleUpdateSuccess('update');
+                }
+            }
             else { const created = await createTender(payload); if ((forceDurum || form.durum) !== 'draft' && created?.id) { setPublishedLinkCopied(false); setIhalePublishSuccess(created.id); } }
             setShowModal(false); await fetchMyTenders(); await fetchPublicTenders();
         } catch (err) { setFormError(err.message || 'Kaydedilemedi.'); }
@@ -133,6 +151,9 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
         yeniGereksinimAciklama, setYeniGereksinimAciklama,
         yeniGereksinimAdet, setYeniGereksinimAdet,
         fileInputRef, ihalePublishSuccess, setIhalePublishSuccess,
+        ihaleUpdateSuccess, setIhaleUpdateSuccess,
+        // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — edit modunda değişiklik yapıldı mı?
+        isFormDirty: !editingTender || !originalFormRef.current ? true : JSON.stringify(form) !== JSON.stringify(originalFormRef.current),
         publishedLinkCopied, setPublishedLinkCopied, refNoCopied, setRefNoCopied,
         openCreate, openEdit, handleClone,
         addGereksinim, removeGereksinim,

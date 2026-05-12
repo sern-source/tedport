@@ -78,6 +78,9 @@
   list-style: none;
   margin: 0;
   padding: 4px 0;
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .simple-select-option {
@@ -128,6 +131,61 @@
   font-size: 16px;
   color: #137fec;
   margin-left: auto;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Arama kutusu — searchable mod */
+.simple-select-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.simple-select-search-icon {
+  font-size: 16px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.simple-select-search {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.82rem;
+  font-family: 'Inter', sans-serif;
+  color: #111827;
+  background: transparent;
+  padding: 0;
+}
+
+.simple-select-search::placeholder {
+  color: #9ca3af;
+}
+
+.simple-select-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: #9ca3af;
+}
+
+.simple-select-search-clear .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.simple-select-search-clear:hover {
+  color: #374151;
+}
+
+.simple-select-empty {
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  color: #9ca3af;
+  text-align: center;
 }
 
 /* ════════════════════════════════════════════════════ */
@@ -198,4 +256,32 @@
 
 [data-theme="dark"] .simple-select-opt-check {
   color: #60a5fa;
+}
+
+[data-theme="dark"] .simple-select-search-wrap {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .simple-select-search {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .simple-select-search::placeholder {
+  color: #475569;
+}
+
+[data-theme="dark"] .simple-select-search-icon {
+  color: #475569;
+}
+
+[data-theme="dark"] .simple-select-search-clear {
+  color: #475569;
+}
+
+[data-theme="dark"] .simple-select-search-clear:hover {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .simple-select-empty {
+  color: #475569;
 }

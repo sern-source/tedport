@@ -2,6 +2,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { getTenderStatus, formatDate } from '../constants/ihaleConstants';
+import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 import { getIhaleFileSignedUrl } from '../services/ihaleService';
 import DatePicker from '../../../components/DatePicker';
 import CitySelect from '../../../components/CitySelect';
@@ -9,9 +10,10 @@ import CitySelect from '../../../components/CitySelect';
 const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, deleteConfirmId, setDeleteConfirmId, closeState, setCloseState }) => {
     const [showBody, setShowBody] = useState(true);
     const [copiedLink, setCopiedLink] = useState(false);
-    const tenderTone = getTenderStatus(tender.durum).tone;
-    const isClosed = tenderTone === 'closed' || tenderTone === 'cancelled';
-    const isActive = tenderTone === 'active';
+    // Enes Doğanay | 12 Mayıs 2026: getTenderStatusMeta tarih bazı durum — yaklaşan/taslak için doğru kısıtlamalar
+    const statusMeta = getTenderStatusMeta(tender);
+    const isClosed = statusMeta.key === 'kapali' || statusMeta.key === 'iptal';
+    const isCanli = statusMeta.key === 'canli';
     const isClosingConfirm = closeState.confirmId === tender.id;
 
     const ekDosyalar = (() => { let r = tender.ek_dosyalar; if (typeof r === 'string') try { r = JSON.parse(r); } catch { r = []; } return Array.isArray(r) ? r : []; })();
@@ -70,8 +72,14 @@ const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, deleteConfirmId, se
                         </div>
                     )}
                     <div className="tom-tender-actions">
-                        <button className="tom-btn tom-btn--edit" onClick={() => onEdit(tender)} disabled={isClosed}><span className="material-symbols-outlined">edit</span>Düzenle</button>
-                        {isActive && (isClosingConfirm ? (
+                        {/* Enes Doğanay | 12 Mayıs 2026: Kapalı ihale için Düzenleme butonu gizlenir */}
+                        {!isClosed && (
+                            <button className="tom-btn tom-btn--edit" onClick={() => onEdit(tender)}>
+                                <span className="material-symbols-outlined">{tender.durum === 'draft' ? 'edit_note' : 'edit'}</span>
+                                {tender.durum === 'draft' ? 'Taslağı Düzenle' : 'Düzenle'}
+                            </button>
+                        )}
+                        {isCanli && (isClosingConfirm ? (
                             <div className="tom-confirm-inline">
                                 <span>İhaleyi kapatmak istediğinize emin misiniz?</span>
                                 <button className="tom-btn tom-btn--confirm" onClick={() => { setCloseState(p => ({ ...p, confirmId: null, visibilityPopupId: tender.id })); }}>Evet, Kapat</button>

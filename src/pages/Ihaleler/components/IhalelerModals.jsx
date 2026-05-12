@@ -56,6 +56,7 @@ const IhalelerModals = ({
             handleFileAdd={ihaleFormHook.handleFileAdd} removeFile={ihaleFormHook.removeFile}
             handleFormSubmit={ihaleFormHook.handleFormSubmit}
             templateHook={ihaleFormHook.templateHook}
+            isFormDirty={ihaleFormHook.isFormDirty}
         />
         {/* Enes Doğanay | 11 Mayıs 2026: Şablon seçim/kaydetme modalı */}
         <IhaleTemplateModal
@@ -70,6 +71,8 @@ const IhalelerModals = ({
             saveSuccess={ihaleFormHook.templateHook?.saveSuccess}
             deleteConfirmId={ihaleFormHook.templateHook?.deleteConfirmId}
             setDeleteConfirmId={ihaleFormHook.templateHook?.setDeleteConfirmId}
+            overwriteConfirmId={ihaleFormHook.templateHook?.overwriteConfirmId}
+            setOverwriteConfirmId={ihaleFormHook.templateHook?.setOverwriteConfirmId}
             currentForm={ihaleFormHook.form}
             onClose={ihaleFormHook.templateHook?.closeModal}
             onApplyTemplate={ihaleFormHook.applyTemplate}
@@ -102,6 +105,7 @@ const IhalelerModals = ({
             currencySearch={teklifHook.currencySearch} setCurrencySearch={teklifHook.setCurrencySearch}
             loginPromptTenderId={teklifHook.loginPromptTenderId} loginPromptPos={teklifHook.loginPromptPos} loginPromptRef={teklifHook.loginPromptRef}
             firmaContactPopup={teklifHook.firmaContactPopup} setFirmaContactPopup={teklifHook.setFirmaContactPopup}
+            isTeklifDirty={teklifHook.isTeklifDirty}
             onClose={() => { if (!teklifHook.teklifSaving) teklifHook.setTeklifTender(null); }}
             onSubmit={teklifHook.handleTeklifSubmit} onDeleteDraft={teklifHook.handleDeleteDraft} onWithdraw={teklifHook.handleWithdrawOffer}
             onUpdateKalem={teklifHook.updateKalem} getGroupedTotals={teklifHook.getGroupedTotals}
@@ -111,6 +115,11 @@ const IhalelerModals = ({
         <IhalePublishSuccess
             ihalePublishSuccess={ihaleFormHook.ihalePublishSuccess} publishedLinkCopied={ihaleFormHook.publishedLinkCopied}
             setPublishedLinkCopied={ihaleFormHook.setPublishedLinkCopied} onClose={() => ihaleFormHook.setIhalePublishSuccess(null)}
+        />
+        {/* Enes Doğanay | 12 Mayıs 2026: Güncelleme/taslak kayıt başarı modalı — type dinamik */}
+        <IhalePublishSuccess
+            ihalePublishSuccess={ihaleFormHook.ihaleUpdateSuccess} type={ihaleFormHook.ihaleUpdateSuccess}
+            onClose={() => ihaleFormHook.setIhaleUpdateSuccess(false)}
         />
     </>
 );

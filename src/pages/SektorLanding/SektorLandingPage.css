@@ -1,0 +1,354 @@
+/* Enes Doğanay | 12 Mayıs 2026: Sektör landing sayfası stilleri */
+
+.sektor-landing {
+    min-height: 100vh;
+    background: var(--bg-light, #f8fafc);
+}
+
+/* ─── Hero ─── */
+.sektor-landing__hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #3b82f6 100%);
+    padding: 52px 24px 44px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.sektor-landing__hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(99,179,237,0.18) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.sektor-landing__hero-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.sektor-landing__hero-icon .material-symbols-outlined {
+    font-size: 28px;
+    color: #fff;
+}
+
+.sektor-landing__hero h1 {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+}
+
+.sektor-landing__hero p {
+    font-size: clamp(0.88rem, 1.5vw, 1rem);
+    color: rgba(255,255,255,0.82);
+    max-width: 560px;
+    margin: 0 auto 20px;
+    line-height: 1.6;
+}
+
+.sektor-landing__hero-stats {
+    display: inline-flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.sektor-landing__hero-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+}
+
+.sektor-landing__hero-stat .material-symbols-outlined {
+    font-size: 15px;
+}
+
+/* ─── Breadcrumb ─── */
+.sektor-landing__breadcrumb {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted, #64748b);
+    flex-wrap: wrap;
+}
+
+.sektor-landing__breadcrumb a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.sektor-landing__breadcrumb a:hover { text-decoration: underline; }
+
+.sektor-landing__breadcrumb .material-symbols-outlined {
+    font-size: 14px;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* ─── İçerik ─── */
+.sektor-landing__body {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 24px 60px;
+}
+
+.sektor-landing__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sektor-landing__toolbar-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark, #1e293b);
+}
+
+.sektor-landing__toolbar-title span {
+    color: #2563eb;
+}
+
+.sektor-landing__back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1.5px solid var(--border, #e2e8f0);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-dark, #374151);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none;
+}
+
+.sektor-landing__back-btn:hover {
+    background: #f1f5f9;
+    border-color: #2563eb;
+    color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.sektor-landing__back-btn .material-symbols-outlined { font-size: 16px; }
+
+/* ─── Grid ─── */
+.sektor-landing__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+/* ─── Boş / Yükleniyor / Hata ─── */
+.sektor-landing__state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 24px;
+    text-align: center;
+    gap: 12px;
+}
+
+.sektor-landing__state .material-symbols-outlined {
+    font-size: 48px;
+    color: var(--text-muted, #94a3b8);
+}
+
+.sektor-landing__state h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-dark, #1e293b);
+    margin: 0;
+}
+
+.sektor-landing__state p {
+    font-size: 0.86rem;
+    color: var(--text-muted, #64748b);
+    margin: 0;
+    max-width: 380px;
+}
+
+.sektor-landing__state-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.18s;
+    margin-top: 4px;
+}
+
+.sektor-landing__state-link:hover { background: #1d4ed8; }
+
+.sektor-landing__spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border, #e2e8f0);
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: sl-spin 0.7s linear infinite;
+}
+
+@keyframes sl-spin { to { transform: rotate(360deg); } }
+
+/* ─── Diğer Sektörler ─── */
+.sektor-landing__other {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1.5px solid var(--border, #e2e8f0);
+}
+
+.sektor-landing__other h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark, #1e293b);
+    margin: 0 0 16px;
+}
+
+.sektor-landing__other-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.sektor-landing__other-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+    background: var(--bg-white, #fff);
+    border: 1.5px solid var(--border, #e2e8f0);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-dark, #374151);
+    text-decoration: none;
+    transition: all 0.18s ease;
+    cursor: pointer;
+}
+
+.sektor-landing__other-chip .material-symbols-outlined {
+    font-size: 16px;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.sektor-landing__other-chip:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    background: #eff6ff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(37,99,235,0.1);
+}
+
+/* ─── Dark mode ─── */
+[data-theme="dark"] .sektor-landing {
+    background: var(--bg-dark, #0f1117);
+}
+
+[data-theme="dark"] .sektor-landing__hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 60%, #2563eb 100%);
+}
+
+[data-theme="dark"] .sektor-landing__breadcrumb { color: #64748b; }
+
+[data-theme="dark"] .sektor-landing__toolbar-title { color: #f1f5f9; }
+
+[data-theme="dark"] .sektor-landing__back-btn {
+    color: #94a3b8;
+    border-color: #2d3748;
+}
+
+[data-theme="dark"] .sektor-landing__back-btn:hover {
+    background: #1e293b;
+    border-color: #3b82f6;
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .sektor-landing__state h3 { color: #f1f5f9; }
+[data-theme="dark"] .sektor-landing__state p { color: #64748b; }
+
+[data-theme="dark"] .sektor-landing__other { border-color: #2d3748; }
+[data-theme="dark"] .sektor-landing__other h2 { color: #f1f5f9; }
+
+[data-theme="dark"] .sektor-landing__other-chip {
+    background: #1e293b;
+    border-color: #2d3748;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .sektor-landing__other-chip:hover {
+    border-color: #3b82f6;
+    color: #60a5fa;
+    background: rgba(37, 99, 235, 0.1);
+}
+
+/* ─── Mobil ─── */
+@media (max-width: 768px) {
+    .sektor-landing__hero {
+        padding: 36px 16px 32px;
+    }
+
+    .sektor-landing__body {
+        padding: 16px 16px 48px;
+    }
+
+    .sektor-landing__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sektor-landing__other-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sektor-landing__toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .sektor-landing__hero h1 {
+        font-size: 1.3rem;
+    }
+
+    .sektor-landing__other-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sektor-landing__hero-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+}

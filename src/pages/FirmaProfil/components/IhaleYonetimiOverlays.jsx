@@ -62,6 +62,7 @@ const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offer
             addEmail={create.addEmail} removeEmail={create.removeEmail}
             handleFirmaSearch={create.handleFirmaSearch} addDavetliFirma={create.addDavetliFirma} removeDavetliFirma={create.removeDavetliFirma}
             handleFileAdd={create.handleFileAdd} removeFile={create.removeFile} handleFormSubmit={create.handleFormSubmit}
+            isFormDirty={create.isFormDirty}
             templateHook={create.templateHook}
         />
         <IhalePopups
@@ -94,6 +95,8 @@ const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offer
             saveSuccess={create.templateHook?.saveSuccess}
             deleteConfirmId={create.templateHook?.deleteConfirmId}
             setDeleteConfirmId={create.templateHook?.setDeleteConfirmId}
+            overwriteConfirmId={create.templateHook?.overwriteConfirmId}
+            setOverwriteConfirmId={create.templateHook?.setOverwriteConfirmId}
             currentForm={create.form}
             onClose={create.templateHook?.closeModal}
             onApplyTemplate={create.applyTemplate}

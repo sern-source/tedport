@@ -25,6 +25,9 @@ const useIhaleTemplates = ({ companyId }) => {
     // Enes Doğanay | 11 Mayıs 2026: Kaydetme başarı state
     const [saveSuccess, setSaveSuccess] = useState(false);
 
+    // Enes Doğanay | 12 Mayıs 2026: Üstüne yazma onay state — aynı isimli şablon varsa
+    const [overwriteConfirmId, setOverwriteConfirmId] = useState(null);
+
     const fetchTemplates = useCallback(async () => {
         if (!companyId) return;
         setLoading(true);
@@ -66,13 +69,25 @@ const useIhaleTemplates = ({ companyId }) => {
     // Enes Doğanay | 11 Mayıs 2026: Mevcut formu şablon olarak kaydet
     const handleSaveTemplate = useCallback(async (form) => {
         if (!saveName.trim()) { setError('Şablon adı boş olamaz.'); return; }
+        // Enes Doğanay | 12 Mayıs 2026: Aynı isimde şablon varsa onay iste
+        const duplicate = templates.find(t => t.sablon_adi.trim().toLowerCase() === saveName.trim().toLowerCase());
+        if (duplicate && overwriteConfirmId !== duplicate.id) {
+            setOverwriteConfirmId(duplicate.id);
+            return;
+        }
         setSaving(true);
         setError('');
+        setOverwriteConfirmId(null);
         try {
             const sablon = { sablon_adi: saveName.trim() };
             TEMPLATE_FIELDS.forEach(f => { sablon[f] = form[f] ?? (f === 'gereksinimler' ? [] : ''); });
+            // Enes Doğanay | 12 Mayıs 2026: Üstüne yazma — eskiyi sil, yenisini kaydet
+            if (overwriteConfirmId) {
+                await ihaleTemplateService.deleteTemplate(overwriteConfirmId);
+                setTemplates(prev => prev.filter(t => t.id !== overwriteConfirmId));
+            }
             const saved = await ihaleTemplateService.saveTemplate(companyId, sablon);
-            setTemplates(prev => [saved, ...prev]);
+            setTemplates(prev => [saved, ...prev.filter(t => t.id !== overwriteConfirmId)]);
             setSaveSuccess(true);
             // Enes Doğanay | 11 Mayıs 2026: Başarı mesajı 1.5s sonra modal'ı kapat
             setTimeout(() => { setShowModal(false); setSaveSuccess(false); }, 1500);
@@ -81,7 +96,7 @@ const useIhaleTemplates = ({ companyId }) => {
         } finally {
             setSaving(false);
         }
-    }, [companyId, saveName]);
+    }, [companyId, saveName, templates, overwriteConfirmId]);
 
     // Enes Doğanay | 11 Mayıs 2026: Şablonu sil
     const handleDeleteTemplate = useCallback(async (id) => {
@@ -106,6 +121,8 @@ const useIhaleTemplates = ({ companyId }) => {
         saveSuccess,
         deleteConfirmId,
         setDeleteConfirmId,
+        overwriteConfirmId,
+        setOverwriteConfirmId,
         openSelectModal,
         openSaveModal,
         closeModal,

@@ -37,6 +37,8 @@ const SSS = lazy(() => import('./pages/StaticPages/SSSPage'));
 const AdminEtiketOnay = lazy(() => import('./pages/Admin/AdminEtiketOnay'));
 // Enes Doğanay | 2 Mayıs 2026: Admin Mesaj Şikayetleri sayfası
 const AdminMesajSikayetleri = lazy(() => import('./pages/Admin/AdminMesajSikayetleri'));
+// Enes Doğanay | 12 Mayıs 2026: Sektör bazlı ihale landing sayfaları — SEO
+const SektorLanding = lazy(() => import('./pages/SektorLanding/SektorLandingPage'));
 
 export default function Router() {
   return (
@@ -76,6 +78,8 @@ export default function Router() {
         <Route path="/hizmet-sartlari" element={<HizmetSartlari />} />
         <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
         <Route path="/sss" element={<SSS />} />
+        {/* Enes Doğanay | 12 Mayıs 2026: Sektör landing sayfaları — SEO için */}
+        <Route path="/ihaleler/sektor/:slug" element={<SektorLanding />} />
         {/* Enes Doğanay | 16 Nisan 2026: Tanımsız rotalar için 404 */}
         <Route path="*" element={<NotFound />} />
       </Route>

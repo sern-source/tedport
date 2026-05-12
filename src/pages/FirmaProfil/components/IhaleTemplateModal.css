@@ -417,6 +417,98 @@
     cursor: not-allowed;
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Üstüne yazma onay bloğu */
+.itm-overwrite-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%);
+    border: 1.5px solid #fcd34d;
+    border-radius: 10px;
+    margin-top: 2px;
+}
+
+.itm-overwrite-confirm__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.itm-overwrite-confirm__icon {
+    font-size: 1.1rem;
+    color: #d97706;
+    flex-shrink: 0;
+}
+
+.itm-overwrite-confirm__title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #92400e;
+    letter-spacing: 0.01em;
+}
+
+.itm-overwrite-confirm__text {
+    font-size: 0.82rem;
+    color: #78350f;
+    margin: 0;
+    line-height: 1.5;
+    padding-left: 2px;
+}
+
+.itm-overwrite-confirm__actions {
+    display: flex;
+    gap: 7px;
+    justify-content: flex-end;
+    margin-top: 2px;
+}
+
+.itm-btn--ghost {
+    background: transparent;
+    color: #92400e;
+    border: 1.5px solid #fcd34d;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+}
+
+.itm-btn--ghost:hover {
+    background: rgba(251, 191, 36, 0.12);
+}
+
+.itm-btn--overwrite {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    color: #fff;
+    border: 1.5px solid #d97706;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+}
+
+.itm-btn--overwrite:hover:not(:disabled) {
+    background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+    border-color: #b45309;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(180, 83, 9, 0.28);
+}
+
+.itm-btn--overwrite:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ─── Dark mode ─── */
+[data-theme="dark"] .itm-overwrite-confirm {
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.08) 0%, rgba(180, 83, 9, 0.1) 100%);
+    border-color: rgba(251, 191, 36, 0.25);
+}
+
+[data-theme="dark"] .itm-overwrite-confirm__title { color: #fde68a; }
+[data-theme="dark"] .itm-overwrite-confirm__text { color: #fcd34d; }
+[data-theme="dark"] .itm-btn--ghost {
+    color: #fde68a;
+    border-color: rgba(251, 191, 36, 0.3);
+}
+[data-theme="dark"] .itm-btn--ghost:hover { background: rgba(251, 191, 36, 0.08); }
+
 /* ─── Dark mode ─── */
 [data-theme="dark"] .itm-save-success p { color: #4ade80; }
 [data-theme="dark"] .itm-save-success__icon { color: #4ade80; }
@@ -547,8 +639,14 @@
         flex-direction: column-reverse;
     }
 
+    .itm-overwrite-confirm__actions {
+        flex-direction: column-reverse;
+    }
+
     .itm-btn--cancel,
-    .itm-btn--save {
+    .itm-btn--save,
+    .itm-btn--ghost,
+    .itm-btn--overwrite {
         width: 100%;
         justify-content: center;
     }

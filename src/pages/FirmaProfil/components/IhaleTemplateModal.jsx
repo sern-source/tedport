@@ -48,6 +48,7 @@ const TemplateItem = ({ t, deleteConfirmId, setDeleteConfirmId, onApply, onDelet
 const IhaleTemplateModal = ({
     showModal, modalMode, templates, loading, error,
     saveName, setSaveName, saving, saveSuccess, deleteConfirmId, setDeleteConfirmId,
+    overwriteConfirmId, setOverwriteConfirmId,
     onClose, onApplyTemplate, onSaveTemplate, onDeleteTemplate,
     currentForm,
 }) => {
@@ -104,18 +105,46 @@ const IhaleTemplateModal = ({
                             onKeyDown={e => { if (e.key === 'Enter' && !saving) onSaveTemplate(currentForm); }}
                         />
                         <p className="itm-save-hint">Başlık, açıklama, tür, KDV, teslim yeri ve gereksinimler kaydedilir.</p>
-                        <div className="itm-save-actions">
-                            <button type="button" className="itm-btn itm-btn--cancel" onClick={onClose}>İptal</button>
-                            <button
-                                type="button"
-                                className="itm-btn itm-btn--save"
-                                disabled={saving || !saveName.trim()}
-                                onClick={() => onSaveTemplate(currentForm)}
-                            >
-                                <span className="material-symbols-outlined">bookmark_add</span>
-                                {saving ? 'Kaydediliyor…' : 'Kaydet'}
-                            </button>
-                        </div>
+                        {/* Enes Doğanay | 12 Mayıs 2026: Aynı isimde şablon varsa üstüne yazma onayı */}
+                        {overwriteConfirmId ? (
+                            <div className="itm-overwrite-confirm">
+                                <div className="itm-overwrite-confirm__header">
+                                    <span className="material-symbols-outlined itm-overwrite-confirm__icon">warning</span>
+                                    <span className="itm-overwrite-confirm__title">Aynı İsimde Şablon Mevcut</span>
+                                </div>
+                                <p className="itm-overwrite-confirm__text">
+                                    <strong>"{saveName}"</strong> adında zaten bir şablon var. Üstüne yazmak istiyor musunuz?
+                                </p>
+                                <div className="itm-overwrite-confirm__actions">
+                                    <button type="button" className="itm-btn itm-btn--ghost" onClick={() => setOverwriteConfirmId(null)}>
+                                        <span className="material-symbols-outlined">close</span>
+                                        İptal
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="itm-btn itm-btn--overwrite"
+                                        disabled={saving}
+                                        onClick={() => onSaveTemplate(currentForm)}
+                                    >
+                                        <span className="material-symbols-outlined">drive_file_rename_outline</span>
+                                        {saving ? 'Kaydediliyor…' : 'Üstüne Yaz'}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="itm-save-actions">
+                                <button type="button" className="itm-btn itm-btn--cancel" onClick={onClose}>İptal</button>
+                                <button
+                                    type="button"
+                                    className="itm-btn itm-btn--save"
+                                    disabled={saving || !saveName.trim()}
+                                    onClick={() => onSaveTemplate(currentForm)}
+                                >
+                                    <span className="material-symbols-outlined">bookmark_add</span>
+                                    {saving ? 'Kaydediliyor…' : 'Kaydet'}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     /* Enes Doğanay | 11 Mayıs 2026: Seçim modu — şablon listesi */

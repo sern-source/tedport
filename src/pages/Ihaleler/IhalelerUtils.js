@@ -14,6 +14,8 @@ export const EMPTY_FORM = {
     durum: 'canli',
     referans_no: '',
     teslim_il: '', teslim_ilce: '',
+    // Enes Doğanay | 12 Mayıs 2026: Sektör — isteğe bağlı, landing page SEO için
+    sektor: '',
     gereksinimler: [],       // [{id, madde, aciklama}]
     davet_emailleri: [],     // string[]
     davetli_firmalar: [],    // [{firma_id, firma_adi, onayli}]

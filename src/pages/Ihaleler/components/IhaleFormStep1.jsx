@@ -1,7 +1,10 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale form adım 1 — Temel Bilgiler
+// Enes Doğanay | 12 Mayıs 2026: Sektör dropdown eklendi (isteğe bağlı, landing page SEO için)
 import React from 'react';
 import CitySelect from '../../../components/CitySelect';
+import SimpleSelect from '../../../components/SimpleSelect';
 import { TURKEY_DISTRICTS } from '../../../constants/turkeyDistricts';
+import { SEKTORLER } from '../../Firmalar/utils/sektorData';
 
 const IhaleFormStep1 = ({ form, setForm }) => (
     <div className="ihale-step-content">
@@ -13,6 +16,20 @@ const IhaleFormStep1 = ({ form, setForm }) => (
             <span>Açıklama</span>
             <textarea rows={4} value={form.aciklama} onChange={e => setForm(p => ({ ...p, aciklama: e.target.value }))} placeholder="İhale kapsamı, genel bilgiler, teknik gereksinimler…" />
         </label>
+        {/* Enes Doğanay | 12 Mayıs 2026: Sektör — isteğe bağlı */}
+        <div className="ihale-field">
+            <span>Sektör <em className="ihale-field__optional">(İsteğe Bağlı)</em></span>
+            <SimpleSelect
+                value={form.sektor}
+                onChange={val => setForm(p => ({ ...p, sektor: val }))}
+                placeholder="Sektör seçiniz"
+                searchable
+                options={[
+                    { value: '', label: 'Belirtilmemiş', icon: 'category' },
+                    ...SEKTORLER.map(s => ({ value: s, label: s, icon: 'domain' })),
+                ]}
+            />
+        </div>
         <div className="ihale-modal__grid">
             <div className="ihale-field">
                 <span>Teslim Yeri İl *</span>

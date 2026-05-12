@@ -63,8 +63,8 @@ export const toDateInput = (v) => {
 
 /* ─── Durum Haritaları ─── */
 export const TENDER_STATUS = {
-    canli: { label: 'Aktif', tone: 'active', icon: 'radio_button_checked' },
-    active: { label: 'Aktif', tone: 'active', icon: 'radio_button_checked' },
+    canli: { label: 'Canlı', tone: 'active', icon: 'radio_button_checked' },
+    active: { label: 'Canlı', tone: 'active', icon: 'radio_button_checked' },
     taslak: { label: 'Taslak', tone: 'draft', icon: 'edit_note' },
     draft: { label: 'Taslak', tone: 'draft', icon: 'edit_note' },
     kapali: { label: 'Kapandı', tone: 'closed', icon: 'lock' },

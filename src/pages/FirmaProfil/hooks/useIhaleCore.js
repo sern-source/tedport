@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import * as ihaleService from '../services/ihaleService';
 import { getTenderStatus, TOM_PAGE_SIZE } from '../constants/ihaleConstants';
+import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 import { supabase } from '../../../supabaseClient';
 
 const useIhaleCore = ({ companyId, refreshCounts }) => {
@@ -96,7 +97,15 @@ const useIhaleCore = ({ companyId, refreshCounts }) => {
             const q = tenderSearch.toLowerCase();
             list = list.filter(t => (t.baslik || '').toLowerCase().includes(q) || (t.referans_no || '').toLowerCase().includes(q) || (t.aciklama || '').toLowerCase().includes(q));
         }
-        if (tenderFilter !== 'all') list = list.filter(t => getTenderStatus(t.durum).tone === tenderFilter);
+        // Enes Doğanay | 12 Mayıs 2026: Tüm filtreler için tarih temelli getTenderStatusMeta kullan
+        if (tenderFilter !== 'all') list = list.filter(t => {
+            const metaKey = getTenderStatusMeta(t).key;
+            if (tenderFilter === 'active') return metaKey === 'canli';
+            if (tenderFilter === 'yaklasan') return metaKey === 'yaklasan';
+            if (tenderFilter === 'closed') return metaKey === 'kapali';
+            if (tenderFilter === 'draft') return metaKey === 'draft';
+            return getTenderStatus(t.durum).tone === tenderFilter;
+        });
         list.sort((a, b) => {
             const aOrd = STATUS_ORDER[String(a.durum || '').toLowerCase()] ?? 2;
             const bOrd = STATUS_ORDER[String(b.durum || '').toLowerCase()] ?? 2;

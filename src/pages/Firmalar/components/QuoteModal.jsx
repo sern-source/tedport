@@ -16,10 +16,21 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
         </div>
       ) : (
         <>
+          {/* Enes Doğanay | 12 Mayıs 2026: Modern gradient header — logo + firma adı */}
           <div className="quote-modal-header">
-            <div>
-              <h3 id="flquote-title">Teklif Talebi</h3>
-              <p className="quote-modal-subtitle">{supplier.name}</p>
+            <div className="quote-modal-header__identity">
+              <div className="quote-modal-logo">
+                {supplier.images
+                  ? <img src={supplier.images} alt={supplier.name} className="quote-modal-logo__img" />
+                  : <span className="quote-modal-logo__fallback">{(supplier.name || '?')[0].toUpperCase()}</span>
+                }
+              </div>
+              <div className="quote-modal-header__text">
+                <span className="quote-modal-header__label">
+                  <span className="material-symbols-outlined">request_quote</span>Teklif Talebi
+                </span>
+                <h3 id="flquote-title">{supplier.name}</h3>
+              </div>
             </div>
             <button className="quote-modal-close" onClick={onClose} type="button" aria-label="Kapat">
               <span className="material-symbols-outlined">close</span>

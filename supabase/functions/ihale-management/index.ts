@@ -58,6 +58,8 @@ interface TenderInput {
   kapali_gorunurluk?: string | null;
   // Enes Doganay | 2 Mayis 2026: Anonim ihale — firma adi gizlenir
   anonim?: boolean | null;
+  // Enes Doganay | 12 Mayis 2026: Sektör — isteğe bağlı, landing page SEO için
+  sektor?: string | null;
 }
 
 // Enes Doganay | 6 Nisan 2026: Bos string -> null donusturur
@@ -426,6 +428,8 @@ Deno.serve(async (request) => {
         kapali_gorunurluk: str(t.kapali_gorunurluk),
         // Enes Doganay | 2 Mayis 2026: Anonim ihale
         anonim: t.anonim === true,
+        // Enes Doganay | 12 Mayis 2026: Sektör — kategori kolonuna kaydedilir
+        kategori: str(t.sektor),
       };
 
       const { data, error } = await supabaseAdmin
@@ -496,6 +500,8 @@ Deno.serve(async (request) => {
         kapali_gorunurluk: str(t.kapali_gorunurluk),
         // Enes Doganay | 2 Mayis 2026: Anonim ihale
         anonim: t.anonim === true,
+        // Enes Doganay | 12 Mayis 2026: Sektör — kategori kolonuna kaydedilir
+        kategori: str(t.sektor),
       };
 
       console.log(

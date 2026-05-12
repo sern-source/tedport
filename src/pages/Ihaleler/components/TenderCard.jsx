@@ -38,6 +38,8 @@ const TenderCard = ({ tender, isHighlighted, isOwnTender, userOffer, highlightRe
                 {teslimYeri && <span className="tender-chip tender-chip--location"><span className="material-symbols-outlined">location_on</span>{teslimYeri}</span>}
             </div>
             <div className="tender-card__info">
+                {/* Enes Doğanay | 12 Mayıs 2026: Sektör — uzun olabilir, chip satırı yerine info satırına alındı */}
+                {tender.kategori && <div className="tender-card__info-row"><span className="material-symbols-outlined">domain</span><span className="tender-card__info-label">Sektör</span><span className="tender-card__info-value">{tender.kategori}</span></div>}
                 <div className="tender-card__info-row"><span className="material-symbols-outlined">event</span><span className="tender-card__info-label">İhale Açılış Tarihi</span><span className="tender-card__info-value">{formatTenderDate(tender.yayin_tarihi)}</span></div>
                 <div className="tender-card__info-row"><span className="material-symbols-outlined">event_busy</span><span className="tender-card__info-label">İhale Kapanış Tarihi</span><span className="tender-card__info-value">{formatTenderDate(tender.son_basvuru_tarihi)}</span></div>
                 {tender.teslim_suresi && <div className="tender-card__info-row"><span className="material-symbols-outlined">local_shipping</span><span className="tender-card__info-label">Teslim</span><span className="tender-card__info-value">{tender.teslim_suresi}</span></div>}

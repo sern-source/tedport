@@ -487,7 +487,6 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
-}
 
 [data-theme="dark"] .cmp-btn--danger {
     background: rgba(153, 27, 27, 0.15);

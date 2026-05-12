@@ -14,10 +14,12 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const [createReqState, setCreateReqState] = useState({ madde: '', aciklama: '', adet: '1' });
     const [emailState, setEmailState] = useState({ input: '', status: null });
     const [firmaState, setFirmaState] = useState({ term: '', results: [], searching: false });
-    const [publishState, setPublishState] = useState({ verifiedUser: false, successId: null, linkCopied: false, refNoCopied: false });
+    const [publishState, setPublishState] = useState({ verifiedUser: false, successId: null, linkCopied: false, refNoCopied: false, editSaved: false, draftSaved: false });
 
     const createFileInputRef = useRef(null);
     const createFirmaResultsRef = useRef(null);
+    // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — düzenle modalı açılınca form snapshot al
+    const originalFormRef = useRef(null);
 
     const handlers = useIhaleCreateHandlers({
         companyId, createForm, setCreateForm, emailState, setEmailState,
@@ -47,7 +49,10 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const openEditInCreateModal = useCallback(async (tender) => {
         const result = await ihaleService.generateRefNo(companyId).catch(() => ({ refNo: '', isVerified: false }));
         setEditTenderId(tender.id);
-        setCreateForm({ baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: tender.yayin_tarihi || '', son_basvuru_tarihi: tender.son_basvuru_tarihi || '', teslim_suresi: tender.teslim_suresi ? String(tender.teslim_suresi) : '', durum: tender.durum || 'canli', referans_no: resetFormState(tender.referans_no || '', result.isVerified), teslim_il: tender.teslim_il || '', teslim_ilce: tender.teslim_ilce || '', gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: Array.isArray(tender.ek_dosyalar) ? tender.ek_dosyalar.filter(f => f && f.name) : [] });
+        const editForm = { baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: tender.yayin_tarihi || '', son_basvuru_tarihi: tender.son_basvuru_tarihi || '', teslim_suresi: tender.teslim_suresi ? String(tender.teslim_suresi) : '', durum: tender.durum || 'canli', referans_no: resetFormState(tender.referans_no || '', result.isVerified), teslim_il: tender.teslim_il || '', teslim_ilce: tender.teslim_ilce || '', gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: Array.isArray(tender.ek_dosyalar) ? tender.ek_dosyalar.filter(f => f && f.name) : [] };
+        // Enes Doğanay | 12 Mayıs 2026: Snapshot kaydet
+        originalFormRef.current = JSON.parse(JSON.stringify(editForm));
+        setCreateForm(editForm);
         setShowCreateModal(true);
     }, [companyId, resetFormState]);
 
@@ -97,6 +102,10 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const isVerifiedUser = publishState.verifiedUser;
     const refNoCopied = publishState.refNoCopied; const setRefNoCopied = (val) => setPublishState(p => ({ ...p, refNoCopied: val }));
     const handleFormSubmit = (_e, forceDurum) => handlers.handleCreateFormSubmit(forceDurum);
+    // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — taslak düzenleme ve yeni form her zaman aktif
+    const isFormDirty = !editTenderId || !originalFormRef.current || createForm.durum === 'draft'
+        ? true
+        : JSON.stringify(createForm) !== JSON.stringify(originalFormRef.current);
 
     return {
         showCreateModal, setShowCreateModal, editTenderId,
@@ -108,6 +117,7 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
         emailInput, emailStatus, firmaSearchTerm, firmaSearchResults, firmaSearching,
         fileInputRef, firmaResultsRef, isVerifiedUser, refNoCopied, setRefNoCopied,
         handleFormSubmit,
+        isFormDirty,
         templateHook, applyTemplate,
         ...handlers,
     };

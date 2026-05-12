@@ -19,7 +19,7 @@ const PreviewSection = ({ icon, label, tags }) => (
 
 const formatDate = d => d ? new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
 
-const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, handleFormSubmit, onOpenSaveTemplate }) => (
+const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, handleFormSubmit, onOpenSaveTemplate, isFormDirty }) => (
     <div className="ihale-step-content ihale-preview">
         <div className="ihale-preview__card">
             <div className="ihale-preview__header">
@@ -41,6 +41,8 @@ const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, h
                 <PreviewItem icon="receipt_long" label="KDV" value={form.kdv_durumu === 'dahil' ? 'KDV Dahil' : 'KDV Hariç'} />
                 <PreviewItem icon="location_on" label="Teslim Yeri" value={[form.teslim_il, form.teslim_ilce].filter(Boolean).join(' / ') || '—'} />
                 <PreviewItem icon="badge" label="Referans" value={form.referans_no || '—'} />
+                {/* Enes Doğanay | 12 Mayıs 2026: Sektör önizlemede göster — sadece seçildiyse */}
+                {form.sektor && <PreviewItem icon="domain" label="Sektör" value={form.sektor} />}
             </div>
             {form.gereksinimler.length > 0 && (
                 <div className="ihale-preview__section">
@@ -85,8 +87,11 @@ const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, h
                 <span className="material-symbols-outlined">save</span>
                 {formSaving ? 'Kaydediliyor…' : 'Taslak Kaydet'}
             </button>
-            <button type="button" className="ihale-btn-save" disabled={formSaving} onClick={() => handleFormSubmit(null, null)}>
-                {formSaving ? 'Kaydediliyor…' : (editingTender ? 'Güncelle' : 'İhaleyi Yayınla')}
+            {/* Enes Doğanay | 12 Mayıs 2026: Draft düzenlemede "İhaleyi Yayınla" göster; form.durum kontrolü her iki sayfayla uyumlu */}
+            <button type="button" className="ihale-btn-save"
+                disabled={formSaving || (!!editingTender && form.durum !== 'draft' && !isFormDirty)}
+                onClick={() => handleFormSubmit(null, (!!editingTender && form.durum === 'draft') ? 'canli' : null)}>
+                {formSaving ? 'Kaydediliyor…' : (editingTender && form.durum !== 'draft' ? 'Güncelle' : 'İhaleyi Yayınla')}
             </button>
         </div>
     </div>

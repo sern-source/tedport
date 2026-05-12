@@ -108,6 +108,8 @@
 [data-theme="dark"] .tom-badge--closed     { background: rgba(239,68,68,0.12);   color: #fca5a5; }
 [data-theme="dark"] .tom-badge--draft      { background: #334155;                color: #94a3b8; }
 [data-theme="dark"] .tom-badge--cancelled  { background: rgba(249,115,22,0.12);  color: #fdba74; }
+/* Enes Doğanay | 12 Mayıs 2026: Yaklaşan dark mode */
+[data-theme="dark"] .tom-badge--yaklasan   { background: rgba(245,158,11,0.12);  color: #fde68a; }
 [data-theme="dark"] .tom-badge--unknown    { background: #334155;                color: #94a3b8; }
 
 /* Hızlı aksiyon butonları */
