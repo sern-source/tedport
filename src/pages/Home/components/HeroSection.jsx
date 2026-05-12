@@ -27,10 +27,30 @@ const HeroSection = ({
     return (
         <section className="sc-hero-section">
             <div className="container">
+                {/* Enes Doğanay | 12 Mayıs 2026: Depth katmanları — blur blob'lar */}
                 <div className="sc-hero-box">
+                    <div className="sc-hero-blob sc-hero-blob--1" aria-hidden="true" />
+                    <div className="sc-hero-blob sc-hero-blob--2" aria-hidden="true" />
                     <div style={{ zIndex: 10 }}>
-                        <h1 className="sc-hero-title">Doğru Tedarikçiyi Hemen Bulun</h1>
-                        <p className="sc-hero-subtitle">Türkiye genelindeki doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.</p>
+                        {/* Enes Doğanay | 12 Mayıs 2026: Güçlü B2B positioning — ekosistem mesajı */}
+                        <h1 className="sc-hero-title">Türkiye'nin Dijital Ticaret Ağı</h1>
+                        <p className="sc-hero-subtitle">ERP değil. CRM değil. Satınalma + tedarik + bağlantı — hepsi tek platformda. Doğrulanmış firmalarla saniyeler içinde teklif alın.</p>
+                    </div>
+
+                    {/* Enes Doğanay | 12 Mayıs 2026: Platform metrik badge'leri — güven sinyali */}
+                    <div className="sc-hero-metrics" style={{ zIndex: 10 }}>
+                        <span className="sc-hero-metric">
+                            <span className="material-symbols-outlined">domain</span>
+                            5.000+ Firma
+                        </span>
+                        <span className="sc-hero-metric">
+                            <span className="material-symbols-outlined">receipt_long</span>
+                            20 Sektör
+                        </span>
+                        <span className="sc-hero-metric">
+                            <span className="material-symbols-outlined">location_on</span>
+                            81 İl Kapsama
+                        </span>
                     </div>
 
                     <div className="sc-search-container" ref={heroSearchRef}>

@@ -1,0 +1,251 @@
+/* Enes Doğanay | 12 Mayıs 2026: HowItWorksSection — 3 adımlı platform akış bölümü */
+.supplier-connect-wrapper .sc-how {
+    padding: 40px 0 44px;
+    background: var(--bg-light);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.supplier-connect-wrapper .sc-how::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Başlık bloğu */
+.supplier-connect-wrapper .sc-how-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.supplier-connect-wrapper .sc-how-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(37, 99, 235, 0.07);
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+}
+
+.supplier-connect-wrapper .sc-how-badge .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.supplier-connect-wrapper .sc-how-title {
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+}
+
+.supplier-connect-wrapper .sc-how-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 460px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Adım kartları grid */
+.supplier-connect-wrapper .sc-how-steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    position: relative;
+    max-width: 920px;
+    margin: 0 auto 32px;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-how-steps {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        align-items: start;
+    }
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Tekil adım kartı */
+.supplier-connect-wrapper .sc-how-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 20px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    position: relative;
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-how-step {
+        border-radius: 0;
+        border-right: none;
+    }
+    .supplier-connect-wrapper .sc-how-step:first-child {
+        border-radius: 14px 0 0 14px;
+    }
+    .supplier-connect-wrapper .sc-how-step:last-child {
+        border-right: 1px solid var(--border-color);
+        border-radius: 0 14px 14px 0;
+    }
+}
+
+.supplier-connect-wrapper .sc-how-step:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    transform: translateY(-2px);
+    z-index: 1;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: İkon */
+.supplier-connect-wrapper .sc-how-step-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--step-color) 10%, transparent);
+    border: 1.5px solid color-mix(in srgb, var(--step-color) 22%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.supplier-connect-wrapper .sc-how-step-icon .material-symbols-outlined {
+    font-size: 26px;
+    color: var(--step-color);
+}
+
+/* Adım numarası */
+.supplier-connect-wrapper .sc-how-step-num {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    opacity: 0.75;
+}
+
+.supplier-connect-wrapper .sc-how-step-title {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 8px;
+}
+
+.supplier-connect-wrapper .sc-how-step-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Bağlantı oku — sadece desktop */
+.supplier-connect-wrapper .sc-how-arrow {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-how-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        right: -18px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--bg-white);
+        border: 1.5px solid var(--border-color);
+        z-index: 2;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+    .supplier-connect-wrapper .sc-how-arrow .material-symbols-outlined {
+        font-size: 16px;
+        color: var(--text-muted);
+    }
+}
+
+/* CTA buton */
+.supplier-connect-wrapper .sc-how-cta {
+    display: flex;
+    justify-content: center;
+}
+
+.supplier-connect-wrapper .sc-how-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.supplier-connect-wrapper .sc-how-cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+.supplier-connect-wrapper .sc-how-cta-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* ── Dark Mode ── */
+[data-theme="dark"] .supplier-connect-wrapper .sc-how {
+    background: var(--bg-light);
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-how-badge {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-how-step-icon {
+    background: color-mix(in srgb, var(--step-color) 15%, transparent);
+    border-color: color-mix(in srgb, var(--step-color) 30%, transparent);
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-how-step:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-how-arrow {
+    background: var(--bg-light);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobil */
+@media (max-width: 480px) {
+    .supplier-connect-wrapper .sc-how {
+        padding: 28px 0 32px;
+    }
+    .supplier-connect-wrapper .sc-how-header {
+        margin-bottom: 20px;
+    }
+    .supplier-connect-wrapper .sc-how-step {
+        padding: 18px 16px;
+    }
+}

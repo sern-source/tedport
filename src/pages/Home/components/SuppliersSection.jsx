@@ -20,7 +20,7 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
     return (
         <section className="sc-suppliers">
             <div className="container">
-                <h2 className="sc-section-title" style={{ marginBottom: '32px' }}>Örnek Tedarikçiler</h2>
+                <h2 className="sc-section-title" style={{ marginBottom: '32px' }}>Öne Çıkan Firmalar</h2>
                 <div className="sc-sup-grid">
                     {isLoading
                         ? Array.from({ length: 4 }).map((_, i) => (

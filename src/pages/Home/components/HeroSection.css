@@ -4,6 +4,7 @@
     padding-bottom: 28px;
 }
 
+/* Enes Doğanay | 12 Mayıs 2026: Premium depth — overflow:hidden blob'ları kırpar */
 .supplier-connect-wrapper .sc-hero-box {
     border-radius: 14px;
     min-height: 280px;
@@ -15,10 +16,68 @@
     padding: 20px 16px;
     gap: 14px;
     margin-top: 12px;
-    background-image: linear-gradient(rgba(16, 25, 34, 0.6), rgba(16, 25, 34, 0.8)), url("/hero-bg.jpg");
+    background-image: linear-gradient(rgba(10, 18, 30, 0.72), rgba(10, 18, 30, 0.88)), url("/hero-bg.jpg");
     background-size: cover;
     background-position: center;
     position: relative;
+    overflow: hidden;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Radial mavi glow — sağ üst köşe */
+.supplier-connect-wrapper .sc-hero-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 78% 15%, rgba(59, 130, 246, 0.28) 0%, transparent 58%),
+                radial-gradient(ellipse at 20% 85%, rgba(99, 102, 241, 0.18) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Subtle grid overlay */
+.supplier-connect-wrapper .sc-hero-box::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Floating blur blob'lar */
+.supplier-connect-wrapper .sc-hero-blob {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(72px);
+    z-index: 1;
+}
+.supplier-connect-wrapper .sc-hero-blob--1 {
+    width: 340px;
+    height: 340px;
+    background: rgba(37, 99, 235, 0.26);
+    top: -80px;
+    right: 8%;
+}
+.supplier-connect-wrapper .sc-hero-blob--2 {
+    width: 220px;
+    height: 220px;
+    background: rgba(99, 102, 241, 0.2);
+    bottom: -50px;
+    left: 4%;
+}
+
+/* dark mode'da zaten hero koyu — blob'lar aynı görünür */
+[data-theme="dark"] .supplier-connect-wrapper .sc-hero-blob--1 {
+    background: rgba(59, 130, 246, 0.22);
+}
+[data-theme="dark"] .supplier-connect-wrapper .sc-hero-blob--2 {
+    background: rgba(99, 102, 241, 0.18);
 }
 
 @media (min-width: 540px) {
@@ -365,6 +424,46 @@
 }
 
 /* Stats Section */
+
+/* Enes Doğanay | 12 Mayıs 2026: Hero metrik badge'leri */
+.supplier-connect-wrapper .sc-hero-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.supplier-connect-wrapper .sc-hero-metric {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(6px);
+    white-space: nowrap;
+}
+
+.supplier-connect-wrapper .sc-hero-metric .material-symbols-outlined {
+    font-size: 14px;
+    color: #93c5fd;
+}
+
+@media (max-width: 480px) {
+    .supplier-connect-wrapper .sc-hero-metric {
+        font-size: 0.72rem;
+        padding: 4px 10px;
+    }
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-hero-metric {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+}
 
 [data-theme="dark"] .sc-hero-suggestions {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);

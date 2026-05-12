@@ -8,6 +8,7 @@ import { useHomeSearch } from './hooks/useHomeSearch';
 import { useHomeSuppliers } from './hooks/useHomeSuppliers';
 import HeroSection from './components/HeroSection';
 import StatsSection from './components/StatsSection';
+import HowItWorksSection from './components/HowItWorksSection';
 import CategoriesSection from './components/CategoriesSection';
 import SuppliersSection from './components/SuppliersSection';
 import CTASection from './components/CTASection';
@@ -29,6 +30,8 @@ const HomePage = () => {
             <main>
                 <HeroSection {...searchProps} />
                 <StatsSection />
+                {/* Enes Doğanay | 12 Mayıs 2026: Nasıl Çalışır — sayfa akışına eklendi */}
+                <HowItWorksSection />
                 <CategoriesSection />
                 <SuppliersSection topSuppliers={topSuppliers} isLoading={isLoading} />
                 <CTASection />

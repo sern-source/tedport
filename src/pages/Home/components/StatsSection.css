@@ -1,9 +1,52 @@
 /* Enes Dogranay | 6 Mayis 2026: StatsSection — platform istatistikleri */
+/* Enes Doğanay | 12 Mayıs 2026: Yeniden tasarım — ikons + premium görünüm */
 .supplier-connect-wrapper .sc-stats {
     background: var(--bg-white);
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
-    padding: 18px 0;
+    padding: 24px 0 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.supplier-connect-wrapper .sc-stats::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: Badge başlık satırı */
+.supplier-connect-wrapper .sc-stats-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.supplier-connect-wrapper .sc-stats-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(37, 99, 235, 0.07);
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.supplier-connect-wrapper .sc-stats-badge .material-symbols-outlined {
+    font-size: 14px;
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-stats-badge {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
 }
 
 .supplier-connect-wrapper .sc-stats-grid {
@@ -14,11 +57,11 @@
 
 @media (min-width: 768px) {
     .supplier-connect-wrapper .sc-stats {
-        padding: 22px 0;
+        padding: 28px 0 32px;
     }
     .supplier-connect-wrapper .sc-stats-grid {
         grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
+        gap: 0;
     }
 }
 
@@ -27,12 +70,57 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding: 14px 12px;
+    border-radius: 12px;
+    transition: background 0.18s ease;
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .supplier-connect-wrapper .sc-stat-item {
+        border-radius: 0;
+        padding: 10px 20px;
+    }
+    /* Dikey ayraç — son item hariç */
+    .supplier-connect-wrapper .sc-stat-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 20%;
+        height: 60%;
+        width: 1px;
+        background: var(--border-color);
+    }
+}
+
+.supplier-connect-wrapper .sc-stat-item:hover {
+    background: var(--bg-light);
+}
+
+/* Enes Doğanay | 12 Mayıs 2026: İkon çemberi */
+.supplier-connect-wrapper .sc-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--stat-color) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--stat-color) 22%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.supplier-connect-wrapper .sc-stat-icon .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--stat-color);
 }
 
 .supplier-connect-wrapper .sc-stat-num {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 900;
-    color: var(--primary);
+    line-height: 1.1;
+    margin-bottom: 3px;
+    letter-spacing: -0.02em;
 }
 
 .supplier-connect-wrapper .sc-stat-label {
@@ -43,11 +131,20 @@
 
 @media (min-width: 540px) {
     .supplier-connect-wrapper .sc-stat-num {
-        font-size: 24px;
+        font-size: 26px;
     }
     .supplier-connect-wrapper .sc-stat-label {
         font-size: 12px;
     }
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-stat-icon {
+    background: color-mix(in srgb, var(--stat-color) 15%, transparent);
+    border-color: color-mix(in srgb, var(--stat-color) 30%, transparent);
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-stat-item:hover {
+    background: var(--bg-light);
 }
 
 /* Categories Section */

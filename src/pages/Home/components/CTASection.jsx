@@ -9,8 +9,9 @@ const CTASection = () => {
     return (
         <section className="sc-cta">
             <div className="container">
-                <h2>İşinizi Büyütmeye Hazır mısınız?</h2>
-                <p>Her gün uluslararası alıcılarla bağlantı kuran binlerce tedarikçiye katılın. Ücretsiz profilinizi şimdi oluşturun.</p>
+                {/* Enes Doğanay | 12 Mayıs 2026: Güçlü CTA başlığı */}
+                <h2>Firmanızı Dijital Ticarete Taşıyın</h2>
+                <p>Satınalmacılar ve tedarikçiler her gün Tedport'ta buluşuyor. Ücretsiz profilinizi oluşturun, ilk teklifinizi bugün alın.</p>
                 <div className="sc-cta-buttons">
                     <button className="sc-btn-white" onClick={() => navigate('/register')}>
                         Tedarikçi Olarak Katıl
