@@ -20,7 +20,7 @@ const SearchModeToggle = ({ searchMode, onSearchModeChange }) => {
                     className={`search-mode-pill${searchMode === key ? ' search-mode-pill--on' : ''}`}
                     onClick={() => onSearchModeChange(searchMode === key ? 'all' : key)}
                     aria-pressed={searchMode === key}
-                    title={`${label} ara`}
+
                 >
                     <span className="material-symbols-outlined search-mode-icon">{icon}</span>
                     <span className="search-mode-text">{label}</span>
