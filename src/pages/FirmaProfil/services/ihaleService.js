@@ -1,6 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale yönetimi Supabase servis katmanı
 import { supabase } from '../../../supabaseClient';
-export { listMyTenders, updateTender, deleteTender, createTender } from '../../../services/ihaleManagementApi';
+export { listMyTenders, updateTender, deleteTender, createTender, completeTender } from '../../../services/ihaleManagementApi';
 
 /* ─── Teklif Sorguları ─── */
 export const fetchTenderOffers = async (tenderIds) => {
@@ -255,3 +255,24 @@ export const submitMesajSikayet = async (payload) => {
 /* ─── Gerçek Zamanlı ─── */
 export const getSupabaseChannel = (name) => supabase.channel(name);
 export const removeSupabaseChannel = (channel) => supabase.removeChannel(channel);
+
+// Enes Doğanay | 13 Mayıs 2026: Tender offer realtime aboneliği — hook'tan Supabase bağımlılığı kaldırıldı
+export const subscribeToTenderOffers = (tenderIds, { onInsert, onUpdate, onDelete }) => {
+    const ids = tenderIds.map(String);
+    const channel = supabase.channel('tom-offers-live')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ihale_teklifleri' }, (payload) => {
+            const row = payload.new;
+            if (row.durum === 'taslak') return;
+            if (ids.includes(String(row.ihale_id))) onInsert(row);
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ihale_teklifleri' }, (payload) => {
+            const row = payload.new;
+            if (ids.includes(String(row.ihale_id))) onUpdate(row);
+        })
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'ihale_teklifleri' }, (payload) => {
+            const row = payload.old;
+            if (row?.ihale_id && ids.includes(String(row.ihale_id))) onDelete(row);
+        })
+        .subscribe();
+    return () => supabase.removeChannel(channel);
+};

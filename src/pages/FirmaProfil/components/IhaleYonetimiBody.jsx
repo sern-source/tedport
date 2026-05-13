@@ -56,6 +56,10 @@ const IhaleYonetimiBody = ({
                             tender={selectedTender}
                             onEdit={create.openEditInCreateModal} onRepeat={create.openRepeatModal}
                             onDelete={tenderActions.handleDeleteTender} onClose={tenderActions.handleCloseTender}
+                            onComplete={tenderActions.handleCompleteTender}
+                            completeConfirmId={tenderActions.completeConfirmId}
+                            setCompleteConfirmId={tenderActions.setCompleteConfirmId}
+                            completeLoading={tenderActions.completeLoading}
                             deleteConfirmId={tenderActions.deleteConfirmId} setDeleteConfirmId={tenderActions.setDeleteConfirmId}
                             closeState={tenderActions.closeState} setCloseState={tenderActions.setCloseState}
                         />

@@ -63,15 +63,17 @@ export const toDateInput = (v) => {
 
 /* ─── Durum Haritaları ─── */
 export const TENDER_STATUS = {
-    canli: { label: 'Canlı', tone: 'active', icon: 'radio_button_checked' },
-    active: { label: 'Canlı', tone: 'active', icon: 'radio_button_checked' },
-    taslak: { label: 'Taslak', tone: 'draft', icon: 'edit_note' },
-    draft: { label: 'Taslak', tone: 'draft', icon: 'edit_note' },
-    kapali: { label: 'Kapandı', tone: 'closed', icon: 'lock' },
-    closed: { label: 'Kapandı', tone: 'closed', icon: 'lock' },
-    completed: { label: 'Tamamlandı', tone: 'closed', icon: 'check_circle' },
-    cancelled: { label: 'İptal', tone: 'cancelled', icon: 'cancel' },
-    iptal: { label: 'İptal', tone: 'cancelled', icon: 'cancel' },
+    canli:      { label: 'Canlı',      tone: 'active',    icon: 'radio_button_checked' },
+    active:     { label: 'Canlı',      tone: 'active',    icon: 'radio_button_checked' },
+    taslak:     { label: 'Taslak',     tone: 'draft',     icon: 'edit_note' },
+    draft:      { label: 'Taslak',     tone: 'draft',     icon: 'edit_note' },
+    kapali:     { label: 'Kapandı',    tone: 'closed',    icon: 'lock' },
+    closed:     { label: 'Kapandı',    tone: 'closed',    icon: 'lock' },
+    // Enes Doğanay | 13 Mayıs 2026: Tamamlandı statüsü — ihale akışı tamamlandı
+    tamamlandi: { label: 'Tamamlandı', tone: 'completed', icon: 'check_circle' },
+    completed:  { label: 'Tamamlandı', tone: 'completed', icon: 'check_circle' },
+    cancelled:  { label: 'İptal',      tone: 'cancelled', icon: 'cancel' },
+    iptal:      { label: 'İptal',      tone: 'cancelled', icon: 'cancel' },
 };
 export const getTenderStatus = (v) => TENDER_STATUS[String(v || '').toLowerCase()] || { label: v || 'Bilinmiyor', tone: 'draft', icon: 'help' };
 

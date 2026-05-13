@@ -82,7 +82,8 @@ export const useAuthLoader = () => {
                 // setUserProfile aynı sync continuation'da → tek render'da doğru firma adıyla görünür.
                 await badges.loadBadgeCounts(user.id, companyId);
                 setManagedCompanyId(companyId);
-                setUserProfile(profileResult.data || { first_name: 'Profilime', last_name: 'Git' });
+                // Enes Doğanay | 13 Mayıs 2026: email AuthContext'te de tutulur — alertService için
+                setUserProfile({ ...(profileResult.data || { first_name: 'Profilime', last_name: 'Git' }), id: user.id, email: user.email });
             } catch {
                 /* sessiz — AbortError veya ağ hatası, session etkilenmez */
             }

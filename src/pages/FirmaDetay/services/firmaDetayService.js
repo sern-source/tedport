@@ -211,3 +211,25 @@ export async function fetchSuggestionsService(search) {
         })
         .map(f => ({ id: f.firmaID, name: f.firma_adi, location: f.il_ilce }));
 }
+
+// Enes Doğanay | 13 Mayıs 2026: Profil görüntüleme kaydı — anonim veya kayıtlı
+export async function trackFirmaView(firmaId, viewerId = null) {
+    // Kendi profilini görüntüleme kaydedilmez
+    if (!firmaId) return;
+    await supabase.from('firma_goruntulemeler').insert({
+        firma_id: String(firmaId),
+        viewer_id: viewerId || null,
+    });
+    // Hata sessizce yutulur — analytics kritik değil
+}
+
+// Enes Doğanay | 13 Mayıs 2026: Son 30 günün görüntüleme sayısı — firma sahibine gösterilir
+export async function fetchFirmaViewCount(firmaId) {
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { count } = await supabase
+        .from('firma_goruntulemeler')
+        .select('id', { count: 'exact', head: true })
+        .eq('firma_id', String(firmaId))
+        .gte('created_at', since);
+    return count ?? 0;
+}

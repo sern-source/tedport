@@ -1,5 +1,6 @@
 // Enes Doğanay | 6 Nisan 2026: Ihale durumlari tum ekranlarda ayni kuralla hesaplanir
 // Enes Doğanay | 6 Nisan 2026: draft ve kapali DB değerleri eklendi
+// Enes Doğanay | 13 Mayıs 2026: tamamlandi durumu eklendi — kapali'dan önce kontrol edilmeli
 export const getTenderStatusMeta = (tender) => {
     const normalizedStatus = (tender?.durum || '').toLowerCase();
     const isActive = tender?.is_active !== false;
@@ -11,7 +12,12 @@ export const getTenderStatusMeta = (tender) => {
         return { key: 'draft', label: 'Taslak', className: 'draft' };
     }
 
-    if (!isActive || normalizedStatus === 'kapali' || normalizedStatus === 'cancelled' || normalizedStatus === 'completed' || normalizedStatus === 'closed') {
+    // Enes Doğanay | 13 Mayıs 2026: tamamlandi kapali'dan önce yakalanmalı
+    if (normalizedStatus === 'tamamlandi' || normalizedStatus === 'completed') {
+        return { key: 'tamamlandi', label: 'Tamamlandı', className: 'tamamlandi' };
+    }
+
+    if (!isActive || normalizedStatus === 'kapali' || normalizedStatus === 'cancelled' || normalizedStatus === 'closed') {
         return { key: 'kapali', label: 'Kapalı', className: 'kapali' };
     }
 

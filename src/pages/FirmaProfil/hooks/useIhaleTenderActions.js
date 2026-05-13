@@ -11,6 +11,9 @@ const useIhaleTenderActions = ({ tenders, setTenders, setOffersByTender, offersB
     const [editReqState, setEditReqState] = useState({ madde: '', aciklama: '' });
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const [closeState, setCloseState] = useState({ tenderId: null, confirmId: null, visibilityPopupId: null });
+    // Enes Doğanay | 13 Mayıs 2026: Tamamlama onay state'i — kapali ihaleler için
+    const [completeConfirmId, setCompleteConfirmId] = useState(null);
+    const [completeLoading, setCompleteLoading] = useState(null);
     const [successState, setSuccessState] = useState({ editSaved: false, copiedLink: false });
 
     const notifyOfferSubmitters = useCallback(async (tender, type, title, message) => {
@@ -88,12 +91,30 @@ const useIhaleTenderActions = ({ tenders, setTenders, setOffersByTender, offersB
         }
     }, [tenders, setTenders, notifyOfferSubmitters]);
 
+    // Enes Doğanay | 13 Mayıs 2026: İhaleyi tamamlandı olarak işaretle — kapali → tamamlandi
+    const handleCompleteTender = useCallback(async (id) => {
+        setCompleteLoading(id);
+        try {
+            const tender = tenders.find(t => t.id === id);
+            if (!tender) throw new Error('İhale bulunamadı.');
+            await ihaleService.completeTender(id);
+            setTenders(prev => prev.map(t => t.id === id ? { ...t, durum: 'tamamlandi' } : t));
+            setCompleteConfirmId(null);
+            if (tender) await notifyOfferSubmitters(tender, 'tender_completed', 'İhale tamamlandı', `"${tender.baslik}" ihalesi tamamlandı.`);
+        } catch (err) {
+            throw new Error(err.message || 'İhale tamamlanamadı.');
+        } finally {
+            setCompleteLoading(null);
+        }
+    }, [tenders, setTenders, notifyOfferSubmitters]);
+
     return {
         editModal, setEditModal, editForm, setEditForm, editError, editSaving,
         editReqState, setEditReqState, deleteConfirmId, setDeleteConfirmId,
         closeState, setCloseState, successState, setSuccessState,
+        completeConfirmId, setCompleteConfirmId, completeLoading,
         openEditModal, handleEditSave, addEditReq, removeEditReq,
-        handleDeleteTender, handleCloseTender,
+        handleDeleteTender, handleCloseTender, handleCompleteTender,
     };
 };
 

@@ -19,10 +19,27 @@ export const searchFirmasByName = async (term) => {
     return data || [];
 };
 
+// Enes Doğanay | 13 Mayıs 2026: İzin verilen MIME tipleri whitelist — güvenlik sınır denetimi
+const ALLOWED_MIME_TYPES = new Set([
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain',
+]);
+
 // Enes Doğanay | 7 Mayıs 2026: Yeni File nesnelerini ihale-ekleri bucket'ına yükle
+// Enes Doğanay | 13 Mayıs 2026: MIME type whitelist kontrolü eklendi
 export const uploadIhaleFiles = async (referansNo, files) => {
     const uploaded = [];
     for (const file of files) {
+        if (!ALLOWED_MIME_TYPES.has(file.type)) {
+            throw new Error(`"${file.name}" dosya türü desteklenmiyor. İzin verilenler: PDF, resim, Word, Excel.`);
+        }
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
         const filePath = `${referansNo || 'temp'}/${Date.now()}_${safeName}`;
         const { error } = await supabase.storage

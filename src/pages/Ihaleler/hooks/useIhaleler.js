@@ -1,10 +1,19 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Public ihale listesi hook — filtre, sıralama, sayfalama (servis üstü)
+// Enes Doğanay | 13 Mayıs 2026: Tüm filtre/sıralama/sayfalama DB seviyesine taşındı
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getTenderStatusMeta } from '../../../constants/tenderUtils';
-import { TENDERS_PAGE_SIZE, getSmartPages } from '../IhalelerUtils';
-import { fetchPublicTenders } from '../services/ihalelerService';
+import { getSmartPages } from '../IhalelerUtils';
+import { fetchPublicTenders, fetchTenderCounts, PAGE_SIZE } from '../services/ihalelerService';
 
-const STATUS_ORDER = { canli: 0, yaklasan: 1, kapali: 2 };
+// Enes Doğanay | 13 Mayıs 2026: "Tümü" görünümünde sayfa içi durum sıralaması (12 öğe, ucuz)
+// Enes Doğanay | 13 Mayıs 2026: tamamlandi eklendi — kapali'dan sonra sıralanır
+const STATUS_ORDER = { canli: 0, yaklasan: 1, kapali: 2, tamamlandi: 3 };
+const sortPageByStatus = (items) =>
+    [...items].sort((a, b) => {
+        const aO = STATUS_ORDER[getTenderStatusMeta(a).key] ?? 3;
+        const bO = STATUS_ORDER[getTenderStatusMeta(b).key] ?? 3;
+        return aO - bO;
+    });
 
 const useIhaleler = (firmaFilter) => {
     const [tenders, setTenders] = useState([]);
@@ -12,11 +21,18 @@ const useIhaleler = (firmaFilter) => {
     const [tableMissing, setTableMissing] = useState(false);
     const [selectedFirmaName, setSelectedFirmaName] = useState('');
     const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    // Enes Doğanay | 13 Mayıs 2026: 300ms debounce — API çağrısını her tuşa basmada tetiklemez
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortBy, setSortBy] = useState('deadline');
     const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
     const sortDropdownRef = useRef(null);
+    // Enes Doğanay | 13 Mayıs 2026: Badge sayıları — ayrı COUNT sorgusundan gelir
+    const [liveCount, setLiveCount] = useState(0);
+    const [upcomingCount, setUpcomingCount] = useState(0);
+    const [closedCount, setClosedCount] = useState(0);
     const [viewMode, setViewMode] = useState(() => {
         try { return localStorage.getItem('tedport_ihale_view') || 'grid'; } catch { return 'grid'; }
     });
@@ -29,17 +45,41 @@ const useIhaleler = (firmaFilter) => {
         return () => document.removeEventListener('mousedown', handler);
     }, [sortDropdownOpen]);
 
+    // Enes Doğanay | 13 Mayıs 2026: Search debounce
+    useEffect(() => {
+        const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+        return () => clearTimeout(t);
+    }, [searchTerm]);
+
+    // Enes Doğanay | 13 Mayıs 2026: Filtre/arama değişince sayfa 1'e dön
+    useEffect(() => { setPage(1); }, [debouncedSearch, statusFilter, sortBy]);
+
     const loadTenders = useCallback(async () => {
         setLoading(true);
         try {
-            const { tenders: data, tableMissing: missing } = await fetchPublicTenders(firmaFilter);
+            const { tenders: data, tableMissing: missing, total: tot } = await fetchPublicTenders({
+                page, firmaFilter, statusFilter, searchTerm: debouncedSearch, sortBy,
+            });
             if (data === null) return;
-            setTenders(data);
+            // Enes Doğanay | 13 Mayıs 2026: "Tümü" görünümünde sayfa içi durum gruplandırması
+            const sorted = (!statusFilter || statusFilter === 'all') ? sortPageByStatus(data) : data;
+            setTenders(sorted);
             setTableMissing(!!missing);
+            setTotal(tot);
             setSelectedFirmaName(firmaFilter ? data[0]?.firma_adi || '' : '');
         } catch (error) {
             if (error?.name !== 'AbortError') setTenders([]);
         } finally { setLoading(false); }
+    }, [page, firmaFilter, statusFilter, debouncedSearch, sortBy]);
+
+    // Enes Doğanay | 13 Mayıs 2026: Header badge sayıları — firmaFilter dışındakilere bağlı değil
+    const loadCounts = useCallback(async () => {
+        try {
+            const counts = await fetchTenderCounts({ firmaFilter });
+            setLiveCount(counts.liveCount);
+            setUpcomingCount(counts.upcomingCount);
+            setClosedCount(counts.closedCount);
+        } catch { /* sessiz — badge sayıları kritik değil */ }
     }, [firmaFilter]);
 
     useEffect(() => {
@@ -48,7 +88,7 @@ const useIhaleler = (firmaFilter) => {
         return () => clearTimeout(fallbackTimer);
     }, [loadTenders]);
 
-    useEffect(() => { setPage(1); }, [searchTerm, statusFilter, sortBy]);
+    useEffect(() => { loadCounts(); }, [loadCounts]);
     useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [page]);
 
     const toggleViewMode = () => {
@@ -57,48 +97,20 @@ const useIhaleler = (firmaFilter) => {
         try { localStorage.setItem('tedport_ihale_view', next); } catch {}
     };
 
-    const filteredTenders = tenders
-        .filter(tender => {
-            const statusMeta = getTenderStatusMeta(tender);
-            const q = searchTerm.trim().toLocaleLowerCase('tr-TR');
-            const matchesQuery = !q || [tender.baslik, tender.aciklama, tender.kategori, tender.ihale_tipi, tender.firma_adi, tender.firma_konum, tender.referans_no]
-                .some(v => (v || '').toLocaleLowerCase('tr-TR').includes(q));
-            // Enes Doğanay | 12 Mayıs 2026: 'acil' filtresi — canlı + 3 günden az kalan
-            let matchesStatus;
-            if (statusFilter === 'acil') {
-                const now = new Date();
-                const deadline = tender.son_basvuru_tarihi ? new Date(tender.son_basvuru_tarihi) : null;
-                matchesStatus = statusMeta.key === 'canli' && deadline && (deadline - now) < 3 * 24 * 60 * 60 * 1000 && (deadline - now) > 0;
-            } else {
-                matchesStatus = statusFilter === 'all' || statusMeta.key === statusFilter;
-            }
-            return matchesQuery && matchesStatus;
-        })
-        .sort((a, b) => {
-            if (statusFilter === 'all') {
-                const aO = STATUS_ORDER[getTenderStatusMeta(a).key] ?? 3;
-                const bO = STATUS_ORDER[getTenderStatusMeta(b).key] ?? 3;
-                if (aO !== bO) return aO - bO;
-            }
-            if (sortBy === 'newest') return (b.yayin_tarihi || '').localeCompare(a.yayin_tarihi || '');
-            if (sortBy === 'title') return (a.baslik || '').localeCompare(b.baslik || '', 'tr');
-            return (a.son_basvuru_tarihi || '').localeCompare(b.son_basvuru_tarihi || '');
-        });
-
-    const liveCount = tenders.filter(t => getTenderStatusMeta(t).key === 'canli').length;
-    const upcomingCount = tenders.filter(t => getTenderStatusMeta(t).key === 'yaklasan').length;
-    const closedCount = tenders.filter(t => getTenderStatusMeta(t).key === 'kapali').length;
-    const totalPages = Math.ceil(filteredTenders.length / TENDERS_PAGE_SIZE);
+    const totalPages = Math.ceil(total / PAGE_SIZE);
     const smartPages = getSmartPages(page, totalPages);
-    const paginatedTenders = filteredTenders.slice((page - 1) * TENDERS_PAGE_SIZE, page * TENDERS_PAGE_SIZE);
 
     return {
         tenders, loading, tableMissing, selectedFirmaName,
         page, setPage, viewMode, toggleViewMode,
         searchTerm, setSearchTerm, statusFilter, setStatusFilter,
         sortBy, setSortBy, sortDropdownOpen, setSortDropdownOpen, sortDropdownRef,
-        filteredTenders, paginatedTenders, totalPages, smartPages,
-        liveCount, upcomingCount, closedCount, fetchPublicTenders: loadTenders,
+        // Enes Doğanay | 13 Mayıs 2026: Server pagination — paginatedTenders = tenders (zaten sayfalanmış)
+        filteredTenders: tenders,
+        paginatedTenders: tenders,
+        total, totalPages, smartPages,
+        liveCount, upcomingCount, closedCount,
+        fetchPublicTenders: loadTenders,
     };
 };
 

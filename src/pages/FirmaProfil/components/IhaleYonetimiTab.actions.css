@@ -309,6 +309,42 @@
 .tom-btn--confirm-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
 .tom-btn--confirm-red:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); }
 
+/* Enes Doğanay | 13 Mayıs 2026: Tamamlandı butonu — yeşil ton */
+.tom-btn--complete-tender {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+    border-radius: 7px;
+    padding: 4px 10px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+    font-family: inherit;
+}
+.tom-btn--complete-tender:hover {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(22,163,74,0.25);
+}
+.tom-btn--complete-tender .material-symbols-outlined { font-size: 13px; }
+
+.tom-confirm-inline--success {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #14532d;
+}
+
+.tom-btn--confirm-green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.tom-btn--confirm-green:hover { background: linear-gradient(135deg, #16a34a, #15803d); }
+.tom-btn--confirm-green:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
 .tom-btn--cancel-sm {
     background: #f1f5f9;
     color: #64748b;

@@ -1,6 +1,8 @@
 // Enes Doğanay | 8 Mayıs 2026: Karşılaştırma tablosu — kart + tablo tasarımı
+// Enes Doğanay | 13 Mayıs 2026: Yerel ScoreRing kaldırıldı — IhaleScoreRing (tek kaynak) kullanılıyor
 import React from 'react';
 import { renderOfferAmount, formatDate } from '../constants/ihaleConstants';
+import IhaleScoreRing from './IhaleScoreRing';
 
 // Enes Doğanay | 8 Mayıs 2026: Trabzonspor bordo ve mavisi
 const AVATAR_COLORS = ['#6b0c22', '#0c3b8c', '#0d9488', '#d97706', '#7c3aed'];
@@ -12,19 +14,6 @@ const getInitials = name => {
 };
 
 const scoreColor = s => s >= 70 ? '#059669' : s >= 40 ? '#d97706' : '#dc2626';
-
-const ScoreRing = ({ score, color }) => {
-    const r = 20, circ = 2 * Math.PI * r;
-    const filled = (score / 100) * circ;
-    return (
-        <svg width="52" height="52" viewBox="0 0 52 52">
-            <circle cx="26" cy="26" r={r} fill="none" stroke="var(--ring-track, #e2e8f0)" strokeWidth="3.5" />
-            <circle cx="26" cy="26" r={r} fill="none" stroke={color} strokeWidth="3.5"
-                strokeDasharray={`${filled} ${circ}`} strokeLinecap="round"
-                transform="rotate(-90 26 26)" />
-        </svg>
-    );
-};
 
 const ROWS = [
     { key: 'overall',  label: 'Genel Puan',      icon: 'leaderboard',    type: 'score' },
@@ -66,7 +55,6 @@ const IhaleCompareTable = ({ compareList, onClear }) => {
                         const sc = scores[idx];
                         const isWinner = sc.overall === best.overall && best.overall > 0;
                         const color = AVATAR_COLORS[idx % AVATAR_COLORS.length];
-                        const ringColor = scoreColor(sc.overall);
                         return (
                             <div key={o.id} className={`tom-cmp__card${isWinner ? ' tom-cmp__card--winner' : ''}`}>
                                 {isWinner && (
@@ -77,8 +65,8 @@ const IhaleCompareTable = ({ compareList, onClear }) => {
                                 <div className="tom-cmp__avatar" style={{ background: color }}>{getInitials(name)}</div>
                                 <div className="tom-cmp__card-name" title={name}>{name}</div>
                                 <div className="tom-cmp__ring-wrap">
-                                    <ScoreRing score={sc.overall} color={ringColor} />
-                                    <span className="tom-cmp__ring-val" style={{ color: ringColor }}>{sc.overall}</span>
+                                    {/* Enes Doğanay | 13 Mayıs 2026: IhaleScoreRing — animasyonlu, tek kaynak */}
+                                    <IhaleScoreRing score={sc.overall} size={52} />
                                 </div>
                             </div>
                         );

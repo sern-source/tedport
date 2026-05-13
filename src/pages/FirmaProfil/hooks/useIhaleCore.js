@@ -1,10 +1,10 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale çekirdek state — yükleme, ihaleler, teklifler, filtreler, realtime
+// Enes Doğanay | 13 Mayıs 2026: supabase doğrudan import kaldırıldı — subscribeToTenderOffers servise taşındı
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import * as ihaleService from '../services/ihaleService';
 import { getTenderStatus, TOM_PAGE_SIZE } from '../constants/ihaleConstants';
 import { getTenderStatusMeta } from '../../../constants/tenderUtils';
-import { supabase } from '../../../supabaseClient';
 
 const useIhaleCore = ({ companyId, refreshCounts }) => {
     const [loading, setLoading] = useState(true);
@@ -55,33 +55,18 @@ const useIhaleCore = ({ companyId, refreshCounts }) => {
         setTenders(rows);
     }, []);
 
-    // Enes Doğanay | 6 Mayıs 2026: Realtime — teklif değişikliklerini izle
+    // Enes Doğanay | 13 Mayıs 2026: Realtime — tenders array değişince kanal yeniden açılmasın
+    // tenderIdKey: sıralı ID string — sadece yeni ihale eklenince/silinince değişir, data güncellemesinde değişmez
+    const tenderIdKey = [...tenders].map(t => t.id).sort().join(',');
     useEffect(() => {
-        if (!companyId || tenders.length === 0) return;
-        const ids = tenders.map(t => String(t.id));
-        const channel = supabase.channel('tom-offers-live')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ihale_teklifleri' }, (payload) => {
-                const row = payload.new;
-                if (row.durum === 'taslak') return;
-                if (ids.includes(String(row.ihale_id))) {
-                    setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: [row, ...(prev[k] || [])] }; });
-                }
-            })
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ihale_teklifleri' }, (payload) => {
-                const row = payload.new;
-                if (ids.includes(String(row.ihale_id))) {
-                    setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: (prev[k] || []).map(o => String(o.id) === String(row.id) ? row : o) }; });
-                }
-            })
-            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'ihale_teklifleri' }, (payload) => {
-                const row = payload.old;
-                if (row?.ihale_id && ids.includes(String(row.ihale_id))) {
-                    setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: (prev[k] || []).filter(o => String(o.id) !== String(row.id)) }; });
-                }
-            })
-            .subscribe();
-        return () => { supabase.removeChannel(channel); };
-    }, [companyId, tenders]);
+        if (!companyId || !tenderIdKey) return;
+        const ids = tenderIdKey.split(',');
+        return ihaleService.subscribeToTenderOffers(ids, {
+            onInsert: (row) => setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: [row, ...(prev[k] || [])] }; }),
+            onUpdate: (row) => setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: (prev[k] || []).map(o => String(o.id) === String(row.id) ? row : o) }; }),
+            onDelete: (row) => setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: (prev[k] || []).filter(o => String(o.id) !== String(row.id)) }; }),
+        });
+    }, [companyId, tenderIdKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Enes Doğanay | 22 Mayıs 2026: İhale seçilince bildirimlerini okundu yap
     useEffect(() => {
@@ -104,6 +89,8 @@ const useIhaleCore = ({ companyId, refreshCounts }) => {
             if (tenderFilter === 'yaklasan') return metaKey === 'yaklasan';
             if (tenderFilter === 'closed') return metaKey === 'kapali';
             if (tenderFilter === 'draft') return metaKey === 'draft';
+            // Enes Doğanay | 13 Mayıs 2026: Tamamlandı filtresi — durum direkt eşleşir
+            if (tenderFilter === 'tamamlandi') return t.durum === 'tamamlandi' || t.durum === 'completed';
             return getTenderStatus(t.durum).tone === tenderFilter;
         });
         list.sort((a, b) => {

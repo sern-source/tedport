@@ -12,7 +12,7 @@ export const useAuthBadgeCounts = ({ managedCompanyId, setUnreadNotifCount, noti
     const loadBadgeCounts = useCallback(async (userId, companyId) => {
         if (companyId) {
             try {
-                const counts = await fetchCompanyBadgeCounts(companyId);
+                const counts = await fetchCompanyBadgeCounts(userId, companyId);
                 setManagedCompanyName(counts.firmaAdi);
                 setPendingQuoteCount(counts.pendingQuoteCount);
                 setIhaleYonetimiUnreadCount(counts.ihaleYonetimiUnreadCount);
@@ -46,7 +46,7 @@ export const useAuthBadgeCounts = ({ managedCompanyId, setUnreadNotifCount, noti
                 : allUnread.filter(n => !(!managedCompanyId && COMPANY_TENDER_TYPES.includes(n.type) && n.firma_id));
             setUnreadNotifCount(filtered.length);
             if (managedCompanyId) {
-                const counts = await fetchCompanyBadgeCounts(managedCompanyId);
+                const counts = await fetchCompanyBadgeCounts(userId, managedCompanyId);
                 setPendingQuoteCount(counts.pendingQuoteCount);
                 setIhaleYonetimiUnreadCount(counts.ihaleYonetimiUnreadCount);
             } else {

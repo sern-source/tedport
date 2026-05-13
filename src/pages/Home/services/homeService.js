@@ -50,3 +50,15 @@ export async function fetchTopSuppliers() {
     }
     return pool.slice(0, 4);
 }
+
+// Enes Doğanay | 13 Mayıs 2026: Platform istatistikleri — firmalar + aktif ihaleler
+export async function fetchPlatformStats() {
+    // Enes Doğanay | 13 Mayıs 2026: firma_ihaleleri.durum (status değil) — ayrı hata yönetimi
+    const firmaRes = await supabase.from('firmalar').select('firmaID', { count: 'exact', head: true });
+    if (firmaRes.error) throw new Error(firmaRes.error.message);
+
+    return {
+        firmaCount: firmaRes.count ?? 0,
+        ihaleCount: 0,
+    };
+}

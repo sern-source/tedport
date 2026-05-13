@@ -15,6 +15,7 @@ import TendersHero from "./components/TendersHero";
 import TendersToolbar from "./components/TendersToolbar";
 import TendersContent from "./components/TendersContent";
 import IhalelerModals from "./components/IhalelerModals";
+import AlertSubscriptionPanel from "./components/AlertSubscriptionPanel";
 
 const IhalelerPage = () => {
     const navigate = useNavigate();
@@ -85,6 +86,13 @@ const IhalelerPage = () => {
                     sortDropdownRef={ihaleler.sortDropdownRef}
                     page={ihaleler.page} setPage={ihaleler.setPage} totalPages={ihaleler.totalPages}
                 />
+                {/* Enes Doğanay | 13 Mayıs 2026: Sektör bazlı e-posta uyarı paneli */}
+                {userProfile && (
+                    <div className="tenders-alert-row">
+                        <AlertSubscriptionPanel userId={userProfile.id} />
+                        <span className="tenders-alert-hint">Yeni ihale açıldığında e-posta al</span>
+                    </div>
+                )}
                 <TendersContent
                     tableMissing={ihaleler.tableMissing} loading={ihaleler.loading}
                     filteredTenders={ihaleler.filteredTenders} paginatedTenders={ihaleler.paginatedTenders}

@@ -20,7 +20,7 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
         }, 80);
     }, []);
 
-    // Enes Doğanay | 7 Mayıs 2026: Realtime kanal + polling
+    // Enes Doğanay | 13 Mayıs 2026: Realtime kanal + circuit breaker — SUBSCRIBED → polling durur
     useEffect(() => {
         if (!activeQuoteId) {
             if (quoteChatChannelRef.current) { supabase.removeChannel(quoteChatChannelRef.current); quoteChatChannelRef.current = null; }
@@ -30,19 +30,27 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
             if (!msg?.id) return;
             setQuoteChatMessages(prev => { if (prev.some(m => m.id === msg.id)) return prev; scrollToBottom(); return [...prev, msg]; });
         };
+        let pollInterval = null;
+        const startPolling = () => {
+            if (pollInterval) return;
+            pollInterval = setInterval(async () => {
+                const data = await fetchQuoteMessages(activeQuoteId).catch(() => null);
+                if (data) setQuoteChatMessages(prev => {
+                    if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev;
+                    scrollToBottom();
+                    return data;
+                });
+            }, 10000);
+        };
+        const stopPolling = () => { if (pollInterval) { clearInterval(pollInterval); pollInterval = null; } };
         const channel = supabase.channel(`teklif-chat-${activeQuoteId}`)
             .on('broadcast', { event: 'new-message' }, ({ payload }) => addMessage(payload))
-            .subscribe();
-        quoteChatChannelRef.current = channel;
-        const pollInterval = setInterval(async () => {
-            const data = await fetchQuoteMessages(activeQuoteId).catch(() => null);
-            if (data) setQuoteChatMessages(prev => {
-                if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev;
-                scrollToBottom();
-                return data;
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') stopPolling();
+                else startPolling();
             });
-        }, 10000);
-        return () => { clearInterval(pollInterval); supabase.removeChannel(channel); quoteChatChannelRef.current = null; };
+        quoteChatChannelRef.current = channel;
+        return () => { stopPolling(); supabase.removeChannel(channel); quoteChatChannelRef.current = null; };
     }, [activeQuoteId, scrollToBottom]);
 
     // Enes Doğanay | 7 Mayıs 2026: Bağlantı restore → mesajları yeniden yükle

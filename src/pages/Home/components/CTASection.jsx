@@ -1,4 +1,4 @@
-// Enes Doğanay | 6 Mayıs 2026: CTA — çağrı aksiyonu bölümü
+// Enes Doğanay | 13 Mayıs 2026: CTASection — alıcı + tedarikçi iki taraflı panel tasarımı
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CTASection.css';
@@ -9,16 +9,46 @@ const CTASection = () => {
     return (
         <section className="sc-cta">
             <div className="container">
-                {/* Enes Doğanay | 12 Mayıs 2026: Güçlü CTA başlığı */}
-                <h2>Firmanızı Dijital Ticarete Taşıyın</h2>
-                <p>Satınalmacılar ve tedarikçiler her gün Tedport'ta buluşuyor. Ücretsiz profilinizi oluşturun, ilk teklifinizi bugün alın.</p>
-                <div className="sc-cta-buttons">
-                    <button className="sc-btn-white" onClick={() => navigate('/register')}>
-                        Tedarikçi Olarak Katıl
-                    </button>
-                    <button className="sc-btn-transparent" onClick={() => navigate('/firmalar')}>
-                        Ürünleri Keşfet
-                    </button>
+                <p className="sc-cta-eyebrow">Platforma Katılın</p>
+                <h2>Hangi taraftasınız?</h2>
+                <div className="sc-cta-split">
+                    {/* Enes Doğanay | 13 Mayıs 2026: Tedarikçi paneli */}
+                    <div className="sc-cta-panel">
+                        <div className="sc-cta-panel__icon">
+                            <span className="material-symbols-outlined">factory</span>
+                        </div>
+                        <h3>Tedarikçiyim</h3>
+                        <p>Firmam için profil oluştur, alıcılardan teklif talebi al, ihalelere katıl.</p>
+                        <div className="sc-cta-panel__btns">
+                            <button className="sc-btn-white" onClick={() => navigate('/register')}>
+                                Ücretsiz Kayıt Ol
+                            </button>
+                            <button className="sc-btn-transparent" onClick={() => navigate('/firmalar')}>
+                                Firmalar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="sc-cta-divider" aria-hidden="true">
+                        <span>veya</span>
+                    </div>
+
+                    {/* Enes Doğanay | 13 Mayıs 2026: Satınalmacı paneli */}
+                    <div className="sc-cta-panel">
+                        <div className="sc-cta-panel__icon">
+                            <span className="material-symbols-outlined">request_quote</span>
+                        </div>
+                        <h3>Satınalmacıyım</h3>
+                        <p>İhale aç, teklifler rekabet etsin, en iyi tedarikçiyi seç.</p>
+                        <div className="sc-cta-panel__btns">
+                            <button className="sc-btn-white" onClick={() => navigate('/ihaleler')}>
+                                İhale Aç
+                            </button>
+                            <button className="sc-btn-transparent" onClick={() => navigate('/register?type=corporate')}>
+                                Kurumsal Başvur
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

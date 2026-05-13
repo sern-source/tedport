@@ -37,7 +37,7 @@ export const useTeklifChat = ({
         return () => { setActiveViewingTeklifId?.(null); };
     }, [activeQuoteChat?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Enes Doğanay | 7 Mayıs 2026: Chat realtime + 10 sn polling
+    // Enes Doğanay | 13 Mayıs 2026: Chat realtime + circuit breaker — realtime aktifken polling durur
     useEffect(() => {
         if (!activeQuoteChat) {
             if (chatChannelRef.current) { supabase.removeChannel(chatChannelRef.current); chatChannelRef.current = null; }
@@ -45,15 +45,26 @@ export const useTeklifChat = ({
         }
         const teklifId = activeQuoteChat.id;
         const addMessage = (msg) => { if (!msg?.id) return; setChatMessages(prev => { if (prev.some(m => m.id === msg.id)) return prev; scrollChatToBottom(); return [...prev, msg]; }); };
-        const channel = supabase.channel(`teklif-chat-${teklifId}`).on('broadcast', { event: 'new-message' }, ({ payload }) => addMessage(payload)).subscribe();
+        let pollInterval = null;
+        const startPolling = () => {
+            if (pollInterval) return;
+            pollInterval = setInterval(async () => {
+                try {
+                    const data = await fetchChatMessages(teklifId);
+                    if (data) setChatMessages(prev => { if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev; scrollChatToBottom(); return data; });
+                } catch { /* sessiz */ }
+            }, 10000);
+        };
+        const stopPolling = () => { if (pollInterval) { clearInterval(pollInterval); pollInterval = null; } };
+        const channel = supabase.channel(`teklif-chat-${teklifId}`)
+            .on('broadcast', { event: 'new-message' }, ({ payload }) => addMessage(payload))
+            .subscribe((status) => {
+                // Enes Doğanay | 13 Mayıs 2026: SUBSCRIBED → polling kapalı; kanal yokken polling açık
+                if (status === 'SUBSCRIBED') stopPolling();
+                else startPolling();
+            });
         chatChannelRef.current = channel;
-        const pollInterval = setInterval(async () => {
-            try {
-                const data = await fetchChatMessages(teklifId);
-                if (data) setChatMessages(prev => { if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev; scrollChatToBottom(); return data; });
-            } catch { /* sessiz */ }
-        }, 10000);
-        return () => { clearInterval(pollInterval); if (chatChannelRef.current) { supabase.removeChannel(chatChannelRef.current); chatChannelRef.current = null; } };
+        return () => { stopPolling(); if (chatChannelRef.current) { supabase.removeChannel(chatChannelRef.current); chatChannelRef.current = null; } };
     }, [activeQuoteChat?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleOpenQuoteChat = useCallback(async (quote) => {

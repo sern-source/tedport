@@ -13,10 +13,8 @@ import './IhaleYonetimiTab.compare.contact.css';
 import './IhaleYonetimiTab.actions.css';
 import './IhaleYonetimiTab.modals.css';
 import './IhaleYonetimiTab.modals.popups.css';
+// Enes Doğanay | 13 Mayıs 2026: dark2/3/4 dark.css içinde birleştirildi
 import './IhaleYonetimiTab.dark.css';
-import './IhaleYonetimiTab.dark2.css';
-import './IhaleYonetimiTab.dark3.css';
-import './IhaleYonetimiTab.dark4.css';
 import './IhaleYonetimiTab.responsive.css';
 
 /* Enes Doğanay | 6 Mayıs 2026: İhale Yönetimi tab içeriği — subtab switcher + her iki panel */

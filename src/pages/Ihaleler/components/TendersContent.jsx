@@ -1,10 +1,10 @@
 ﻿// Enes Doğanay | 5 Mayıs 2026: İhale listesi içeriği — durum state'lerine göre routing
+// Enes Doğanay | 13 Mayıs 2026: Login duvarı kaldırıldı — içerik herkese açık, buton seviyesinde auth
 import React from 'react';
 import './TendersContent.css';
 import TenderCard from './TenderCard';
 import TendersListView from './TendersListView';
 import TendersPagination from './TendersPagination';
-import TendersLoginOverlay from './TendersLoginOverlay';
 
 const TendersContent = ({
     tableMissing, loading, filteredTenders, paginatedTenders,
@@ -37,8 +37,7 @@ const TendersContent = ({
 
     return (
         <>
-            {!userProfile && <TendersLoginOverlay onLoginRedirect={onLoginRedirect} onRegisterRedirect={onRegisterRedirect} />}
-            <div className={!userProfile ? 'tenders-blurred-content' : undefined}>
+            <div>
                 {(searchTerm.trim().length >= 2 || statusFilter !== 'all') && (
                     <p className="tenders-result-count"><span>{filteredTenders.length}</span> ihale listeleniyor</p>
                 )}

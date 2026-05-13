@@ -1,0 +1,136 @@
+/* Enes Doğanay | 13 Mayıs 2026: Abonelik iptal sayfası stilleri */
+.unsub-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-page, #f8fafc);
+    padding: 24px;
+}
+
+.unsub-card {
+    background: var(--bg-white, #fff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 16px;
+    padding: 40px 36px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+
+/* Enes Doğanay | 15 Mayıs 2026: Logo — iki img CSS toggle, picture'ın OS dark mode sorunu yok */
+.unsub-logo {
+    height: 36px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 24px;
+}
+
+.unsub-logo--dark { display: none; }
+
+[data-theme="dark"] .unsub-logo--light { display: none; }
+[data-theme="dark"] .unsub-logo--dark  { display: block; }
+
+.unsub-icon {
+    font-size: 52px;
+    display: block;
+    margin: 0 auto 16px;
+}
+
+.unsub-icon--spin {
+    color: #94a3b8;
+    animation: unsub-spin 1.1s linear infinite;
+}
+
+@keyframes unsub-spin {
+    to { transform: rotate(360deg); }
+}
+
+.unsub-icon--success {
+    color: #16a34a;
+}
+
+.unsub-icon--error {
+    color: #dc2626;
+}
+
+.unsub-card h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-dark, #1e293b);
+    margin: 0 0 10px;
+}
+
+.unsub-card p {
+    font-size: 0.88rem;
+    color: var(--text-muted, #64748b);
+    margin: 0 0 8px;
+    line-height: 1.5;
+}
+
+.unsub-hint {
+    font-size: 0.82rem;
+    margin-top: 16px !important;
+}
+
+.unsub-hint a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.unsub-home-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: #2563eb;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.unsub-home-btn:hover {
+    background: #1d4ed8;
+}
+
+[data-theme="dark"] .unsub-page {
+    background: #0b1120;
+}
+
+[data-theme="dark"] .unsub-card {
+    background: #111827;
+    border-color: #1e293b;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+[data-theme="dark"] .unsub-card h2 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .unsub-icon--success {
+    color: #4ade80;
+}
+
+[data-theme="dark"] .unsub-icon--error {
+    color: #f87171;
+}
+
+[data-theme="dark"] .unsub-home-btn {
+    background: #2563eb;
+}
+
+[data-theme="dark"] .unsub-home-btn:hover {
+    background: #1d4ed8;
+}
+
+@media (max-width: 480px) {
+    .unsub-card {
+        padding: 28px 20px;
+        border-radius: 12px;
+    }
+}

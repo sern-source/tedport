@@ -7,14 +7,17 @@ import { getIhaleFileSignedUrl } from '../services/ihaleService';
 import DatePicker from '../../../components/DatePicker';
 import CitySelect from '../../../components/CitySelect';
 
-const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, deleteConfirmId, setDeleteConfirmId, closeState, setCloseState }) => {
+const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, onComplete, completeConfirmId, setCompleteConfirmId, completeLoading, deleteConfirmId, setDeleteConfirmId, closeState, setCloseState }) => {
     const [showBody, setShowBody] = useState(true);
     const [copiedLink, setCopiedLink] = useState(false);
     // Enes Doğanay | 12 Mayıs 2026: getTenderStatusMeta tarih bazı durum — yaklaşan/taslak için doğru kısıtlamalar
     const statusMeta = getTenderStatusMeta(tender);
     const isClosed = statusMeta.key === 'kapali' || statusMeta.key === 'iptal';
+    const isTamamlandi = tender.durum === 'tamamlandi' || tender.durum === 'completed';
+    const isKapaliOnly = isClosed && !isTamamlandi;
     const isCanli = statusMeta.key === 'canli';
     const isClosingConfirm = closeState.confirmId === tender.id;
+    const isCompleteConfirm = completeConfirmId === tender.id;
 
     const ekDosyalar = (() => { let r = tender.ek_dosyalar; if (typeof r === 'string') try { r = JSON.parse(r); } catch { r = []; } return Array.isArray(r) ? r : []; })();
 
@@ -35,9 +38,16 @@ const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, deleteConfirmId, se
                 <div className="tom-info-card__body">
                     {isClosed && (
                         <div className="tom-closed-cta">
-                            <span className="material-symbols-outlined">lock</span>
-                            <div><strong>Bu ihale kapandı</strong><span>Benzer içerikle yeniden yayınlamak ister misiniz?</span></div>
-                            <button className="tom-btn tom-btn--repeat tom-btn--repeat-sm" onClick={() => onRepeat(tender)}><span className="material-symbols-outlined">replay</span>İhaleyi Tekrarla</button>
+                            <span className="material-symbols-outlined">{isTamamlandi ? 'check_circle' : 'lock'}</span>
+                            <div>
+                                <strong>{isTamamlandi ? 'Bu ihale tamamlandı' : 'Bu ihale kapandı'}</strong>
+                                <span>{isTamamlandi ? 'Kazanan tedarikçi seçildi, ihale süreci kapandı.' : 'Benzer içerikle yeniden yayınlamak ister misiniz?'}</span>
+                            </div>
+                            {!isTamamlandi && (
+                                <button className="tom-btn tom-btn--repeat tom-btn--repeat-sm" onClick={() => onRepeat(tender)}>
+                                    <span className="material-symbols-outlined">replay</span>İhaleyi Tekrarla
+                                </button>
+                            )}
                         </div>
                     )}
                     <p className="tom-info-card__desc">{tender.aciklama || 'Bu ihale için açıklama girilmemiş.'}</p>
@@ -87,6 +97,24 @@ const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, deleteConfirmId, se
                             </div>
                         ) : (
                             <button className="tom-btn tom-btn--close-tender" onClick={() => setCloseState(p => ({ ...p, confirmId: tender.id }))}><span className="material-symbols-outlined">lock</span>İhaleyi Kapat</button>
+                        ))}
+                        {/* Enes Doğanay | 13 Mayıs 2026: Kapali → Tamamlandi akışı */}
+                        {isKapaliOnly && (isCompleteConfirm ? (
+                            <div className="tom-confirm-inline tom-confirm-inline--success">
+                                <span>İhaleyi tamamlandı olarak işaretlemek istiyor musunuz?</span>
+                                <button
+                                    className="tom-btn tom-btn--confirm tom-btn--confirm-green"
+                                    disabled={completeLoading === tender.id}
+                                    onClick={() => onComplete(tender.id)}
+                                >
+                                    {completeLoading === tender.id ? 'İşleniyor...' : 'Evet, Tamamla'}
+                                </button>
+                                <button className="tom-btn tom-btn--cancel-sm" onClick={() => setCompleteConfirmId(null)}>İptal</button>
+                            </div>
+                        ) : (
+                            <button className="tom-btn tom-btn--complete-tender" onClick={() => setCompleteConfirmId(tender.id)}>
+                                <span className="material-symbols-outlined">check_circle</span>İhaleyi Tamamla
+                            </button>
                         ))}
                         {deleteConfirmId === tender.id ? (
                             <div className="tom-confirm-inline tom-confirm-inline--danger">

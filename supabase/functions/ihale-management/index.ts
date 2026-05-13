@@ -1,7 +1,8 @@
 // Enes Doganay | 6 Nisan 2026: Ihale yonetim Edge Function
 // Enes Doganay | 10 Nisan 2026: Yeni modal alanlari — kdv_durumu, gereksinimler, davet_emailleri, davetli_firmalar, teslim_il/teslim_ilce
 // Enes Doganay | 15 Nisan 2026: send_offer_status_email aksiyonu — teklif kabul/red e-postası
-// Aksiyonlar: list_my_tenders | create_tender | update_tender | delete_tender | send_offer_status_email
+// Aksiyonlar: list_my_tenders | create_tender | update_tender | complete_tender | delete_tender | send_offer_status_email
+// Enes Doganay | 13 Mayis 2026: complete_tender — yalnizca durum=tamamlandi gunceller, baslik dogrulamasi gerektirmez
 import { createAdminClient } from "../_shared/supabaseAdmin.ts";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
@@ -9,6 +10,7 @@ type IhalePayload =
   | { action: "list_my_tenders" }
   | { action: "create_tender"; tender: TenderInput }
   | { action: "update_tender"; id: string; tender: TenderInput }
+  | { action: "complete_tender"; id: string }
   | { action: "delete_tender"; id: string }
   // Enes Doganay | 15 Nisan 2026: Teklif kabul/red e-postası
   | {
@@ -325,8 +327,249 @@ const sendInvitationEmails = async (
   }
 };
 
+// Enes Doganay | 13 Mayis 2026: Yeni canli ihale abonelerine bildirim emaili gonder
+const sendAlertSubscriberEmails = async (
+  supabaseAdmin: ReturnType<typeof createAdminClient>,
+  tender: {
+    id: number | string;
+    baslik: string;
+    kategori: string | null;
+    il_ilce: string | null;
+    son_basvuru_tarihi: string | null;
+    firma_adi: string;
+  },
+): Promise<void> => {
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL");
+  if (!resendApiKey || !fromEmail) return;
+
+  // Aktif aboneleri getir: tum kategoriler (null) + ilgili kategori
+  let subscribers: Array<{ email: string; unsubscribe_token: string | null }> =
+    [];
+  try {
+    if (tender.kategori) {
+      const [nullRes, catRes] = await Promise.all([
+        supabaseAdmin.from("ihale_uyarilari").select("email, unsubscribe_token")
+          .eq("aktif", true).is("kategori", null),
+        supabaseAdmin.from("ihale_uyarilari").select("email, unsubscribe_token")
+          .eq("aktif", true).eq("kategori", tender.kategori),
+      ]);
+      subscribers = [
+        ...((nullRes.data ?? []) as typeof subscribers),
+        ...((catRes.data ?? []) as typeof subscribers),
+      ];
+    } else {
+      const { data } = await supabaseAdmin.from("ihale_uyarilari")
+        .select("email, unsubscribe_token").eq("aktif", true).is(
+          "kategori",
+          null,
+        );
+      subscribers = (data ?? []) as typeof subscribers;
+    }
+  } catch (err) {
+    console.error("sendAlertSubscriberEmails: abone sorgusu hatasi", err);
+    return;
+  }
+
+  if (!subscribers.length) return;
+
+  // Enes Doganay | 13 Mayis 2026: Ayni email birden fazla abonelikle eklenmis olabilir
+  // (ornek: hem "Tum Ihaleler" hem ilgili sektor) — e-posta adresine gore tekillestirilir
+  const uniqueEmails = new Map<string, string | null>();
+  for (const sub of subscribers) {
+    const email = String(sub.email || "").trim().toLowerCase();
+    if (email && !uniqueEmails.has(email)) {
+      uniqueEmails.set(email, sub.unsubscribe_token);
+    }
+  }
+  const dedupedSubscribers = Array.from(uniqueEmails.entries()).map(
+    ([email, unsubscribe_token]) => ({ email, unsubscribe_token }),
+  );
+
+  const safe = (s: string) =>
+    String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
+      />/g,
+      "&gt;",
+    ).replace(/"/g, "&quot;");
+
+  const safeBaslik = safe(tender.baslik);
+  const safeFirma = safe(tender.firma_adi);
+  const safeKategori = tender.kategori ? safe(tender.kategori) : null;
+  const tenderUrl = "https://tedport.com/ihaleler";
+
+  // Enes Doganay | 13 Mayis 2026: ISO timestamp'ten okunabilir Turkce tarih — "27 Mayıs 2026"
+  const formatDate = (d: string | null): string | null => {
+    if (!d) return null;
+    const dateOnly = d.slice(0, 10); // "2026-05-27T00:00:00+00:00" → "2026-05-27"
+    const parts = dateOnly.split("-");
+    if (parts.length !== 3) return d;
+    const months = [
+      "Ocak",
+      "Şubat",
+      "Mart",
+      "Nisan",
+      "Mayıs",
+      "Haziran",
+      "Temmuz",
+      "Ağustos",
+      "Eylül",
+      "Ekim",
+      "Kasım",
+      "Aralık",
+    ];
+    const day = parseInt(parts[2], 10);
+    const month = months[parseInt(parts[1], 10) - 1] ?? parts[1];
+    return `${day} ${month} ${parts[0]}`;
+  };
+  const safeTarih = formatDate(tender.son_basvuru_tarihi);
+
+  for (const sub of dedupedSubscribers) {
+    const unsubUrl = sub.unsubscribe_token
+      ? `https://tedport.com/abonelik-iptal?token=${sub.unsubscribe_token}`
+      : null;
+
+    const html = `<!DOCTYPE html>
+<html lang="tr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
+<style>
+  body,#body-table{margin:0;padding:0;background-color:#f1f5f9;}
+  @media only screen and (max-width:600px){
+    .ec{width:100%!important;max-width:100%!important;}
+    .sp{padding-left:24px!important;padding-right:24px!important;}
+    .hsp{padding-top:24px!important;padding-bottom:20px!important;}
+    .title-text{font-size:20px!important;}
+  }
+  @media (prefers-color-scheme:dark){
+    body,#body-table,.email-bg{background-color:#0f172a!important;}
+    .card-body{background-color:#1e293b!important;}
+    .tender-box{background-color:#172554!important;border-color:#2563eb!important;}
+    .tender-title{color:#f1f5f9!important;}
+    .tender-label{color:#94a3b8!important;}
+    .tender-val{color:#e2e8f0!important;}
+    .footer-cell{border-top-color:#334155!important;}
+    .footer-p{color:#64748b!important;}
+    .footer-a{color:#60a5fa!important;}
+    .unsub-a{color:#475569!important;}
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;">
+<table id="body-table" class="email-bg" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#f1f5f9">
+  <tr><td align="center" style="padding:40px 16px;">
+    <table class="ec" role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;width:100%;">
+
+      <!-- HEADER: mavi gradient arka plan -->
+      <tr>
+        <td bgcolor="#1e3a8a" class="sp hsp" style="background-color:#1e3a8a;border-radius:16px 16px 0 0;padding:32px 40px 28px 40px;">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:bold;color:#ffffff;line-height:1;">Tedport</p>
+          <p style="margin:4px 0 18px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#93c5fd;text-transform:uppercase;letter-spacing:1.5px;">Tedarik Portali</p>
+          <p class="title-text" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:bold;color:#ffffff;line-height:1.25;">Yeni ihale yayınlandı!</p>
+          <p style="margin:10px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#93c5fd;line-height:1.65;">Uyarı aboneliğiniz kapsamında yeni bir ihale açıldı.</p>
+        </td>
+      </tr>
+
+      <!-- BODY -->
+      <tr>
+        <td bgcolor="#ffffff" class="card-body sp" style="background-color:#ffffff;border-radius:0 0 16px 16px;padding:28px 40px 32px 40px;">
+
+          <!-- IHALE KUTUSU -->
+          <table class="tender-box" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:2px solid #bfdbfe;border-radius:12px;margin-bottom:24px;">
+            <tr>
+              <td bgcolor="#eff6ff" class="tender-box" style="background-color:#eff6ff;border-radius:10px;padding:20px 22px;">
+                <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;color:#2563eb;text-transform:uppercase;letter-spacing:1.5px;">Yeni İhale</p>
+                <p class="tender-title" style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:bold;color:#0f172a;line-height:1.35;">${safeBaslik}</p>
+                <p class="tender-label" style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#64748b;">Firma:&nbsp;<strong class="tender-val" style="color:#0f172a;">${safeFirma}</strong></p>
+                ${
+      safeKategori
+        ? `<p class="tender-label" style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#64748b;">Sektör:&nbsp;<strong class="tender-val" style="color:#0f172a;">${safeKategori}</strong></p>`
+        : ""
+    }
+                ${
+      safeTarih
+        ? `<p class="tender-label" style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#64748b;">Son Başvuru:&nbsp;<strong style="color:#dc2626;">${safeTarih}</strong></p>`
+        : ""
+    }
+              </td>
+            </tr>
+          </table>
+
+          <!-- BUTON — Outlook VML + standard fallback -->
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px;">
+            <tr>
+              <td align="center">
+                <!--[if mso]>
+                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="${tenderUrl}" style="height:48px;v-text-anchor:middle;width:220px;" arcsize="20%" stroke="f" fillcolor="#1d4ed8">
+                  <w:anchorlock/>
+                  <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;">İhaleleri Görüntüle</center>
+                </v:roundrect>
+                <![endif]-->
+                <!--[if !mso]><!-->
+                <a href="${tenderUrl}" style="display:inline-block;background-color:#1d4ed8;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;padding:14px 36px;border-radius:10px;-webkit-text-size-adjust:none;">İhaleleri Görüntüle</a>
+                <!--<![endif]-->
+              </td>
+            </tr>
+          </table>
+
+          <!-- FOOTER -->
+          <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td class="footer-cell" style="border-top:1px solid #e2e8f0;padding-top:18px;">
+                <p class="footer-p" style="margin:0 0 6px 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#94a3b8;line-height:1.7;">
+                  Bu e-postayı Tedport ihale uyarı aboneliğiniz nedeniyle aldınız.<br>
+                  Sorularınız için <a href="mailto:info@tedport.com" class="footer-a" style="color:#2563eb;text-decoration:none;">info@tedport.com</a>
+                </p>
+                ${
+      unsubUrl
+        ? `<p style="margin:0;"><a href="${unsubUrl}" class="unsub-a" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#94a3b8;text-decoration:underline;">Bu bildirimlere artık abone olmak istemiyorum</a></p>`
+        : ""
+    }
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+
+    const resp = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: [sub.email],
+        subject: `Yeni ihale: ${tender.baslik} — Tedport`,
+        html,
+      }),
+    });
+
+    if (!resp.ok) {
+      console.error(
+        "Alert email gonderilemedi:",
+        sub.email,
+        await resp.text(),
+      );
+    } else {
+      console.log("Alert email gonderildi:", sub.email);
+    }
+  }
+};
+
 // Enes Doganay | 6 Nisan 2026: Durum degeri DB CHECK constraint ile uyumlu olmali
-const VALID_DURUM = ["draft", "canli", "kapali"] as const;
+// Enes Doganay | 13 Mayis 2026: tamamlandi eklendi
+const VALID_DURUM = ["draft", "canli", "kapali", "tamamlandi"] as const;
 const normalizeDurum = (v: unknown): string => {
   const d = String(v || "").toLowerCase().trim();
   if ((VALID_DURUM as readonly string[]).includes(d)) return d;
@@ -371,6 +614,28 @@ Deno.serve(async (request) => {
   const supabaseAdmin = createAdminClient();
 
   try {
+    // Enes Doganay | 13 Mayis 2026: Payload once okunuyor — unsubscribe_by_token auth gerektirmez
+    const payload: IhalePayload = await request.json();
+
+    // ── Abonelik iptali (auth yok, token yeterli) ──────────────────────
+    if ((payload as { action: string }).action === "unsubscribe_by_token") {
+      const token = (payload as { action: string; token?: string }).token;
+      if (!token || typeof token !== "string" || token.length < 10) {
+        return jsonResponse({ error: "Gecersiz token." }, 400);
+      }
+      const { data: rows, error: unsubErr } = await supabaseAdmin
+        .from("ihale_uyarilari")
+        .update({ aktif: false })
+        .eq("unsubscribe_token", token)
+        .eq("aktif", true)
+        .select("id");
+      if (unsubErr) return jsonResponse({ error: unsubErr.message }, 500);
+      if (!rows || rows.length === 0) {
+        return jsonResponse({ already: true }, 200);
+      }
+      return jsonResponse({ success: true });
+    }
+
     const authResult = await getAuthenticatedManager(
       request,
       supabaseAdmin,
@@ -380,7 +645,6 @@ Deno.serve(async (request) => {
     }
 
     const { firmaId } = authResult;
-    const payload: IhalePayload = await request.json();
 
     // ── Liste ──────────────────────────────────────────────────────────
     if (payload.action === "list_my_tenders") {
@@ -441,10 +705,11 @@ Deno.serve(async (request) => {
       if (error) throw error;
 
       // Enes Doganay | 1 Mayis 2026: Taslak degilse davet emaillerini gonder
+      // Enes Doganay | 13 Mayis 2026: Canli ihalede abonelere bildirim gonder
       const inviteEmails = Array.isArray(t.davet_emailleri)
         ? t.davet_emailleri.filter(Boolean) as string[]
         : [];
-      if (data.durum !== "draft" && inviteEmails.length > 0) {
+      if (data.durum !== "draft") {
         const { data: firmaRow } = await supabaseAdmin
           .from("firmalar")
           .select("firma_adi")
@@ -453,13 +718,28 @@ Deno.serve(async (request) => {
         const firmaAdi =
           (firmaRow as { firma_adi?: string } | null)?.firma_adi ??
             "Bilinmeyen Firma";
-        await sendInvitationEmails(
-          inviteEmails,
-          data.baslik,
-          String(data.id),
-          firmaAdi,
-        )
-          .catch((err) => console.error("sendInvitationEmails hata:", err));
+
+        if (inviteEmails.length > 0) {
+          await sendInvitationEmails(
+            inviteEmails,
+            data.baslik,
+            String(data.id),
+            firmaAdi,
+          ).catch((err) => console.error("sendInvitationEmails hata:", err));
+        }
+
+        if (data.durum === "canli") {
+          sendAlertSubscriberEmails(supabaseAdmin, {
+            id: data.id,
+            baslik: data.baslik,
+            kategori: (data as any).kategori ?? null,
+            il_ilce: (data as any).il_ilce ?? null,
+            son_basvuru_tarihi: (data as any).son_basvuru_tarihi ?? null,
+            firma_adi: firmaAdi,
+          }).catch((err) =>
+            console.error("sendAlertSubscriberEmails hata:", err)
+          );
+        }
       }
 
       return jsonResponse({ tender: data }, 201);
@@ -517,6 +797,16 @@ Deno.serve(async (request) => {
         updateObj.yayin_tarihi = parsedDate;
       }
 
+      // Enes Doganay | 13 Mayis 2026: Taslak->canli gecisini tespit icin onceki durumu al
+      const { data: oldTenderRow } = await supabaseAdmin
+        .from("firma_ihaleleri")
+        .select("durum")
+        .eq("id", payload.id)
+        .eq("firma_id", firmaId)
+        .maybeSingle();
+      const oldDurum = (oldTenderRow as { durum?: string } | null)?.durum ??
+        null;
+
       const { data: updated, error: updErr } = await supabaseAdmin
         .from("firma_ihaleleri")
         .update(updateObj)
@@ -532,11 +822,12 @@ Deno.serve(async (request) => {
       }
 
       // Enes Doganay | 1 Mayis 2026: Taslak -> canli gecisinde davet emaillerini gonder
+      // Enes Doganay | 13 Mayis 2026: Canli ihalede abonelere bildirim gonder
       const updatedTender = updated[0];
       const updInviteEmails = Array.isArray(t.davet_emailleri)
         ? t.davet_emailleri.filter(Boolean) as string[]
         : [];
-      if (updatedTender.durum !== "draft" && updInviteEmails.length > 0) {
+      if (updatedTender.durum !== "draft") {
         const { data: updFirmaRow } = await supabaseAdmin
           .from("firmalar")
           .select("firma_adi")
@@ -545,21 +836,61 @@ Deno.serve(async (request) => {
         const updFirmaAdi =
           (updFirmaRow as { firma_adi?: string } | null)?.firma_adi ??
             "Bilinmeyen Firma";
-        await sendInvitationEmails(
-          updInviteEmails,
-          updatedTender.baslik,
-          String(updatedTender.id),
-          updFirmaAdi,
-        )
-          .catch((err) =>
-            console.error(
-              "sendInvitationEmails (update) hata:",
-              err,
-            )
+
+        if (updInviteEmails.length > 0) {
+          await sendInvitationEmails(
+            updInviteEmails,
+            updatedTender.baslik,
+            String(updatedTender.id),
+            updFirmaAdi,
+          ).catch((err) =>
+            console.error("sendInvitationEmails (update) hata:", err)
           );
+        }
+
+        // Sadece draft -> canli gecisinde abonelere bildirim gonder
+        if (updatedTender.durum === "canli" && oldDurum === "draft") {
+          sendAlertSubscriberEmails(supabaseAdmin, {
+            id: updatedTender.id,
+            baslik: updatedTender.baslik,
+            kategori: (updatedTender as any).kategori ?? null,
+            il_ilce: (updatedTender as any).il_ilce ?? null,
+            son_basvuru_tarihi: (updatedTender as any).son_basvuru_tarihi ??
+              null,
+            firma_adi: updFirmaAdi,
+          }).catch((err) =>
+            console.error("sendAlertSubscriberEmails (update) hata:", err)
+          );
+        }
       }
 
       return jsonResponse({ tender: updatedTender });
+    }
+
+    // ── Tamamla ─────────────────────────────────────────────────────────
+    // Enes Doganay | 13 Mayis 2026: Yalnizca durum=tamamlandi — baslik validasyonu yok
+    if (payload.action === "complete_tender") {
+      if (!payload.id) {
+        return jsonResponse({ error: "Ihale ID gerekli." }, 400);
+      }
+
+      const { data: completedTender, error: completeErr } = await supabaseAdmin
+        .from("firma_ihaleleri")
+        .update({ durum: "tamamlandi" })
+        .eq("id", payload.id)
+        .eq("firma_id", firmaId)
+        .select()
+        .maybeSingle();
+
+      if (completeErr) throw completeErr;
+      if (!completedTender) {
+        return jsonResponse(
+          { error: "Ihale bulunamadi veya bu firmaya ait degil." },
+          404,
+        );
+      }
+
+      return jsonResponse({ tender: completedTender });
     }
 
     // ── Sil ────────────────────────────────────────────────────────────

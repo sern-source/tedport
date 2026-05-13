@@ -38,6 +38,8 @@
 .tender-card--yaklasan::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
 .tender-card--kapali::before { background: linear-gradient(90deg, #ef4444, #b91c1c); }
 .tender-card--draft::before { background: linear-gradient(90deg, #94a3b8, #64748b); }
+/* Enes Doğanay | 13 Mayıs 2026: Tamamlandı kart üst çizgisi */
+.tender-card--tamamlandi::before { background: linear-gradient(90deg, #34d399, #059669); }
 
 /* Enes Doğanay | 12 Mayıs 2026: Urgency — 2 günden az kalan canlı ihale */
 .tender-card--urgent::before {
@@ -564,6 +566,11 @@
     color: #b91c1c;
 }
 
+/* Enes Doğanay | 13 Mayıs 2026: Tamamlandı durum rengi */
+.tender-card-status-tamamlandi {
+    color: #065f46;
+}
+
 .tender-card-status-draft {
     color: #64748b;
 }
@@ -613,6 +620,8 @@
 [data-theme="dark"] .tender-card-status-canli { color: #86efac; }
 [data-theme="dark"] .tender-card-status-yaklasan { color: #fde68a; }
 [data-theme="dark"] .tender-card-status-kapali { color: #fca5a5; }
+/* Enes Doğanay | 13 Mayıs 2026: Tamamlandı dark mode */
+[data-theme="dark"] .tender-card-status-tamamlandi { color: #6ee7b7; }
 [data-theme="dark"] .tender-card-status-draft { color: var(--text-muted); }
 
 /* Enes Doğanay | 4 Mayıs 2026: outline→fill butonlar dark */

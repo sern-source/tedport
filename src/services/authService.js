@@ -70,62 +70,52 @@ export async function upsertOAuthProfile(userId, meta, userEmail, userAgent, pro
   return { error, profile: { first_name: firstName, last_name: lastName } };
 }
 
-// Enes Doğanay | 6 Mayıs 2026: Kurumsal badge sayıları
+// Enes Doğanay | 13 Mayıs 2026: Kurumsal badge sayıları — tek RPC sorgusu (N+1 → 1)
 // Döner: { firmaAdi, pendingQuoteCount, ihaleYonetimiUnreadCount }
-export async function fetchCompanyBadgeCounts(companyId) {
-  const [firmResult, quoteResult, firmTendersResult] = await Promise.all([
-    supabase.from('firmalar').select('firma_adi').eq('firmaID', companyId).single(),
-    supabase.from('teklif_talepleri').select('id', { count: 'exact', head: true }).eq('firma_id', companyId).eq('durum', 'pending'),
-    supabase.from('firma_ihaleleri').select('id').eq('firma_id', companyId),
-  ]);
-  const result = {
-    firmaAdi: firmResult.data?.firma_adi || null,
-    pendingQuoteCount: quoteResult.count || 0,
-    ihaleYonetimiUnreadCount: 0,
-  };
-  const tenderIds = (firmTendersResult.data || []).map(t => t.id);
-  if (tenderIds.length > 0) {
-    try {
-      const { data: offerRows } = await supabase.from('ihale_teklifleri').select('id').in('ihale_id', tenderIds);
-      const offerIds = (offerRows || []).map(o => o.id);
-      if (offerIds.length > 0) {
-        const { count } = await supabase.from('ihale_teklif_mesajlari')
-          .select('id', { count: 'exact', head: true })
-          .in('teklif_id', offerIds)
-          .eq('sender_role', 'bidder')
-          .eq('okundu_firma', false);
-        result.ihaleYonetimiUnreadCount = count || 0;
-      }
-    } catch {
-      result.ihaleYonetimiUnreadCount = 0;
-    }
+// Enes Doğanay | 13 Mayıs 2026: RPC hata verirse firmalar'dan doğrudan firma_adi çekilir (fallback)
+export async function fetchCompanyBadgeCounts(userId, companyId) {
+  let firmaAdi = null;
+  let pendingQuoteCount = 0;
+  let ihaleYonetimiUnreadCount = 0;
+
+  try {
+    const { data, error } = await supabase.rpc('get_user_badge_counts', {
+      p_user_id:    userId,
+      p_company_id: String(companyId),
+    });
+    if (error) throw new Error(error.message);
+    firmaAdi                 = data.firma_adi             || null;
+    pendingQuoteCount        = data.pending_quote_count   || 0;
+    ihaleYonetimiUnreadCount = data.ihale_yonetimi_unread || 0;
+  } catch {
+    /* RPC mevcut değil veya hata verdi — badge sayıları 0, firma adı fallback'ten alınır */
   }
-  return result;
+
+  // Enes Doğanay | 13 Mayıs 2026: RPC firma adı döndüremediyse firmalar tablosundan doğrudan çek
+  if (!firmaAdi) {
+    const { data: fw } = await supabase
+      .from('firmalar')
+      .select('firma_adi')
+      .eq('firmaID', companyId)
+      .maybeSingle();
+    firmaAdi = fw?.firma_adi || null;
+  }
+
+  return { firmaAdi, pendingQuoteCount, ihaleYonetimiUnreadCount };
 }
 
-// Enes Doğanay | 6 Mayıs 2026: Bireysel badge sayıları
+// Enes Doğanay | 13 Mayıs 2026: Bireysel badge sayıları — tek RPC sorgusu
 // Döner: { pendingQuoteCount, myOffersUnreadCount }
 export async function fetchIndividualBadgeCounts(userId) {
-  const [{ count: quoteCount }, { data: userOffers }] = await Promise.all([
-    supabase.from('bildirimler').select('id', { count: 'exact', head: true })
-      .eq('user_id', userId).eq('is_read', false).in('type', ['quote_reply', 'quote_message']),
-    supabase.from('ihale_teklifleri').select('id').eq('user_id', userId),
-  ]);
-  const result = { pendingQuoteCount: quoteCount || 0, myOffersUnreadCount: 0 };
-  const offerIds = (userOffers || []).map(o => o.id);
-  if (offerIds.length > 0) {
-    try {
-      const { count } = await supabase.from('ihale_teklif_mesajlari')
-        .select('id', { count: 'exact', head: true })
-        .in('teklif_id', offerIds)
-        .eq('sender_role', 'company')
-        .eq('okundu_bidder', false);
-      result.myOffersUnreadCount = count || 0;
-    } catch {
-      result.myOffersUnreadCount = 0;
-    }
-  }
-  return result;
+  const { data, error } = await supabase.rpc('get_user_badge_counts', {
+    p_user_id:    userId,
+    p_company_id: null,
+  });
+  if (error) throw new Error(error.message);
+  return {
+    pendingQuoteCount:   data.notif_unread      || 0,
+    myOffersUnreadCount: data.my_offers_unread  || 0,
+  };
 }
 
 // Enes Doğanay | 6 Mayıs 2026: Bildirimi okundu olarak işaretle

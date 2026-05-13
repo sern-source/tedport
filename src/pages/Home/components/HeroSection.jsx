@@ -21,6 +21,8 @@ const HeroSection = ({
     handleSearch,
     handleClearSearch,
     handleCloseSuggestions,
+    // Enes Doğanay | 13 Mayıs 2026: Canlı firma sayısı — fallback 5000
+    firmaCount = 5000,
 }) => {
     const navigate = useNavigate();
 
@@ -41,7 +43,7 @@ const HeroSection = ({
                     <div className="sc-hero-metrics" style={{ zIndex: 10 }}>
                         <span className="sc-hero-metric">
                             <span className="material-symbols-outlined">domain</span>
-                            5.000+ Firma
+                            {firmaCount} Firma
                         </span>
                         <span className="sc-hero-metric">
                             <span className="material-symbols-outlined">receipt_long</span>

@@ -153,3 +153,21 @@
     background: linear-gradient(135deg, #1e2d4a, #1e293b);
     border-color: #1e40af;
 }
+
+/* Enes Doğanay | 13 Mayıs 2026: AppBanner dark mode — eksik sınıflar tamamlandı */
+[data-theme="dark"] .sc-app-banner-content h3 {
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .sc-app-banner-content p {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .sc-store-btn {
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+[data-theme="dark"] .sc-app-banner-inner::before {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4);
+}

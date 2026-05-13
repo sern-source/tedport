@@ -42,8 +42,9 @@ const TendersToolbar = ({
                 { key: 'canli',    label: 'Canlı',     icon: 'bolt' },
                 { key: 'acil',     label: 'Acil',      icon: 'local_fire_department' },
                 { key: 'yaklasan', label: 'Yaklaşan',  icon: 'schedule' },
-                { key: 'kapali',   label: 'Kapalı',    icon: 'lock' }
-            ].map((filterOption) => (
+                { key: 'kapali',      label: 'Kapalı',    icon: 'lock' },
+                // Enes Doğanay | 13 Mayıs 2026: Tamamlandı filtresi eklendi
+                { key: 'tamamlandi',  label: 'Tamamlandı', icon: 'check_circle' }            ].map((filterOption) => (
                 <button
                     key={filterOption.key}
                     type="button"

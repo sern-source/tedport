@@ -37,6 +37,15 @@ export const updateTender = async (id, tender) => {
     return data?.tender;
 };
 
+// Enes Doğanay | 13 Mayıs 2026: İhaleyi tamamlandı olarak işaretle — ayrı action, baslik validasyonu yok
+export const completeTender = async (id) => {
+    const { data, error } = await supabase.functions.invoke('ihale-management', {
+        body: { action: 'complete_tender', id }
+    });
+    if (error) throw new Error(await extractFnError(error, 'İhale tamamlanamadı.'));
+    return data?.tender;
+};
+
 // Enes Doğanay | 6 Nisan 2026: İhaleyi siler; server sahipliği doğrular
 export const deleteTender = async (id) => {
     const { data, error } = await supabase.functions.invoke('ihale-management', {

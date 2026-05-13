@@ -14,6 +14,8 @@ const FirmaDetayHero = ({
     isLoggedIn,
     // Enes Doğanay | 12 Mayıs 2026: Admin onaylı sertifika listesi
     sertifikalar,
+    // Enes Doğanay | 13 Mayıs 2026: Aylık profil görüntüleme sayısı (sadece firma sahibi görür)
+    viewCount,
 }) => {
     const navigate = useNavigate();
 
@@ -42,9 +44,8 @@ const FirmaDetayHero = ({
                                 alt={firma.firma_adi}
                                 className="supp-avatar2"
                                 style={{ objectFit: 'contain', background: '#fff', padding: '6px' }}
-                                onError={e => {
-                                    e.currentTarget.outerHTML = `<img class='supp-avatar2' src='/tedport_default_company_logo.png' alt='Default Logo' style='object-fit:contain;background:#fff;padding:6px;' />`;
-                                }}
+                                // Enes Doğanay | 13 Mayıs 2026: outerHTML injection kaldırıldı — src swap ile güvenli fallback
+                                onError={e => { e.currentTarget.src = '/tedport_default_company_logo.png'; }}
                             />
                         ) : (
                             <img
@@ -104,6 +105,13 @@ const FirmaDetayHero = ({
                                             <span className="material-symbols-outlined">edit</span>
                                             Firma Bilgilerini Düzenle
                                         </button>
+                                    )}
+                                    {/* Enes Doğanay | 13 Mayıs 2026: Profil analitik badge — sadece firma sahibi görür */}
+                                    {isCurrentUserCompanyManager && viewCount !== null && (
+                                        <span className="firma-view-count-badge">
+                                            <span className="material-symbols-outlined">visibility</span>
+                                            Bu ay <strong>{viewCount}</strong> kişi profilinizi görüntüledi
+                                        </span>
                                     )}
                                 </div>
                             </div>

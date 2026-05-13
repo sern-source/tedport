@@ -39,6 +39,8 @@ const AdminEtiketOnay = lazy(() => import('./pages/Admin/AdminEtiketOnay'));
 const AdminMesajSikayetleri = lazy(() => import('./pages/Admin/AdminMesajSikayetleri'));
 // Enes Doğanay | 12 Mayıs 2026: Sektör bazlı ihale landing sayfaları — SEO
 const SektorLanding = lazy(() => import('./pages/SektorLanding/SektorLandingPage'));
+// Enes Doğanay | 13 Mayıs 2026: E-posta abonelik iptal sayfası — KVKK/GDPR
+const UnsubscribePage = lazy(() => import('./pages/Abonelik/UnsubscribePage'));
 
 export default function Router() {
   return (
@@ -46,8 +48,6 @@ export default function Router() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        {/* Enes Doğanay | 11 Nisan 2026: Eski /home2 yolu geriye uyumluluk için korundu */}
-        <Route path="/home2" element={<Home />} />
         <Route path="/firmalar" element={<Firmalar />} />
         <Route path="/ihaleler" element={<Ihaleler />} />
         <Route path="/login" element={<Login />} />
@@ -80,6 +80,8 @@ export default function Router() {
         <Route path="/sss" element={<SSS />} />
         {/* Enes Doğanay | 12 Mayıs 2026: Sektör landing sayfaları — SEO için */}
         <Route path="/ihaleler/sektor/:slug" element={<SektorLanding />} />
+        {/* Enes Doğanay | 13 Mayıs 2026: E-posta abonelik iptali — KVKK/GDPR */}
+        <Route path="/abonelik-iptal" element={<UnsubscribePage />} />
         {/* Enes Doğanay | 16 Nisan 2026: Tanımsız rotalar için 404 */}
         <Route path="*" element={<NotFound />} />
       </Route>

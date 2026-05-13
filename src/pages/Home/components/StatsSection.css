@@ -39,10 +39,16 @@
     font-size: 14px;
 }
 
-[data-theme="dark"] .supplier-connect-wrapper .sc-stats-badge {
+/* Enes Doğanay | 13 Mayıs 2026: dark mode düzeltme — sc-stats-header'da arka plan/renk tanımlı */
+[data-theme="dark"] .supplier-connect-wrapper .sc-stats-header {
     background: rgba(59, 130, 246, 0.12);
     border-color: rgba(59, 130, 246, 0.25);
     color: #60a5fa;
+}
+
+[data-theme="dark"] .supplier-connect-wrapper .sc-stats {
+    background: var(--bg-white);
+    border-color: var(--border);
 }
 
 .supplier-connect-wrapper .sc-stats-grid {
@@ -141,6 +147,20 @@
 
 [data-theme="dark"] .supplier-connect-wrapper .sc-stat-item:hover {
     background: var(--bg-light);
+}
+
+/* Enes Doğanay | 13 Mayıs 2026: Yükleniyor animasyonu */
+.supplier-connect-wrapper .sc-stat-item--loading .sc-stat-num {
+    background: var(--border);
+    color: transparent !important;
+    border-radius: 6px;
+    min-width: 48px;
+    animation: statPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes statPulse {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1;   }
 }
 
 /* Categories Section */

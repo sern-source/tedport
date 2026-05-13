@@ -16,3 +16,24 @@
         padding: 20px 14px 40px;
     }
 }
+
+/* Enes Doğanay | 13 Mayıs 2026: Uyarı satırı — toolbar altında */
+.tenders-alert-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0 2px;
+}
+
+.tenders-alert-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .tenders-alert-hint {
+    color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+    .tenders-alert-row { flex-wrap: wrap; }
+}

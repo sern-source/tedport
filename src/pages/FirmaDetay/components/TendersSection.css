@@ -115,6 +115,13 @@
   border: 1px solid #fca5a5;
 }
 
+/* Enes Doğanay | 15 Mayıs 2026: tamamlandi badge — yeşil ton, canli'dan ayırt edilsin */
+.tender-status-tamamlandi {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
 /* Tenders Section */
 .tenders-section {
   margin-top: 1.5rem;
@@ -348,6 +355,13 @@
   background: #2d1010;
   color: #f87171;
   border-color: #991b1b;
+}
+
+/* Enes Doğanay | 15 Mayıs 2026: tamamlandi dark mode */
+[data-theme="dark"] .tender-status-tamamlandi {
+  background: rgba(52,211,153,0.1);
+  color: #6ee7b7;
+  border-color: #065f46;
 }
 
 /* Tender meta chip (mavi) */

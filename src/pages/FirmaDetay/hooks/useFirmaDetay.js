@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     fetchFirmaById, fetchFirmaTenders, fetchFirmaEkip,
     fetchUserSessionData, sendQuoteRequestService, fetchSuggestionsService,
+    trackFirmaView, fetchFirmaViewCount,
 } from '../services/firmaDetayService';
 // Enes Doğanay | 12 Mayıs 2026: Sertifika servisi — onaylı rozet verileri
 import { fetchFirmaSertifikalari } from '../../../services/sertifikaService';
@@ -36,6 +37,8 @@ export function useFirmaDetay(id) {
     const [detaySearchMode, setDetaySearchMode] = useState('all');
     // Enes Doğanay | 12 Mayıs 2026: Onaylı sertifika rozet listesi
     const [sertifikalar, setSertifikalar] = useState([]);
+    // Enes Doğanay | 13 Mayıs 2026: Firma sahibine gösterilen aylık görüntüleme sayısı
+    const [viewCount, setViewCount] = useState(null);
     const [showQuoteModal, setShowQuoteModal] = useState(false);
     const [quoteForm, setQuoteFormState] = useState(EMPTY_QUOTE_FORM);
     const [quoteSending, setQuoteSending] = useState(false);
@@ -77,11 +80,19 @@ export function useFirmaDetay(id) {
 
     const checkUserSessionAndNotes = async () => {
         const sessionData = await fetchUserSessionData(id);
-        if (!sessionData) { setUserProfile(null); setManagedCompanyId(null); return; }
+        if (!sessionData) { setUserProfile(null); setManagedCompanyId(null); trackFirmaView(id, null); return; }
         sessionUserIdRef.current = sessionData.userId;
         sessionUserEmailRef.current = sessionData.userEmail;
         setUserProfile(sessionData.profile);
-        setManagedCompanyId(sessionData.managedCompanyId);
+        const companyId = sessionData.managedCompanyId;
+        setManagedCompanyId(companyId);
+        // Enes Doğanay | 13 Mayıs 2026: Görüntüleme kaydı ve analitik
+        const isOwner = companyId && String(companyId) === String(id);
+        if (!isOwner) {
+            trackFirmaView(id, sessionData.userId || null);
+        } else {
+            fetchFirmaViewCount(id).then(cnt => setViewCount(cnt)).catch(() => {});
+        }
         notes.setSavedNotes(sessionData.notes);
         favorites.setMyLists(sessionData.lists);
         if (sessionData.remindersError && !isMissingRelationError(sessionData.remindersError)) { /* sessiz — hatırlatıcı yüklenemedi, kritik değil */ }
@@ -143,6 +154,7 @@ export function useFirmaDetay(id) {
         detaySearchMode, setDetaySearchMode,
         handleSuggestionClick, handleSearchSubmit,
         sertifikalar,
+        viewCount,
         showQuoteModal, setShowQuoteModal, quoteForm, setQuoteField,
         quoteSending, quoteSent, quoteFile, setQuoteFile, handleSendQuoteRequest,
         showEkipModal, setShowEkipModal,

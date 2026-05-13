@@ -53,8 +53,10 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
                     { key: 'all',       label: 'Tümü',     icon: 'apps' },
                     { key: 'active',    label: 'Canlı',     icon: 'check_circle' },
                     { key: 'yaklasan',  label: 'Yaklaşan',  icon: 'schedule' },
-                    { key: 'closed',    label: 'Kapalı',   icon: 'lock' },
-                    { key: 'draft',     label: 'Taslak',    icon: 'edit_note' },
+                    { key: 'closed',      label: 'Kapalı',    icon: 'lock' },
+                    { key: 'draft',       label: 'Taslak',    icon: 'edit_note' },
+                    // Enes Doğanay | 13 Mayıs 2026: Tamamlandı filtresi eklendi
+                    { key: 'tamamlandi',  label: 'Tamamlandı', icon: 'check_circle' },
                 ].map(f => (
                     <button key={f.key} className={`tom-pill${tenderFilter === f.key ? ' tom-pill--on' : ''}`} onClick={() => { setTenderFilter(f.key); setTenderPage(1); }}>
                         <span className="material-symbols-outlined">{f.icon}</span>{f.label}
@@ -94,8 +96,9 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
                     visibleTenders.map(t => {
                         // Enes Doğanay | 12 Mayıs 2026: getTenderStatusMeta tarih bazı (yaklaşan), tone/icon dönüşümü
                         const meta = getTenderStatusMeta(t);
-                        const KEY_TO_TONE = { canli: 'active', yaklasan: 'yaklasan', kapali: 'closed', draft: 'draft', iptal: 'cancelled' };
-                        const KEY_TO_ICON = { canli: 'radio_button_checked', yaklasan: 'schedule', kapali: 'lock', draft: 'edit_note', iptal: 'cancel' };
+                        // Enes Doğanay | 13 Mayıs 2026: tamamlandi eklendi
+                        const KEY_TO_TONE = { canli: 'active', yaklasan: 'yaklasan', kapali: 'closed', tamamlandi: 'tamamlandi', draft: 'draft', iptal: 'cancelled' };
+                        const KEY_TO_ICON = { canli: 'radio_button_checked', yaklasan: 'schedule', kapali: 'lock', tamamlandi: 'check_circle', draft: 'edit_note', iptal: 'cancel' };
                         const st = { tone: KEY_TO_TONE[meta.key] || 'unknown', icon: KEY_TO_ICON[meta.key] || 'help', label: meta.label };
                         const cnt = (offersByTender[String(t.id)] || []).length;
                         const isActive = String(selectedId) === String(t.id);

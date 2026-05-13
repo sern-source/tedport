@@ -6,6 +6,7 @@ import SharedFooter from '../../components/SharedFooter';
 import SEO from '../../components/SEO';
 import { useHomeSearch } from './hooks/useHomeSearch';
 import { useHomeSuppliers } from './hooks/useHomeSuppliers';
+import { useHomePlatformStats } from './hooks/useHomePlatformStats';
 import HeroSection from './components/HeroSection';
 import StatsSection from './components/StatsSection';
 import HowItWorksSection from './components/HowItWorksSection';
@@ -17,6 +18,8 @@ import AppBanner from './components/AppBanner';
 const HomePage = () => {
     const searchProps = useHomeSearch();
     const { topSuppliers, isLoading } = useHomeSuppliers();
+    // Enes Doğanay | 13 Mayıs 2026: Hero badge için canlı firma sayısı
+    const { stats: platformStats } = useHomePlatformStats();
 
     return (
         <div className="supplier-connect-wrapper">
@@ -28,7 +31,7 @@ const HomePage = () => {
             <SharedHeader />
 
             <main>
-                <HeroSection {...searchProps} />
+                <HeroSection {...searchProps} firmaCount={platformStats.firmaCount} />
                 <StatsSection />
                 {/* Enes Doğanay | 12 Mayıs 2026: Nasıl Çalışır — sayfa akışına eklendi */}
                 <HowItWorksSection />
