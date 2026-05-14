@@ -23,9 +23,10 @@ const HomePage = () => {
 
     return (
         <div className="supplier-connect-wrapper">
+            {/* Enes Doğanay | 14 Mayıs 2026: SEO başlık ve açıklaması hero konumlandırmasıyla eşleştirildi */}
             <SEO
-                title="Türkiye'nin B2B Tedarik Platformu"
-                description="Tedport ile doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun. İhale açın, teklif verin, firmaları keşfedin. Ücretsiz üyelik."
+                title="Türkiye'nin Kurumsal İş Ağı"
+                description="Doğru firmaları keşfedin, satınalma süreçlerinizi hızlandırın ve uzun vadeli çözüm ortaklıkları kurun — hepsi tek platformda. Ücretsiz üyelik."
                 path="/"
             />
             <SharedHeader />

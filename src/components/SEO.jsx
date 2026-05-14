@@ -2,12 +2,13 @@
 import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'Tedport';
-const DEFAULT_DESC = "Türkiye'nin B2B tedarik portalı. Doğrulanmış üreticiler, toptancılar ve distribütörlerle bağlantı kurun.";
+// Enes Doğanay | 14 Mayıs 2026: Varsayılan açıklama ve fallback başlık güncellendi
+const DEFAULT_DESC = "Doğru firmaları keşfedin, satınalma süreçlerinizi hızlandırın ve uzun vadeli çözüm ortaklıkları kurun — hepsi tek platformda. Ücretsiz üyelik.";
 const DEFAULT_IMAGE = '/tedport-logo-sade.jpg';
 const BASE_URL = 'https://tedport.com';
 
 export default function SEO({ title, description, path, image, noIndex }) {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — B2B Tedarik Portalı`;
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Türkiye'nin Kurumsal İş Ağı`;
   const desc = description || DEFAULT_DESC;
   const img = image || DEFAULT_IMAGE;
   const url = path ? `${BASE_URL}${path}` : BASE_URL;
