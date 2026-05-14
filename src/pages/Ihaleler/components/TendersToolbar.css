@@ -286,10 +286,12 @@
 }
 
 /* === Responsive === */
+/* Enes Doğanay | 14 Mayıs 2026: Mobil overflow fix — filter pills min-width:0 + scrollbar gizleme */
 @media (max-width: 768px) {
     .tenders-toolbar {
         flex-direction: column;
         align-items: stretch;
+        max-width: 100%;
     }
 
     .tenders-search-box {
@@ -298,16 +300,39 @@
         padding: 0 10px;
         border-radius: 10px;
         gap: 6px;
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .tenders-search-box input {
         font-size: 0.82rem;
+        min-width: 0;
     }
 
     .tenders-filter-pills {
         overflow-x: auto;
         flex-wrap: nowrap;
         -webkit-overflow-scrolling: touch;
+        /* KEY FIX: flex item min-width:0 allows overflow-x:auto to scroll instead of expanding */
+        min-width: 0;
+        max-width: 100%;
+        /* Scrollbar gizle — kaydırılabilir ama temiz görünüm */
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+
+    .tenders-filter-pills::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tenders-sort-box {
+        width: 100%;
+    }
+
+    .tenders-sort-trigger {
+        width: 100%;
+        box-sizing: border-box;
     }
 
     /* Enes Doğanay | 14 Mayıs 2026: Mini sayfalama tam genişlik almasın */

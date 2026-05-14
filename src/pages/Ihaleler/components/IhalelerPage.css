@@ -11,9 +11,11 @@
     padding: 28px 20px 56px;
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: Mobil overflow-x engeli — toolbar ve kart taşmalarını kapat */
 @media (max-width: 768px) {
     .tenders-page-main {
         padding: 20px 14px 40px;
+        overflow-x: hidden;
     }
 }
 
