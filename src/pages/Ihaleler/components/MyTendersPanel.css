@@ -529,3 +529,20 @@
     border-color: #7f1d1d;
     color: #fca5a5;
 }
+
+/* Enes Doğanay | 14 Mayıs 2026: 480px — ihale satırı dikey düzen, butonlar tam genişlik */
+@media (max-width: 480px) {
+    .my-tender-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .my-tender-row__actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .my-tender-btn {
+        flex: 1;
+        justify-content: center;
+    }
+}

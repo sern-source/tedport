@@ -309,6 +309,17 @@
         flex-wrap: nowrap;
         -webkit-overflow-scrolling: touch;
     }
+
+    /* Enes Doğanay | 14 Mayıs 2026: Mini sayfalama tam genişlik almasın */
+    .tenders-mini-pagination {
+        align-self: flex-start;
+    }
+}
+
+/* Enes Doğanay | 14 Mayıs 2026: 480px — sıralama etiketi gizle, kompakt görünüm */
+@media (max-width: 480px) {
+    .tenders-sort-label { display: none; }
+    .tenders-sort-trigger { min-width: unset; }
 }
 
 /* === Dark mode === */

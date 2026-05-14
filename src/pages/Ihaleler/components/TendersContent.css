@@ -402,19 +402,45 @@
     .tenders-list-col--konum { display: none; }
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: Liste görünümü mobil — flex layout, gereksiz sütunlar gizlendi */
 @media (max-width: 768px) {
     .tenders-grid {
         grid-template-columns: 1fr;
     }
     .tenders-list-header { display: none; }
     .tenders-list-row {
-        grid-template-columns: 1fr 1fr 72px;
-        gap: 6px;
-        padding: 12px 16px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        padding: 10px 14px;
     }
     .tenders-list-col--konum,
-    .tenders-list-col--tarih:first-of-type { display: none; }
-    .tenders-list-col--baslik { grid-column: 1 / 2; }
+    .tenders-list-col--tarih { display: none; }
+    .tenders-list-col--firma {
+        width: 100%;
+        font-size: 0.75rem;
+    }
+    .tenders-list-col--baslik {
+        flex: 1;
+        min-width: 0;
+    }
+    .tenders-list-col--durum {
+        flex-shrink: 0;
+    }
+    .tenders-list-col--actions {
+        flex-shrink: 0;
+        overflow: visible;
+    }
+}
+
+/* Enes Doğanay | 14 Mayıs 2026: Blur CTA kartı — 480px kompakt padding */
+@media (max-width: 480px) {
+    .tenders-blur-cta {
+        padding: 20px 16px;
+        border-radius: 12px;
+        max-width: calc(100vw - 28px);
+    }
 }
 
 /* === Dark mode === */

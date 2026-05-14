@@ -100,3 +100,27 @@
         justify-content: center;
     }
 }
+
+/* Enes Doğanay | 14 Mayıs 2026: 480px — hero daha kompakt */
+@media (max-width: 480px) {
+    .tenders-hero-compact {
+        padding: 12px 14px;
+        gap: 10px;
+    }
+    .tenders-hero-compact__left h1 {
+        font-size: 1rem;
+    }
+    .tenders-hero-compact__left p {
+        font-size: 0.73rem;
+    }
+    .tenders-mini-stat {
+        padding: 5px 8px;
+        gap: 4px;
+    }
+    .tenders-mini-stat strong {
+        font-size: 0.88rem;
+    }
+    .tenders-mini-stat span:last-child {
+        font-size: 0.67rem;
+    }
+}

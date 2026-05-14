@@ -448,11 +448,17 @@
 
 /* === Responsive === */
 @media (max-width: 640px) {
+    /* Enes Doğanay | 14 Mayıs 2026: Bottom-sheet pattern — overlay padding kaldırıldı, modal alttan kayar */
+    .tender-detail-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
     .tender-detail-modal {
         width: 100vw;
         max-width: 100vw;
-        max-height: 100vh;
-        border-radius: 0;
+        max-height: 92vh;
+        border-radius: 16px 16px 0 0;
         border-top: 3px solid #2563eb;
     }
 
