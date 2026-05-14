@@ -728,7 +728,10 @@ Deno.serve(async (request) => {
           ).catch((err) => console.error("sendInvitationEmails hata:", err));
         }
 
-        if (data.durum === "canli") {
+        // Enes Doganay | 14 Mayis 2026: Sadece acik ihaleler abonelere bildirilir — davetli ihalelerde genel uyari email gonderilmez
+        if (
+          data.durum === "canli" && (data as any).ihale_tipi !== "Davetli İhale"
+        ) {
           sendAlertSubscriberEmails(supabaseAdmin, {
             id: data.id,
             baslik: data.baslik,
@@ -848,8 +851,11 @@ Deno.serve(async (request) => {
           );
         }
 
-        // Sadece draft -> canli gecisinde abonelere bildirim gonder
-        if (updatedTender.durum === "canli" && oldDurum === "draft") {
+        // Enes Doganay | 14 Mayis 2026: Sadece acik ihaleler abonelere bildirilir — davetli ihalelerde genel uyari email gonderilmez
+        if (
+          updatedTender.durum === "canli" && oldDurum === "draft" &&
+          (updatedTender as any).ihale_tipi !== "Davetli İhale"
+        ) {
           sendAlertSubscriberEmails(supabaseAdmin, {
             id: updatedTender.id,
             baslik: updatedTender.baslik,

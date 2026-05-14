@@ -1,9 +1,9 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Public ihale listesi hook — filtre, sıralama, sayfalama (servis üstü)
 // Enes Doğanay | 13 Mayıs 2026: Tüm filtre/sıralama/sayfalama DB seviyesine taşındı
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 import { getSmartPages } from '../IhalelerUtils';
-import { fetchPublicTenders, fetchTenderCounts, PAGE_SIZE } from '../services/ihalelerService';
+import { fetchPublicTenders, fetchTenderCounts, fetchInvitedTenders, PAGE_SIZE } from '../services/ihalelerService';
 
 // Enes Doğanay | 13 Mayıs 2026: "Tümü" görünümünde sayfa içi durum sıralaması (12 öğe, ucuz)
 // Enes Doğanay | 13 Mayıs 2026: tamamlandi eklendi — kapali'dan sonra sıralanır
@@ -15,8 +15,10 @@ const sortPageByStatus = (items) =>
         return aO - bO;
     });
 
-const useIhaleler = (firmaFilter) => {
+const useIhaleler = (firmaFilter, { userEmail, userFirmaId } = {}) => {
     const [tenders, setTenders] = useState([]);
+    // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler — ayrı sorgu, merge edilir
+    const [invitedTenders, setInvitedTenders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [tableMissing, setTableMissing] = useState(false);
     const [selectedFirmaName, setSelectedFirmaName] = useState('');
@@ -91,6 +93,14 @@ const useIhaleler = (firmaFilter) => {
     useEffect(() => { loadCounts(); }, [loadCounts]);
     useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [page]);
 
+    // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler — kullanıcı değişince yeniden yüklenir
+    useEffect(() => {
+        if (!userEmail && !userFirmaId) { setInvitedTenders([]); return; }
+        fetchInvitedTenders(userEmail, userFirmaId)
+            .then(data => setInvitedTenders(data.map(t => ({ ...t, _isInvited: true }))))
+            .catch(() => setInvitedTenders([]));
+    }, [userEmail, userFirmaId]);
+
     const toggleViewMode = () => {
         const next = viewMode === 'grid' ? 'list' : 'grid';
         setViewMode(next);
@@ -100,14 +110,52 @@ const useIhaleler = (firmaFilter) => {
     const totalPages = Math.ceil(total / PAGE_SIZE);
     const smartPages = getSmartPages(page, totalPages);
 
+    // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleleri mevcut filtre/arama ile eşleştir (sayfa-1 başına prepend)
+    const invitedFiltered = useMemo(() => {
+        if (!invitedTenders.length) return [];
+        let list = invitedTenders;
+
+        if (statusFilter && statusFilter !== 'all') {
+            list = list.filter(t => {
+                const meta = getTenderStatusMeta(t);
+                if (statusFilter === 'canli') return meta.key === 'canli';
+                if (statusFilter === 'kapali') return meta.key === 'kapali';
+                if (statusFilter === 'yaklasan') return meta.key === 'yaklasan';
+                if (statusFilter === 'acil') {
+                    const d = t.son_basvuru_tarihi ? new Date(t.son_basvuru_tarihi) : null;
+                    const diff = d ? d - new Date() : -1;
+                    return meta.key === 'canli' && diff > 0 && diff < 3 * 24 * 60 * 60 * 1000;
+                }
+                return t.durum === statusFilter;
+            });
+        }
+        if (debouncedSearch && debouncedSearch.trim().length >= 2) {
+            const q = debouncedSearch.toLowerCase();
+            list = list.filter(t =>
+                (t.baslik || '').toLowerCase().includes(q) ||
+                (t.firma_adi || '').toLowerCase().includes(q) ||
+                (t.referans_no || '').toLowerCase().includes(q)
+            );
+        }
+        // Kendi ihalesi zaten public listede var — duplicate'i önle
+        const publicIds = new Set(tenders.map(t => t.id));
+        return list.filter(t => !publicIds.has(t.id));
+    }, [invitedTenders, tenders, statusFilter, debouncedSearch]);
+
+    // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler sadece sayfa 1'de öne eklenir
+    const mergedTenders = useMemo(
+        () => page === 1 ? [...invitedFiltered, ...tenders] : tenders,
+        [page, invitedFiltered, tenders]
+    );
+
     return {
         tenders, loading, tableMissing, selectedFirmaName,
         page, setPage, viewMode, toggleViewMode,
         searchTerm, setSearchTerm, statusFilter, setStatusFilter,
         sortBy, setSortBy, sortDropdownOpen, setSortDropdownOpen, sortDropdownRef,
         // Enes Doğanay | 13 Mayıs 2026: Server pagination — paginatedTenders = tenders (zaten sayfalanmış)
-        filteredTenders: tenders,
-        paginatedTenders: tenders,
+        filteredTenders: mergedTenders,
+        paginatedTenders: mergedTenders,
         total, totalPages, smartPages,
         liveCount, upcomingCount, closedCount,
         fetchPublicTenders: loadTenders,

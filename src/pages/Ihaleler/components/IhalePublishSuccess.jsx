@@ -22,7 +22,7 @@ const IhalePublishSuccess = ({ ihalePublishSuccess, publishedLinkCopied, setPubl
         );
     }
 
-    // Enes Doğanay | 12 Mayıs 2026: Taslak kaydedildi modalı
+    // Enes Doğanay | 12 Mayıs 2026: Taslak kaydedildi modalı (mevcut ihale güncelleme)
     if (type === 'draft') {
         return (
             <div className="teklif-success-overlay" onClick={onClose}>
@@ -32,6 +32,22 @@ const IhalePublishSuccess = ({ ihalePublishSuccess, publishedLinkCopied, setPubl
                     </div>
                     <h3>Taslak Kaydedildi!</h3>
                     <p>Değişiklikleriniz taslak olarak kaydedildi.</p>
+                    <button className="teklif-success-card__btn" onClick={onClose}>Tamam</button>
+                </div>
+            </div>
+        );
+    }
+
+    // Enes Doğanay | 14 Mayıs 2026: Yeni ihale taslak olarak oluşturuldu
+    if (type === 'draft-new') {
+        return (
+            <div className="teklif-success-overlay" onClick={onClose}>
+                <div className="teklif-success-card" onClick={e => e.stopPropagation()}>
+                    <div className="teklif-success-card__icon">
+                        <span className="material-symbols-outlined">save</span>
+                    </div>
+                    <h3>Taslak Oluşturuldu!</h3>
+                    <p>İhaleniz taslak olarak kaydedildi. Hazır olduğunuzda düzenleyip yayınlayabilirsiniz.</p>
                     <button className="teklif-success-card__btn" onClick={onClose}>Tamam</button>
                 </div>
             </div>

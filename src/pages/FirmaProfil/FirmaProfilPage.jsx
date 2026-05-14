@@ -12,6 +12,7 @@ import { useFirmaCore } from './hooks/useFirmaCore';
 import { useTeklifYonetimi } from './hooks/useTeklifYonetimi';
 import { useEkipYonetimi } from './hooks/useEkipYonetimi';
 import { useFirmaContent } from './hooks/useFirmaContent';
+import useFirmaDashboard from './hooks/useFirmaDashboard';
 import { NAV_ITEMS } from './constants/firmaProfilConstants';
 import { markNotificationRead } from './services/firmaService';
 import FirmaSidebar from './components/FirmaSidebar';
@@ -23,12 +24,15 @@ const EMPTY_QUOTES_DATA = { reportModal: null, setReportModal: () => {}, reportN
 
 const FirmaProfilPage = () => {
   const { latestNotification, setActiveViewingTeklifId, updateNotifPrefsCache, ihaleYonetimiUnreadCount, setIhaleYonetimiUnreadCount, refreshCounts } = useAuth();
-  const { companyId, firma, setFirma, userId, loading, myRole, showEkipPublic, ekipVisibilitySaving, handleEkipPublicToggle, isEmbedded, fromSirketim, currentTab, setTab, searchParams, setSearchParams, navigate, fpToast, showFpToast, notifPrefs, setNotifPrefs, handleLogout } = useFirmaCore();
+  // Enes Doğanay | 14 Mayıs 2026: myPagePermissions eklendi — analitik izin desteği
+  const { companyId, firma, setFirma, userId, loading, myRole, myPagePermissions, showEkipPublic, ekipVisibilitySaving, handleEkipPublicToggle, isEmbedded, fromSirketim, currentTab, setTab, searchParams, setSearchParams, navigate, fpToast, showFpToast, notifPrefs, setNotifPrefs, handleLogout } = useFirmaCore();
 
   const notifData = useNotifications(userId, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showFpToast);
   const favData = useFavorites(userId, showFpToast);
   const teklifData = useTeklifYonetimi({ companyId, userId, notifications: notifData.notifications, setNotifications: notifData.setNotifications, setActiveViewingTeklifId, refreshCounts, setTab, searchParams, setSearchParams, currentTab, showFpToast });
   const ekipData = useEkipYonetimi({ companyId, userId, firmaAdi: firma?.firma_adi, showFpToast });
+  // Enes Doğanay | 14 Mayıs 2026: Analitik dashboard — sadece sekme aktifken yükle
+  const dashboardData = useFirmaDashboard(companyId, currentTab === 'analitik');
   const content = useFirmaContent({ notifications: notifData.notifications, upcomingReminders: notifData.upcomingReminders, showAllNotifications: notifData.showAllNotifications, getFilteredNotifications: notifData.getFilteredNotifications, incomingQuotes: teklifData.incomingQuotes, outgoingQuotes: teklifData.outgoingQuotes, setTab, navigate, handleMarkNotificationRead: notifData.handleMarkNotificationRead, handleOpenQuoteChat: teklifData.handleOpenQuoteChat });
 
   // Enes Doğanay | 7 Mayıs 2026: Gerçek zamanlı bildirim listeye ekle — _isViewingChat tüm tipler için çalışır
@@ -94,8 +98,8 @@ const FirmaProfilPage = () => {
           </div>
         )}
         <div className={`layout${isEmbedded ? ' layout--embedded' : ''}${fromSirketim ? ' layout--no-sidebar' : ''}`}>
-          {!isEmbedded && !fromSirketim && <FirmaSidebar firma={firma} currentTab={currentTab} setTab={setTab} myRole={myRole} unreadNotifCount={content.unreadNotifCount} ihaleYonetimiUnreadCount={ihaleYonetimiUnreadCount} incomingQuotes={teklifData.incomingQuotes} unreadQuoteIds={content.unreadQuoteIds} setActiveQuoteChat={teklifData.setActiveQuoteChat} handleLogout={handleLogout} favData={favData} />}
-          <FirmaProfilContent firma={firma} setFirma={setFirma} currentTab={currentTab} companyId={companyId} searchParams={searchParams} setTab={setTab} setIhaleYonetimiUnreadCount={setIhaleYonetimiUnreadCount} myRole={myRole} teklifData={teklifData} notifData={notifData} notifPrefs={notifPrefs} ekipData={ekipData} userId={userId} favData={favData} content={content} navigate={navigate} showEkipPublic={showEkipPublic} ekipVisibilitySaving={ekipVisibilitySaving} handleEkipPublicToggle={handleEkipPublicToggle} />
+          {!isEmbedded && !fromSirketim && <FirmaSidebar firma={firma} currentTab={currentTab} setTab={setTab} myRole={myRole} myPagePermissions={myPagePermissions} unreadNotifCount={content.unreadNotifCount} ihaleYonetimiUnreadCount={ihaleYonetimiUnreadCount} incomingQuotes={teklifData.incomingQuotes} unreadQuoteIds={content.unreadQuoteIds} setActiveQuoteChat={teklifData.setActiveQuoteChat} handleLogout={handleLogout} favData={favData} />}
+          <FirmaProfilContent firma={firma} setFirma={setFirma} currentTab={currentTab} companyId={companyId} searchParams={searchParams} setTab={setTab} setIhaleYonetimiUnreadCount={setIhaleYonetimiUnreadCount} myRole={myRole} myPagePermissions={myPagePermissions} teklifData={teklifData} notifData={notifData} notifPrefs={notifPrefs} ekipData={ekipData} userId={userId} favData={favData} content={content} navigate={navigate} showEkipPublic={showEkipPublic} ekipVisibilitySaving={ekipVisibilitySaving} handleEkipPublicToggle={handleEkipPublicToggle} dashboardData={dashboardData} />
         </div>
       </div>
     </>

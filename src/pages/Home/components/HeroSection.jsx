@@ -34,9 +34,13 @@ const HeroSection = ({
                     <div className="sc-hero-blob sc-hero-blob--1" aria-hidden="true" />
                     <div className="sc-hero-blob sc-hero-blob--2" aria-hidden="true" />
                     <div style={{ zIndex: 10 }}>
-                        {/* Enes Doğanay | 12 Mayıs 2026: Güçlü B2B positioning — ekosistem mesajı */}
-                        <h1 className="sc-hero-title">Türkiye'nin Dijital Ticaret Ağı</h1>
-                        <p className="sc-hero-subtitle">ERP değil. CRM değil. Satınalma + tedarik + bağlantı — hepsi tek platformda. Doğrulanmış firmalarla saniyeler içinde teklif alın.</p>
+                        {/* Enes Doğanay | 14 Mayıs 2026: Premium B2B positioning — çözüm ortaklığı eyebrow + güçlü başlık */}
+                        <span className="sc-hero-eyebrow">
+                            <span className="material-symbols-outlined">handshake</span>
+                            Çözüm Ortaklığı Platformu
+                        </span>
+                        <h1 className="sc-hero-title">Türkiye'nin Kurumsal İş Ağı</h1>
+                        <p className="sc-hero-subtitle">Doğru firmaları keşfedin, satınalma süreçlerinizi hızlandırın ve uzun vadeli çözüm ortaklıkları kurun — hepsi tek platformda.</p>
                     </div>
 
                     {/* Enes Doğanay | 12 Mayıs 2026: Platform metrik badge'leri — güven sinyali */}

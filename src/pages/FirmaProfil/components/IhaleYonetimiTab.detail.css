@@ -142,6 +142,20 @@
     color: #334155;
     border-bottom: 1px solid #f8fafc;
 }
+/* Enes Doğanay | 14 Mayıs 2026: İhaledeki birim gösterge badge */
+.tom-kalem-birim-badge {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 0.67rem;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 0 4px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
 
 .tom-kalemler__wrap td strong { font-weight: 600; color: #0f172a; }
 /* Enes Doğanay | 9 Mayıs 2026: Zebra stripe — okunurluğu artırır */

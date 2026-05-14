@@ -27,7 +27,8 @@ const IhalelerPage = () => {
     const duzenleParam = searchParams.get("duzenle") || "";
     const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
 
-    const ihaleler = useIhaleler(firmaFilter);
+    // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleleri yükle — kullanıcı email ve firma bilgisi
+    const ihaleler = useIhaleler(firmaFilter, { userEmail: userProfile?.email, userFirmaId: authManagedCompanyId });
     const myTendersHook = useMyTenders({ fetchPublicTenders: ihaleler.fetchPublicTenders });
     const ihaleFormHook = useIhaleForm({
         managedFirmaId: myTendersHook.managedFirmaId,

@@ -1,0 +1,498 @@
+/* Enes Doğanay | 14 Mayıs 2026: Firma Analitik Dashboard — tüm stiller */
+
+/* ─── Root ─── */
+.fdb-root {
+    padding: 28px 28px 40px;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ─── Header ─── */
+.fdb-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.fdb-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    letter-spacing: -0.3px;
+}
+.fdb-header-title .material-symbols-outlined {
+    font-size: 1.3rem;
+    color: #2563eb;
+}
+.fdb-header-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* ─── Metrik kartlar grid ─── */
+.fdb-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.fdb-metric-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.05);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    overflow: hidden;
+}
+.fdb-metric-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+}
+.fdb-metric-card--blue::before   { background: #2563eb; }
+.fdb-metric-card--green::before  { background: #16a34a; }
+.fdb-metric-card--purple::before { background: #7c3aed; }
+.fdb-metric-card--orange::before { background: #ea580c; }
+
+.fdb-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(15,23,42,0.09);
+}
+
+.fdb-metric-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+.fdb-metric-card--blue   .fdb-metric-icon { background: rgba(37, 99, 235, 0.10); color: #2563eb; }
+.fdb-metric-card--green  .fdb-metric-icon { background: rgba(22, 163, 74, 0.10);  color: #16a34a; }
+.fdb-metric-card--purple .fdb-metric-icon { background: rgba(124, 58, 237, 0.10); color: #7c3aed; }
+.fdb-metric-card--orange .fdb-metric-icon { background: rgba(234, 88, 12, 0.10);  color: #ea580c; }
+.fdb-metric-icon .material-symbols-outlined { font-size: 1.3rem; }
+
+.fdb-metric-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.fdb-metric-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+.fdb-metric-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.fdb-metric-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+/* ─── Alt bölümler grid ─── */
+.fdb-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.fdb-section--wide {
+    grid-column: span 2;
+}
+
+.fdb-section {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.03), 0 2px 8px rgba(15,23,42,0.04);
+    overflow: hidden;
+}
+.fdb-section-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    background: var(--bg-light);
+}
+.fdb-section-header .material-symbols-outlined {
+    font-size: 1rem;
+    color: #2563eb;
+}
+.fdb-section-badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #2563eb;
+    background: rgba(37,99,235,0.08);
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+.fdb-section-body {
+    padding: 18px;
+}
+
+/* ─── Bar Chart (görüntüleme) ─── */
+.fdb-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 110px;
+}
+.fdb-chart-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+}
+.fdb-chart-count {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    height: 14px;
+    line-height: 14px;
+}
+.fdb-chart-bar-wrap {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    background: var(--bg-light);
+    border-radius: 4px 4px 0 0;
+    min-height: 0;
+}
+.fdb-chart-bar {
+    width: 100%;
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.fdb-chart-day {
+    font-size: 0.64rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* ─── İhale Durum Pilleri ─── */
+.fdb-status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.fdb-status-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    min-width: 72px;
+    flex: 1;
+    text-align: center;
+    border: 1px solid transparent;
+}
+.fdb-status-pill--canli      { background: rgba(22, 163, 74, 0.08); border-color: rgba(22, 163, 74, 0.2); }
+.fdb-status-pill--yaklasan   { background: rgba(217, 119, 6, 0.08);  border-color: rgba(217, 119, 6, 0.2); }
+.fdb-status-pill--kapali     { background: rgba(220, 38, 38, 0.08);  border-color: rgba(220, 38, 38, 0.2); }
+.fdb-status-pill--tamamlandi { background: rgba(20, 184, 166, 0.08); border-color: rgba(20, 184, 166, 0.2); }
+.fdb-status-pill--draft      { background: rgba(100, 116, 139, 0.08); border-color: rgba(100, 116, 139, 0.2); }
+
+.fdb-status-pill-count {
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+.fdb-status-pill--canli      .fdb-status-pill-count { color: #16a34a; }
+.fdb-status-pill--yaklasan   .fdb-status-pill-count { color: #d97706; }
+.fdb-status-pill--kapali     .fdb-status-pill-count { color: #dc2626; }
+.fdb-status-pill--tamamlandi .fdb-status-pill-count { color: #0d9488; }
+.fdb-status-pill--draft      .fdb-status-pill-count { color: #64748b; }
+
+.fdb-status-pill-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--text-muted);
+}
+.fdb-status-pill-pct {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+}
+
+/* ─── Teklif Durum Çubuğu ─── */
+.fdb-offer-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.fdb-offer-bar {
+    display: flex;
+    height: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--bg-light);
+    gap: 2px;
+}
+.fdb-offer-bar-seg { height: 100%; min-width: 6px; }
+.fdb-offer-bar-seg--pending  { background: #f59e0b; }
+.fdb-offer-bar-seg--kabul    { background: #16a34a; }
+.fdb-offer-bar-seg--red      { background: #ef4444; }
+.fdb-offer-bar-seg--approved { background: #2563eb; }
+
+.fdb-offer-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.fdb-offer-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.fdb-offer-legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.fdb-offer-legend-item--pending  .fdb-offer-legend-dot { background: #f59e0b; }
+.fdb-offer-legend-item--kabul    .fdb-offer-legend-dot { background: #16a34a; }
+.fdb-offer-legend-item--red      .fdb-offer-legend-dot { background: #ef4444; }
+.fdb-offer-legend-item--approved .fdb-offer-legend-dot { background: #2563eb; }
+
+/* ─── Top Tenders listesi ─── */
+.fdb-top-tenders {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.fdb-top-tender-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.fdb-top-tender-rank {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    min-width: 22px;
+    text-align: right;
+}
+.fdb-top-tender-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.fdb-top-tender-name {
+    font-size: 0.79rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.fdb-top-tender-bar-wrap {
+    height: 5px;
+    background: var(--bg-light);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.fdb-top-tender-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 6px;
+}
+.fdb-top-tender-durum {
+    font-size: 0.64rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+}
+.fdb-top-tender-durum--canli      { background: rgba(22,163,74,0.1);  color: #16a34a; }
+.fdb-top-tender-durum--yaklasan   { background: rgba(217,119,6,0.1);  color: #d97706; }
+.fdb-top-tender-durum--kapali     { background: rgba(220,38,38,0.1);  color: #dc2626; }
+.fdb-top-tender-durum--tamamlandi { background: rgba(20,184,166,0.1); color: #0d9488; }
+.fdb-top-tender-durum--draft      { background: rgba(100,116,139,0.1); color: #64748b; }
+.fdb-top-tender-count {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    min-width: 22px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* ─── Yardımcı ─── */
+.fdb-empty-note {
+    font-size: 0.77rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ─── Loading / Error ─── */
+.fdb-loading, .fdb-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 60px 0;
+    color: var(--text-muted);
+}
+.fdb-loading-icon {
+    font-size: 2.5rem;
+    color: #2563eb;
+    animation: fdbPulse 1.5s ease-in-out infinite;
+}
+.fdb-error .material-symbols-outlined { font-size: 2rem; color: #ef4444; }
+@keyframes fdbPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+
+/* ─────────────────────────────────────────────
+   DARK MODE
+───────────────────────────────────────────── */
+[data-theme="dark"] .fdb-metric-card {
+    background: var(--bg-white);
+    border-color: var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+[data-theme="dark"] .fdb-metric-card--blue   .fdb-metric-icon { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+[data-theme="dark"] .fdb-metric-card--green  .fdb-metric-icon { background: rgba(34, 197, 94, 0.12);  color: #4ade80; }
+[data-theme="dark"] .fdb-metric-card--purple .fdb-metric-icon { background: rgba(139, 92, 246, 0.14); color: #a78bfa; }
+[data-theme="dark"] .fdb-metric-card--orange .fdb-metric-icon { background: rgba(251, 146, 60, 0.12); color: #fb923c; }
+[data-theme="dark"] .fdb-metric-card--blue::before   { background: #3b82f6; }
+[data-theme="dark"] .fdb-metric-card--green::before  { background: #22c55e; }
+[data-theme="dark"] .fdb-metric-card--purple::before { background: #8b5cf6; }
+[data-theme="dark"] .fdb-metric-card--orange::before { background: #f97316; }
+
+[data-theme="dark"] .fdb-section { background: var(--bg-white); border-color: var(--border); }
+[data-theme="dark"] .fdb-section-header { background: var(--bg-light); border-color: var(--border); }
+[data-theme="dark"] .fdb-section-header .material-symbols-outlined { color: #60a5fa; }
+[data-theme="dark"] .fdb-section-badge { color: #60a5fa; background: rgba(59,130,246,0.12); }
+[data-theme="dark"] .fdb-header-title .material-symbols-outlined { color: #60a5fa; }
+
+[data-theme="dark"] .fdb-chart-bar-wrap { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] .fdb-chart-bar { background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); }
+
+[data-theme="dark"] .fdb-status-pill--canli      { background: rgba(34, 197, 94, 0.08);  border-color: rgba(34, 197, 94, 0.25); }
+[data-theme="dark"] .fdb-status-pill--yaklasan   { background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.25); }
+[data-theme="dark"] .fdb-status-pill--kapali     { background: rgba(248, 113, 113, 0.08); border-color: rgba(248, 113, 113, 0.25); }
+[data-theme="dark"] .fdb-status-pill--tamamlandi { background: rgba(45, 212, 191, 0.08); border-color: rgba(45, 212, 191, 0.25); }
+[data-theme="dark"] .fdb-status-pill--canli      .fdb-status-pill-count { color: #4ade80; }
+[data-theme="dark"] .fdb-status-pill--yaklasan   .fdb-status-pill-count { color: #fbbf24; }
+[data-theme="dark"] .fdb-status-pill--kapali     .fdb-status-pill-count { color: #f87171; }
+[data-theme="dark"] .fdb-status-pill--tamamlandi .fdb-status-pill-count { color: #2dd4bf; }
+
+[data-theme="dark"] .fdb-offer-bar { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] .fdb-top-tender-bar-wrap { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] .fdb-top-tender-durum--canli      { background: rgba(34,197,94,0.12);   color: #4ade80; }
+[data-theme="dark"] .fdb-top-tender-durum--yaklasan   { background: rgba(251,191,36,0.12);  color: #fbbf24; }
+[data-theme="dark"] .fdb-top-tender-durum--kapali     { background: rgba(248,113,113,0.12); color: #f87171; }
+[data-theme="dark"] .fdb-top-tender-durum--tamamlandi { background: rgba(45,212,191,0.12);  color: #2dd4bf; }
+/* Enes Doğanay | 14 Mayıs 2026: Dark mode — eksik draft ve hover varyantları */
+[data-theme="dark"] .fdb-status-pill--draft      { background: rgba(100,116,139,0.10); border-color: rgba(100,116,139,0.25); }
+[data-theme="dark"] .fdb-status-pill--draft      .fdb-status-pill-count { color: #94a3b8; }
+[data-theme="dark"] .fdb-top-tender-durum--draft { background: rgba(100,116,139,0.12); color: #94a3b8; }
+[data-theme="dark"] .fdb-metric-card:hover       { box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+[data-theme="dark"] .fdb-loading-icon            { color: #60a5fa; }
+[data-theme="dark"] .fdb-error .material-symbols-outlined { color: #f87171; }
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .fdb-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .fdb-sections { grid-template-columns: 1fr; }
+    .fdb-section--wide { grid-column: span 1; }
+}
+
+/* Enes Doğanay | 14 Mayıs 2026: 768px — tablet geçiş */
+@media (max-width: 768px) {
+    .fdb-root { padding: 20px 16px 32px; }
+    .fdb-header-title { font-size: 1.1rem; }
+    .fdb-section-header { padding: 11px 14px; font-size: 0.8rem; }
+    .fdb-top-tender-row { gap: 8px; }
+}
+
+@media (max-width: 600px) {
+    .fdb-root { padding: 16px 14px 30px; gap: 16px; }
+    .fdb-metrics-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .fdb-metric-card { padding: 12px 12px 12px 16px; gap: 10px; }
+    .fdb-metric-value { font-size: 1.35rem; }
+    .fdb-metric-icon { width: 34px; height: 34px; }
+    .fdb-metric-icon .material-symbols-outlined { font-size: 1.1rem; }
+    .fdb-section-body { padding: 12px; }
+    .fdb-chart { height: 80px; }
+    .fdb-status-row { gap: 8px; }
+    .fdb-status-pill { min-width: 56px; padding: 8px 10px; }
+    .fdb-status-pill-count { font-size: 1.15rem; }
+}
+
+/* Enes Doğanay | 14 Mayıs 2026: 480px — küçük telefon (zorunlu breakpoint) */
+@media (max-width: 480px) {
+    .fdb-root { padding: 12px 10px 24px; gap: 12px; }
+    .fdb-metrics-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .fdb-metric-card { padding: 10px 10px 10px 14px; gap: 8px; }
+    .fdb-metric-value { font-size: 1.15rem; }
+    .fdb-metric-sub { display: none; }
+    .fdb-metric-icon { width: 30px; height: 30px; }
+    .fdb-metric-icon .material-symbols-outlined { font-size: 0.95rem; }
+    .fdb-header-title { font-size: 1rem; gap: 6px; }
+    .fdb-section-header { font-size: 0.75rem; padding: 9px 11px; gap: 5px; }
+    .fdb-section-body { padding: 10px; }
+    .fdb-chart { height: 70px; gap: 4px; }
+    .fdb-chart-count { font-size: 0.58rem; }
+    .fdb-status-pill { min-width: 48px; padding: 6px 8px; }
+    .fdb-status-pill-count { font-size: 1rem; }
+    .fdb-status-pill-pct { display: none; }
+    .fdb-top-tender-durum { display: none; }
+    .fdb-top-tender-row { gap: 7px; }
+    .fdb-offer-legend { gap: 6px; }
+    .fdb-offer-legend-item { font-size: 0.64rem; gap: 4px; }
+    .fdb-offer-legend-dot { width: 7px; height: 7px; }
+    .fdb-top-tender-count { min-width: 18px; font-size: 0.75rem; }
+    .fdb-top-tender-name { font-size: 0.73rem; }
+    .fdb-top-tender-rank { font-size: 0.65rem; min-width: 18px; }
+}

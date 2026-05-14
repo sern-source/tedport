@@ -7,22 +7,22 @@ const STEPS = [
     {
         step: '01',
         icon: 'person_add',
-        title: 'Profilini Oluştur',
-        desc: 'Firmanı dakikalar içinde kaydet. Ürün ve hizmetlerini listele, sektörünü seç. Üyelik tamamen ücretsiz.',
+        title: 'Kurumsal Profilinizi Oluşturun',
+        desc: 'Firmanızı dakikalar içinde oluşturun, ürün ve hizmetlerinizi sergileyin, sektörünüzde görünür olun.',
         color: '#2563eb',
     },
     {
         step: '02',
         icon: 'receipt_long',
-        title: 'İhale Aç veya Teklif Ver',
-        desc: 'Satınalma talebi oluştur, onlarca tedarikçiden teklif al. Ya da açık ihalelere teklif vererek yeni müşteriler kazan.',
+        title: 'Teklif Süreçlerinizi Yönetin',
+        desc: 'Satınalma taleplerinizi yayınlayın, ilgili firmalardan teklifler alın veya yeni iş fırsatlarına doğrudan ulaşın.',
         color: '#0891b2',
     },
     {
         step: '03',
         icon: 'handshake',
-        title: 'Bağlantı Kur, Büyü',
-        desc: 'Doğrulanmış firmalarla güvenli ticaret yap. Tekrarlayan siparişler, uzun vadeli ortaklıklar — hepsi tek platformda.',
+        title: 'Güçlü İş Bağlantıları Kurun',
+        desc: 'Doğrulanmış firmalarla sürdürülebilir iş ilişkileri geliştirin, uzun vadeli çözüm ortaklıkları oluşturun.',
         color: '#059669',
     },
 ];
@@ -39,9 +39,9 @@ const HowItWorksSection = () => {
                         <span className="material-symbols-outlined">play_circle</span>
                         Nasıl Çalışır?
                     </span>
-                    <h2 className="sc-how-title">Üç Adımda Dijital Ticarete Başla</h2>
+                    <h2 className="sc-how-title">Üç Adımda İş Ağınızı Genişletin</h2>
                     <p className="sc-how-subtitle">
-                        Satıcı mı, alıcı mı? Fark etmez — Tedport her iki taraf için de çalışır.
+                        Tedarikçi mi, satınalmacı mı? Fark etmez — Tedport her iki taraf için de çalışır.
                     </p>
                 </div>
 

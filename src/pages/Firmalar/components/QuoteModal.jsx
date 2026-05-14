@@ -1,10 +1,63 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif talebi modalı — kart ve liste görünümü paylaşımlı
-import React from 'react';
+// Enes Doğanay | 14 Mayıs 2026: Kalem kalem ekleme sistemi — ihale formuyla aynı mantık
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import CitySelect from '../../../components/CitySelect';
 import DatePicker from '../../../components/DatePicker';
+import { useAuth } from '../../../AuthContext';
 import './QuoteModal.css';
 
-const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onClose, onSetField, onSetFile, onSubmit }) => (
+// Enes Doğanay | 14 Mayıs 2026: Kalem birim seçenekleri
+const BIRIM_OPTIONS = ['Adet', 'Kg', 'Ton', 'Gram', 'Litre', 'Metre', 'm²', 'Metreküp', 'Kutu', 'Paket', 'Set', 'Takım', 'Rulo', 'Palet', 'Lot'];
+
+const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onClose, onSetField, onSetFile, onSubmit }) => {
+  // Enes Doğanay | 14 Mayıs 2026: Firma kullanıcısı mı tespiti + auto-close
+  const { managedCompanyId } = useAuth();
+  const isFirmaUser = Boolean(managedCompanyId);
+  // Enes Doğanay | 14 Mayıs 2026: Yeni kalem input state
+  const [yeniMadde, setYeniMadde] = useState('');
+  const [yeniAdet, setYeniAdet] = useState('1');
+  const [yeniBirim, setYeniBirim] = useState('Adet');
+  const [yeniAciklama, setYeniAciklama] = useState('');
+  const [kalemBirimOpen, setKalemBirimOpen] = useState(false);
+  const [kalemBirimMenuPos, setKalemBirimMenuPos] = useState({ top: 0, left: 0, width: 0 });
+  const kalemBirimRef = useRef(null);
+  // Enes Doğanay | 14 Mayıs 2026: Kalem eklendikten sonra madde input'a fokuslan
+  const maddeInputRef = useRef(null);
+
+  // Enes Doğanay | 14 Mayıs 2026: Teklif gönderildikten 4 saniye sonra modalı otomatik kapat
+  useEffect(() => {
+    if (!sent) return;
+    const t = setTimeout(() => onClose(), 4000);
+    return () => clearTimeout(t);
+  }, [sent, onClose]);
+
+  const handleKalemBirimToggle = () => {
+    if (!kalemBirimOpen && kalemBirimRef.current) {
+      const r = kalemBirimRef.current.getBoundingClientRect();
+      setKalemBirimMenuPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 120) });
+    }
+    setKalemBirimOpen(o => !o);
+  };
+
+  const handleAddKalem = () => {
+    if (!yeniMadde.trim()) return;
+    onSetField('kalemler', [...(form.kalemler || []), {
+      id: Date.now().toString(),
+      adet: Number(yeniAdet) || 1,
+      birim: yeniBirim,
+      madde: yeniMadde.trim(),
+      aciklama: yeniAciklama.trim(),
+    }]);
+    setYeniMadde(''); setYeniAdet('1'); setYeniAciklama('');
+    // Enes Doğanay | 14 Mayıs 2026: Madde input'a fokuslan — state güncellenmesi beklenir
+    setTimeout(() => maddeInputRef.current?.focus(), 0);
+  };
+
+  const handleRemoveKalem = (id) =>
+    onSetField('kalemler', (form.kalemler || []).filter(k => k.id !== id));
+
+  return (
   <div className="quote-modal-overlay">
     {/* Enes Doğanay | 8 Mayıs 2026: role=dialog + aria-modal */}
     <div className="quote-modal" role="dialog" aria-modal="true" aria-labelledby="flquote-title" onClick={e => e.stopPropagation()}>
@@ -13,6 +66,15 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
           <span className="material-symbols-outlined quote-success-icon">check_circle</span>
           <h3>Teklif Talebiniz Gönderildi!</h3>
           <p>Firma en kısa sürede talebinizi inceleyecektir.</p>
+          {/* Enes Doğanay | 14 Mayıs 2026: Kullanıcı tipine göre yönlendirme — firma → Teklif Yönetimi, alıcı → Teklif Taleplerim */}
+          <div className="quote-success-info">
+            <span className="material-symbols-outlined">request_quote</span>
+            {isFirmaUser ? (
+              <span><a href="/firma-profil?tab=teklifler">Teklif Yönetimi</a> sayfasından teklifinizin durumunu takip edebilirsiniz.</span>
+            ) : (
+              <span><a href="/profile?tab=quotes">Teklif Taleplerim</a> sayfasından teklifinizin durumunu takip edebilirsiniz.</span>
+            )}
+          </div>
         </div>
       ) : (
         <>
@@ -46,14 +108,70 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
               />
             </div>
 
-            <div className="quote-form-row">
-              <div className="quote-form-group">
-                <label>Miktar</label>
+            {/* Enes Doğanay | 14 Mayıs 2026: Kalem kalem ekleme sistemi */}
+            <div className="quote-form-group">
+              <label className="quote-kalem-label">
+                <span className="material-symbols-outlined">checklist</span>
+                Talep Kalemleri
+              </label>
+              <p className="quote-kalem-desc">Teklif alacağınız ürün ve malzemeleri miktar ve birimle birlikte ekleyin.</p>
+              <div className="quote-kalem-input-row">
+                <div className="quote-kalem-adet-group">
+                  <input
+                    type="number" min="1" max="99999" placeholder="1"
+                    value={yeniAdet} onChange={e => setYeniAdet(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
+                    className="quote-kalem-adet-input"
+                  />
+                  <div className="quote-kalem-birim-wrap">
+                    <button
+                      ref={kalemBirimRef} type="button"
+                      className={kalemBirimOpen ? 'quote-kalem-birim-trigger open' : 'quote-kalem-birim-trigger'}
+                      onClick={handleKalemBirimToggle}
+                    >
+                      <span className="quote-kalem-birim-label">{yeniBirim}</span>
+                      <span className="material-symbols-outlined quote-kalem-birim-chevron">expand_more</span>
+                    </button>
+                  </div>
+                </div>
                 <input
-                  type="number" placeholder="Ör: 500" value={form.miktar} min={1} max={99999}
-                  onChange={e => { const v = e.target.value; if (v === '' || (Number(v) >= 0 && Number(v) <= 99999)) onSetField('miktar', v); }}
+                  type="text" placeholder="Ürün / Malzeme adı *"
+                  value={yeniMadde} onChange={e => setYeniMadde(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
+                  className="quote-kalem-madde-input"
+                  ref={maddeInputRef}
                 />
+                <input
+                  type="text" placeholder="Açıklama (opsiyonel)"
+                  value={yeniAciklama} onChange={e => setYeniAciklama(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
+                  className="quote-kalem-aciklama-input"
+                />
+                <button type="button" className="quote-kalem-add-btn" onClick={handleAddKalem} disabled={!yeniMadde.trim()}>
+                  <span className="material-symbols-outlined">add</span>
+                </button>
               </div>
+              {(form.kalemler || []).length > 0 && (
+                <div className="quote-kalem-table">
+                  <div className="quote-kalem-table__header">
+                    <span>#</span><span>Miktar</span><span>Kalem</span><span>Açıklama</span><span></span>
+                  </div>
+                  {(form.kalemler || []).map((k, i) => (
+                    <div key={k.id} className="quote-kalem-table__row">
+                      <span className="quote-kalem-table__num">{i + 1}</span>
+                      <span className="quote-kalem-table__adet">{k.adet} {k.birim}</span>
+                      <span className="quote-kalem-table__madde">{k.madde}</span>
+                      <span className="quote-kalem-table__aciklama">{k.aciklama || '—'}</span>
+                      <button type="button" className="quote-kalem-table__remove" onClick={() => handleRemoveKalem(k.id)}>
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="quote-form-row">
               <div className="quote-form-group">
                 <label>Talep Edilen Teslim Tarihi</label>
                 <DatePicker
@@ -62,11 +180,10 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
-            </div>
-
-            <div className="quote-form-group">
-              <label>Teslim Yeri</label>
-              <CitySelect value={form.teslim_yeri} onChange={city => onSetField('teslim_yeri', city)} />
+              <div className="quote-form-group">
+                <label>Teslim Yeri</label>
+                <CitySelect value={form.teslim_yeri} onChange={city => onSetField('teslim_yeri', city)} />
+              </div>
             </div>
 
             <div className="quote-form-group">
@@ -74,7 +191,7 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
               <textarea
                 placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi vb.)"
                 value={form.mesaj} onChange={e => onSetField('mesaj', e.target.value)}
-                rows={4} maxLength={2000}
+                rows={3} maxLength={2000}
               />
             </div>
 
@@ -120,7 +237,25 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
         </>
       )}
     </div>
+    {kalemBirimOpen && createPortal(
+      <>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99998 }} onClick={() => setKalemBirimOpen(false)} />
+        <div className="quote-birim-menu" style={{ position: 'fixed', top: kalemBirimMenuPos.top, left: kalemBirimMenuPos.left, minWidth: kalemBirimMenuPos.width, zIndex: 99999 }}>
+          {BIRIM_OPTIONS.map(b => (
+            <button key={b} type="button"
+              className={yeniBirim === b ? 'quote-birim-option active' : 'quote-birim-option'}
+              onClick={() => { setYeniBirim(b); setKalemBirimOpen(false); }}
+            >
+              <span className="quote-birim-option-label">{b}</span>
+              {yeniBirim === b && <span className="material-symbols-outlined quote-birim-check">check</span>}
+            </button>
+          ))}
+        </div>
+      </>,
+      document.body
+    )}
   </div>
-);
+  );
+};
 
 export default QuoteModal;

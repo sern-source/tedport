@@ -59,47 +59,82 @@ body {
 @media (min-width: 1024px) { .sidebar-mobile-toggle { display: none; } }
 
 /* ── Aktif filtre etiketleri ─────────────────────────────────────────── */
+/* ── Enes Doğanay | 14 Mayıs 2026: Aktif filtre şeridi modernize edildi ─────────── */
 .active-filter-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 16px;
   align-items: center;
 }
 
 .active-filter-tags-label {
-  font-size: 14px;
-  color: #64748b;
-  margin-right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-gray, #94a3b8);
+  flex-shrink: 0;
+  margin-right: 2px;
 }
+.active-filter-tags-label .material-symbols-outlined { font-size: 15px; }
 
 .active-filter-clear-all {
-  background: none;
-  border: none;
-  color: #ef4444;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 13px;
-  margin-left: 8px;
-  text-decoration: underline;
+  font-family: inherit;
+  transition: all 0.15s;
+  text-decoration: none;
+  margin-left: 2px;
 }
+.active-filter-clear-all .material-symbols-outlined { font-size: 13px; }
+.active-filter-clear-all:hover { border-color: #fca5a5; color: #e11d48; background: #fff1f2; }
 
 .filter-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 12px;
+  padding: 4px 8px 4px 12px;
   border-radius: 999px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.filter-chip--cities    { background: #e0e7ff; color: #4f46e5; border: 1px solid #c7d2fe; }
-.filter-chip--sectors   { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
-.filter-chip--categories { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+.filter-chip-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 0 2px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+.filter-chip-close:hover { opacity: 1; }
+.filter-chip-close .material-symbols-outlined { font-size: 13px; }
+
+/* Enes Doğanay | 14 Mayıs 2026: Soft chip renkler — daha az doygun, göz yormaz */
+.filter-chip--cities    { background: #f0f1ff; color: #7c7de0; border: 1px solid #dddeff; }
+.filter-chip--sectors   { background: #f0fdf4; color: #5daa63; border: 1px solid #d4f0d7; }
+.filter-chip--categories { background: #fff9f0; color: #e09a44; border: 1px solid #fde8c0; }
 /* Enes Doğanay | 12 Mayıs 2026: Onaylı firma filtre tag */
 .filter-chip--verified  { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
 
 [data-theme="dark"] .filter-chip--verified { background: rgba(59,130,246,0.15); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+
+/* Enes Doğanay | 14 Mayıs 2026: Dark mode aktif filtre bar */
+[data-theme="dark"] .active-filter-clear-all:hover { border-color: #f87171; color: #f87171; background: rgba(239,68,68,0.1); }
 
 /* ── Paylaşımlı butonlar ─────────────────────────────────────────────── */
 /* Enes Doğanay | 11 Mayıs 2026: İletişime Geç butonu büyütüldü */
@@ -277,9 +312,10 @@ body {
 }
 
 /* ── Dark mode ────────────────────────────────────────────────────────── */
-[data-theme="dark"] .filter-chip--cities  { background: #1e2d4a; color: #93c5fd; border-color: #1e40af; }
-[data-theme="dark"] .filter-chip--sectors { background: #14291e; color: #4ade80; border-color: #166534; }
-[data-theme="dark"] .filter-chip--categories { background: #2a1a0a; color: #fb923c; border-color: #9a3412; }
+/* Enes Doğanay | 14 Mayıs 2026: Dark mode soft chip renkler */
+[data-theme="dark"] .filter-chip--cities  { background: rgba(99,102,241,0.12); color: #a5b4fc; border-color: rgba(99,102,241,0.25); }
+[data-theme="dark"] .filter-chip--sectors { background: rgba(74,222,128,0.08); color: #86efac; border-color: rgba(74,222,128,0.2); }
+[data-theme="dark"] .filter-chip--categories { background: rgba(251,146,60,0.1); color: #fdba74; border-color: rgba(251,146,60,0.22); }
 
 [data-theme="dark"] .platform-badge-text { background: #292007; color: #fbbf24; border-color: #92400e; }
 [data-theme="dark"] .platform-badge-icon { color: #fbbf24; }

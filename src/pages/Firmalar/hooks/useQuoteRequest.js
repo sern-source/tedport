@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { sendQuoteRequest, fetchUserProfile, fetchCurrentSession } from '../services/firmaService';
 
-const EMPTY_FORM = { konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' };
+// Enes Doğanay | 14 Mayıs 2026: miktar/birim kaldırıldı — kalemler dizisiyle yönetiliyor
+const EMPTY_FORM = { konu: '', mesaj: '', kalemler: [], teslim_tarihi: '', teslim_yeri: '' };
 
 export const useQuoteRequest = (onError) => {
   const [activeSupplier, setActiveSupplier] = useState(null);

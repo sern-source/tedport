@@ -116,7 +116,8 @@ const IhaleSidebar = ({ filteredTenders, selectedId, offersByTender, tenderUnrea
                                         <span className={`tom-tender-card__offers tom-offer-count--${cnt === 0 ? 'zero' : cnt <= 3 ? 'amber' : 'green'}`}>
                                             <span className="material-symbols-outlined">mail</span>{cnt} teklif
                                         </span>
-                                        {dl !== null && (
+                                        {/* Enes Doğanay | 14 Mayıs 2026: Kapalı/tamamlandı/iptal ihalelerde gün sayacı gösterilmez */}
+                                        {dl !== null && !['kapali', 'tamamlandi', 'iptal'].includes(meta.key) && (
                                             <span className={dl <= 3 && dl >= 0 ? 'tom-deadline--urgent' : dl < 0 ? 'tom-deadline--past' : ''}>
                                                 <span className="material-symbols-outlined">schedule</span>
                                                 {dl > 0 ? `${dl} gün kaldı` : dl === 0 ? 'Son gün!' : 'Süre doldu'}

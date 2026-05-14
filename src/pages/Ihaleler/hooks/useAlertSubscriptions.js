@@ -1,6 +1,8 @@
 // Enes Doğanay | 13 Mayıs 2026: Çoklu uyarı aboneliği hook — kategori bazlı toggle
+// Enes Doğanay | 14 Mayıs 2026: Toplu işlemler için subscribeToAlertsAll / unsubscribeAllAlerts kullanılıyor
 import { useState, useEffect, useCallback } from 'react';
-import { getUserAlerts, subscribeToAlerts, unsubscribeFromAlerts } from '../../../services/alertService';
+import { getUserAlerts, subscribeToAlerts, unsubscribeFromAlerts, subscribeToAlertsAll, unsubscribeAllAlerts } from '../../../services/alertService';
+import { SEKTORLER } from '../../Firmalar/utils/sektorData';
 
 // Enes Doğanay | 13 Mayıs 2026: Tüm aktif abonelikleri yönetir
 // kategori=null → tüm ihaleler, kategori='...' → sadece o sektör
@@ -30,21 +32,35 @@ export function useAlertSubscriptions({ userId }) {
         return () => { cancelled = true; };
     }, [userId]);
 
-    // Enes Doğanay | 13 Mayıs 2026: kategori=null = tüm ihaleler, string = sektör adı
+    // Enes Doğanay | 14 Mayıs 2026: Tüm İhaleler için batch işlem; tek sektör değişimi için tekli sorgu
     const toggleSubscription = useCallback(async (kategori) => {
         if (!userId) return;
         setLoading(true);
         setError(null);
         try {
-            const existing = subscriptions.find(s =>
-                kategori === null ? s.kategori === null : s.kategori === kategori
-            );
-            if (existing) {
-                await unsubscribeFromAlerts(existing.id);
-                setSubscriptions(prev => prev.filter(s => s.id !== existing.id));
+            if (kategori === null) {
+                const nullSub = subscriptions.find(s => s.kategori === null);
+                if (nullSub) {
+                    // Tüm abonelikleri tek sorguda kaldır
+                    await unsubscribeAllAlerts(userId);
+                    setSubscriptions([]);
+                } else {
+                    // Null + tüm sektörleri batch insert/update ile abone ol (tek round-trip)
+                    const all = await subscribeToAlertsAll(userId, [null, ...SEKTORLER]);
+                    setSubscriptions(all);
+                }
             } else {
-                const newSub = await subscribeToAlerts(userId, kategori);
-                setSubscriptions(prev => [...prev, { ...newSub, kategori }]);
+                const existing = subscriptions.find(s => s.kategori === kategori);
+                const nullSub = subscriptions.find(s => s.kategori === null);
+                if (existing) {
+                    // Sektörü kaldır; null aboneliği de varsa onu da kaldır
+                    const toRemove = nullSub ? [existing.id, nullSub.id] : [existing.id];
+                    await Promise.all(toRemove.map(id => unsubscribeFromAlerts(id)));
+                    setSubscriptions(prev => prev.filter(s => !toRemove.includes(s.id)));
+                } else {
+                    const newSub = await subscribeToAlerts(userId, kategori);
+                    setSubscriptions(prev => [...prev, { ...newSub, kategori }]);
+                }
             }
         } catch (err) {
             setError(err.message || 'Abonelik işlemi başarısız.');

@@ -1,20 +1,26 @@
-// Enes Doğanay | 6 Mayıs 2026: Aktif filtre etiketleri şeridi
+// Enes Doğanay | 14 Mayıs 2026: Modern aktif filtre şeridi — icon, temiz buton, inline style kaldırıldı
 import React from 'react';
 
 const FirmalarActiveFilterTags = ({ activeTags, removeFilterTag, setFilters }) => {
     if (!activeTags.length) return null;
     return (
         <div className="active-filter-tags">
-            <span className="active-filter-tags-label">Filtreler:</span>
+            <span className="active-filter-tags-label">
+                <span className="material-symbols-outlined">filter_list</span>
+                Filtreler
+            </span>
             {activeTags.map(({ type, value }) => (
                 <span key={`${type}-${value}`} className={`filter-chip filter-chip--${type}`}>
                     {value}
-                    <button onClick={() => removeFilterTag(type, value)} aria-label={`${value} filtresini kaldır`} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 4px', lineHeight: 1 }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '14px', verticalAlign: 'middle' }}>close</span>
+                    <button className="filter-chip-close" onClick={() => removeFilterTag(type, value)} aria-label={`${value} filtresini kaldır`}>
+                        <span className="material-symbols-outlined">close</span>
                     </button>
                 </span>
             ))}
-            <button className="active-filter-clear-all" onClick={() => setFilters({ cities: [], categories: [], sectors: [] })}>Temizle</button>
+            <button className="active-filter-clear-all" onClick={() => setFilters({ cities: [], categories: [], sectors: [] })}>
+                <span className="material-symbols-outlined">close</span>
+                Temizle
+            </button>
         </div>
     );
 };

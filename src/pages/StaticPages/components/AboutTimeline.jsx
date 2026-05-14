@@ -2,10 +2,10 @@
 import React from 'react';
 
 const TIMELINE = [
-    { year: 'Eylül 2025', title: 'Fikrin Doğuşu', desc: "Tedport fikri, Türkiye'deki B2B tedarik süreçlerinin dijitalleştirilmesi ihtiyacından doğdu. 3 kişilik kurucu ekip olarak yolculuğumuza başladık.", side: 'left' },
-    { year: 'Ocak 2026', title: 'Platform Geliştirme', desc: 'Yoğun geliştirme sürecine girildi. Teknik altyapı kuruldu, tasarım tamamlandı ve beta testleri başlatıldı.', side: 'right' },
-    { year: 'Mart 2026', title: 'Platform Lansmanı', desc: 'Tedport.com yayına alındı. Firma kayıtları, arama, filtreleme ve teklif sistemi ile hizmete başlandı.', side: 'left' },
-    { year: 'Nisan 2026', title: 'Büyüme Dönemi', desc: 'İhale sistemi, kurumsal hesaplar ve gelişmiş filtreleme özellikleri eklendi. 81 il kapsamında hizmet verilmeye başlandı.', side: 'right' },
+    { year: 'Eylül 2025', title: 'Fikrin Doğuşu', desc: 'Tedport fikri; firmaların satınalma, tedarikçi keşfi ve iş geliştirme süreçlerini daha verimli yönetebilmesi hedefiyle ortaya çıktı. 3 kişilik kurucu ekiple yolculuğumuza başladık.', side: 'left' },
+    { year: 'Ocak 2026', title: 'Platform Geliştirme', desc: 'Teknik altyapı, kullanıcı deneyimi ve platform mimarisi üzerinde yoğun geliştirme süreci tamamlandı. Beta testleri başlatıldı.', side: 'right' },
+    { year: 'Mart 2026', title: 'Platform Lansmanı', desc: 'Tedport.com yayına alındı. Firma keşfi, teklif yönetimi ve satınalma süreçlerini destekleyen temel sistemler kullanıcılarla buluştu.', side: 'left' },
+    { year: 'Nisan 2026', title: 'Büyüme Süreci', desc: 'İhale sistemi, kurumsal hesaplar ve gelişmiş filtreleme özellikleri devreye alındı. Türkiye\'nin 81 ilindeki firmalara erişim sağlandı.', side: 'right' },
 ];
 
 const AboutTimeline = () => (

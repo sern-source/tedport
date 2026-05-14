@@ -106,6 +106,7 @@
 [data-theme="dark"] .ihale-firma-tag .material-symbols-outlined { color: #22c55e; }
 [data-theme="dark"] .ihale-firma-tag button:hover { background: #166534; color: #dc2626; }
 [data-theme="dark"] .ihale-req-table__num { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .ihale-req-table__adet { color: var(--text-dark); }
 [data-theme="dark"] .ihale-req-table__remove:hover { background: #450a0a; color: #f87171; }
 [data-theme="dark"] .ihale-file-item button:hover { background: #450a0a; color: #f87171; }
 
@@ -114,6 +115,19 @@
 [data-theme="dark"] .ihale-req-adet-group { background: #0f172a; border-color: #334155; }
 [data-theme="dark"] .ihale-req-adet-group:focus-within { border-color: #3b82f6; background: #1e293b; }
 [data-theme="dark"] .ihale-req-adet-input { color: #e2e8f0; }
+
+/* Enes Doğanay | 14 Mayıs 2026: Birim dropdown dark */
+[data-theme="dark"] .ihale-birim-wrap { border-left-color: #334155; }
+[data-theme="dark"] .ihale-birim-trigger:hover { background: rgba(59, 130, 246, 0.15); }
+[data-theme="dark"] .ihale-birim-trigger.open { background: rgba(59, 130, 246, 0.18); }
+[data-theme="dark"] .ihale-birim-label { color: var(--text-dark); }
+[data-theme="dark"] .ihale-birim-chevron { color: #94a3b8; }
+[data-theme="dark"] .ihale-birim-menu { background: #1e293b; border-color: #334155; box-shadow: 0 8px 28px rgba(0,0,0,0.35); }
+[data-theme="dark"] .ihale-birim-option:hover { background: #1e3a5f; }
+[data-theme="dark"] .ihale-birim-option.active { background: #1e3a5f; }
+[data-theme="dark"] .ihale-birim-option-label { color: #e2e8f0; }
+[data-theme="dark"] .ihale-birim-option.active .ihale-birim-option-label { color: #93c5fd; }
+[data-theme="dark"] .ihale-birim-check { color: #93c5fd; }
 
 /* === Önizleme ek === */
 [data-theme="dark"] .ihale-preview__anonim-badge {

@@ -1,26 +1,34 @@
 /* Enes Doğanay | 6 Mayıs 2026: Filtre sidebar — şehir, sektör, kategori filtreleri, dark mode */
 
+/* Enes Doğanay | 14 Mayıs 2026: Sidebar tek birleşik kart paneliyle sarıldı */
 .sidebar {
   display: none;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0;
   width: 100%;
   margin-bottom: 1.5rem;
   min-width: 100%;
   min-height: auto;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .sidebar.sidebar-mobile-open {
   display: flex;
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: align-self:start — sidebar içerik yüksekliğini geçmesin */
 @media (min-width: 1024px) {
   .sidebar {
     display: flex;
     width: auto;
     margin-bottom: 0;
-    gap: 1rem;
+    gap: 0;
     min-width: auto;
+    align-self: start;
   }
 }
 
@@ -28,7 +36,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.35rem;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -44,34 +52,44 @@
 }
 
 /* ── Details / Summary ────────────────────────────────────────────────── */
-.filter-group { display: flex; flex-direction: column; gap: 0.6rem; }
+.filter-group { display: flex; flex-direction: column; gap: 0; }
 
+/* Enes Doğanay | 14 Mayıs 2026: details artık kart değil, panel içinde bölüm */
 details {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-white);
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
   overflow: hidden;
   width: 100%;
   max-width: 100%;
 }
 
+/* sidebar-header zaten border-bottom sağlar — ilk details'de çift border olmasın */
+.filter-group > details:first-child { border-top: none; }
+
+/* Enes Doğanay | 14 Mayıs 2026: Summary — arka plan yok, hover’da hafif tint */
 summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  background: var(--bg-light);
+  padding: 11px 16px;
+  background: transparent;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 0.78rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-dark);
   list-style: none;
+  transition: background 0.15s;
+  min-height: 44px;
 }
+summary:hover { background: rgba(0,0,0,0.03); }
 summary::-webkit-details-marker { display: none; }
-summary .material-symbols-outlined { font-size: 18px; color: var(--text-muted); }
+summary .material-symbols-outlined { font-size: 18px; color: #3b82f6; transition: transform 0.2s; }
 details[open] summary .material-symbols-outlined { transform: rotate(180deg); }
 
 .filter-content {
-  padding: 0.6rem 0.75rem;
+  padding: 10px 16px 14px;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -180,8 +198,12 @@ details[open] summary .material-symbols-outlined { transform: rotate(180deg); }
 .filter-show-more-btn:hover { background: var(--border); }
 
 /* ── Dark mode ────────────────────────────────────────────────────────── */
-[data-theme="dark"] details { background: var(--bg-card, #1e293b); }
-[data-theme="dark"] summary { background: rgba(255,255,255,0.04); }
+/* Enes Doğanay | 14 Mayıs 2026: Dark mode — CSS var’lar çoğu şeyi halleder, sadece override’lar */
+[data-theme="dark"] details { background: transparent; }
+[data-theme="dark"] .sidebar { box-shadow: 0 1px 4px rgba(0,0,0,0.25); }
+[data-theme="dark"] summary { background: transparent; }
+[data-theme="dark"] summary:hover { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] summary .material-symbols-outlined { color: #60a5fa; }
 [data-theme="dark"] .filter-search-input { background: var(--bg-card, #1e293b); }
 [data-theme="dark"] .fs-count-badge { background: #3b82f6; }
 
@@ -205,4 +227,55 @@ details[open] summary .material-symbols-outlined { transform: rotate(180deg); }
 
 [data-theme="dark"] .fs-pill--on:hover {
   background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+/* ── Mobil responsive ───────────────────────────────────────────────── */
+/* Enes Doğanay | 14 Mayıs 2026: Mobil sidebar kart — tam genişlik, sıkışık padding */
+@media (max-width: 767px) {
+  .sidebar {
+    border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-header {
+    padding: 12px 14px;
+  }
+
+  summary {
+    padding: 10px 14px;
+    font-size: 0.79rem;
+  }
+
+  .filter-content {
+    padding: 8px 14px 12px;
+    max-height: 220px;
+  }
+
+  .fs-pill {
+    font-size: 0.71rem;
+    padding: 4px 9px;
+  }
+
+  .filter-search-input {
+    font-size: 14px; /* prevent iOS zoom on focus */
+    padding: 9px 10px;
+  }
+}
+
+@media (max-width: 479px) {
+  .sidebar {
+    border-radius: 8px;
+  }
+
+  .sidebar-header {
+    padding: 11px 12px;
+  }
+
+  summary {
+    padding: 10px 12px;
+  }
+
+  .filter-content {
+    padding: 8px 12px 12px;
+  }
 }

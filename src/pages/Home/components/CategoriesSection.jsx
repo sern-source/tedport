@@ -21,8 +21,8 @@ const CategoriesSection = () => {
             <div className="container">
                 <div className="sc-section-header">
                     <div>
-                        <h2 className="sc-section-title">Öne Çıkan Sektörler</h2>
-                        <p className="sc-section-desc">Faaliyet gösterdiğiniz sektörü seçin, ilgili firmaları listeleyin.</p>
+                        <h2 className="sc-section-title">Türkiye'nin Önde Gelen Sektörleri</h2>
+                        <p className="sc-section-desc">Faaliyet gösterdiğiniz sektördeki firmaları keşfedin ve yeni iş bağlantıları kurun.</p>
                     </div>
                     {/* Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği */}
                     <span className="sc-view-all" onClick={() => navigate('/firmalar')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar'); }} style={{ cursor: 'pointer' }}>

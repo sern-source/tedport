@@ -108,6 +108,36 @@
 /* ═══════════════════════════════════════════════════
    PAYLAŞILABILIR İHALE LİNKİ
    ═══════════════════════════════════════════════════ */
+/* Enes Doğanay | 14 Mayıs 2026: Kompakt tek buton — eski link row yerine */
+.tom-link-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+.tom-link-copy-btn:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+    transform: translateY(-1px);
+}
+.tom-link-copy-btn--done {
+    background: #f0fdf4;
+    color: #059669;
+    border-color: #bbf7d0;
+}
+.tom-link-copy-btn .material-symbols-outlined { font-size: 15px; }
+
 .tom-share-link-row {
     display: flex;
     align-items: center;

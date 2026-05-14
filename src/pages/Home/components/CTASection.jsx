@@ -10,7 +10,7 @@ const CTASection = () => {
         <section className="sc-cta">
             <div className="container">
                 <p className="sc-cta-eyebrow">Platforma Katılın</p>
-                <h2>Hangi taraftasınız?</h2>
+                <h2>İş Süreçlerinizi Tedport ile Güçlendirin</h2>
                 <div className="sc-cta-split">
                     {/* Enes Doğanay | 13 Mayıs 2026: Tedarikçi paneli */}
                     <div className="sc-cta-panel">
@@ -18,7 +18,7 @@ const CTASection = () => {
                             <span className="material-symbols-outlined">factory</span>
                         </div>
                         <h3>Tedarikçiyim</h3>
-                        <p>Firmam için profil oluştur, alıcılardan teklif talebi al, ihalelere katıl.</p>
+                        <p>Kurumsal profilinizi oluşturun, yeni firmalarla bağlantı kurun ve iş fırsatlarına ulaşın.</p>
                         <div className="sc-cta-panel__btns">
                             <button className="sc-btn-white" onClick={() => navigate('/register')}>
                                 Ücretsiz Kayıt Ol
@@ -39,7 +39,7 @@ const CTASection = () => {
                             <span className="material-symbols-outlined">request_quote</span>
                         </div>
                         <h3>Satınalmacıyım</h3>
-                        <p>İhale aç, teklifler rekabet etsin, en iyi tedarikçiyi seç.</p>
+                        <p>Satınalma taleplerinizi yönetin, farklı firmalardan teklifler alın ve doğru çözüm ortağını bulun.</p>
                         <div className="sc-cta-panel__btns">
                             <button className="sc-btn-white" onClick={() => navigate('/ihaleler')}>
                                 İhale Aç

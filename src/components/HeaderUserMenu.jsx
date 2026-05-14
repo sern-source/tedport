@@ -46,6 +46,7 @@ const HeaderUserMenu = ({
                             <MenuItem icon="request_quote" label="Teklif Yönetimi" onClick={() => go('/firma-profil?tab=teklifler')} badge={pendingQuoteCount} />
                             <MenuItem icon="gavel" label="İhale Yönetimi" onClick={() => go('/firma-profil?tab=ihale-yonetimi')} badge={ihaleYonetimiUnreadCount} />
                             <MenuItem icon="group" label="Ekip Yönetimi" onClick={() => go('/firma-profil?tab=ekip')} />
+                            <MenuItem icon="bar_chart" label="Analitik" onClick={() => go('/firma-profil?tab=analitik')} />
                             <MenuItem icon="notifications" label="Bildirimler" onClick={() => go('/firma-profil?tab=bildirimler')} badge={unreadNotifCount} />
                         </>
                     ) : (

@@ -27,11 +27,12 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: Kalem satırı rahat sığasın diye modal genişletildi */
 .quote-modal {
   background: var(--bg-white);
   border-radius: 16px;
   width: 100%;
-  max-width: 500px;
+  max-width: 620px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18), 0 4px 16px rgba(15, 23, 42, 0.08);
@@ -276,6 +277,32 @@
   margin: 0;
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: Teklif Taleplerim yönlendirme bandı */
+.quote-success-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: left;
+}
+.quote-success-info .material-symbols-outlined {
+  font-size: 15px;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+.quote-success-info a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+.quote-success-info a:hover { text-decoration: underline; }
+
 @media (max-width: 540px) {
   .quote-form-row {
     flex-direction: column;
@@ -296,6 +323,10 @@
 [data-theme="dark"] .quote-modal { background: var(--bg-white); }
 [data-theme="dark"] .quote-modal-header { background: linear-gradient(145deg, #1e3a5f 0%, #172554 100%); border-bottom-color: #1e40af; }
 [data-theme="dark"] .quote-modal-header__label { color: #93c5fd; }
+/* Enes Doğanay | 14 Mayıs 2026: DatePicker trigger kompakt — teslim tarihi + yeri aynı yükseklikte */
+.quote-form-row .dp-trigger { padding: 6px 12px; font-size: 0.84rem; }
+.quote-form-row .dp-trigger .dp-icon { font-size: 16px; }
+
 [data-theme="dark"] .quote-modal-header__text h3 { color: #f1f5f9; }
 [data-theme="dark"] .quote-modal-logo { background: #1e293b; border-color: #1e40af; }
 [data-theme="dark"] .quote-modal-logo__fallback { color: #60a5fa; }
@@ -306,4 +337,309 @@
 [data-theme="dark"] .quote-form-group select { background: var(--bg-light); border-color: var(--border); color: var(--text-dark); }
 [data-theme="dark"] .quote-form-info { background: var(--bg-light); border-color: var(--border); }
 [data-theme="dark"] .quote-btn-cancel { background: var(--bg-light); border-color: var(--border); color: var(--text-dark); }
+[data-theme="dark"] .quote-success-info { background: #1e3a5f; border-color: #1e40af; color: #94a3b8; }
+[data-theme="dark"] .quote-success-info a { color: #93c5fd; }
 
+/* Enes Doğanay | 14 Mayıs 2026: Miktar + birim dropdown */
+.quote-miktar-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.quote-form-group .quote-miktar-row input {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+.quote-birim-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  height: 42px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-light);
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.84rem;
+  color: var(--text-dark);
+  transition: border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.quote-birim-trigger:hover,
+.quote-birim-trigger.open {
+  border-color: #2563eb;
+  background: #f0f7ff;
+}
+.quote-birim-label { font-weight: 500; font-size: 0.84rem; color: var(--text-dark); }
+.quote-birim-chevron { font-size: 16px; color: var(--text-muted); transition: transform 0.15s; }
+.quote-birim-trigger.open .quote-birim-chevron { transform: rotate(180deg); }
+.quote-birim-menu {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 4px;
+  overflow-y: auto;
+  max-height: 220px;
+}
+.quote-birim-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.83rem;
+  color: var(--text-dark);
+  width: 100%;
+  text-align: left;
+  transition: background 0.1s;
+}
+.quote-birim-option:hover { background: var(--bg-light); }
+.quote-birim-option.active { background: #eff6ff; }
+.quote-birim-option-label { color: var(--text-dark); }
+.quote-birim-option.active .quote-birim-option-label { color: #2563eb; }
+.quote-birim-check { font-size: 14px; color: #2563eb; }
+[data-theme="dark"] .quote-birim-trigger { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .quote-birim-trigger:hover,
+[data-theme="dark"] .quote-birim-trigger.open { border-color: #3b82f6; background: #1e3a5f; }
+[data-theme="dark"] .quote-birim-label { color: #e2e8f0; }
+[data-theme="dark"] .quote-birim-menu { background: #1e293b; border-color: #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+[data-theme="dark"] .quote-birim-option { color: #e2e8f0; }
+[data-theme="dark"] .quote-birim-option:hover { background: #0f172a; }
+[data-theme="dark"] .quote-birim-option.active { background: #1e3a5f; }
+[data-theme="dark"] .quote-birim-option-label { color: #e2e8f0; }
+[data-theme="dark"] .quote-birim-option.active .quote-birim-option-label { color: #93c5fd; }
+[data-theme="dark"] .quote-birim-check { color: #93c5fd; }
+@media (max-width: 480px) {
+  .quote-miktar-row { flex-wrap: wrap; }
+  .quote-birim-trigger { width: 100%; justify-content: space-between; }
+}
+
+/* Enes Doğanay | 14 Mayıs 2026: Talep kalemleri — ihale formu stiliyle birebir */
+.quote-kalem-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.quote-kalem-label .material-symbols-outlined { font-size: 16px; color: #3b82f6; }
+
+.quote-kalem-desc {
+  margin: 0;
+  font-size: 11.5px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.quote-kalem-optional {
+  font-weight: 400;
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: none;
+}
+
+.quote-kalem-input-row { display: flex; gap: 8px; align-items: center; }
+
+/* Enes Doğanay | 14 Mayıs 2026: Adet + birim — tek kenarlıklı birleşik grup (ihale formu ile aynı) */
+.quote-kalem-adet-group {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: visible;
+  background: var(--bg-light);
+  transition: border-color 0.15s;
+  position: relative;
+}
+.quote-kalem-adet-group:focus-within { border-color: #3b82f6; background: var(--bg-white); }
+
+.quote-kalem-adet-input {
+  width: 38px !important;
+  min-width: 0;
+  border: none !important;
+  border-radius: 7px 0 0 7px !important;
+  background: transparent !important;
+  padding: 5px 2px 5px 5px !important;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dark);
+  outline: none;
+  font-family: inherit;
+}
+
+.quote-kalem-birim-wrap {
+  position: relative;
+  border-left: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+}
+
+.quote-kalem-birim-trigger {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  height: 100%;
+  border-radius: 0 6px 6px 0;
+  transition: background 0.12s;
+  min-width: 0;
+}
+.quote-kalem-birim-trigger:hover { background: rgba(59,130,246,0.07); }
+.quote-kalem-birim-trigger.open { background: rgba(59,130,246,0.10); }
+
+.quote-kalem-birim-label { font-size: 11px; font-weight: 600; color: var(--text-dark); min-width: 20px; }
+.quote-kalem-birim-chevron { font-size: 14px; color: #64748b; transition: transform 0.15s; }
+.quote-kalem-birim-trigger.open .quote-kalem-birim-chevron { transform: rotate(180deg); }
+
+.quote-kalem-madde-input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--text-dark);
+  background: var(--bg-light);
+  font-family: inherit;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.quote-kalem-madde-input:focus { border-color: #3b82f6; background: var(--bg-white); }
+.quote-kalem-madde-input:hover { border-color: #93c5fd; }
+
+.quote-kalem-aciklama-input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--text-dark);
+  background: var(--bg-light);
+  font-family: inherit;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.quote-kalem-aciklama-input:focus { border-color: #3b82f6; background: var(--bg-white); }
+.quote-kalem-aciklama-input:hover { border-color: #93c5fd; }
+
+.quote-kalem-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 7px;
+  background: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.quote-kalem-add-btn:hover:not(:disabled) { background: #2563eb; }
+.quote-kalem-add-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+.quote-kalem-add-btn .material-symbols-outlined { font-size: 16px; }
+
+/* Enes Doğanay | 14 Mayıs 2026: Kalemler tablosu — ihale formuyla aynı */
+.quote-kalem-table {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.quote-kalem-table__header {
+  display: grid;
+  grid-template-columns: 28px 78px 1fr 1fr 28px;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--bg-light);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.quote-kalem-table__row {
+  display: grid;
+  grid-template-columns: 28px 78px 1fr 1fr 28px;
+  gap: 8px;
+  padding: 6px 10px;
+  align-items: start;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px;
+  transition: background 0.1s;
+}
+.quote-kalem-table__row:hover { background: var(--bg-light); }
+.quote-kalem-table__num {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 5px;
+  background: #eff6ff; color: #3b82f6;
+  font-weight: 700; font-size: 11px;
+}
+.quote-kalem-table__adet {
+  font-weight: 700;
+  color: var(--text-dark);
+  font-size: 12px;
+  text-align: left;
+  padding-top: 2px;
+}
+.quote-kalem-table__madde {
+  font-weight: 600;
+  color: var(--text-dark);
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.4;
+}
+.quote-kalem-table__aciklama {
+  color: var(--text-muted);
+  font-size: 12px;
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.4;
+}
+.quote-kalem-table__remove {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  border: none; background: transparent;
+  color: #94a3b8; cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.15s, color 0.15s;
+}
+.quote-kalem-table__remove:hover { background: #fef2f2; color: #ef4444; }
+.quote-kalem-table__remove .material-symbols-outlined { font-size: 15px; }
+
+/* Enes Doğanay | 14 Mayıs 2026: Dark mode — kalem sistemi */
+[data-theme="dark"] .quote-kalem-adet-group { border-color: #334155; background: var(--bg-dark, #0f172a); }
+[data-theme="dark"] .quote-kalem-birim-wrap { border-left-color: #334155; }
+[data-theme="dark"] .quote-kalem-birim-label { color: #e2e8f0; }
+[data-theme="dark"] .quote-kalem-madde-input,
+[data-theme="dark"] .quote-kalem-aciklama-input { background: var(--bg-dark, #0f172a); color: #e2e8f0; border-color: #334155; }
+[data-theme="dark"] .quote-kalem-madde-input:focus,
+[data-theme="dark"] .quote-kalem-aciklama-input:focus { background: #1e293b; }
+[data-theme="dark"] .quote-kalem-table__num { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .quote-kalem-table__row:hover { background: var(--bg-dark, #0f172a); }
+[data-theme="dark"] .quote-kalem-table__remove:hover { background: rgba(239,68,68,0.15); }
+
+/* Enes Doğanay | 14 Mayıs 2026: Mobil — kalem input satırı */
+@media (max-width: 600px) {
+  .quote-kalem-input-row { flex-wrap: wrap; gap: 6px; }
+  .quote-kalem-adet-group { flex: 0 0 auto; }
+  .quote-kalem-madde-input,
+  .quote-kalem-aciklama-input { flex: 1 1 100px; min-width: 0; }
+  .quote-kalem-add-btn { flex-shrink: 0; }
+  .quote-kalem-table__header,
+  .quote-kalem-table__row { grid-template-columns: 24px 68px 1fr 24px; }
+  .quote-kalem-table__aciklama { display: none; }
+}

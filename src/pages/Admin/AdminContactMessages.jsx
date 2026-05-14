@@ -246,6 +246,13 @@ const AdminContactMessages = () => {
                             <span>{msg.company}</span>
                           </div>
                         )}
+                        {/* Enes Doğanay | 14 Mayıs 2026: Telefon numarası */}
+                        {msg.phone && (
+                          <div className="acm-card-detail-row">
+                            <span className="material-symbols-outlined">phone</span>
+                            <a href={`tel:${msg.phone}`} style={{ color: 'var(--text-dark)', textDecoration: 'none' }}>{msg.phone}</a>
+                          </div>
+                        )}
                         <div className="acm-card-message">{msg.message}</div>
 
                         <div className="acm-card-actions">

@@ -153,15 +153,8 @@ export async function uploadQuoteFileService(userId, file) {
     return { url: filePath, name: file.name };
 }
 
-export async function sendQuoteRequestService({ firmaId, userId, userProfile, managedCompanyId, quoteForm, quoteFile }) {
-    let senderFirmaId = null;
-    let senderFirmaAdi = '';
-    if (managedCompanyId) {
-        senderFirmaId = managedCompanyId;
-        const { data: senderFirma } = await supabase.from('firmalar').select('firma_adi').eq('firmaID', managedCompanyId).single();
-        senderFirmaAdi = senderFirma?.firma_adi || '';
-    }
-
+// Enes Doğanay | 14 Mayıs 2026: gonderen_firma_id kaldırıldı — teklif talebi her zaman bireysel gönderilir, şirket adına değil
+export async function sendQuoteRequestService({ firmaId, userId, userProfile, quoteForm, quoteFile }) {
     let ekDosyaUrl = null;
     let ekDosyaAdi = null;
     if (quoteFile) {
@@ -173,14 +166,16 @@ export async function sendQuoteRequestService({ firmaId, userId, userProfile, ma
     const { error } = await supabase.from('teklif_talepleri').insert([{
         firma_id: String(firmaId),
         user_id: userId,
-        gonderen_firma_id: senderFirmaId,
+        gonderen_firma_id: null,
         ad_soyad: `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim(),
         email: userProfile?.email || '',
         telefon: '',
-        firma_adi: senderFirmaAdi,
+        firma_adi: '',
+        // Enes Doğanay | 14 Mayıs 2026: firma_adi boş — bireysel talep, şirket adı gösterilmez
         konu: quoteForm.konu.trim(),
         mesaj: quoteForm.mesaj.trim(),
-        miktar: quoteForm.miktar.trim() || null,
+        // Enes Doğanay | 14 Mayıs 2026: Kalemler JSONB alanı — miktar kaldırıldı
+        kalemler: quoteForm.kalemler?.length ? quoteForm.kalemler : null,
         teslim_tarihi: quoteForm.teslim_tarihi || null,
         teslim_yeri: quoteForm.teslim_yeri || null,
         ek_dosya_url: ekDosyaUrl,

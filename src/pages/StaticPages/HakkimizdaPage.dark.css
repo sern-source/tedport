@@ -10,13 +10,38 @@
 
 [data-theme="dark"] .about-page-wrapper .about-gray-bg,
 [data-theme="dark"] .about-page-wrapper .about-stats-section {
-  background-color: #1e293b;
+  background-color: var(--bg-white);
+  border-color: var(--border);
 }
 
-[data-theme="dark"] .about-page-wrapper .about-badge {
-  background-color: rgba(59, 158, 255, 0.12);
-  color: #93c5fd;
+/* Enes Doğanay | 14 Mayıs 2026: Stats dark mode — anasayfayla eşleştirildi */
+[data-theme="dark"] .about-page-wrapper .about-stats-badge {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
 }
+
+[data-theme="dark"] .about-page-wrapper .about-stat-icon {
+  background: color-mix(in srgb, var(--stat-color) 15%, transparent);
+  border-color: color-mix(in srgb, var(--stat-color) 30%, transparent);
+}
+
+[data-theme="dark"] .about-page-wrapper .about-stat-item:hover {
+  background: var(--bg-light);
+}
+
+
+[data-theme="dark"] .about-page-wrapper .about-badge {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-hero-image {
+  border-color: rgba(59, 130, 246, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
 
 [data-theme="dark"] .about-page-wrapper .about-value-card {
   background-color: #1e293b;
@@ -25,8 +50,9 @@
 }
 
 [data-theme="dark"] .about-page-wrapper .about-value-icon {
-  background-color: rgba(59, 158, 255, 0.12);
-  color: var(--primary);
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
 }
 
 [data-theme="dark"] .about-page-wrapper .about-btn-light {
@@ -48,9 +74,15 @@
   background-color: #0f172a;
 }
 
-[data-theme="dark"] .about-page-wrapper .about-feature-icon {
+[data-theme="dark"] .about-page-wrapper .about-feature-item {
   background-color: #1e293b;
   border-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-feature-icon {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
 }
 
 /* Enes Doğanay | 12 Mayıs 2026: Problem section dark mode */

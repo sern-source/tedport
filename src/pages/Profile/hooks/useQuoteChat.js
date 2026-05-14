@@ -12,6 +12,8 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
     const [quoteChatSending, setQuoteChatSending] = useState(false);
     const quoteChatEndRef = useRef(null);
     const quoteChatChannelRef = useRef(null);
+    // Enes Doğanay | 14 Mayıs 2026: Stale fetch guard — openQuoteChat race condition önler
+    const latestQuoteIdRef = useRef(null);
 
     const scrollToBottom = useCallback((smooth = true) => {
         setTimeout(() => {
@@ -21,21 +23,24 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
     }, []);
 
     // Enes Doğanay | 13 Mayıs 2026: Realtime kanal + circuit breaker — SUBSCRIBED → polling durur
+    // Enes Doğanay | 14 Mayıs 2026: cleaned flag — removeChannel tetiklediği CLOSED callback'i orphan interval açmasın
     useEffect(() => {
         if (!activeQuoteId) {
             if (quoteChatChannelRef.current) { supabase.removeChannel(quoteChatChannelRef.current); quoteChatChannelRef.current = null; }
             return;
         }
+        let cleaned = false; // Enes Doğanay | 14 Mayıs 2026: cleanup sonrası callback/interval guard
         const addMessage = (msg) => {
-            if (!msg?.id) return;
+            if (!msg?.id || cleaned) return;
             setQuoteChatMessages(prev => { if (prev.some(m => m.id === msg.id)) return prev; scrollToBottom(); return [...prev, msg]; });
         };
         let pollInterval = null;
         const startPolling = () => {
-            if (pollInterval) return;
+            if (pollInterval || cleaned) return;
             pollInterval = setInterval(async () => {
                 const data = await fetchQuoteMessages(activeQuoteId).catch(() => null);
-                if (data) setQuoteChatMessages(prev => {
+                if (cleaned || !data) return; // Enes Doğanay | 14 Mayıs 2026: stale async guard
+                setQuoteChatMessages(prev => {
                     if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev;
                     scrollToBottom();
                     return data;
@@ -46,11 +51,18 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
         const channel = supabase.channel(`teklif-chat-${activeQuoteId}`)
             .on('broadcast', { event: 'new-message' }, ({ payload }) => addMessage(payload))
             .subscribe((status) => {
+                // Enes Doğanay | 14 Mayıs 2026: cleaned guard — removeChannel tetiklediği CLOSED callback'ini yakalar
+                if (cleaned) return;
                 if (status === 'SUBSCRIBED') stopPolling();
                 else startPolling();
             });
         quoteChatChannelRef.current = channel;
-        return () => { stopPolling(); supabase.removeChannel(channel); quoteChatChannelRef.current = null; };
+        return () => {
+            cleaned = true; // Enes Doğanay | 14 Mayıs 2026: önce flag, sonra removeChannel — sıra önemli
+            stopPolling();
+            supabase.removeChannel(channel);
+            quoteChatChannelRef.current = null;
+        };
     }, [activeQuoteId, scrollToBottom]);
 
     // Enes Doğanay | 7 Mayıs 2026: Bağlantı restore → mesajları yeniden yükle
@@ -63,6 +75,7 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
 
     const openQuoteChat = useCallback(async (quoteId) => {
         setActiveQuoteId(quoteId);
+        latestQuoteIdRef.current = quoteId; // Enes Doğanay | 14 Mayıs 2026: race guard
         setQuoteChatLoading(true);
         setQuoteChatInput('');
         if (userId) {
@@ -76,10 +89,15 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
         }
         try {
             const data = await fetchQuoteMessages(quoteId);
+            // Enes Doğanay | 14 Mayıs 2026: Stale fetch guard — fetch sürerken başka teklif açıldıysa yoksay
+            if (latestQuoteIdRef.current !== quoteId) return;
             setQuoteChatMessages(data);
             scrollToBottom(false);
         } catch { setQuoteChatMessages([]); }
-        finally { setQuoteChatLoading(false); }
+        finally {
+            // Enes Doğanay | 14 Mayıs 2026: Sadece bu teklif hâlâ aktifse loading kapat
+            if (latestQuoteIdRef.current === quoteId) setQuoteChatLoading(false);
+        }
     }, [userId, scrollToBottom, refreshCounts, setNotifications, setActiveQuoteId]);
 
     const sendQuoteChatMessage = useCallback(async () => {

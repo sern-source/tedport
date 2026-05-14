@@ -28,6 +28,8 @@ const TeklifKalemTable = ({ kalemler, onUpdateKalem, setCurrencyModalIdx, setCur
                     <div className="teklif-kalem-col teklif-kalem-col--miktar">
                         <input type="number" min="1" value={kalem.miktar}
                             onChange={e => onUpdateKalem(idx, 'miktar', e.target.value)} className="teklif-kalem-input" />
+                        {/* Enes Doğanay | 14 Mayıs 2026: İhaledeki birim görüntüle — display only */}
+                        {kalem.birim && <span className="teklif-kalem-birim-badge">{kalem.birim}</span>}
                     </div>
                     <div className="teklif-kalem-col teklif-kalem-col--fiyat">
                         <input type="number" min="0" step="0.01" placeholder="0.00" value={kalem.birim_fiyat}

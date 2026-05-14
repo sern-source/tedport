@@ -107,6 +107,15 @@
     transform: scale(0.95);
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: Dokunmatik ekranlarda minimum 40px hedef alanı */
+@media (max-width: 1023px) {
+    .shared-back-btn,
+    .shared-theme-toggle {
+        width: 40px;
+        height: 40px;
+    }
+}
+
 .shared-back-btn .material-symbols-outlined {
     font-size: 20px;
     line-height: 1;
@@ -164,7 +173,15 @@
     object-fit: contain;
 }
 
-/* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG kullanılıyor, light/dark show-hide kaldırıldı */
+/* Enes Doğanay | 14 Mayıs 2026: Mobil header kompakt — logo küçük, header daha ince */
+@media (max-width: 639px) {
+    .shared-logo-area {
+        height: 40px;
+    }
+    .shared-logo-image {
+        height: 40px;
+    }
+}
 
 /* ========== SEARCH BAR ========== */
 
@@ -193,16 +210,16 @@
     }
 }
 
-/* Enes Doğanay | 11 Mayıs 2026: Gelişmiş arama modu — toggle alt satır eklenince biraz geniş */
+/* Enes Doğanay | 14 Mayıs 2026: Gelişmiş arama modu — SMT + input için daha geniş */
 .shared-search-bar--advanced {
-    max-width: 300px;
-    min-width: 180px;
+    max-width: 380px;
+    min-width: 200px;
 }
 
 @media (min-width: 1024px) {
     .shared-search-bar--advanced {
-        max-width: 320px;
-        min-width: 200px;
+        max-width: 440px;
+        min-width: 240px;
     }
 }
 
@@ -213,16 +230,18 @@
     align-items: center;
 }
 
-/* Enes Doğanay | 11 Mayıs 2026: Advanced modda input-row + toggle tek kutu gibi görünür */
+/* Enes Doğanay | 14 Mayıs 2026: Advanced modda input-row tek yuvarlak kutu, eski alt-strip yok */
+/* NOT: overflow:hidden kullanılmıyor — smt-menu dropdown kırpılmamalı */
 .shared-search-bar--advanced .shared-search-input-row {
     background: var(--bg-light);
-    border-radius: 8px 8px 0 0;
+    border-radius: 8px;
     transition: background 0.2s;
 }
 
 .shared-search-bar--advanced .shared-search-input-row input {
     background: transparent;
-    border-radius: 0;
+    border-radius: 0 8px 8px 0;
+    padding-left: 6px;
 }
 
 .shared-search-bar--advanced .shared-search-input-row:focus-within {
@@ -244,7 +263,151 @@
 [data-theme="dark"] .shared-search-bar--advanced .search-mode-toggle { background: #1e293b; }
 [data-theme="dark"] .shared-search-bar--advanced .shared-search-input-row:focus-within + .search-mode-toggle { background: #334155; }
 
-/* ========== SEARCH MODE TOGGLE ========== */
+/* ========== SEARCH MODE TOGGLE (SMT) — inline dropdown ========== */
+/* Enes Doğanay | 14 Mayıs 2026: Input row solunda kompakt mod seçici dropdown */
+.smt-wrap {
+    position: relative;
+    flex-shrink: 0;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+}
+
+.smt-trigger {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0 8px 0 10px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: background 0.15s;
+    border-radius: 8px 0 0 8px;
+}
+
+.smt-trigger:hover { background: var(--bg-light); }
+
+.smt-icon {
+    font-size: 15px !important;
+    color: #2563eb;
+}
+
+.smt-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.smt-chevron {
+    font-size: 14px !important;
+    color: var(--text-gray);
+    transition: transform 0.2s;
+}
+
+.smt-chevron.open { transform: rotate(180deg); }
+
+.smt-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+    min-width: 148px;
+    z-index: 200;
+    padding: 4px;
+    animation: smt-drop 0.12s ease;
+}
+
+@keyframes smt-drop {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.smt-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-dark);
+    text-align: left;
+    transition: background 0.12s;
+}
+
+.smt-option:hover { background: var(--bg-light); }
+
+.smt-option.active {
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.smt-option .material-symbols-outlined { font-size: 16px !important; color: var(--text-gray); }
+.smt-option.active .material-symbols-outlined { color: #2563eb; }
+
+.smt-check {
+    margin-left: auto;
+    font-size: 15px !important;
+    color: #2563eb !important;
+}
+
+.shared-search-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    flex-shrink: 0;
+    margin: 0 2px;
+}
+
+/* ========== DARK MODE: SMT ========== */
+/* Enes Doğanay | 14 Mayıs 2026: Trigger hover container'dan ayırt edilebilir hale getirildi */
+[data-theme="dark"] .smt-icon { color: #60a5fa; }
+[data-theme="dark"] .smt-trigger:hover { background: rgba(255,255,255,0.08); }
+[data-theme="dark"] .smt-label { color: #f1f5f9; }
+[data-theme="dark"] .smt-menu { background: #1e293b; border-color: #334155; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+[data-theme="dark"] .smt-option { color: #f1f5f9; }
+[data-theme="dark"] .smt-option:hover { background: #334155; }
+[data-theme="dark"] .smt-option.active { background: #1e3a5f; color: #60a5fa; }
+[data-theme="dark"] .smt-option.active .material-symbols-outlined { color: #60a5fa; }
+[data-theme="dark"] .smt-check { color: #60a5fa !important; }
+[data-theme="dark"] .shared-search-divider { background: #334155; }
+
+/* ========== RESPONSIVE: SMT mobil ========== */
+/* Enes Doğanay | 14 Mayıs 2026: Küçük ekranlarda label gizlenir, trigger kompakt görünür */
+@media (max-width: 639px) {
+    .smt-label { display: none; }
+    .smt-trigger { padding: 0 5px 0 8px; }
+    .smt-icon { font-size: 17px !important; }
+    .shared-search-bar--advanced {
+        min-width: 100px;
+        max-width: 240px;
+    }
+    .smt-menu {
+        min-width: 130px;
+    }
+}
+
+@media (max-width: 400px) {
+    .shared-search-bar--advanced {
+        min-width: 80px;
+    }
+    .smt-trigger { padding: 0 4px 0 6px; }
+    .smt-chevron { display: none; }
+}
+
+/* ========== SEARCH MODE TOGGLE (eski pill stiller — kullanılmıyor) ========== */
 /* Enes Doğanay | 11 Mayıs 2026: Input row altında normal akışta, ayrı satır */
 .search-mode-toggle {
     display: flex;
@@ -307,10 +470,20 @@
     font-size: 0.68rem;
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: Aktif mod hint — sağa hizalı, italik, muted */
+.search-mode-hint {
+    margin-left: auto;
+    font-size: 0.62rem;
+    color: var(--text-gray);
+    font-style: italic;
+    white-space: nowrap;
+}
+
 /* Enes Doğanay | 11 Mayıs 2026: Mobilde prefix gizle */
 @media (max-width: 480px) {
     .search-mode-label-prefix { display: none; }
     .search-mode-toggle { padding: 3px 6px 4px; }
+    .search-mode-hint { display: none; }
 }
 
 /* ========== DARK MODE: SEARCH MODE TOGGLE ========== */
@@ -337,6 +510,10 @@
 
 [data-theme="dark"] .search-mode-pill--on:hover {
     background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+[data-theme="dark"] .search-mode-hint {
+    color: #64748b;
 }
 
 .shared-search-bar input {
@@ -568,9 +745,13 @@
     cursor: pointer;
     background: none;
     border: none;
-    padding: 8px 4px;
+    padding: 10px 8px;
     flex-shrink: 0;
     transition: opacity 0.2s;
+    min-width: 40px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
 }
 
 .shared-hamburger:hover {
@@ -836,7 +1017,7 @@
     align-items: center;
     gap: 10px;
     color: var(--text-dark);
-    padding: 11px 10px;
+    padding: 13px 10px;
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
@@ -847,6 +1028,8 @@
     text-align: left;
     width: 100%;
     border-radius: 6px;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 /* Enes Doğanay | 8 Nisan 2026: Mobil menü ikon ve badge stilleri */
@@ -914,8 +1097,10 @@
 }
 
 /* Kullanıcı butonu dark'ta */
+/* Enes Doğanay | 14 Mayıs 2026: Metin rengi eklendi — #1d4ed8 dark arka planda okunaksız (kontrast ~1.8:1) */
 [data-theme="dark"] .shared-user-btn {
     border-color: #1e40af;
+    color: #93c5fd;
 }
 
 [data-theme="dark"] .shared-user-btn:hover {
@@ -925,8 +1110,10 @@
 }
 
 /* Kayıt ol butonu dark'ta */
+/* Enes Doğanay | 14 Mayıs 2026: Metin rengi eklendi — aynı kontrast sorunu */
 [data-theme="dark"] .shared-register-btn {
     border-color: #1e40af;
+    color: #93c5fd;
 }
 
 [data-theme="dark"] .shared-register-btn:hover,
@@ -946,4 +1133,25 @@
 [data-theme="dark"] .shared-mobile-menu a:active,
 [data-theme="dark"] .shared-mobile-menu button:active {
     background-color: #1e2d4a;
+}
+
+/* ========== DARK MODE: Tamamlanan eksikler ========== */
+/* Enes Doğanay | 14 Mayıs 2026: Hardcoded light renklerin dark override'ları */
+[data-theme="dark"] .shared-header {
+    box-shadow: 0 1px 0 #334155, 0 2px 8px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .shared-suggestion-avatar {
+    background: #1e3a5f;
+    color: #60a5fa;
+    border-color: #1e40af;
+}
+
+[data-theme="dark"] .shared-history-clear {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .shared-mobile-menu {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    border-color: #334155;
 }

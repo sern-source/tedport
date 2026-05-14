@@ -24,7 +24,7 @@ export const useTeklifYonetimi = ({ companyId, userId, notifications, setNotific
     const [quoteContactPopup, setQuoteContactPopup] = useState(null);
     const [qCopied, setQCopied] = useState(null);
 
-    const chat = useTeklifChat({ incomingQuotes, setIncomingQuotes, setOutgoingQuotes, notifications, setNotifications, refreshCounts, userId, showFpToast, setActiveViewingTeklifId, currentTab });
+    const chat = useTeklifChat({ incomingQuotes, setIncomingQuotes, setOutgoingQuotes, notifications, setNotifications, refreshCounts, userId, companyId, showFpToast, setActiveViewingTeklifId, currentTab });
 
     // Enes Doğanay | 7 Mayıs 2026: İlk yükleme
     useEffect(() => {

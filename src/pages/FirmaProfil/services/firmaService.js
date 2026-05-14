@@ -13,15 +13,17 @@ export const fetchFirmaData = async (companyId) => {
 };
 
 /* Enes Doğanay | 6 Mayıs 2026: Kullanıcının firmadaki rolünü getir */
+// Enes Doğanay | 14 Mayıs 2026: page_permissions de alındı — analitik izin desteği
 export const fetchUserRole = async (userId, companyId) => {
   const { data, error } = await supabase
     .from('kurumsal_firma_yoneticileri')
-    .select('role')
+    .select('role, page_permissions')
     .eq('user_id', userId)
     .eq('firma_id', String(companyId))
     .maybeSingle();
   if (error) throw new Error(error.message);
-  return data?.role || null;
+  if (!data) return null;
+  return { role: data.role, page_permissions: data.page_permissions || {} };
 };
 
 /* Enes Doğanay | 6 Mayıs 2026: Bildirim tercihlerini getir */
@@ -59,6 +61,15 @@ export const markNotificationsRead = async (ids) => {
     .from('bildirimler')
     .update({ is_read: true })
     .in('id', ids);
+  if (error) throw new Error(error.message);
+};
+
+// Enes Doğanay | 14 Mayıs 2026: Tüm firma üyelerinin teklif bildirimlerini okundu yap — SECURITY DEFINER RPC
+export const markTeklifFirmaNotificationsRead = async (teklifId, companyId) => {
+  const { error } = await supabase.rpc('mark_teklif_firma_notifications_read', {
+    p_teklif_id: teklifId,
+    p_firma_id: String(companyId),
+  });
   if (error) throw new Error(error.message);
 };
 

@@ -98,6 +98,27 @@
     }
 }
 
+/* Enes Doğanay | 14 Mayıs 2026: Hero eyebrow chip — çözüm ortaklığı kategori etiketi */
+.supplier-connect-wrapper .sc-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.supplier-connect-wrapper .sc-hero-eyebrow .material-symbols-outlined {
+    font-size: 13px;
+}
+
 .supplier-connect-wrapper .sc-hero-title {
     color: white;
     font-size: 22px;

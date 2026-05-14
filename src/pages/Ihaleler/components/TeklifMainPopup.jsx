@@ -78,7 +78,7 @@ const TeklifMainPopup = ({
                     </div>
                     {teklifError && <div className="teklif-popup__error"><span className="material-symbols-outlined">error</span>{teklifError}</div>}
                 </div>
-                <TeklifPopupFooter getGroupedTotals={getGroupedTotals} teklifForm={teklifForm} teklifSaving={teklifSaving} isUpdateMode={isUpdateMode} isDraftMode={isDraftMode} setWithdrawConfirm={setWithdrawConfirm} setDraftDeleteConfirm={setDraftDeleteConfirm} onSubmit={onSubmit} />
+                <TeklifPopupFooter getGroupedTotals={getGroupedTotals} teklifForm={teklifForm} teklifSaving={teklifSaving} isUpdateMode={isUpdateMode} isDraftMode={isDraftMode} setWithdrawConfirm={setWithdrawConfirm} setDraftDeleteConfirm={setDraftDeleteConfirm} onSubmit={onSubmit} isTeklifDirty={isTeklifDirty} />
             </div>
         </div>
     );

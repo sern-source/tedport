@@ -18,6 +18,8 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
     const [yeniGereksinimAciklama, setYeniGereksinimAciklama] = useState('');
     // Enes Doğanay | 9 Mayıs 2026: Gereksinim adet alanı — default 1
     const [yeniGereksinimAdet, setYeniGereksinimAdet] = useState('1');
+    // Enes Doğanay | 14 Mayıs 2026: Gereksinim birim seçimi — default Adet
+    const [yeniGereksinimBirim, setYeniGereksinimBirim] = useState('Adet');
     const [ihalePublishSuccess, setIhalePublishSuccess] = useState(null);
     // Enes Doğanay | 12 Mayıs 2026: Güncelleme başarı modalı
     const [ihaleUpdateSuccess, setIhaleUpdateSuccess] = useState(false);
@@ -87,9 +89,11 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
     const addGereksinim = () => {
         if (!yeniGereksinimMadde.trim()) return;
         // Enes Doğanay | 9 Mayıs 2026: Adet alanı eklendi
+        // Enes Doğanay | 14 Mayıs 2026: Birim alanı eklendi
         const adet = Math.max(1, parseInt(yeniGereksinimAdet) || 1);
-        setForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: yeniGereksinimMadde.trim(), aciklama: yeniGereksinimAciklama.trim(), adet }] }));
-        setYeniGereksinimMadde(''); setYeniGereksinimAciklama(''); setYeniGereksinimAdet('1');
+        const birim = yeniGereksinimBirim || 'Adet';
+        setForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: yeniGereksinimMadde.trim(), aciklama: yeniGereksinimAciklama.trim(), adet, birim }] }));
+        setYeniGereksinimMadde(''); setYeniGereksinimAciklama(''); setYeniGereksinimAdet('1'); setYeniGereksinimBirim('Adet');
     };
     const removeGereksinim = (id) => setForm(p => ({ ...p, gereksinimler: p.gereksinimler.filter(g => g.id !== id) }));
     const handleFileAdd = (e) => {
@@ -104,7 +108,8 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
         if (e) e.preventDefault();
         setFormSaving(true); setFormError('');
         try {
-            if (form.ihale_tipi === 'Davetli İhale' && form.davetli_firmalar.length === 0) { setFormError('Davetli ihale için en az bir firma eklemeniz gerekiyor.'); return; }
+            // Enes Doğanay | 14 Mayıs 2026: Firma veya kişi (email) yeterli
+            if (form.ihale_tipi === 'Davetli İhale' && form.davetli_firmalar.length === 0 && form.davet_emailleri.length === 0) { setFormError('Davetli ihale için en az bir firma veya kişi eklemeniz gerekiyor.'); return; }
             const onaysiz = form.davetli_firmalar.find(f => !f.onayli);
             if (onaysiz) { setFormError(`"${onaysiz.firma_adi}" henüz onaylı bir firma değil.`); return; }
             const existingFiles = form.ek_dosyalar.filter(f => f.path && f.url);
@@ -126,7 +131,16 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
                     setIhaleUpdateSuccess('update');
                 }
             }
-            else { const created = await createTender(payload); if ((forceDurum || form.durum) !== 'draft' && created?.id) { setPublishedLinkCopied(false); setIhalePublishSuccess(created.id); } }
+            else {
+                const created = await createTender(payload);
+                const savedDurum = forceDurum || form.durum;
+                // Enes Doğanay | 14 Mayıs 2026: Yeni ihale taslağı için ayrı tip — 'draft-new'
+                if (savedDurum === 'draft') {
+                    setIhaleUpdateSuccess('draft-new');
+                } else if (created?.id) {
+                    setPublishedLinkCopied(false); setIhalePublishSuccess(created.id);
+                }
+            }
             setShowModal(false); await fetchMyTenders(); await fetchPublicTenders();
         } catch (err) { setFormError(err.message || 'Kaydedilemedi.'); }
         finally { setFormSaving(false); }
@@ -150,6 +164,7 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
         yeniGereksinimMadde, setYeniGereksinimMadde,
         yeniGereksinimAciklama, setYeniGereksinimAciklama,
         yeniGereksinimAdet, setYeniGereksinimAdet,
+        yeniGereksinimBirim, setYeniGereksinimBirim,
         fileInputRef, ihalePublishSuccess, setIhalePublishSuccess,
         ihaleUpdateSuccess, setIhaleUpdateSuccess,
         // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — edit modunda değişiklik yapıldı mı?

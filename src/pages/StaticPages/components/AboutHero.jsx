@@ -7,15 +7,19 @@ const AboutHero = ({ onContact }) => (
         <div className="about-container about-hero-inner">
             <div className="about-hero-content">
                 <span className="about-badge">Hakkımızda</span>
-                <h1 className="about-hero-title">Türkiye&apos;nin Dijital Ticaret Altyapısını Kuruyoruz</h1>
+                <h1 className="about-hero-title">Türkiye&apos;nin B2B Çözüm Ortaklığı Platformunu İnşa Ediyoruz</h1>
                 <p className="about-hero-desc">
-                    Firmalar birbirini bulamıyor. Satınalma süreçleri yavaş. Güven problemi çözülmemiş.
-                    Tedport, bu döngüyü kırmak için kuruldu.
+                    Firmaların doğru iş ortaklarına daha hızlı ulaşabildiği, satınalma ve teklif süreçlerini
+                    daha verimli yönetebildiği güçlü bir dijital ekosistem oluşturuyoruz.
                 </p>
                 <p className="about-hero-desc">
-                    B2B satınalma, tedarikçi keşfi ve ihale süreçlerini tek platformda toplayarak
-                    Türkiye&apos;deki firmaların birbirine doğrudan, güvenli ve hızlı bağlandığı
-                    bir ticaret ağı inşa ediyoruz.
+                    Tedport; satınalma, tedarikçi keşfi ve ihale süreçlerini tek platformda bir araya getirerek
+                    firmaların güvenle bağlantı kurmasını, yeni fırsatlar keşfetmesini ve iş süreçlerini
+                    hızlandırmasını sağlayan bir çözüm ortaklığı platformudur.
+                </p>
+                <p className="about-hero-desc">
+                    Türkiye&apos;nin dört bir yanındaki firmaları daha görünür, daha erişilebilir ve daha
+                    bağlantılı hale getiren sürdürülebilir bir iş ağı kurmayı hedefliyoruz.
                 </p>
                 <div className="about-hero-buttons">
                     <button className="about-btn-primary" onClick={onContact}>İletişime Geçin</button>

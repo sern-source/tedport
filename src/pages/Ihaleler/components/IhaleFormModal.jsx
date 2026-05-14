@@ -18,6 +18,8 @@ const IhaleFormModal = ({
     yeniGereksinimMadde, setYeniGereksinimMadde,
     yeniGereksinimAciklama, setYeniGereksinimAciklama,
     yeniGereksinimAdet, setYeniGereksinimAdet,
+    // Enes Doğanay | 14 Mayıs 2026: Birim props
+    yeniGereksinimBirim, setYeniGereksinimBirim,
     emailInput, emailStatus,
     firmaSearchTerm, firmaSearchResults, firmaSearching,
     fileInputRef, firmaResultsRef, refNoCopied, setRefNoCopied, isVerifiedUser,
@@ -43,6 +45,11 @@ const IhaleFormModal = ({
             if (!form.yayin_tarihi) { setFormError('İhale açılış tarihi zorunludur.'); return; }
             if (!form.son_basvuru_tarihi) { setFormError('İhale kapanış tarihi zorunludur.'); return; }
             if (!form.teslim_suresi.trim()) { setFormError('Talep edilen teslim süresi zorunludur.'); return; }
+            // Enes Doğanay | 14 Mayıs 2026: Davetli ihale — en az bir firma veya kişi zorunlu
+            if (form.ihale_tipi === 'Davetli İhale' && form.davetli_firmalar.length === 0 && form.davet_emailleri.length === 0) {
+                setFormError('Davetli ihale için en az bir firma veya kişi eklemeniz gerekiyor.');
+                return;
+            }
         }
         if (stepperStep === 2) {
             if (form.gereksinimler.length === 0) { setFormError('En az bir talep kalemi eklemelisiniz.'); return; }
@@ -110,6 +117,7 @@ const IhaleFormModal = ({
                             form={form} yeniGereksinimMadde={yeniGereksinimMadde} setYeniGereksinimMadde={setYeniGereksinimMadde}
                             yeniGereksinimAciklama={yeniGereksinimAciklama} setYeniGereksinimAciklama={setYeniGereksinimAciklama}
                             yeniGereksinimAdet={yeniGereksinimAdet} setYeniGereksinimAdet={setYeniGereksinimAdet}
+                            yeniGereksinimBirim={yeniGereksinimBirim} setYeniGereksinimBirim={setYeniGereksinimBirim}
                             fileInputRef={fileInputRef} addGereksinim={addGereksinim} removeGereksinim={removeGereksinim}
                             handleFileAdd={handleFileAdd} removeFile={removeFile}
                         />

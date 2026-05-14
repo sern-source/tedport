@@ -42,6 +42,7 @@ const IhalelerModals = ({
             yeniGereksinimMadde={ihaleFormHook.yeniGereksinimMadde} setYeniGereksinimMadde={ihaleFormHook.setYeniGereksinimMadde}
             yeniGereksinimAciklama={ihaleFormHook.yeniGereksinimAciklama} setYeniGereksinimAciklama={ihaleFormHook.setYeniGereksinimAciklama}
             yeniGereksinimAdet={ihaleFormHook.yeniGereksinimAdet} setYeniGereksinimAdet={ihaleFormHook.setYeniGereksinimAdet}
+            yeniGereksinimBirim={ihaleFormHook.yeniGereksinimBirim} setYeniGereksinimBirim={ihaleFormHook.setYeniGereksinimBirim}
             emailInput={ihaleFormHook.emailInput} setEmailInput={ihaleFormHook.setEmailInput} emailStatus={ihaleFormHook.emailStatus}
             firmaSearchTerm={ihaleFormHook.firmaSearchTerm} setFirmaSearchTerm={ihaleFormHook.setFirmaSearchTerm}
             firmaSearchResults={ihaleFormHook.firmaSearchResults} firmaSearching={ihaleFormHook.firmaSearching}

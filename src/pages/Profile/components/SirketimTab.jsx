@@ -140,6 +140,14 @@ const SirketimTab = ({
                 <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
+            {/* Enes Doğanay | 14 Mayıs 2026: Analitik panel butonu */}
+            {myCompany.page_permissions?.analitik && (
+              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=analitik&from=sirketim')}>
+                <span className="material-symbols-outlined">bar_chart</span>
+                Analitik
+                <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
+              </button>
+            )}
           </div>
         </div>
       )}

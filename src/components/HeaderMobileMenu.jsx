@@ -2,6 +2,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+// Enes Doğanay | 14 Mayıs 2026: Nav linkleri için ikon eşlemesi — kullanıcı linklerle görsel tutarlılık
+const NAV_ICON_MAP = {
+    '/':           'home',
+    '/firmalar':   'business',
+    '/ihaleler':   'gavel',
+    '/hakkimizda': 'info',
+    '/iletisim':   'contact_mail',
+};
+
 /* Enes Doğanay | 6 Mayıs 2026: Mobil menü link satırı — icon + label + opsiyonel badge */
 const MobileLink = ({ href, icon, label, onClick, badge }) => (
     <Link to={href} onClick={onClick}>
@@ -22,10 +31,25 @@ const HeaderMobileMenu = ({
     return (
         <div className="shared-mobile-menu" id="mobile-menu">
             {items.map((item) => (
-                <Link key={item.href} to={item.href} onClick={close}>{item.label}</Link>
+                <Link key={item.href} to={item.href} onClick={close}>
+                    <span className="material-symbols-outlined shared-mobile-menu-icon">
+                        {NAV_ICON_MAP[item.href] || 'arrow_forward'}
+                    </span>
+                    {item.label}
+                </Link>
             ))}
-            {authChecked && !userProfile && locationPathname !== '/login' && <Link to="/login" onClick={close}>Giriş Yap</Link>}
-            {authChecked && !userProfile && locationPathname !== '/register' && <Link to="/register" onClick={close} className="shared-mobile-register">Kayıt Ol</Link>}
+            {authChecked && !userProfile && locationPathname !== '/login' && (
+                <Link to="/login" onClick={close}>
+                    <span className="material-symbols-outlined shared-mobile-menu-icon">login</span>
+                    Giriş Yap
+                </Link>
+            )}
+            {authChecked && !userProfile && locationPathname !== '/register' && (
+                <Link to="/register" onClick={close} className="shared-mobile-register">
+                    <span className="material-symbols-outlined shared-mobile-menu-icon">person_add</span>
+                    Kayıt Ol
+                </Link>
+            )}
             {userProfile && (
                 <>
                     {managedCompanyId ? (
@@ -35,6 +59,7 @@ const HeaderMobileMenu = ({
                             <MobileLink href="/firma-profil?tab=teklifler" icon="request_quote" label="Teklif Yönetimi" onClick={close} badge={pendingQuoteCount} />
                             <MobileLink href="/firma-profil?tab=ihale-yonetimi" icon="gavel" label="İhale Yönetimi" onClick={close} badge={ihaleYonetimiUnreadCount} />
                             <MobileLink href="/firma-profil?tab=ekip" icon="group" label="Ekip Yönetimi" onClick={close} />
+                            <MobileLink href="/firma-profil?tab=analitik" icon="bar_chart" label="Analitik" onClick={close} />
                             <MobileLink href="/firma-profil?tab=bildirimler" icon="notifications" label="Bildirimler" onClick={close} badge={unreadNotifCount} />
                         </>
                     ) : (

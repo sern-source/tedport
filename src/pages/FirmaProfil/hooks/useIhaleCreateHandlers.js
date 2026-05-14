@@ -39,7 +39,8 @@ export const useIhaleCreateHandlers = ({
             const pendingEmail = emailState.input.trim().toLowerCase();
             const finalEmails = (pendingEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pendingEmail) && emailState.status === 'valid' && !createForm.davet_emailleri.includes(pendingEmail))
                 ? [...createForm.davet_emailleri, pendingEmail] : createForm.davet_emailleri;
-            if (createForm.ihale_tipi === 'Davetli İhale' && createForm.davetli_firmalar.length === 0) { setStepperState(p => ({ ...p, saving: false, error: 'Davetli ihale için en az bir firma eklemeniz gerekiyor.' })); return; }
+            // Enes Doğanay | 14 Mayıs 2026: Firma veya kişi (email) yeterli
+            if (createForm.ihale_tipi === 'Davetli İhale' && createForm.davetli_firmalar.length === 0 && createForm.davet_emailleri.length === 0) { setStepperState(p => ({ ...p, saving: false, error: 'Davetli ihale için en az bir firma veya kişi eklemeniz gerekiyor.' })); return; }
             const onaysiz = createForm.davetli_firmalar.find(f => !f.onayli);
             if (onaysiz) { setStepperState(p => ({ ...p, saving: false, error: `"${onaysiz.firma_adi}" henüz onaylı bir firma değil.` })); return; }
             const uploadedFiles = [];
@@ -75,9 +76,11 @@ export const useIhaleCreateHandlers = ({
     const addGereksinim = () => {
         if (!createReqState.madde.trim()) return;
         // Enes Doğanay | 9 Mayıs 2026: Adet alanı eklendi
+        // Enes Doğanay | 14 Mayıs 2026: Birim alanı eklendi
         const adet = Math.max(1, parseInt(createReqState.adet) || 1);
-        setCreateForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: createReqState.madde.trim(), aciklama: createReqState.aciklama.trim(), adet }] }));
-        setCreateReqState({ madde: '', aciklama: '', adet: '1' });
+        const birim = createReqState.birim || 'Adet';
+        setCreateForm(p => ({ ...p, gereksinimler: [...p.gereksinimler, { id: Date.now(), madde: createReqState.madde.trim(), aciklama: createReqState.aciklama.trim(), adet, birim }] }));
+        setCreateReqState({ madde: '', aciklama: '', adet: '1', birim: 'Adet' });
     };
     const removeGereksinim = (id) => setCreateForm(p => ({ ...p, gereksinimler: p.gereksinimler.filter(g => g.id !== id) }));
 

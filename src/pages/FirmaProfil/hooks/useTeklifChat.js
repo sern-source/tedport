@@ -5,13 +5,13 @@ import {
     fetchChatMessages, sendChatMessage as sendChatMessageService,
     enrichTeklifMessages,
 } from '../services/teklifService';
-import { markNotificationsRead } from '../services/firmaService';
+import { markNotificationsRead, markTeklifFirmaNotificationsRead } from '../services/firmaService';
 
 // Enes Doğanay | 7 Mayıs 2026: Chat state + realtime — list state dışarıdan gelir
 export const useTeklifChat = ({
     incomingQuotes, setIncomingQuotes, setOutgoingQuotes,
     notifications, setNotifications, refreshCounts,
-    userId, showFpToast, setActiveViewingTeklifId, currentTab,
+    userId, companyId, showFpToast, setActiveViewingTeklifId, currentTab,
 }) => {
     const [activeQuoteChat, setActiveQuoteChat] = useState(null);
     const [chatMessages, setChatMessages] = useState([]);
@@ -20,6 +20,8 @@ export const useTeklifChat = ({
     const [chatSending, setChatSending] = useState(false);
     const chatEndRef = useRef(null);
     const chatChannelRef = useRef(null);
+    // Enes Doğanay | 14 Mayıs 2026: Stale fetch guard — handleOpenQuoteChat race condition önler
+    const latestChatIdRef = useRef(null);
 
     const scrollChatToBottom = useCallback((smooth = true) => {
         setTimeout(() => {
@@ -38,20 +40,23 @@ export const useTeklifChat = ({
     }, [activeQuoteChat?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Enes Doğanay | 13 Mayıs 2026: Chat realtime + circuit breaker — realtime aktifken polling durur
+    // Enes Doğanay | 14 Mayıs 2026: cleaned flag — removeChannel sonrası subscribe callback'i orphan interval açmasın
     useEffect(() => {
         if (!activeQuoteChat) {
             if (chatChannelRef.current) { supabase.removeChannel(chatChannelRef.current); chatChannelRef.current = null; }
             return;
         }
         const teklifId = activeQuoteChat.id;
-        const addMessage = (msg) => { if (!msg?.id) return; setChatMessages(prev => { if (prev.some(m => m.id === msg.id)) return prev; scrollChatToBottom(); return [...prev, msg]; }); };
+        let cleaned = false; // Enes Doğanay | 14 Mayıs 2026: cleanup sonrası callback/interval guard
+        const addMessage = (msg) => { if (!msg?.id || cleaned) return; setChatMessages(prev => { if (prev.some(m => m.id === msg.id)) return prev; scrollChatToBottom(); return [...prev, msg]; }); };
         let pollInterval = null;
         const startPolling = () => {
-            if (pollInterval) return;
+            if (pollInterval || cleaned) return;
             pollInterval = setInterval(async () => {
                 try {
                     const data = await fetchChatMessages(teklifId);
-                    if (data) setChatMessages(prev => { if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev; scrollChatToBottom(); return data; });
+                    if (cleaned || !data) return; // Enes Doğanay | 14 Mayıs 2026: stale async guard
+                    setChatMessages(prev => { if (prev.length === data.length && prev.every((m, i) => m.id === data[i]?.id)) return prev; scrollChatToBottom(); return data; });
                 } catch { /* sessiz */ }
             }, 10000);
         };
@@ -60,27 +65,49 @@ export const useTeklifChat = ({
             .on('broadcast', { event: 'new-message' }, ({ payload }) => addMessage(payload))
             .subscribe((status) => {
                 // Enes Doğanay | 13 Mayıs 2026: SUBSCRIBED → polling kapalı; kanal yokken polling açık
+                // Enes Doğanay | 14 Mayıs 2026: cleaned guard — removeChannel tetiklediği CLOSED callback'ini yakalar
+                if (cleaned) return;
                 if (status === 'SUBSCRIBED') stopPolling();
                 else startPolling();
             });
         chatChannelRef.current = channel;
-        return () => { stopPolling(); if (chatChannelRef.current) { supabase.removeChannel(chatChannelRef.current); chatChannelRef.current = null; } };
+        return () => {
+            cleaned = true; // Enes Doğanay | 14 Mayıs 2026: önce flag, sonra removeChannel — sıra önemli
+            stopPolling();
+            if (chatChannelRef.current) { supabase.removeChannel(chatChannelRef.current); chatChannelRef.current = null; }
+        };
     }, [activeQuoteChat?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleOpenQuoteChat = useCallback(async (quote) => {
         setActiveQuoteChat(quote); setChatLoading(true); setChatInput('');
-        const relatedUnread = (notifications || []).filter(n => !n.is_read && ['quote_reply', 'quote_message', 'quote_received'].includes(n.type) && String(n.metadata?.teklif_id) === String(quote.id));
-        if (relatedUnread.length > 0) {
-            const ids = relatedUnread.map(n => n.id);
-            try { await markNotificationsRead(ids); } catch { /* sessiz */ }
-            setNotifications(prev => prev.map(n => ids.includes(n.id) ? { ...n, is_read: true } : n));
-            refreshCounts();
+        latestChatIdRef.current = quote.id; // Enes Doğanay | 14 Mayıs 2026: race guard — fetch dönmeden önce başka teklif açılırsa iptal
+        // Enes Doğanay | 14 Mayıs 2026: isIncoming erken hesapla — hem bildirim hem durum mantığında kullanılır
+        const isIncoming = incomingQuotes.some(q => q.id === quote.id);
+        // Enes Doğanay | 14 Mayıs 2026: Gelen teklif → tüm firma üyelerinin bildirimini okundu yap (firma-level)
+        if (isIncoming && companyId) {
+            try { await markTeklifFirmaNotificationsRead(quote.id, companyId); } catch { /* sessiz */ }
+        } else {
+            const relatedUnread = (notifications || []).filter(n => !n.is_read && ['quote_reply', 'quote_message', 'quote_received'].includes(n.type) && String(n.metadata?.teklif_id) === String(quote.id));
+            if (relatedUnread.length > 0) {
+                const ids = relatedUnread.map(n => n.id);
+                try { await markNotificationsRead(ids); } catch { /* sessiz */ }
+            }
         }
+        // Enes Doğanay | 14 Mayıs 2026: Yerel state optimistic güncelle — badge anında kalkar
+        setNotifications(prev => prev.map(n =>
+            ['quote_reply', 'quote_message', 'quote_received'].includes(n.type) &&
+            String(n.metadata?.teklif_id) === String(quote.id)
+                ? { ...n, is_read: true }
+                : n
+        ));
+        refreshCounts();
         try {
             const data = await fetchChatMessages(quote.id);
+            // Enes Doğanay | 14 Mayıs 2026: Stale fetch guard — fetch sürerken başka teklif açıldıysa yoksay
+            if (latestChatIdRef.current !== quote.id) return;
             let enriched; try { enriched = await enrichTeklifMessages(data); } catch { enriched = data; }
+            if (latestChatIdRef.current !== quote.id) return; // enrich sonrası ikinci kontrol
             setChatMessages(enriched);
-            const isIncoming = incomingQuotes.some(q => q.id === quote.id);
             if (isIncoming && quote.durum === 'pending') {
                 const { updateQuoteStatus } = await import('../services/teklifService');
                 await updateQuoteStatus(quote.id, 'read').catch(() => {});
@@ -88,8 +115,11 @@ export const useTeklifChat = ({
             }
             scrollChatToBottom(false);
         } catch (err) { showFpToast?.('error', err.message || 'Mesajlar yüklenemedi.'); }
-        finally { setChatLoading(false); }
-    }, [notifications, setNotifications, refreshCounts, incomingQuotes, scrollChatToBottom, showFpToast, setIncomingQuotes]);
+        finally {
+            // Enes Doğanay | 14 Mayıs 2026: Sadece bu teklif hâlâ aktifse loading kapat
+            if (latestChatIdRef.current === quote.id) setChatLoading(false);
+        }
+    }, [notifications, setNotifications, refreshCounts, incomingQuotes, scrollChatToBottom, showFpToast, setIncomingQuotes, companyId]);
 
     const handleSendChatMessage = useCallback(async () => {
         if (!chatInput.trim() || !activeQuoteChat || chatSending) return;

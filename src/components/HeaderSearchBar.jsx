@@ -11,17 +11,35 @@ const HeaderSearchBar = ({
     searchBarRef,
     // Enes Doğanay | 11 Mayıs 2026: Gelişmiş arama — sadece FirmalarPage'den gelir
     searchMode = null, onSearchModeChange = null,
-}) => (
+}) => {
+    // Enes Doğanay | 14 Mayıs 2026: Kısa ve doğru placeholder — kategori aramaı yok
+    const PLACEHOLDERS = {
+        firma: 'Firma adı ara...',
+        urun:  'Ürün veya hizmet ara...',
+    };
+    const placeholder = PLACEHOLDERS[searchMode] || 'Firma veya ürün ara...';
+
+    return (
     <div className={`shared-search-bar${searchMode ? ' shared-search-bar--advanced' : ''}`} ref={searchBarRef}>
         {/* Enes Doğanay | 11 Mayıs 2026: Input row — ikon, input ve temizle butonu bir arada */}
         <div className="shared-search-input-row">
-            <div className="shared-search-icon">
-                <span className="material-symbols-outlined">search</span>
-            </div>
+            {/* Enes Doğanay | 14 Mayıs 2026: Mod seçici input'un soluna prepend — yalnızca FirmalarPage */}
+            {searchMode && (
+                <>
+                    <SearchModeToggle searchMode={searchMode} onSearchModeChange={onSearchModeChange} />
+                    <span className="shared-search-divider" aria-hidden="true" />
+                </>
+            )}
+            {/* Enes Doğanay | 14 Mayıs 2026: SMT aktifken search ikonu gizlenir — SMT kendi ikonunu taşır */}
+            {!searchMode && (
+                <div className="shared-search-icon">
+                    <span className="material-symbols-outlined">search</span>
+                </div>
+            )}
             <input
                 type="text"
                 aria-label="Firma, ürün ya da kategori ara"
-                placeholder="Firma, ürün ya da kategori ara..."
+                placeholder={placeholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
@@ -36,8 +54,6 @@ const HeaderSearchBar = ({
                 </button>
             )}
         </div>
-        {/* Enes Doğanay | 11 Mayıs 2026: Mod toggle — input row'un altında ayrı satır */}
-        <SearchModeToggle searchMode={searchMode} onSearchModeChange={onSearchModeChange} />
         {suggestions.length > 0 && (
             <div className="shared-search-suggestions">
                 {suggestions.map((item) => (
@@ -83,6 +99,7 @@ const HeaderSearchBar = ({
             </div>
         )}
     </div>
-);
+    );
+};
 
 export default HeaderSearchBar;

@@ -71,6 +71,7 @@
 }
 
 [data-theme="dark"] .mop-kalemler h4        { color: #94a3b8; }
+[data-theme="dark"] .mop-kalem-birim-badge  { background: #1e293b; border-color: #334155; color: #94a3b8; }
 [data-theme="dark"] .mop-kalemler__wrap     { border-color: #334155; }
 [data-theme="dark"] .mop-kalemler thead     { background: #0f172a; }
 [data-theme="dark"] .mop-kalemler th        { color: #475569; }

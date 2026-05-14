@@ -20,6 +20,8 @@ const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, onComplete, complet
     const isCompleteConfirm = completeConfirmId === tender.id;
 
     const ekDosyalar = (() => { let r = tender.ek_dosyalar; if (typeof r === 'string') try { r = JSON.parse(r); } catch { r = []; } return Array.isArray(r) ? r : []; })();
+    // Enes Doğanay | 14 Mayıs 2026: Gereksinimler listesi — JSON string veya array
+    const gereksinimler = (() => { let r = tender.gereksinimler; if (typeof r === 'string') try { r = JSON.parse(r); } catch { r = []; } return Array.isArray(r) ? r : []; })();
 
     return (
         <div className="tom-info-card">
@@ -57,6 +59,27 @@ const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, onComplete, complet
                         ))}
                         {tender.kdv_durumu && <div className="tom-info-cell"><span className="material-symbols-outlined">receipt_long</span><div><small>KDV Durumu</small><strong>{tender.kdv_durumu}</strong></div></div>}
                     </div>
+                    {gereksinimler.length > 0 && (
+                        <div className="tom-info-gereksinimler">
+                            {/* Enes Doğanay | 14 Mayıs 2026: İhale kalemleri — info card içinde özet */}
+                            <h4><span className="material-symbols-outlined">list_alt</span>İhale Kalemleri ({gereksinimler.length})</h4>
+                            <div className="tom-info-gereksinimler__wrap">
+                                <table>
+                                    {/* Enes Doğanay | 14 Mayıs 2026: Sıralama # | MIKTAR | KALEM */}
+                                <thead><tr><th>#</th><th>Miktar</th><th>Kalem</th></tr></thead>
+                                    <tbody>
+                                        {gereksinimler.map((g, i) => (
+                                            <tr key={g.id || i}>
+                                                <td>{i + 1}</td>
+                                                <td>{g.adet ? `${g.adet}${g.birim ? ` ${g.birim}` : ''}` : (g.birim || '—')}</td>
+                                                <td><strong>{g.madde || '—'}</strong></td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                     {ekDosyalar.length > 0 && (
                         <div className="tom-info-card__files">
                             <h4><span className="material-symbols-outlined">attach_file</span> Ek Dokümanlar ({ekDosyalar.length})</h4>
@@ -73,13 +96,13 @@ const IhaleInfoCard = ({ tender, onEdit, onDelete, onRepeat, onComplete, complet
                         </div>
                     )}
                     {tender.durum !== 'draft' && (
-                        <div className="tom-share-link-row">
-                            <span className="material-symbols-outlined tom-share-link-row__icon">link</span>
-                            <input className="tom-share-link-row__input" readOnly value={`https://tedport.com/ihaleler?ihale=${tender.id}`} onFocus={e => e.target.select()} />
-                            <button className={`tom-share-link-row__copy${copiedLink ? ' tom-share-link-row__copy--done' : ''}`} onClick={() => { navigator.clipboard.writeText(`https://tedport.com/ihaleler?ihale=${tender.id}`); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000); }}>
-                                <span className="material-symbols-outlined">{copiedLink ? 'check' : 'content_copy'}</span>{copiedLink ? 'Kopyalandı!' : 'Kopyala'}
-                            </button>
-                        </div>
+                        <button
+                            className={`tom-link-copy-btn${copiedLink ? ' tom-link-copy-btn--done' : ''}`}
+                            onClick={() => { navigator.clipboard.writeText(`https://tedport.com/ihaleler?ihale=${tender.id}`); setCopiedLink(true); setTimeout(() => setCopiedLink(false), 2000); }}
+                        >
+                            <span className="material-symbols-outlined">{copiedLink ? 'check' : 'link'}</span>
+                            {copiedLink ? 'Kopyalandı!' : 'İhale Linkini Kopyala'}
+                        </button>
                     )}
                     <div className="tom-tender-actions">
                         {/* Enes Doğanay | 12 Mayıs 2026: Kapalı ihale için Düzenleme butonu gizlenir */}

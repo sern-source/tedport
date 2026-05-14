@@ -12,8 +12,8 @@ const AppBanner = () => (
                 <div className="sc-app-banner-content">
                     {/* Enes Doğanay | 13 Mayıs 2026: Q3 2026 tahmini lansman tarihi */}
                     <div className="sc-app-banner-badge">2026 Q3</div>
-                    <h3>Tedport Mobil Uygulama Yolda!</h3>
-                    <p>Tedarikçilerinizi cebinizden yönetin. iOS ve Android uygulamaları 2026 yılı üçüncü çeyreğinde hizmetinizde.</p>
+                    <h3>Tedport Her Yerde Yanınızda</h3>
+                    <p>Firma bağlantılarınızı, teklif süreçlerinizi ve satınalma operasyonlarınızı mobil cihazlarınızdan yönetin. iOS ve Android için 2026 Q3'te hizmetinizde.</p>
                 </div>
                 <div className="sc-app-banner-stores">
                     <div className="sc-store-btn">

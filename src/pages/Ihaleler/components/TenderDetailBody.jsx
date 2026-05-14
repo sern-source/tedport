@@ -42,12 +42,12 @@ const TenderDetailBody = ({ dt }) => {
                     <h3><span className="material-symbols-outlined">checklist</span> Talep Kalemleri ({gereksinimler.length})</h3>
                     <div className="tender-detail__req-table">
                         <div className="tender-detail__req-table-head">
-                            <span>#</span><span>Adet</span><span>Kalem</span><span>Açıklama</span>
+                            <span>#</span><span>Miktar</span><span>Kalem</span><span>Açıklama</span>
                         </div>
                         {gereksinimler.map((g, i) => (
                             <div key={g.id || i} className="tender-detail__req-table-row">
                                 <span className="tender-detail__req-num">{i + 1}</span>
-                                <span className="tender-detail__req-adet">{g.adet || 1}</span>
+                                <span className="tender-detail__req-adet">{g.adet || 1} {g.birim || 'Adet'}</span>
                                 <span className="tender-detail__req-madde">{g.madde}</span>
                                 <span className="tender-detail__req-aciklama">{g.aciklama || '—'}</span>
                             </div>

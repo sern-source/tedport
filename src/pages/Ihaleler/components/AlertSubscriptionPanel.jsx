@@ -21,21 +21,24 @@ const AlertSubscriptionPanel = ({ userId }) => {
 
     if (!userId || initializing) return null;
 
-    const activeCount = subscriptions.length;
+    // Enes Doğanay | 14 Mayıs 2026: Tüm İhaleler seçilince null+tüm sektörler oluşuyor — label için anlamlı sayı
+    const nullActive = isSubscribed(null);
+    const sectorActiveCount = subscriptions.filter(s => s.kategori !== null).length;
+    const activeCount = nullActive ? 0 : sectorActiveCount; // null aktifken label ayrı gösterilir
 
     return (
         <div className="alert-panel-wrap" ref={wrapRef}>
             {/* Enes Doğanay | 13 Mayıs 2026: Tetikleyici buton */}
             <button
-                className={`alert-panel-trigger${activeCount > 0 ? ' alert-panel-trigger--active' : ''}`}
+                className={`alert-panel-trigger${(nullActive || activeCount > 0) ? ' alert-panel-trigger--active' : ''}`}
                 onClick={() => setOpen(o => !o)}
                 aria-expanded={open}
             >
                 <span className="material-symbols-outlined">
-                    {activeCount > 0 ? 'notifications_active' : 'notifications'}
+                    {(nullActive || activeCount > 0) ? 'notifications_active' : 'notifications'}
                 </span>
                 <span className="alert-panel-trigger__label">
-                    {activeCount > 0 ? `${activeCount} Uyarı Aktif` : 'Uyarı Al'}
+                    {nullActive ? 'Tüm İhaleler Aktif' : activeCount > 0 ? `${activeCount} Uyarı Aktif` : 'Uyarı Al'}
                 </span>
                 <span className={`material-symbols-outlined alert-panel-chevron${open ? ' alert-panel-chevron--open' : ''}`}>
                     expand_more

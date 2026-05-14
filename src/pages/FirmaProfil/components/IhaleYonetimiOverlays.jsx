@@ -52,6 +52,7 @@ const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offer
             yeniGereksinimMadde={create.yeniGereksinimMadde} setYeniGereksinimMadde={create.setYeniGereksinimMadde}
             yeniGereksinimAciklama={create.yeniGereksinimAciklama} setYeniGereksinimAciklama={create.setYeniGereksinimAciklama}
             yeniGereksinimAdet={create.yeniGereksinimAdet} setYeniGereksinimAdet={create.setYeniGereksinimAdet}
+            yeniGereksinimBirim={create.yeniGereksinimBirim} setYeniGereksinimBirim={create.setYeniGereksinimBirim}
             emailInput={create.emailInput} emailStatus={create.emailStatus}
             firmaSearchTerm={create.firmaSearchTerm} firmaSearchResults={create.firmaSearchResults}
             firmaSearching={create.firmaSearching} fileInputRef={create.fileInputRef}

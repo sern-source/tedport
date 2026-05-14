@@ -1,4 +1,5 @@
 // Enes Doğanay | 6 Mayıs 2026: İletişim formu — ad, e-posta, konu, mesaj alanları
+// Enes Doğanay | 14 Mayıs 2026: Telefon alanı eklendi (İsteğe bağlı)
 import React from 'react';
 
 const IletisimForm = ({ formData, status, handleChange, handleSubmit }) => (
@@ -14,9 +15,14 @@ const IletisimForm = ({ formData, status, handleChange, handleSubmit }) => (
                     <label htmlFor="company">Şirket Adı</label>
                     <input id="company" name="company" placeholder="Şirketinizin adı" type="text" className="contact-form-control" value={formData.company} onChange={handleChange} />
                 </div>
-                <div className="contact-form-group full-width">
+                <div className="contact-form-group">
                     <label htmlFor="email">E-posta</label>
                     <input id="email" name="email" placeholder="ornek@sirket.com" type="email" required className="contact-form-control" value={formData.email} onChange={handleChange} />
+                </div>
+                {/* Enes Doğanay | 14 Mayıs 2026: İsteğe bağlı telefon alanı */}
+                <div className="contact-form-group">
+                    <label htmlFor="phone">Telefon <span style={{ fontWeight: 400, textTransform: 'none', color: 'var(--text-muted)', fontSize: '0.74rem' }}>(isteğe bağlı)</span></label>
+                    <input id="phone" name="phone" placeholder="+90 5__ ___ __ __" type="tel" className="contact-form-control" value={formData.phone} onChange={handleChange} />
                 </div>
                 <div className="contact-form-group full-width">
                     <label htmlFor="subject">Konu</label>

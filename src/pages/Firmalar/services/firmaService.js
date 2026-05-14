@@ -186,14 +186,8 @@ export const fetchSenderFirmaAdi = async (managedId) => {
   return data?.firma_adi || '';
 };
 
+// Enes Doğanay | 14 Mayıs 2026: gonderen_firma_id kaldırıldı — teklif talebi her zaman bireysel gönderilir, şirket adına değil
 export const sendQuoteRequest = async ({ supplier, form, file, userId, userProfile }) => {
-  let senderFirmaId = null;
-  let senderFirmaAdi = '';
-  const managedId = await getManagedCompanyId();
-  if (managedId) {
-    senderFirmaId = managedId;
-    senderFirmaAdi = await fetchSenderFirmaAdi(managedId);
-  }
   let ekDosyaUrl = null;
   let ekDosyaAdi = null;
   if (file) {
@@ -204,14 +198,16 @@ export const sendQuoteRequest = async ({ supplier, form, file, userId, userProfi
   const { error } = await supabase.from('teklif_talepleri').insert([{
     firma_id: String(supplier.id),
     user_id: userId,
-    gonderen_firma_id: senderFirmaId,
+    gonderen_firma_id: null,
     ad_soyad: `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim(),
     email: userProfile?.email || '',
     telefon: '',
-    firma_adi: senderFirmaAdi,
+    firma_adi: '',
+    // Enes Doğanay | 14 Mayıs 2026: firma_adi boş — bireysel talep, şirket adı gösterilmez
     konu: form.konu.trim(),
     mesaj: form.mesaj.trim(),
-    miktar: form.miktar?.trim() || null,
+    // Enes Doğanay | 14 Mayıs 2026: Kalemler JSONB alanı — miktar kaldırıldı
+    kalemler: form.kalemler?.length ? form.kalemler : null,
     teslim_tarihi: form.teslim_tarihi || null,
     teslim_yeri: form.teslim_yeri || null,
     ek_dosya_url: ekDosyaUrl,

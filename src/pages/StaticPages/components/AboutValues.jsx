@@ -7,7 +7,7 @@ const AboutValues = () => (
         <div className="about-container">
             <div className="about-section-header">
                 <h2>Misyon &amp; Vizyon</h2>
-                <p>Bizi bu işe iten neden ve hedeflediğimiz yer.</p>
+                <p>Tedport&apos;u inşa ederken bize yol gösteren temel amaç ve uzun vadeli hedefimiz.</p>
             </div>
             <div className="about-values-grid">
                 <div className="about-value-card">
@@ -15,7 +15,7 @@ const AboutValues = () => (
                         <span className="material-symbols-outlined">target</span>
                     </div>
                     <h3>Misyonumuz</h3>
-                    <p>Türkiye'deki firmaların doğru tedarikçiye, doğru müşteriye ve doğru iş fırsatına daha kısa sürede ulaşmasını sağlamak. Satınalma ve satış süreçlerini merkezi, şeffaf ve ölçülebilir hale getirmek.</p>
+                    <p>Türkiye&apos;deki firmaların doğru çözüm ortaklarına, doğru müşterilere ve yeni iş fırsatlarına daha hızlı ulaşmasını sağlamak. Satınalma, teklif ve iş geliştirme süreçlerini daha verimli, ölçülebilir ve erişilebilir hale getirmek.</p>
                     <div className="about-value-glow glow-blue"></div>
                 </div>
                 <div className="about-value-card">
@@ -23,7 +23,7 @@ const AboutValues = () => (
                         <span className="material-symbols-outlined">visibility</span>
                     </div>
                     <h3>Vizyonumuz</h3>
-                    <p>Türkiye'nin en çok tercih edilen B2B dijital ticaret ağı olmak. Satınalma profesyonelleri, satış ekipleri ve tedarikçi firmalar için tek adres — yazılım şirketi değil, ekosistem kurucusu.</p>
+                    <p>Türkiye&apos;nin en çok tercih edilen B2B çözüm ortaklığı platformu olmak. Firmaların yalnızca bağlantı kurduğu değil; birlikte büyüdüğü, iş geliştirdiği ve uzun vadeli iş birlikleri oluşturduğu güçlü bir ekosistem inşa etmek.</p>
                     <div className="about-value-glow glow-purple"></div>
                 </div>
             </div>

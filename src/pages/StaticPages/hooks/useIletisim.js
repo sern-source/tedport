@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { submitContactForm } from '../services/iletisimService';
 
 // Enes Doğanay | 6 Mayıs 2026: Boş form sabiti
-const EMPTY_FORM = { name: '', company: '', email: '', subject: '', message: '' };
+const EMPTY_FORM = { name: '', company: '', email: '', phone: '', subject: '', message: '' };
 
 // Enes Doğanay | 6 Mayıs 2026: Form state, handler'lar ve submit mantığı
 export const useIletisim = () => {

@@ -37,60 +37,98 @@ const QuoteChatView = ({
         <span className="material-symbols-outlined">arrow_back</span> Teklif Listesine Dön
       </button>
 
-      <div className="quote-chat-header-card">
-        <div className="quote-chat-header-top">
-          <div>
-            <h2>{activeQuote.konu}</h2>
-            {activeQuote.firma_id ? (
-              <p className="quote-chat-firma">
-                <button
-                  className="quote-chat-sender-btn"
-                  onClick={() => navigate(`/firmadetay/${activeQuote.firma_id}`)}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>storefront</span>
+      {/* Enes Doğanay | 14 Mayıs 2026: Yeniden tasarlanmış talep kart başlığı — IhaleOfferCard stiliyle */}
+      <div className="qcv-card">
+        <div className="qcv-card__bar" />
+        <div className="qcv-card__body">
+          <div className="qcv-card__top">
+            <div className="qcv-card__title-wrap">
+              <h2 className="qcv-card__title">
+                <span className="material-symbols-outlined">request_quote</span>
+                {activeQuote.konu}
+              </h2>
+              {activeQuote.firma_id ? (
+                <button className="qcv-card__firma-btn" onClick={() => navigate(`/firmadetay/${activeQuote.firma_id}`)}>
+                  <span className="material-symbols-outlined">storefront</span>
                   {activeQuote._firma_adi}
-                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>open_in_new</span>
+                  <span className="material-symbols-outlined qcv-card__ext-icon">open_in_new</span>
                 </button>
-              </p>
-            ) : (
-              <p className="quote-chat-firma">{activeQuote._firma_adi}</p>
-            )}
-          </div>
-          <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>
-            {STATUS_MAP[displayDurum] || 'Beklemede'}
-          </span>
-        </div>
-        <div className="quote-chat-meta">
-          {activeQuote.miktar && (
-            <span className="my-quote-tag"><strong>Miktar:</strong> {activeQuote.miktar}</span>
-          )}
-          {activeQuote.teslim_tarihi && (
-            <span className="my-quote-tag">
-              <strong>Talep Edilen Teslim Tarihi:</strong>{' '}
-              {new Date(activeQuote.teslim_tarihi).toLocaleDateString('tr-TR')}
-            </span>
-          )}
-          {activeQuote.teslim_yeri && (
-            <span className="my-quote-tag"><strong>Teslim Yeri:</strong> {activeQuote.teslim_yeri}</span>
-          )}
-        </div>
-        {activeQuote.ek_dosya_url && activeQuote.ek_dosya_adi && (
-          <div className="quote-chat-attachment" onClick={handleOpenAttachment}>
-            <div className="quote-chat-attachment-icon">
-              <span className="material-symbols-outlined">description</span>
+              ) : (
+                <span className="qcv-card__firma-btn">{activeQuote._firma_adi}</span>
+              )}
             </div>
-            <div className="quote-chat-attachment-info">
-              <span className="quote-chat-attachment-name">{activeQuote.ek_dosya_adi}</span>
-              <span className="quote-chat-attachment-hint">Eki görüntülemek için tıklayın</span>
-            </div>
-            <span className="quote-chat-attachment-open">
-              <span className="material-symbols-outlined">open_in_new</span>
+            <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>
+              {STATUS_MAP[displayDurum] || 'Beklemede'}
             </span>
           </div>
-        )}
-        <div className="quote-chat-initial-msg">
-          <small>Talep Detayları</small>
-          <p>{activeQuote.mesaj}</p>
+
+          {(activeQuote.teslim_tarihi || activeQuote.teslim_yeri) && (
+            <div className="qcv-card__meta">
+              {activeQuote.teslim_tarihi && (
+                <span className="qcv-meta-tag">
+                  <span className="material-symbols-outlined">calendar_today</span>
+                  <span><strong>Talep Edilen Teslim:</strong> {new Date(activeQuote.teslim_tarihi).toLocaleDateString('tr-TR')}</span>
+                </span>
+              )}
+              {activeQuote.teslim_yeri && (
+                <span className="qcv-meta-tag">
+                  <span className="material-symbols-outlined">location_on</span>
+                  <span><strong>Teslim Yeri:</strong> {activeQuote.teslim_yeri}</span>
+                </span>
+              )}
+            </div>
+          )}
+
+          {Array.isArray(activeQuote.kalemler) && activeQuote.kalemler.length > 0 && (
+            <div className="qcv-kalemler">
+              <h4>
+                <span className="material-symbols-outlined">list_alt</span>
+                Talep Kalemleri ({activeQuote.kalemler.length})
+              </h4>
+              <div className="qcv-kalemler__wrap">
+                <table>
+                  <thead>
+                    <tr><th>#</th><th>Miktar</th><th>Kalem</th><th>Açıklama</th></tr>
+                  </thead>
+                  <tbody>
+                    {activeQuote.kalemler.map((k, i) => (
+                      <tr key={i}>
+                        <td>{i + 1}</td>
+                        <td>{k.adet}{k.birim && <span className="qcv-birim-badge">{k.birim}</span>}</td>
+                        <td><strong>{k.madde}</strong></td>
+                        <td>{k.aciklama || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeQuote.mesaj && (
+            <div className="qcv-detail-msg">
+              <small>
+                <span className="material-symbols-outlined">notes</span>
+                Talep Detayları
+              </small>
+              <p>{activeQuote.mesaj}</p>
+            </div>
+          )}
+
+          {activeQuote.ek_dosya_url && activeQuote.ek_dosya_adi && (
+            <div className="quote-chat-attachment" onClick={handleOpenAttachment}>
+              <div className="quote-chat-attachment-icon">
+                <span className="material-symbols-outlined">description</span>
+              </div>
+              <div className="quote-chat-attachment-info">
+                <span className="quote-chat-attachment-name">{activeQuote.ek_dosya_adi}</span>
+                <span className="quote-chat-attachment-hint">Eki görüntülemek için tıklayın</span>
+              </div>
+              <span className="quote-chat-attachment-open">
+                <span className="material-symbols-outlined">open_in_new</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

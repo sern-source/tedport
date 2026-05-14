@@ -1,5 +1,6 @@
 /* Enes Doğanay | 6 Mayıs 2026: QuoteChatView — sayfa seviyesi stiller */
 /* Chat stilleri: src/components/QuoteChatShared.css */
+/* qcv-card stilleri: src/components/QuoteChatShared.css */
 
 .quotes-section {
   display: flex;

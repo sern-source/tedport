@@ -89,6 +89,13 @@ const TendersListView = ({
                     </span>
                     <span className="tenders-list-col tenders-list-col--baslik">
                         {isNew && <span className="tenders-list-new-badge">Yeni</span>}
+                        {/* Enes Doğanay | 14 Mayıs 2026: Davetli ihale rozeti */}
+                        {tender._isInvited && (
+                            <span className="tenders-list-invite-badge">
+                                <span className="material-symbols-outlined">mark_email_read</span>
+                                Davetli
+                            </span>
+                        )}
                         {tender.baslik}
                     </span>
                     <span className="tenders-list-col tenders-list-col--konum">{[tender.teslim_il, tender.teslim_ilce].filter(Boolean).join(' / ') || '—'}</span>

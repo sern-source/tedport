@@ -31,116 +31,187 @@ const QuoteChatHeader = ({
     if (url) window.open(url, '_blank');
   };
 
+  /* Enes Doğanay | 14 Mayıs 2026: gönderen/alıcı bilgisi */
+  const senderLabel = isIncoming
+    ? (q.ad_soyad || q.email || 'Bilinmiyor')
+    : (q._alici_firma_adi || 'Firma');
+  const firmaLabel = q.firma_adi ? ` • ${q.firma_adi}` : '';
+  const hasKalemler = Array.isArray(q.kalemler) && q.kalemler.length > 0;
+
   return (
-    <div className="quote-chat-header-card">
-      <div className="quote-chat-header-top">
-        <div>
-          <h2>{q.konu}</h2>
-          <p className="quote-chat-firma">
+    <div className="qcv-card">
+      <div className="qcv-card__bar" />
+      <div className="qcv-card__body">
+        {/* Başlık ve durum */}
+        <div className="qcv-card__top">
+          <div className="qcv-card__title-wrap">
+            <h2 className="qcv-card__title">
+              <span className="material-symbols-outlined">request_quote</span>
+              {q.konu}
+            </h2>
             {isIncoming ? (
               <button
-                className="quote-chat-sender-btn"
+                className="qcv-card__firma-btn"
                 onClick={() => handleOpenQuoteContact(q)}
                 data-tooltip="Profili Görüntüle"
                 aria-label="Profili Görüntüle"
               >
-                {q.ad_soyad}
+                <span className="material-symbols-outlined">person</span>
+                {senderLabel}{firmaLabel}
+                <span className="material-symbols-outlined qcv-card__ext-icon">open_in_new</span>
               </button>
             ) : (
-              q._alici_firma_adi || 'Firma'
+              <span className="qcv-card__firma-btn" style={{ cursor: 'default' }}>
+                <span className="material-symbols-outlined">storefront</span>
+                {senderLabel}{firmaLabel}
+              </span>
             )}
-            {q.firma_adi ? ` • ${q.firma_adi}` : ''}
-          </p>
-        </div>
-        <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>{st}</span>
-      </div>
-      <div className="quote-chat-meta">
-        {isIncoming && <span className="my-quote-tag"><strong>E-posta:</strong> {q.email}</span>}
-        {q.miktar && <span className="my-quote-tag"><strong>Miktar:</strong> {q.miktar}</span>}
-        {q.teslim_tarihi && (
-          <span className="my-quote-tag">
-            <strong>Talep Edilen Teslim Tarihi:</strong>{' '}
-            {new Date(q.teslim_tarihi).toLocaleDateString('tr-TR')}
-          </span>
-        )}
-        {q.teslim_yeri && (
-          <span className="my-quote-tag"><strong>Teslim Yeri:</strong> {q.teslim_yeri}</span>
-        )}
-      </div>
-      {q.ek_dosya_url && q.ek_dosya_adi && (
-        <div className="quote-chat-attachment" onClick={handleOpenAttachment}>
-          <div className="quote-chat-attachment-icon">
-            <span className="material-symbols-outlined">description</span>
           </div>
-          <div className="quote-chat-attachment-info">
-            <span className="quote-chat-attachment-name">{q.ek_dosya_adi}</span>
-            <span className="quote-chat-attachment-hint">Eki görüntülemek için tıklayın</span>
-          </div>
-          <span className="quote-chat-attachment-open">
-            <span className="material-symbols-outlined">open_in_new</span>
-          </span>
+          <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>{st}</span>
         </div>
-      )}
-      <div className="quote-chat-initial-msg">
-        <small>Talep detayları</small>
-        <p>{q.mesaj}</p>
-      </div>
-      {isIncoming && (
-        <div className="cmp-quote-actions" style={{ marginTop: '12px' }}>
-          {q.durum !== 'rejected' && q.durum !== 'closed' && (
-            confirmRejectQuoteId === q.id ? (
-              <div className="cmp-quote-delete-confirm" style={{ display: 'inline-flex' }}>
-                <span>Reddetmek istediğinize emin misiniz?</span>
-                <button
-                  className="cmp-quote-delete-btn cmp-quote-delete-btn--yes"
-                  onClick={() => handleQuoteStatusChange(q.id, 'rejected')}
-                >
-                  Evet
-                </button>
-                <button
-                  className="cmp-quote-delete-btn cmp-quote-delete-btn--no"
-                  onClick={() => setConfirmRejectQuoteId(null)}
-                >
-                  Hayır
-                </button>
-              </div>
-            ) : (
-              <button
-                className="cmp-btn cmp-btn--sm cmp-btn--rejected"
-                onClick={() => setConfirmRejectQuoteId(q.id)}
-              >
-                <span className="material-symbols-outlined">close</span> Reddet
-              </button>
-            )
+        {/* Meta etiketler */}
+        <div className="qcv-card__meta">
+          {isIncoming && q.email && (
+            <span className="qcv-meta-tag">
+              <span className="material-symbols-outlined">mail</span>
+              <strong>E-posta:</strong> {q.email}
+            </span>
           )}
-          {q.durum !== 'closed' && q.durum !== 'rejected' && !confirmRejectQuoteId && (
-            confirmCloseQuoteId === q.id ? (
-              <div className="cmp-quote-delete-confirm" style={{ display: 'inline-flex' }}>
-                <span>Sonlandırmak istediğinize emin misiniz?</span>
-                <button
-                  className="cmp-quote-delete-btn cmp-quote-delete-btn--yes"
-                  onClick={() => { handleQuoteStatusChange(q.id, 'closed'); setConfirmCloseQuoteId(null); }}
-                >
-                  Evet
-                </button>
-                <button
-                  className="cmp-quote-delete-btn cmp-quote-delete-btn--no"
-                  onClick={() => setConfirmCloseQuoteId(null)}
-                >
-                  Hayır
-                </button>
-              </div>
-            ) : (
-              <button
-                className="cmp-btn cmp-btn--sm cmp-btn--closed"
-                onClick={() => setConfirmCloseQuoteId(q.id)}
-              >
-                <span className="material-symbols-outlined">archive</span> Görüşmeyi Sonlandır
-              </button>
-            )
+          {q.miktar && (
+            <span className="qcv-meta-tag">
+              <span className="material-symbols-outlined">inventory_2</span>
+              <strong>Miktar:</strong> {q.miktar}
+            </span>
+          )}
+          {q.teslim_tarihi && (
+            <span className="qcv-meta-tag">
+              <span className="material-symbols-outlined">calendar_today</span>
+              <strong>Teslim Tarihi:</strong>{' '}
+              {new Date(q.teslim_tarihi).toLocaleDateString('tr-TR')}
+            </span>
+          )}
+          {q.teslim_yeri && (
+            <span className="qcv-meta-tag">
+              <span className="material-symbols-outlined">location_on</span>
+              <strong>Teslim Yeri:</strong> {q.teslim_yeri}
+            </span>
           )}
         </div>
-      )}
+        {/* Talep kalemleri tablosu */}
+        {hasKalemler && (
+          <div className="qcv-kalemler">
+            <h4>
+              <span className="material-symbols-outlined">checklist</span>
+              Talep Kalemleri
+            </h4>
+            <div className="qcv-kalemler__wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Miktar</th>
+                    <th>Kalem</th>
+                    <th>Açıklama</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {q.kalemler.map((k, i) => (
+                    <tr key={i}>
+                      <td>{i + 1}</td>
+                      <td>
+                        <strong>{k.adet}</strong>
+                        {k.birim && <span className="qcv-birim-badge">{k.birim}</span>}
+                      </td>
+                      <td><strong>{k.madde}</strong></td>
+                      <td>{k.aciklama || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        {/* Ek dosya */}
+        {q.ek_dosya_url && q.ek_dosya_adi && (
+          <div className="quote-chat-attachment" onClick={handleOpenAttachment}>
+            <div className="quote-chat-attachment-icon">
+              <span className="material-symbols-outlined">description</span>
+            </div>
+            <div className="quote-chat-attachment-info">
+              <span className="quote-chat-attachment-name">{q.ek_dosya_adi}</span>
+              <span className="quote-chat-attachment-hint">Eki görüntülemek için tıklayın</span>
+            </div>
+            <span className="quote-chat-attachment-open">
+              <span className="material-symbols-outlined">open_in_new</span>
+            </span>
+          </div>
+        )}
+        {/* Talep mesajı */}
+        <div className="qcv-detail-msg">
+          <small>
+            <span className="material-symbols-outlined">notes</span>
+            Talep Detayları
+          </small>
+          <p>{q.mesaj}</p>
+        </div>
+        {/* Gelen talep aksiyonları */}
+        {isIncoming && (
+          <div className="cmp-quote-actions" style={{ marginTop: '4px' }}>
+            {q.durum !== 'rejected' && q.durum !== 'closed' && (
+              confirmRejectQuoteId === q.id ? (
+                <div className="cmp-quote-delete-confirm" style={{ display: 'inline-flex' }}>
+                  <span>Reddetmek istediğinize emin misiniz?</span>
+                  <button
+                    className="cmp-quote-delete-btn cmp-quote-delete-btn--yes"
+                    onClick={() => handleQuoteStatusChange(q.id, 'rejected')}
+                  >
+                    Evet
+                  </button>
+                  <button
+                    className="cmp-quote-delete-btn cmp-quote-delete-btn--no"
+                    onClick={() => setConfirmRejectQuoteId(null)}
+                  >
+                    Hayır
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="cmp-btn cmp-btn--sm cmp-btn--rejected"
+                  onClick={() => setConfirmRejectQuoteId(q.id)}
+                >
+                  <span className="material-symbols-outlined">close</span> Reddet
+                </button>
+              )
+            )}
+            {q.durum !== 'closed' && q.durum !== 'rejected' && !confirmRejectQuoteId && (
+              confirmCloseQuoteId === q.id ? (
+                <div className="cmp-quote-delete-confirm" style={{ display: 'inline-flex' }}>
+                  <span>Sonlandırmak istediğinize emin misiniz?</span>
+                  <button
+                    className="cmp-quote-delete-btn cmp-quote-delete-btn--yes"
+                    onClick={() => { handleQuoteStatusChange(q.id, 'closed'); setConfirmCloseQuoteId(null); }}
+                  >
+                    Evet
+                  </button>
+                  <button
+                    className="cmp-quote-delete-btn cmp-quote-delete-btn--no"
+                    onClick={() => setConfirmCloseQuoteId(null)}
+                  >
+                    Hayır
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="cmp-btn cmp-btn--sm cmp-btn--closed"
+                  onClick={() => setConfirmCloseQuoteId(q.id)}
+                >
+                  <span className="material-symbols-outlined">archive</span> Görüşmeyi Sonlandır
+                </button>
+              )
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

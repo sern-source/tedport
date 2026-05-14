@@ -213,6 +213,52 @@
 .tom-info-card__file-btn:hover { background: #dbeafe; border-color: #93c5fd; transform: translateY(-1px); }
 .tom-info-card__file-btn .material-symbols-outlined { font-size: 16px; }
 
+/* Enes Doğanay | 14 Mayıs 2026: İhale kalemleri — info card içi */
+.tom-info-gereksinimler {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+}
+.tom-info-gereksinimler h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+    margin: 0 0 8px;
+}
+.tom-info-gereksinimler h4 .material-symbols-outlined { font-size: 17px; color: #3b82f6; }
+.tom-info-gereksinimler__wrap {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.tom-info-gereksinimler__wrap table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.73rem;
+}
+.tom-info-gereksinimler__wrap thead { background: #f8fafc; }
+.tom-info-gereksinimler__wrap th {
+    padding: 5px 8px;
+    text-align: left;
+    font-size: 0.67rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #e2e8f0;
+}
+.tom-info-gereksinimler__wrap td {
+    padding: 5px 8px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+.tom-info-gereksinimler__wrap td strong { font-weight: 600; color: #0f172a; }
+.tom-info-gereksinimler__wrap tbody tr:last-child td { border-bottom: none; }
+.tom-info-gereksinimler__wrap tbody tr:nth-child(even) { background: #f8fafc; }
+
 /* ═══════════════════════════════════════════════════
    TEKLİFLER BÖLÜMÜ
    ═══════════════════════════════════════════════════ */

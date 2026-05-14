@@ -445,6 +445,34 @@
 [data-theme="dark"] .tenders-list-new-badge {
     background: #1d4ed8;
 }
+
+/* Enes Doğanay | 14 Mayıs 2026: Davetli ihale rozeti — liste görünümü */
+.tenders-list-invite-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 7px 1px 5px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #6d28d9, #7c3aed);
+    color: #ede9fe;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.tenders-list-invite-badge .material-symbols-outlined {
+    font-size: 0.85rem;
+}
+[data-theme="dark"] .tenders-list-invite-badge {
+    background: linear-gradient(135deg, #5b21b6, #6d28d9);
+    color: #f5f3ff;
+}
+
+@media (max-width: 768px) {
+    .tenders-list-invite-badge { font-size: 0.56rem; padding: 1px 5px; }
+}
 [data-theme="dark"] .tenders-list-col--firma { color: #60a5fa; }
 [data-theme="dark"] .tenders-list-col--firma:hover { color: #93c5fd; }
 

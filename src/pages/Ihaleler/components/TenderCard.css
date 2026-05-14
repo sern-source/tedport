@@ -680,3 +680,59 @@
     .tender-card__info-label { min-width: 50px; }
     .tender-action { font-size: 0.72rem; padding: 5px 10px; }
 }
+
+/* ─── Enes Doğanay | 14 Mayıs 2026: Davetli İhale Bandı ─── */
+.tender-card__invite-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 55%, #8b5cf6 100%);
+    color: #ede9fe;
+    font-size: 0.71rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle shimmer sweep */
+.tender-card__invite-banner::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+    animation: inviteBannerShimmer 3s ease-in-out infinite;
+}
+
+@keyframes inviteBannerShimmer {
+    0%   { left: -60%; }
+    60%  { left: 120%; }
+    100% { left: 120%; }
+}
+
+.tender-card__invite-banner .material-symbols-outlined {
+    font-size: 1rem;
+    color: #c4b5fd;
+}
+
+/* Dark mode */
+[data-theme="dark"] .tender-card__invite-banner {
+    background: linear-gradient(135deg, #3b0764 0%, #5b21b6 55%, #7c3aed 100%);
+    color: #f5f3ff;
+}
+[data-theme="dark"] .tender-card__invite-banner .material-symbols-outlined {
+    color: #ddd6fe;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .tender-card__invite-banner {
+        font-size: 0.66rem;
+        padding: 6px 10px;
+    }
+}

@@ -50,15 +50,20 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
         }
         const existing = userOffers[String(tender.id)];
         if (existing) {
-            const loadedKalemler = Array.isArray(existing.kalemler) ? existing.kalemler.map(k => ({ ...k, para_birimi: k.para_birimi || existing.para_birimi || 'TRY' })) : [];
-            // Enes Doğanay | 12 Mayıs 2026: formData — snapshot + state aynı nesne ile başlat
+            // Enes Doğanay | 14 Mayıs 2026: Numeric alanlar string'e normalize edilir — dirty karşılaştırması için tip tutarlılığı
+            const loadedKalemler = Array.isArray(existing.kalemler) ? existing.kalemler.map(k => ({
+                ...k,
+                birim_fiyat: k.birim_fiyat !== undefined && k.birim_fiyat !== null ? String(k.birim_fiyat) : '',
+                miktar: k.miktar !== undefined && k.miktar !== null ? String(k.miktar) : '1',
+                para_birimi: k.para_birimi || existing.para_birimi || 'TRY',
+            })) : [];
             const formData = { kalemler: loadedKalemler, genel_toplam: existing.toplam_tutar ? String(existing.toplam_tutar) : '', para_birimi: existing.para_birimi || 'TRY', kdv_dahil: existing.kdv_dahil || false, teslim_suresi_gun: existing.teslim_suresi_gun ? String(existing.teslim_suresi_gun) : '', teslim_aciklamasi: existing.teslim_aciklamasi || '', not: existing.not_field || '' };
             setTeklifForm(formData);
             setOriginalTeklifForm(formData);
         } else {
             const gereksinimler = Array.isArray(tender.gereksinimler) ? tender.gereksinimler : [];
-            // Enes Doğanay | 9 Mayıs 2026: Miktar varsayılanı gereksinim adetinden gelir
-            const kalemler = gereksinimler.map(g => ({ gereksinim_id: g.id, madde: g.madde, birim_fiyat: '', miktar: String(g.adet || 1), aciklama: '', para_birimi: 'TRY' }));
+            // Enes Doğanay | 14 Mayıs 2026: Birim de ihaledeki gereksinim verisinden gelir
+            const kalemler = gereksinimler.map(g => ({ gereksinim_id: g.id, madde: g.madde, birim: g.birim || '', birim_fiyat: '', miktar: String(g.adet || 1), aciklama: '', para_birimi: 'TRY' }));
             setTeklifForm({ kalemler, genel_toplam: '', para_birimi: 'TRY', kdv_dahil: tender.kdv_durumu === 'dahil', teslim_suresi_gun: '', teslim_aciklamasi: '', not: '' });
             setOriginalTeklifForm(null);
         }
@@ -83,9 +88,11 @@ const useTeklifActions = ({ userProfile, authManagedCompanyId, managedCompanyNam
     // Enes Doğanay | 7 Mayıs 2026: Submit / silme / geri çekme — ayrı hook
     const submitActions = useTeklifSubmitActions({ formState, userOffers, setUserOffers, authManagedCompanyId, managedCompanyName, userProfile });
 
-    // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — tüm form değişikliklerini izler
+    // Enes Doğanay | 14 Mayıs 2026: Dirty tracking — JSON karşılaştırması, geri alınca buton tekrar deaktif olur
+    // formData oluşturulurken numeric alanlar string'e normalize edildi, bu yüzden tip uyuşmazlığı olmaz
     const isTeklifDirty = useMemo(() => {
         if (!formState.originalTeklifForm) return true;
+        if (formState.teklifForm === formState.originalTeklifForm) return false;
         const formChanged = JSON.stringify(formState.teklifForm) !== JSON.stringify(formState.originalTeklifForm);
         return formChanged || formState.teklifDosya !== null;
     }, [formState.teklifForm, formState.originalTeklifForm, formState.teklifDosya]);

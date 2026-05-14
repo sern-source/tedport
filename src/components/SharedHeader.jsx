@@ -34,6 +34,8 @@ const SharedHeader = ({
     const [searchFocused, setSearchFocused] = useState(false);
     const dropdownRef = useRef(null);
     const searchBarRef = useRef(null);
+    // Enes Doğanay | 14 Mayıs 2026: Mobil menü dışarı tıklayınca kapansın
+    const headerRef = useRef(null);
     // Enes Doğanay | 13 Nisan 2026: ref ile stabilize — useEffect dependency sorunu önlenir
     const onSuggestionClickRef = useRef(onSuggestionClick);
     onSuggestionClickRef.current = onSuggestionClick;
@@ -50,6 +52,18 @@ const SharedHeader = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Enes Doğanay | 14 Mayıs 2026: Mobil menü açıkken header dışına tıklayınca kapat
+    useEffect(() => {
+        if (!isMobileMenuOpen) return;
+        const closeMobileMenu = (e) => {
+            if (headerRef.current && !headerRef.current.contains(e.target)) {
+                setIsMobileMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', closeMobileMenu);
+        return () => document.removeEventListener('mousedown', closeMobileMenu);
+    }, [isMobileMenuOpen]);
+
     const handleLogout = async () => {
         await logout();
         setIsDropdownOpen(false);
@@ -61,7 +75,7 @@ const SharedHeader = ({
     const isHomePage = location.pathname === '/';
 
     return (
-        <header className="shared-header">
+        <header className="shared-header" ref={headerRef}>
             <div className="shared-header-inner">
                 {/* Enes Doğanay | 14 Nisan 2026: Sol grup — geri butonu + logo */}
                 <div className="shared-header-left">

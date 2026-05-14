@@ -55,8 +55,9 @@ const IhaleOfferCard = ({ offer, idx, isExpanded, isCompare, compareCount, isHig
                         {kalemler.length > 0 && (
                             <div className="tom-kalemler"><h4><span className="material-symbols-outlined">list_alt</span>Teklif Kalemleri ({kalemler.length})</h4>
                                 <div className="tom-kalemler__wrap">
-                                    <table><thead><tr><th>Madde</th><th>Miktar</th><th>Birim Fiyat</th><th>Toplam</th><th>Açıklama</th></tr></thead>
-                                        <tbody>{kalemler.map((k, i) => { const kCur = k.para_birimi || offer.para_birimi || 'TRY'; const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0); return (<tr key={k.madde ? `${i}-${k.madde}` : i}><td><strong>{k.madde || '—'}</strong></td><td>{k.miktar || '—'}</td><td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td><td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td><td>{k.aciklama || k.not || '—'}</td></tr>); })}</tbody>
+                                    {/* Enes Doğanay | 14 Mayıs 2026: Sıralama MIKTAR | KALEM — birim badge MIKTAR hücresinde */}
+                                    <table><thead><tr><th>Miktar</th><th>Kalem</th><th>Birim Fiyat</th><th>Toplam</th><th>Açıklama</th></tr></thead>
+                                        <tbody>{kalemler.map((k, i) => { const kCur = k.para_birimi || offer.para_birimi || 'TRY'; const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0); return (<tr key={k.madde ? `${i}-${k.madde}` : i}><td>{k.miktar || '—'}{k.birim && <span className="tom-kalem-birim-badge">{k.birim}</span>}</td><td><strong>{k.madde || '—'}</strong></td><td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td><td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td><td>{k.aciklama || k.not || '—'}</td></tr>); })}</tbody>
                                     </table>
                                 </div>
                             </div>

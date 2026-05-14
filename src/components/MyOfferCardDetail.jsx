@@ -93,7 +93,8 @@ const MyOfferCardDetail = ({
                     <h4><span className="material-symbols-outlined">list_alt</span>Teklif Kalemleri ({kalemler.length})</h4>
                     <div className="mop-kalemler__wrap">
                         <table>
-                            <thead><tr><th>Madde</th><th>Miktar</th><th>Birim Fiyat</th><th>Toplam</th></tr></thead>
+                            {/* Enes Doğanay | 14 Mayıs 2026: Sıralama MIKTAR | KALEM — birim badge MIKTAR hücresinde */}
+                            <thead><tr><th>Miktar</th><th>Kalem</th><th>Birim Fiyat</th><th>Toplam</th></tr></thead>
                             <tbody>
                                 {kalemler.map((k, i) => {
                                     const kCur = k.para_birimi || offer.para_birimi || 'TRY';
@@ -101,8 +102,8 @@ const MyOfferCardDetail = ({
                                     // Enes Doğanay | 8 Mayıs 2026: index as key kaldırıldı — composite key kullanılıyor
                                     return (
                                         <tr key={`${i}-${k.madde || 'kalem'}`}>
+                                            <td>{k.miktar || '—'}{k.birim && <span className="mop-kalem-birim-badge">{k.birim}</span>}</td>
                                             <td><strong>{k.madde || '—'}</strong></td>
-                                            <td>{k.miktar || '—'}</td>
                                             <td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td>
                                             <td>{kTotal ? formatMoney(kTotal, kCur) : '—'}</td>
                                         </tr>

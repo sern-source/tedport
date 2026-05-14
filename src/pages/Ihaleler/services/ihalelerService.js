@@ -43,16 +43,28 @@ export const fetchPublicTenders = async ({ page = 1, firmaFilter, statusFilter =
     let query = supabase
         .from('firma_ihaleleri')
         .select('*', { count: 'exact' })
-        .neq('durum', 'draft');
+        .neq('durum', 'draft')
+        // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler genel listeden gizlenir
+        .neq('ihale_tipi', 'Davetli İhale');
 
     if (firmaFilter) query = query.eq('firma_id', firmaFilter);
 
-    // Durum filtresi
+    // Enes Doğanay | 14 Mayıs 2026: Durum filtresi — tarih koşulları eklendi
     if (statusFilter === 'acil') {
-        // Enes Doğanay | 13 Mayıs 2026: acil = canli + son 3 gün içinde biten
         const now       = new Date().toISOString();
         const threeDays = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
         query = query.eq('durum', 'canli').gt('son_basvuru_tarihi', now).lt('son_basvuru_tarihi', threeDays);
+    } else if (statusFilter === 'canli') {
+        // Canlı = durum 'canli' + yayında (yayin_tarihi geçmiş) + son tarih geçmemiş
+        const now = new Date().toISOString();
+        query = query
+            .eq('durum', 'canli')
+            .or(`yayin_tarihi.is.null,yayin_tarihi.lte.${now}`)
+            .or(`son_basvuru_tarihi.is.null,son_basvuru_tarihi.gt.${now}`);
+    } else if (statusFilter === 'yaklasan') {
+        // Yaklaşan = DB'de 'yaklasan' VEYA 'canli' ama henüz yayınlanmamış (yayin_tarihi > şimdi)
+        const now = new Date().toISOString();
+        query = query.or(`durum.eq.yaklasan,and(durum.eq.canli,yayin_tarihi.gt.${now})`);
     } else if (statusFilter && statusFilter !== 'all') {
         query = query.eq('durum', statusFilter);
     }
@@ -103,14 +115,21 @@ export const fetchTenderCounts = async ({ firmaFilter } = {}) => {
         let q = supabase
             .from('firma_ihaleleri')
             .select('*', { count: 'exact', head: true })
-            .neq('durum', 'draft');
+            .neq('durum', 'draft')
+            // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler sayaçlara dahil edilmez
+            .neq('ihale_tipi', 'Davetli İhale');
         if (firmaFilter) q = q.eq('firma_id', firmaFilter);
         return q;
     };
 
+    // Enes Doğanay | 14 Mayıs 2026: Sayaçlar tarih koşullarıyla hizalandı
+    const now = new Date().toISOString();
     const [canliRes, yaklaşanRes, kapaliRes] = await Promise.all([
-        makeBase().eq('durum', 'canli'),
-        makeBase().eq('durum', 'yaklasan'),
+        makeBase()
+            .eq('durum', 'canli')
+            .or(`yayin_tarihi.is.null,yayin_tarihi.lte.${now}`)
+            .or(`son_basvuru_tarihi.is.null,son_basvuru_tarihi.gt.${now}`),
+        makeBase().or(`durum.eq.yaklasan,and(durum.eq.canli,yayin_tarihi.gt.${now})`),
         makeBase().eq('durum', 'kapali').or('kapali_gorunurluk.is.null,kapali_gorunurluk.neq.gizle'),
     ]);
 
@@ -119,4 +138,59 @@ export const fetchTenderCounts = async ({ firmaFilter } = {}) => {
         upcomingCount: yaklaşanRes.count ?? 0,
         closedCount:   kapaliRes.count   ?? 0,
     };
+};
+
+// Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler — sadece davetli email/firma için
+export const fetchInvitedTenders = async (email, firmaId) => {
+    if (!email && !firmaId) return [];
+    const queries = [];
+
+    if (email) {
+        const safeEmail = email.trim().toLowerCase();
+        queries.push(
+            supabase
+                .from('firma_ihaleleri')
+                .select('*')
+                .eq('ihale_tipi', 'Davetli İhale')
+                .neq('durum', 'draft')
+                // Enes Doğanay | 14 Mayıs 2026: JSONB array için filter+cs+JSON.stringify — .contains() dizi için PG array formatı üretir, JSONB'de çalışmaz
+                .filter('davet_emailleri', 'cs', JSON.stringify([safeEmail]))
+        );
+    }
+    if (firmaId) {
+        queries.push(
+            supabase
+                .from('firma_ihaleleri')
+                .select('*')
+                .eq('ihale_tipi', 'Davetli İhale')
+                .neq('durum', 'draft')
+                .filter('davetli_firmalar', 'cs', JSON.stringify([{ firma_id: String(firmaId) }]))
+        );
+    }
+
+    const results = await Promise.all(queries);
+    const seen = new Set();
+    const all = [];
+    for (const { data } of results) {
+        for (const t of (data || [])) {
+            if (!seen.has(t.id)) { seen.add(t.id); all.push(t); }
+        }
+    }
+    if (!all.length) return [];
+
+    // Enes Doğanay | 14 Mayıs 2026: Firma bilgisi join
+    const firmaIds = [...new Set(all.map(t => t.firma_id).filter(Boolean))];
+    const { data: firmsData } = firmaIds.length
+        ? await supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
+        : { data: [] };
+
+    return all.map(tender => {
+        const firm = (firmsData || []).find(f => String(f.firmaID) === String(tender.firma_id)) || {};
+        return {
+            ...tender,
+            firma_adi:      tender.anonim ? null : (firm.firma_adi || tender.firma_adi || 'Firma bilgisi bulunamadı'),
+            firma_kategori: firm.category_name || '',
+            firma_konum:    firm.il_ilce || tender.il_ilce || 'Konum belirtilmedi',
+        };
+    });
 };

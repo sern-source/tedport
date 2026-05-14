@@ -27,6 +27,13 @@ const TenderCard = ({ tender, isHighlighted, isOwnTender, userOffer, highlightRe
 
     return (
         <article ref={highlightRef} className={`tender-card tender-card--${statusMeta.className}${isHighlighted ? ' tender-card--highlight' : ''}${isOwnTender ? ' tender-card--own' : ''}${isUrgent ? ' tender-card--urgent' : ''}`}>
+            {/* Enes Doğanay | 14 Mayıs 2026: Davetli ihale bandı — üstte özel davet göstergesi */}
+            {tender._isInvited && (
+                <div className="tender-card__invite-banner">
+                    <span className="material-symbols-outlined">mark_email_read</span>
+                    Davet Edildiniz
+                </div>
+            )}
             <div className="tender-card__header">
                 {tender.anonim ? (
                     <span className="tender-card__company tender-card__company--anonim"><span className="material-symbols-outlined">visibility_off</span>Anonim Firma</span>

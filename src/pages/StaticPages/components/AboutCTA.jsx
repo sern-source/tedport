@@ -6,8 +6,8 @@ const AboutCTA = ({ onRegister, onFirmalar }) => (
     <section className="about-cta-section">
         <div className="container">
             <div className="about-cta-inner">
-                <h2>Ticaret Ağınıza Katılın</h2>
-                <p>Binlerce firma zaten burada. Tedarikçi bulun, ihale açın, yeni müşteriler kazanın — ücretsiz.</p>
+                <h2>İş Ağınızı Güçlendirin</h2>
+                <p>Binlerce firma Tedport ekosisteminde yeni çözüm ortaklarıyla buluşuyor. Doğru firmaları keşfedin, satınalma süreçlerinizi yönetin ve yeni iş fırsatlarına ulaşın — ücretsiz.</p>
                 <div className="about-cta-buttons">
                     <button className="about-btn-white" onClick={onRegister}>
                         Hemen Üye Ol

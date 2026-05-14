@@ -13,7 +13,8 @@ import { useFirmaDetayNotes } from './useFirmaDetayNotes';
 import { useFirmaDetayFavorites } from './useFirmaDetayFavorites';
 
 const TENDERS_PREVIEW = 3;
-const EMPTY_QUOTE_FORM = { konu: '', mesaj: '', miktar: '', teslim_tarihi: '', teslim_yeri: '' };
+// Enes Doğanay | 14 Mayıs 2026: miktar/birim kaldırıldı — kalemler dizisiyle yönetiliyor
+const EMPTY_QUOTE_FORM = { konu: '', mesaj: '', kalemler: [], teslim_tarihi: '', teslim_yeri: '' };
 
 export function useFirmaDetay(id) {
     const navigate = useNavigate();
@@ -133,7 +134,8 @@ export function useFirmaDetay(id) {
         if (!sessionUserIdRef.current) { showFdToast('info', 'Lütfen önce giriş yapın.'); return; }
         setQuoteSending(true);
         try {
-            await sendQuoteRequestService({ firmaId: id, userId: sessionUserIdRef.current, userProfile, managedCompanyId, quoteForm, quoteFile });
+            // Enes Doğanay | 14 Mayıs 2026: managedCompanyId geçirilmiyor — teklif talebi her zaman bireysel
+            await sendQuoteRequestService({ firmaId: id, userId: sessionUserIdRef.current, userProfile, quoteForm, quoteFile });
             setQuoteSent(true);
             setTimeout(() => { setShowQuoteModal(false); setQuoteSent(false); setQuoteFormState(EMPTY_QUOTE_FORM); setQuoteFile(null); }, 2000);
         } catch { showFdToast('error', 'Teklif talebi gönderilemedi.'); }

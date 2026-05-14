@@ -3,10 +3,12 @@ import React from 'react';
 
 /* Enes Doğanay | 6 Mayıs 2026: İzin kalemi listesi */
 const PERMISSION_ITEMS = [
-  { key: 'firma_paneli', icon: 'storefront', label: 'Firma Paneli' },
+  { key: 'firma_paneli',    icon: 'storefront',   label: 'Firma Paneli' },
   { key: 'teklif_yonetimi', icon: 'request_quote', label: 'Teklif Yönetimi' },
-  { key: 'ihale_yonetimi', icon: 'gavel', label: 'İhale Yönetimi' },
-  { key: 'ekip_yonetimi', icon: 'group', label: 'Ekip Yönetimi' },
+  { key: 'ihale_yonetimi',  icon: 'gavel',         label: 'İhale Yönetimi' },
+  { key: 'ekip_yonetimi',   icon: 'group',         label: 'Ekip Yönetimi' },
+  // Enes Doğanay | 14 Mayıs 2026: Analitik izni eklendi
+  { key: 'analitik',        icon: 'bar_chart',     label: 'Analitik' },
 ];
 
 /* Enes Doğanay | 6 Mayıs 2026: Sayfa izin ızgarası */

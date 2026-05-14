@@ -28,7 +28,7 @@ const About = () => {
 
     return (
         <>
-            <SEO title="Hakkımızda" description="Tedport hakkında bilgi edinin. Türkiye'nin B2B tedarik portalı hikayesi ve misyonu." path="/hakkimizda" />
+            <SEO title="Hakkımızda" description="Türkiye'nin B2B çözüm ortaklığı platformu Tedport hakkında bilgi edinin. Misyonumuz, vizyonumuz ve platformun sunduğu avantajlar." path="/hakkimizda" />
             <SharedHeader navItems={NAV_ITEMS} />
 
             <div className="about-page-wrapper">

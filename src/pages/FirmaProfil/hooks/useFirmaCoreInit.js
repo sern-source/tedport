@@ -16,6 +16,8 @@ export const useFirmaCoreInit = ({ navigate }) => {
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [myRole, setMyRole] = useState(null);
+    // Enes Doğanay | 14 Mayıs 2026: Kullanıcının sayfa izinleri — analitik dahil
+    const [myPagePermissions, setMyPagePermissions] = useState({});
     const [showEkipPublic, setShowEkipPublic] = useState(true);
     const [ekipVisibilitySaving, setEkipVisibilitySaving] = useState(false);
     const [notifPrefs, setNotifPrefs] = useState(DEFAULT_NOTIF_PREFS);
@@ -47,7 +49,10 @@ export const useFirmaCoreInit = ({ navigate }) => {
                         anlik_bildirimler: notifPrefsData.anlik_bildirimler ?? true,
                     });
                 }
-                if (roleData) setMyRole(roleData);
+                if (roleData) {
+                    setMyRole(roleData.role);
+                    setMyPagePermissions(roleData.page_permissions || {});
+                }
                 setLoading(false);
             } catch (err) {
                 if (!err?.message?.includes('abort')) { /* sessiz */ }
@@ -73,6 +78,7 @@ export const useFirmaCoreInit = ({ navigate }) => {
 
     return {
         companyId, firma, setFirma, userId, loading, myRole, setMyRole,
+        myPagePermissions,
         showEkipPublic, setShowEkipPublic, ekipVisibilitySaving, handleEkipPublicToggle,
         notifPrefs, setNotifPrefs, handleLogout,
     };

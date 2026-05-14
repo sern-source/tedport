@@ -1,4 +1,5 @@
 // Enes Doğanay | 13 Mayıs 2026: İhale uyarı aboneliği servis katmanı
+// Enes Doğanay | 14 Mayıs 2026: Toplu subscribe/unsubscribe eklendi (“Tüm İhaleler” performansı)
 import { supabase } from '../supabaseClient';
 
 // Enes Doğanay | 13 Mayıs 2026: Kullanıcının mevcut aboneliğini kontrol et
@@ -53,6 +54,63 @@ export async function subscribeToAlerts(userId, kategori = null) {
         .single();
     if (error) throw new Error(error.message);
     return data;
+}
+
+// Enes Doğanay | 14 Mayıs 2026: Toplu abonelik — Tüm İhaleler seçince null + tüm sektörler
+// Tek seferde: 1 auth + 1 select + 1-2 sorgu (update batch + insert batch)
+export async function subscribeToAlertsAll(userId, kategoriler) {
+    const { data: authData } = await supabase.auth.getUser();
+    const email = authData?.user?.email;
+    if (!email) throw new Error('Kullanıcı email adresi bulunamadı.');
+
+    // Tüm mevcut kayıtları tek sorguda al (aktif/pasif)
+    const { data: existing } = await supabase
+        .from('ihale_uyarilari')
+        .select('id, kategori, aktif')
+        .eq('user_id', userId);
+
+    const byKey = new Map((existing || []).map(r => [r.kategori ?? '__null__', r]));
+
+    const updateIds = [];
+    const insertRows = [];
+    for (const k of kategoriler) {
+        const key = k === null ? '__null__' : k;
+        const row = byKey.get(key);
+        if (row) {
+            if (!row.aktif) updateIds.push(row.id);
+        } else {
+            insertRows.push({ user_id: userId, email, kategori: k, aktif: true });
+        }
+    }
+
+    // Paralel: pasif olanları aktifleştir + yenilerini ekle
+    await Promise.all([
+        updateIds.length
+            ? supabase.from('ihale_uyarilari').update({ aktif: true, email }).in('id', updateIds)
+            : null,
+        insertRows.length
+            ? supabase.from('ihale_uyarilari').insert(insertRows)
+            : null,
+    ].filter(Boolean));
+
+    // Güncel listeyi dön
+    const { data: all, error } = await supabase
+        .from('ihale_uyarilari')
+        .select('id, kategori, aktif, created_at')
+        .eq('user_id', userId)
+        .eq('aktif', true);
+    if (error) throw new Error(error.message);
+    return all || [];
+}
+
+// Enes Doğanay | 14 Mayıs 2026: Tüm aktif abonelikleri tek sorguda iptal et
+export async function unsubscribeAllAlerts(userId) {
+    const { error } = await supabase
+        .from('ihale_uyarilari')
+        .update({ aktif: false })
+        .eq('user_id', userId)
+        .eq('aktif', true);
+    if (error) throw new Error(error.message);
 }
 
 // Enes Doğanay | 13 Mayıs 2026: Aboneliği iptal et

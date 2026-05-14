@@ -11,7 +11,7 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const [editTenderId, setEditTenderId] = useState(null);
     const [createForm, setCreateForm] = useState(CREATE_EMPTY_FORM);
     const [stepperState, setStepperState] = useState({ step: 0, error: '', saving: false });
-    const [createReqState, setCreateReqState] = useState({ madde: '', aciklama: '', adet: '1' });
+    const [createReqState, setCreateReqState] = useState({ madde: '', aciklama: '', adet: '1', birim: 'Adet' });
     const [emailState, setEmailState] = useState({ input: '', status: null });
     const [firmaState, setFirmaState] = useState({ term: '', results: [], searching: false });
     const [publishState, setPublishState] = useState({ verifiedUser: false, successId: null, linkCopied: false, refNoCopied: false, editSaved: false, draftSaved: false });
@@ -30,7 +30,7 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
 
     const resetFormState = useCallback((refNo, isVerified) => {
         setStepperState({ step: 0, error: '', saving: false });
-        setCreateReqState({ madde: '', aciklama: '', adet: '1' });
+        setCreateReqState({ madde: '', aciklama: '', adet: '1', birim: 'Adet' });
         setEmailState({ input: '', status: null });
         setFirmaState({ term: '', results: [], searching: false });
         setPublishState(p => ({ ...p, verifiedUser: isVerified }));
@@ -96,6 +96,8 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const yeniGereksinimAciklama = createReqState.aciklama; const setYeniGereksinimAciklama = (val) => setCreateReqState(p => ({ ...p, aciklama: val }));
     // Enes Doğanay | 9 Mayıs 2026: Adet adapter
     const yeniGereksinimAdet = createReqState.adet; const setYeniGereksinimAdet = (val) => setCreateReqState(p => ({ ...p, adet: val }));
+    // Enes Doğanay | 14 Mayıs 2026: Birim adapter
+    const yeniGereksinimBirim = createReqState.birim; const setYeniGereksinimBirim = (val) => setCreateReqState(p => ({ ...p, birim: val }));
     const emailInput = emailState.input; const emailStatus = emailState.status;
     const firmaSearchTerm = firmaState.term; const firmaSearchResults = firmaState.results; const firmaSearching = firmaState.searching;
     const fileInputRef = createFileInputRef; const firmaResultsRef = createFirmaResultsRef;
@@ -113,7 +115,7 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
         openCreateModal, openEditInCreateModal, openRepeatModal,
         showModal, editingTender, form, setForm,
         formSaving, formError, setFormError, stepperStep, setStepperStep,
-        yeniGereksinimMadde, setYeniGereksinimMadde, yeniGereksinimAciklama, setYeniGereksinimAciklama, yeniGereksinimAdet, setYeniGereksinimAdet,
+        yeniGereksinimMadde, setYeniGereksinimMadde, yeniGereksinimAciklama, setYeniGereksinimAciklama, yeniGereksinimAdet, setYeniGereksinimAdet, yeniGereksinimBirim, setYeniGereksinimBirim,
         emailInput, emailStatus, firmaSearchTerm, firmaSearchResults, firmaSearching,
         fileInputRef, firmaResultsRef, isVerifiedUser, refNoCopied, setRefNoCopied,
         handleFormSubmit,
