@@ -291,6 +291,62 @@
     border-style: dashed;
 }
 
+/* Enes Doğanay | 16 Mayıs 2026: Miktar stepper grup */
+.teklif-miktar-group {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg-white);
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+.teklif-miktar-group:focus-within {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+.teklif-kalem-input--miktar {
+    flex: 1;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    min-width: 0;
+    text-align: center;
+    padding: 5px 2px !important;
+    -moz-appearance: textfield;
+}
+.teklif-kalem-input--miktar::-webkit-outer-spin-button,
+.teklif-kalem-input--miktar::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Enes Doğanay | 16 Mayıs 2026: Stepper butonları */
+.teklif-step-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #94a3b8;
+    width: 22px;
+    flex-shrink: 0;
+    padding: 0;
+    transition: background 0.12s, color 0.12s;
+}
+.teklif-step-btn .material-symbols-outlined { font-size: 13px; }
+.teklif-step-btn:hover { background: rgba(59,130,246,0.08); color: #3b82f6; }
+[data-theme="dark"] .teklif-step-btn { color: #64748b; }
+[data-theme="dark"] .teklif-step-btn:hover { background: rgba(59,130,246,0.15); color: #93c5fd; }
+
+/* Enes Doğanay | 16 Mayıs 2026: Native spin butonları gizle — birim fiyat + teslim günü */
+.teklif-kalem-input[type="number"]::-webkit-outer-spin-button,
+.teklif-kalem-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.teklif-kalem-input[type="number"] { -moz-appearance: textfield; }
+.teklif-popup__inline-field input[type="number"]::-webkit-outer-spin-button,
+.teklif-popup__inline-field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.teklif-popup__inline-field input[type="number"] { -moz-appearance: textfield; }
+
 .teklif-kalem-col--amount {
     font-weight: 700;
     color: var(--text-dark);
@@ -527,5 +583,15 @@
     background: var(--bg-white);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Enes Doğanay | 16 Mayıs 2026: Dark mode — kalem birim badge + note input */
+[data-theme="dark"] .teklif-kalem-birim-badge {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #334155;
+}
+[data-theme="dark"] .teklif-kalem-input--note {
+    color: #94a3b8;
 }
 

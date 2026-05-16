@@ -13,6 +13,23 @@ const INITIAL_CORPORATE_FORM = {
     verificationNote: '', authorizationDoc: null,
 };
 
+// Enes Doğanay | 16 Mayıs 2026: Kurumsal olmayan (kişisel) e-posta domain'leri
+const PERSONAL_EMAIL_DOMAINS = new Set([
+    'gmail.com', 'googlemail.com',
+    'hotmail.com', 'hotmail.com.tr', 'live.com', 'live.com.tr', 'outlook.com', 'outlook.com.tr', 'msn.com',
+    'yahoo.com', 'yahoo.com.tr', 'ymail.com',
+    'icloud.com', 'me.com', 'mac.com',
+    'yandex.com', 'yandex.ru',
+    'protonmail.com', 'proton.me',
+    'mail.com', 'aol.com', 'zoho.com',
+    'gmx.com', 'gmx.net',
+]);
+
+const isCorporateEmail = (email) => {
+    const domain = String(email || '').trim().toLowerCase().split('@')[1] || '';
+    return domain.length > 0 && !PERSONAL_EMAIL_DOMAINS.has(domain);
+};
+
 const validateCorporateForm = (form) => {
     const errors = {};
     const required = [
@@ -23,6 +40,10 @@ const validateCorporateForm = (form) => {
         { key: 'companyIl', label: 'İl' }, { key: 'companyIlce', label: 'İlçe' }, { key: 'companyOpenAddress', label: 'Açık Adres' },
     ];
     required.forEach(({ key, label }) => { if (!String(form[key] || '').trim()) errors[key] = `${label} alanını doldurunuz.`; });
+    // Enes Doğanay | 16 Mayıs 2026: Kişisel e-posta domain kontrolü — sadece kurumsal mail kabul edilir
+    if (!errors.corporateEmail && String(form.corporateEmail || '').includes('@') && !isCorporateEmail(form.corporateEmail)) {
+        errors.corporateEmail = 'Lütfen şirket e-posta adresinizi yazınız. (Gmail, Hotmail, Yahoo vb. kabul edilmez.)';
+    }
     if (!form.authorizationDoc) errors.authorizationDoc = 'Lütfen imzalanmış yetkilendirme belgesini yükleyin.';
     return errors;
 };

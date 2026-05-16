@@ -1,5 +1,6 @@
 // Enes Doğanay | 7 Mayıs 2026: Teklif form supabase işlemleri — service katmanı
 import { supabase } from '../../../supabaseClient';
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 
 // Enes Doğanay | 8 Mayıs 2026: Mevcut auth oturumunu döndür — hook'larda doğrudan supabase çağırılmasını engeller
 export const getAuthSession = async () => {
@@ -51,7 +52,9 @@ export const fetchFirmaContactInfo = async (tender) => {
 
 // Enes Doğanay | 7 Mayıs 2026: Teklif dosyasını storage'a yükle, path döndür
 export const uploadTeklifDosya = async (userId, dosya) => {
-    const ext = dosya.name.split('.').pop();
+    const ext = dosya.name.split('.').pop()?.toLowerCase() || '';
+    // Enes Doğanay | 16 Mayıs 2026: Servis katmanı tip doğrulamasyı — accept attr. kolayca atlatılır
+    if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) throw new Error(ALLOWED_EK_DOSYA_HATA);
     const path = `${userId}/${Date.now()}.${ext}`;
     const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(path, dosya);
     if (uploadErr) throw new Error('Dosya yüklenemedi: ' + uploadErr.message);

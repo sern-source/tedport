@@ -3,7 +3,7 @@ import React from 'react';
 import './CompanyCatalogSection.css';
 
 /* Enes Doğanay | 6 Mayıs 2026: catalog, productDraft, setProductDraft, handlers */
-const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handlers }) => {
+const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handlers, fieldError = { key: '', msg: '' } }) => {
     const {
         addCategory, removeCategory, setCatName,
         addSub, removeSub, setSubName,
@@ -41,12 +41,14 @@ const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handler
                         <div className="cmp-cat-header">
                             <span className="cmp-cat-chevron">▼</span>
                             <input
+                                data-field-key={`cat-${cat.id}`}
                                 className="cmp-cat-name"
                                 type="text"
                                 value={cat.name}
                                 onChange={e => setCatName(cat.id, e.target.value)}
                                 placeholder={`Kategori ${catIdx + 1} adı (örn. Demir-Çelik Ürünler)`}
                             />
+                            {fieldError.key === `cat-${cat.id}` && <span className="cmp-field-err cmp-field-err--inline"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                             <div className="cmp-cat-header__btns">
                                 <button type="button" className="cmp-btn cmp-btn--ghost cmp-btn--sm" onClick={() => addSub(cat.id)}>
                                     <span className="material-symbols-outlined">add</span>
@@ -65,17 +67,22 @@ const CompanyCatalogSection = ({ catalog, productDraft, setProductDraft, handler
                                         <div className="cmp-sub-header">
                                             <span className="cmp-sub-bullet">•</span>
                                             <input
+                                                data-field-key={`sub-${sub.id}`}
                                                 className="cmp-sub-name"
                                                 type="text"
                                                 value={sub.name}
                                                 onChange={e => setSubName(cat.id, sub.id, e.target.value)}
                                                 placeholder={`Alt kategori ${subIdx + 1} adı (örn. Boru Ürünleri)`}
                                             />
+                                            {fieldError.key === `sub-${sub.id}` && <span className="cmp-field-err cmp-field-err--inline"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                                             <button type="button" className="cmp-btn cmp-btn--danger cmp-btn--icon cmp-btn--sm" onClick={() => removeSub(cat.id, sub.id)} data-tooltip="Alt Kategoriyi Sil" aria-label="Alt kategoriyi sil">
                                                 <span className="material-symbols-outlined">close</span>
                                             </button>
                                         </div>
-                                        <div className="cmp-products-wrap">
+                                        <div data-field-key={`prod-${sub.id}`} className="cmp-products-wrap">
+                                            {fieldError.key === `prod-${sub.id}` && (
+                                                <span className="cmp-field-err cmp-field-err--block"><span className="material-symbols-outlined">error</span>Ürün adlarından birinde uygunsuz ifade var. Lütfen ilgili ürünü kaldırıp tekrar ekleyin.</span>
+                                            )}
                                             {sub.products.map(prod => (
                                                 <span key={prod.id} className="cmp-pill">
                                                     {prod.name}

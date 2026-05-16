@@ -26,8 +26,13 @@ const TeklifKalemTable = ({ kalemler, onUpdateKalem, setCurrencyModalIdx, setCur
                             className="teklif-kalem-input teklif-kalem-input--note" />
                     </div>
                     <div className="teklif-kalem-col teklif-kalem-col--miktar">
-                        <input type="number" min="1" value={kalem.miktar}
-                            onChange={e => onUpdateKalem(idx, 'miktar', e.target.value)} className="teklif-kalem-input" />
+                        {/* Enes Doğanay | 16 Mayıs 2026: Miktar stepper butonları */}
+                        <div className="teklif-miktar-group">
+                            <button type="button" className="teklif-step-btn" tabIndex={-1} onClick={() => onUpdateKalem(idx, 'miktar', String(Math.max(1, (parseInt(kalem.miktar) || 1) - 1)))}><span className="material-symbols-outlined">remove</span></button>
+                            <input type="number" min="1" value={kalem.miktar}
+                                onChange={e => onUpdateKalem(idx, 'miktar', e.target.value)} className="teklif-kalem-input teklif-kalem-input--miktar" />
+                            <button type="button" className="teklif-step-btn" tabIndex={-1} onClick={() => onUpdateKalem(idx, 'miktar', String(Math.min(99999, (parseInt(kalem.miktar) || 1) + 1)))}><span className="material-symbols-outlined">add</span></button>
+                        </div>
                         {/* Enes Doğanay | 14 Mayıs 2026: İhaledeki birim görüntüle — display only */}
                         {kalem.birim && <span className="teklif-kalem-birim-badge">{kalem.birim}</span>}
                     </div>

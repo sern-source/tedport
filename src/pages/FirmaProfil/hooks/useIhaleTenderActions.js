@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale düzenleme/silme/kapatma aksiyonları
 import { useState, useCallback } from 'react';
 import * as ihaleService from '../services/ihaleService';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 import { toDateInput } from '../constants/ihaleConstants';
 
 const useIhaleTenderActions = ({ tenders, setTenders, setOffersByTender, offersByTender, selectedId, setSelectedId, companyId }) => {
@@ -37,6 +38,13 @@ const useIhaleTenderActions = ({ tenders, setTenders, setOffersByTender, offersB
     const handleEditSave = useCallback(async () => {
         if (!editForm) return;
         if (!editForm.baslik.trim()) { setEditError('İhale başlığı zorunludur.'); return; }
+        // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu — başlık, açıklama, gereksinim kalemleri
+        const editTexts = [
+            editForm.baslik,
+            editForm.aciklama,
+            ...(editForm.gereksinimler || []).flatMap(g => [g.madde, g.aciklama]),
+        ];
+        if (editTexts.some(t => containsProfanity(t))) { setEditError(PROFANITY_ERROR_MSG); return; }
         setEditSaving(true);
         setEditError('');
         try {

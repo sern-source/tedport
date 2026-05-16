@@ -75,6 +75,13 @@
     border-top-color: #334155;
 }
 
+/* Enes Doğanay | 16 Mayıs 2026: Profanity hata dark mode */
+[data-theme="dark"] .scm-send-error {
+    background: #2d1a1a;
+    border-top-color: #7f1d1d;
+    color: #f87171;
+}
+
 [data-theme="dark"] .scm-input {
     background: #0f172a;
     border-color: #334155;

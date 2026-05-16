@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { onSupabaseConnectionEvent } from '../../../supabaseRecovery';
 import { fetchQuoteMessages, sendQuoteMessageService, markQuoteNotificationsRead } from '../services/quotesService';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, setNotifications, setMyQuotes }) => {
     const [quoteChatMessages, setQuoteChatMessages] = useState([]);
@@ -103,6 +104,8 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
     const sendQuoteChatMessage = useCallback(async () => {
         if (!quoteChatInput.trim() || !activeQuoteId || !userId || quoteChatSending) return;
         const text = quoteChatInput.trim();
+        // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu
+        if (containsProfanity(text)) throw new Error(PROFANITY_ERROR_MSG);
         setQuoteChatSending(true);
         try {
             const data = await sendQuoteMessageService(activeQuoteId, userId, text);

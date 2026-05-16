@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CompanyLogoSection from './CompanyLogoSection';
 import { SEKTORLER } from '../pages/Firmalar/utils/sektorData';
 
-const CompanyGeneralInfoCard = ({ fields, set, logoPreview, logoUploading, pendingLogoUrl, logoRedNotu, handleLogoUpload }) => {
+const CompanyGeneralInfoCard = ({ fields, set, logoPreview, logoUploading, pendingLogoUrl, logoRedNotu, handleLogoUpload, fieldError = { key: '', msg: '' } }) => {
     const [sektorOpen, setSektorOpen] = useState(false);
     const [sektorQuery, setSektorQuery] = useState('');
     const sektorRef = useRef(null);
@@ -59,7 +59,8 @@ const CompanyGeneralInfoCard = ({ fields, set, logoPreview, logoUploading, pendi
             <div className="cmp-grid cmp-grid--3">
                 <label className="cmp-field">
                     <span>Firma Adı *</span>
-                    <input type="text" value={fields.firma_adi} onChange={e => set('firma_adi', e.target.value)} required placeholder="Örn. ABC Makine San. A.Ş." />
+                    <input data-field-key="firma_adi" type="text" value={fields.firma_adi} onChange={e => set('firma_adi', e.target.value)} required placeholder="Örn. ABC Makine San. A.Ş." />
+                    {fieldError.key === 'firma_adi' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                 </label>
                 {/* Enes Doğanay | 12 Mayıs 2026: Ana Sektör combobox — listeden seç veya serbest metin */}
                 <div className="cmp-field">
@@ -68,6 +69,7 @@ const CompanyGeneralInfoCard = ({ fields, set, logoPreview, logoUploading, pendi
                         <div className={`cmp-sektor-trigger${sektorOpen ? ' cmp-sektor-trigger--open' : ''}`}>
                             <input
                                 ref={inputRef}
+                                data-field-key="ana_sektor"
                                 type="text"
                                 className="cmp-sektor-input"
                                 value={sektorOpen ? sektorQuery : (fields.ana_sektor || '')}
@@ -104,14 +106,16 @@ const CompanyGeneralInfoCard = ({ fields, set, logoPreview, logoUploading, pendi
                             </div>
                         )}
                     </div>
+                    {fieldError.key === 'ana_sektor' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                 </div>
                 <label className="cmp-field">
                     <span>Kategori / Açıklayıcı Ad</span>
-                    <input type="text" value={fields.category_name} onChange={e => set('category_name', e.target.value)} placeholder="Örn. Boru ve Profil Üreticisi" />
+                    <input data-field-key="category_name" type="text" value={fields.category_name} onChange={e => set('category_name', e.target.value)} placeholder="Örn. Boru ve Profil Üreticisi" />
+                    {fieldError.key === 'category_name' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                 </label>
                 <label className="cmp-field">
                     <span>Web Sitesi</span>
-                    <div className="cmp-field-web">
+                    <div className="cmp-field-web" data-field-key="web_sitesi">
                         <input type="text" value={fields.web_sitesi} onChange={e => set('web_sitesi', e.target.value)} placeholder="www.ornekfirma.com" />
                         {/* Enes Doğanay | 8 Mayıs 2026: aria-label — data-tooltip screen reader için yeterli değil */}
                         {fields.web_sitesi?.trim() && (
@@ -120,6 +124,7 @@ const CompanyGeneralInfoCard = ({ fields, set, logoPreview, logoUploading, pendi
                             </a>
                         )}
                     </div>
+                    {fieldError.key === 'web_sitesi' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                 </label>
             </div>
             <CompanyLogoSection logoPreview={logoPreview} logoUploading={logoUploading} pendingLogoUrl={pendingLogoUrl} logoRedNotu={logoRedNotu} handleLogoUpload={handleLogoUpload} />

@@ -6,7 +6,7 @@ import EkipModal from './EkipModal';
 const FirmaDetayModals = ({ fd }) => (
     <>
         {fd.showQuoteModal && (
-            <FdQuoteModal firma={fd.firma} userProfile={fd.userProfile} quoteForm={fd.quoteForm} onFormChange={fd.setQuoteField} quoteSending={fd.quoteSending} quoteSent={fd.quoteSent} quoteFile={fd.quoteFile} setQuoteFile={fd.setQuoteFile} onClose={() => fd.setShowQuoteModal(false)} onSubmit={fd.handleSendQuoteRequest} onFileWarning={(msg) => fd.showFdToast('warning', msg)} />
+            <FdQuoteModal firma={fd.firma} userProfile={fd.userProfile} quoteForm={fd.quoteForm} onFormChange={fd.setQuoteField} quoteSending={fd.quoteSending} quoteSent={fd.quoteSent} quoteFile={fd.quoteFile} setQuoteFile={fd.setQuoteFile} onClose={() => { fd.setShowQuoteModal(false); fd.setFdQuoteFieldError({ key: '', msg: '' }); }} onSubmit={fd.handleSendQuoteRequest} onFileWarning={(msg) => fd.showFdToast('warning', msg)} fieldError={fd.fdQuoteFieldError} />
         )}
         {fd.showEkipModal && (
             <EkipModal firmaEkip={fd.firmaEkip} onClose={() => fd.setShowEkipModal(false)} />

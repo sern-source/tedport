@@ -2,6 +2,7 @@
 // Enes Doğanay | 12 Mayıs 2026: company alanı, selectedPurpose + handlePurposeSelect eklendi
 import { useState } from 'react';
 import { submitContactForm } from '../services/iletisimService';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 // Enes Doğanay | 6 Mayıs 2026: Boş form sabiti
 const EMPTY_FORM = { name: '', company: '', email: '', phone: '', subject: '', message: '' };
@@ -29,6 +30,12 @@ export const useIletisim = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
+    // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu — konu ve mesaj alanları
+    if (containsProfanity(formData.subject) || containsProfanity(formData.message)) {
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 5000);
+      return;
+    }
     try {
       await submitContactForm(formData);
       setStatus('success');

@@ -48,6 +48,7 @@
 
 /* Enes Doğanay | 2 Mayıs 2026: Faz 2 — dark mode token override'ları */
 [data-theme="dark"] {
+  color-scheme: dark; /* Enes Doğanay | 16 Mayıs 2026: native form kontrolleri (spin btn, scrollbar vb.) dark modda render et */
   --primary: #3b9eff;
   --primary-color: var(--primary);
   --primary-hover: #2b8fe8;

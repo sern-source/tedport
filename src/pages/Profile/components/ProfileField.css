@@ -362,3 +362,20 @@
 [data-theme="dark"] .field-pending-email strong {
   color: #64748b;
 }
+
+/* Enes Doğanay | 16 Mayıs 2026: Kaydet hatası — alan bazlı satır içi hata mesajı */
+.field-save-err {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+.field-save-err .material-symbols-outlined {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .field-save-err {
+  color: #f87171;
+}

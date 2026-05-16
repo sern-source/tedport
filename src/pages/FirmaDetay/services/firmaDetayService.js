@@ -1,5 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: FirmaDetay Supabase servis katmanı
 import { supabase } from '../../../supabaseClient';
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 
 export async function fetchFirmaById(id) {
     const { data, error } = await supabase
@@ -146,7 +147,9 @@ export async function deleteNoteService(userId, noteId, now) {
 }
 
 export async function uploadQuoteFileService(userId, file) {
-    const ext = file.name.split('.').pop();
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    // Enes Doğanay | 16 Mayıs 2026: Servis katmanı tip doğrulamasyı — accept attr. kolayca atlatılır
+    if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) throw new Error(ALLOWED_EK_DOSYA_HATA);
     const filePath = `${userId}/${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from('teklif-ekleri').upload(filePath, file);
     if (error) throw error;

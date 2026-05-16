@@ -72,7 +72,7 @@ const FirmalarPage = () => {
         </div>
       </div>
       {page.quote.activeSupplier && (
-        <QuoteModal supplier={page.quote.activeSupplier} form={page.quote.quoteForm} quoteFile={page.quote.quoteFile} sending={page.quote.sending} sent={page.quote.sent} userProfile={page.quote.userProfile} onClose={page.quote.closeModal} onSetField={page.quote.setField} onSetFile={page.quote.setQuoteFile} onSubmit={page.quote.handleSubmit} />
+        <QuoteModal supplier={page.quote.activeSupplier} form={page.quote.quoteForm} quoteFile={page.quote.quoteFile} sending={page.quote.sending} sent={page.quote.sent} userProfile={page.quote.userProfile} onClose={page.quote.closeModal} onSetField={page.quote.setField} onSetFile={page.quote.setQuoteFile} onSubmit={page.quote.handleSubmit} fieldError={page.quote.quoteFieldError} />
       )}
     </>
   );

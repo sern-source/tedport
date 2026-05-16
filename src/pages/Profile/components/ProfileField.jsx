@@ -11,6 +11,8 @@ const ProfileField = ({
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value || '');
   const [isSaving, setIsSaving] = useState(false);
+  // Enes Doğanay | 16 Mayıs 2026: Alan bazlı satır içi hata mesajı
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => { setTempValue(value || ''); }, [value]);
 
@@ -18,12 +20,19 @@ const ProfileField = ({
     if (tempValue !== value) {
       if (isEmail) { setIsEditing(false); onSave(dbField, tempValue, isEmail); return; }
       setIsSaving(true);
-      try { await onSave(dbField, tempValue, isEmail); } finally { setIsSaving(false); }
+      setSaveError('');
+      try {
+        await onSave(dbField, tempValue, isEmail);
+        setIsEditing(false);
+      } catch (err) {
+        setSaveError(err?.message || 'Kaydedilemedi.');
+      } finally { setIsSaving(false); }
+      return;
     }
     setIsEditing(false);
   };
 
-  const handleCancelClick = () => { setTempValue(value || ''); setIsEditing(false); };
+  const handleCancelClick = () => { setTempValue(value || ''); setIsEditing(false); setSaveError(''); };
   const handleKeyDown = (e) => { if (e.key === 'Enter' && !isSaving) handleSaveClick(); };
 
   return (
@@ -42,13 +51,16 @@ const ProfileField = ({
                 </div>
               </div>
             ) : (
-              <div className="field-edit-row">
-                <input className="field-input" type="text" value={tempValue} onChange={e => setTempValue(e.target.value)} onKeyDown={handleKeyDown} autoFocus disabled={isSaving} />
-                <button className="field-btn-save" onClick={handleSaveClick} disabled={isSaving}>
-                  {isSaving ? <span className="field-btn-spinner" /> : 'Kaydet'}
-                </button>
-                <button className="field-btn-cancel" onClick={handleCancelClick} disabled={isSaving}>İptal</button>
-              </div>
+              <>
+                <div className="field-edit-row">
+                  <input className="field-input" type="text" value={tempValue} onChange={e => { setTempValue(e.target.value); setSaveError(''); }} onKeyDown={handleKeyDown} autoFocus disabled={isSaving} />
+                  <button className="field-btn-save" onClick={handleSaveClick} disabled={isSaving}>
+                    {isSaving ? <span className="field-btn-spinner" /> : 'Kaydet'}
+                  </button>
+                  <button className="field-btn-cancel" onClick={handleCancelClick} disabled={isSaving}>İptal</button>
+                </div>
+                {saveError && <span className="field-save-err"><span className="material-symbols-outlined">error</span>{saveError}</span>}
+              </>
             )}
           </>
         ) : (

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../../supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: sadece onAuthStateChange için
 import { updateUserEmail, updateProfileField, syncEmailAfterConfirm, getAuthUser } from '../services/profileService';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 // Enes Doğanay | 7 Mayıs 2026: E-posta değişikliği izleme, onay, handler — user/setUser/setProfile dışarıdan gelir
 export const useProfileEmailHandlers = ({ user, setUser, setProfile }) => {
@@ -42,6 +43,8 @@ export const useProfileEmailHandlers = ({ user, setUser, setProfile }) => {
     }, [pendingEmail]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleUpdateField = useCallback(async (field, newValue, isEmail = false) => {
+        // Enes Doğanay | 16 Mayıs 2026: Küfür kontrolü try dışında — ProfileField'a re-throw edilsin
+        if (!isEmail && containsProfanity(newValue)) throw new Error(PROFANITY_ERROR_MSG);
         try {
             if (isEmail) {
                 setPendingEmail(newValue);

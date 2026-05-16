@@ -3,6 +3,7 @@ import { supabase } from '../../../supabaseClient';
 import { getManagedCompanyId } from '../../../services/companyManagementApi';
 import { expandSearchTerms, levenshtein } from '../../../constants/synonyms';
 import { sanitizeSearch, ISTANBUL_AVRUPA, ISTANBUL_ANADOLU, getSektorKeywords } from '../utils/firmaUtils';
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 
 const PAGE_SIZE = 10;
 
@@ -173,7 +174,9 @@ export const fetchUserProfile = async (userId) => {
 };
 
 export const uploadQuoteFile = async (userId, file) => {
-  const ext = file.name.split('.').pop();
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  // Enes Doğanay | 16 Mayıs 2026: Servis katmanı tip doğrulamasyı — accept attr. kolayca atlatılır
+  if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) throw new Error(ALLOWED_EK_DOSYA_HATA);
   const filePath = `${userId}/${Date.now()}.${ext}`;
   const { error } = await supabase.storage.from('teklif-ekleri').upload(filePath, file);
   if (error) throw new Error(error.message);

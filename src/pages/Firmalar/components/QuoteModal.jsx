@@ -5,12 +5,13 @@ import { createPortal } from 'react-dom';
 import CitySelect from '../../../components/CitySelect';
 import DatePicker from '../../../components/DatePicker';
 import { useAuth } from '../../../AuthContext';
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_ACCEPT, ALLOWED_EK_DOSYA_HATA, ALLOWED_EK_DOSYA_ETIKET } from '../../../constants/fileUpload';
 import './QuoteModal.css';
 
 // Enes Doğanay | 14 Mayıs 2026: Kalem birim seçenekleri
 const BIRIM_OPTIONS = ['Adet', 'Kg', 'Ton', 'Gram', 'Litre', 'Metre', 'm²', 'Metreküp', 'Kutu', 'Paket', 'Set', 'Takım', 'Rulo', 'Palet', 'Lot'];
 
-const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onClose, onSetField, onSetFile, onSubmit }) => {
+const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onClose, onSetField, onSetFile, onSubmit, fieldError = { key: '', msg: '' } }) => {
   // Enes Doğanay | 14 Mayıs 2026: Firma kullanıcısı mı tespiti + auto-close
   const { managedCompanyId } = useAuth();
   const isFirmaUser = Boolean(managedCompanyId);
@@ -21,6 +22,8 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
   const [yeniAciklama, setYeniAciklama] = useState('');
   const [kalemBirimOpen, setKalemBirimOpen] = useState(false);
   const [kalemBirimMenuPos, setKalemBirimMenuPos] = useState({ top: 0, left: 0, width: 0 });
+  // Enes Doğanay | 16 Mayıs 2026: Dosya türü hata mesajı — component yerel state
+  const [fileError, setFileError] = useState('');
   const kalemBirimRef = useRef(null);
   // Enes Doğanay | 14 Mayıs 2026: Kalem eklendikten sonra madde input'a fokuslan
   const maddeInputRef = useRef(null);
@@ -56,6 +59,18 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
 
   const handleRemoveKalem = (id) =>
     onSetField('kalemler', (form.kalemler || []).filter(k => k.id !== id));
+
+  // Enes Doğanay | 16 Mayıs 2026: + basılmadan submit edilirse pending kalemi otomatik dahil et
+  const handleSubmitClick = () => {
+    const pendingKalem = yeniMadde.trim() ? {
+      id: Date.now().toString(),
+      adet: Number(yeniAdet) || 1,
+      birim: yeniBirim,
+      madde: yeniMadde.trim(),
+      aciklama: yeniAciklama.trim(),
+    } : null;
+    onSubmit(pendingKalem);
+  };
 
   return (
   <div className="quote-modal-overlay">
@@ -106,6 +121,7 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
                 type="text" placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi"
                 value={form.konu} onChange={e => onSetField('konu', e.target.value)} maxLength={200}
               />
+              {fieldError.key === 'konu' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
             </div>
 
             {/* Enes Doğanay | 14 Mayıs 2026: Kalem kalem ekleme sistemi */}
@@ -117,12 +133,15 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
               <p className="quote-kalem-desc">Teklif alacağınız ürün ve malzemeleri miktar ve birimle birlikte ekleyin.</p>
               <div className="quote-kalem-input-row">
                 <div className="quote-kalem-adet-group">
+                  {/* Enes Doğanay | 16 Mayıs 2026: Adet stepper butonları */}
+                  <button type="button" className="quote-kalem-step-btn" tabIndex={-1} onClick={() => setYeniAdet(String(Math.max(1, (parseInt(yeniAdet) || 1) - 1)))}><span className="material-symbols-outlined">remove</span></button>
                   <input
                     type="number" min="1" max="99999" placeholder="1"
                     value={yeniAdet} onChange={e => setYeniAdet(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
                     className="quote-kalem-adet-input"
                   />
+                  <button type="button" className="quote-kalem-step-btn" tabIndex={-1} onClick={() => setYeniAdet(String(Math.min(99999, (parseInt(yeniAdet) || 1) + 1)))}><span className="material-symbols-outlined">add</span></button>
                   <div className="quote-kalem-birim-wrap">
                     <button
                       ref={kalemBirimRef} type="button"
@@ -169,6 +188,7 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
                   ))}
                 </div>
               )}
+              {fieldError.key === 'kalemler' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
             </div>
 
             <div className="quote-form-row">
@@ -193,6 +213,7 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
                 value={form.mesaj} onChange={e => onSetField('mesaj', e.target.value)}
                 rows={3} maxLength={2000}
               />
+              {fieldError.key === 'mesaj' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
             </div>
 
             <div className="quote-form-group">
@@ -204,11 +225,16 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
                 </label>
                 <input
                   id="quote-modal-file" type="file"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
+                  accept={ALLOWED_EK_DOSYA_ACCEPT}
                   style={{ display: 'none' }}
                   onChange={e => {
                     const f = e.target.files?.[0];
-                    if (f && f.size <= 10 * 1024 * 1024) onSetFile(f);
+                    if (!f) return;
+                    const ext = f.name.split('.').pop()?.toLowerCase() || '';
+                    if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) { setFileError(ALLOWED_EK_DOSYA_HATA); e.target.value = ''; return; }
+                    if (f.size > 10 * 1024 * 1024) { setFileError('Dosya boyutu en fazla 10 MB olabilir.'); e.target.value = ''; return; }
+                    setFileError('');
+                    onSetFile(f);
                   }}
                 />
                 {quoteFile && (
@@ -217,6 +243,8 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
                   </button>
                 )}
               </div>
+              {/* Enes Doğanay | 16 Mayıs 2026: Dosya türü hata mesajı */}
+              {fileError && <p style={{ margin: '4px 0 0', fontSize: '0.77rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: 4 }}><span className="material-symbols-outlined" style={{ fontSize: 14 }}>error</span>{fileError}</p>}
             </div>
 
             <div className="quote-form-info">
@@ -228,7 +256,7 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
           <div className="quote-modal-footer">
             <button className="btn btn-outline quote-btn-cancel" onClick={onClose} type="button">İptal</button>
             <button
-              className="btn btn-primary quote-btn-send" onClick={onSubmit} type="button"
+              className="btn btn-primary quote-btn-send" onClick={handleSubmitClick} type="button"
               disabled={sending || !form.konu.trim() || !form.mesaj.trim()}
             >
               {sending ? 'Gönderiliyor...' : 'Teklif İste'}

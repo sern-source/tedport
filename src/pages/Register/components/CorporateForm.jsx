@@ -32,7 +32,7 @@ const CorporateForm = ({ corporate, kvkkAccepted, onKvkkChange, marketingConsent
                 <div className="input-group">
                     <label>Başvuranın Telefon Numarası</label>
                     <div className="input-wrapper">
-                        <input className={`form-input${corporateErrors.phone ? ' form-input--error' : ''}`} type="tel" placeholder="0 (XXX) XXX XX XX" value={corporateForm.phone} onChange={e => setField('phone', e.target.value)} name="crp_ph_x" autoComplete="one-time-code" />
+                        <input className={`form-input${corporateErrors.phone ? ' form-input--error' : ''}`} type="tel" placeholder="0 (5XX) XXX XX XX" value={corporateForm.phone} onChange={e => setField('phone', e.target.value)} name="crp_ph_x" autoComplete="one-time-code" />
                         <span className="material-symbols-outlined input-icon">phone</span>
                     </div>
                     {corporateErrors.phone && <span className="field-error-text">{corporateErrors.phone}</span>}
@@ -51,10 +51,9 @@ const CorporateForm = ({ corporate, kvkkAccepted, onKvkkChange, marketingConsent
                 <div className="input-group">
                     <label>Kurumsal E-posta</label>
                     <div className="input-wrapper">
-                        <input className={`form-input${corporateErrors.corporateEmail ? ' form-input--error' : ''}`} type="email" placeholder="tedport@sirketiniz.com" value={corporateForm.corporateEmail} onChange={e => setField('corporateEmail', e.target.value)} name="crp_ce_x" autoComplete="one-time-code" />
+                        <input className={`form-input${corporateErrors.corporateEmail ? ' form-input--error' : ''}`} type="email" placeholder="adsoyad@sirketiniz.com" value={corporateForm.corporateEmail} onChange={e => setField('corporateEmail', e.target.value)} name="crp_ce_x" autoComplete="one-time-code" />
                         <span className="material-symbols-outlined input-icon">mail</span>
                     </div>
-                    <span className="field-hint">Test için kişisel e-posta kullanabilirsiniz; canlıda şirket adresi tercih edilir.</span>
                     {corporateErrors.corporateEmail && <span className="field-error-text">{corporateErrors.corporateEmail}</span>}
                 </div>
             </div>

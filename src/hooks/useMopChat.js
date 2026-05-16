@@ -1,6 +1,7 @@
 // Enes Doğanay | 7 Mayıs 2026: MOP (My Offers Panel) chat state + realtime + handler'lar
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../utils/contentModeration';
 import {
     fetchChatMessages, markMessagesReadByBidder, markTeklifNotificationsRead,
     sendChatMessage, notifyFirmaManagers, markSingleMessageRead, fetchFirmaManagerIds,
@@ -130,6 +131,8 @@ export function useMopChat({ offers, tenderMap, firmaMap, firmaLogoMap, userProf
         const senderId = getUserId?.();
         if (!senderId) return;
         const messageText = mopChatInput.trim();
+        // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu — uygunsuz kelimede throw, SharedChatInputBar yakalar
+        if (containsProfanity(messageText)) throw new Error(PROFANITY_ERROR_MSG);
         setMopChatSending(true);
         try {
             const data = await sendChatMessage({ teklif_id: activeMopChat.offer.id, sender_id: senderId, sender_role: 'bidder', mesaj: messageText, okundu_bidder: true });

@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 // Enes Doğanay | 7 Mayıs 2026: Emoji sabit listesi
 const EMOJI_LIST = [
+
     '😊','😄','😂','🤣','😍','🥰','😎','🤔','😅','🙏',
     '👍','👎','🎉','🔥','✅','❌','⚠️','📌','📎','💬',
     '💡','📞','📧','🕐','🗓️','📋','✏️','🏷️','🔍','💰',
@@ -12,6 +13,8 @@ const EMOJI_LIST = [
 const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
     // Enes Doğanay | 7 Mayıs 2026: Emoji picker açık/kapalı
     const [emojiOpen, setEmojiOpen] = useState(false);
+    // Enes Doğanay | 16 Mayıs 2026: Gönderim hatası — profanity veya ağ hatası
+    const [sendError, setSendError] = useState('');
     const emojiRef = useRef(null);
 
     // Enes Doğanay | 7 Mayıs 2026: Emoji picker dışına tıklanınca kapat
@@ -27,8 +30,17 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
     const handleKey = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            if (!sending && input.trim()) onSend();
+            if (!sending && input.trim()) handleSendWithCheck();
         }
+    };
+
+    // Enes Doğanay | 16 Mayıs 2026: onSend() promise'ini yakala — hook throw ederse hata göster, 4s sonra temizle
+    const handleSendWithCheck = () => {
+        Promise.resolve(onSend()).catch(err => {
+            const msg = err?.message || 'Mesaj gönderilemedi.';
+            setSendError(msg);
+            setTimeout(() => setSendError(''), 4000);
+        });
     };
 
     if (isClosed) {
@@ -41,7 +53,8 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
     }
 
     return (
-        <div className="scm-input-row">
+        <div className="scm-input-wrap">
+            <div className="scm-input-row">
             <div className="scm-emoji-wrap" ref={emojiRef}>
                 <button
                     className={`scm-emoji-trigger${emojiOpen ? ' active' : ''}`}
@@ -80,7 +93,7 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
             />
             <button
                 className="scm-send-btn"
-                onClick={onSend}
+                onClick={handleSendWithCheck}
                 disabled={sending || !input.trim()}
             >
                 {sending
@@ -88,6 +101,14 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
                     : <span className="material-symbols-outlined">send</span>
                 }
             </button>
+        </div>
+        {/* Enes Doğanay | 16 Mayıs 2026: Profanity / gönderim hata mesajı */}
+        {sendError && (
+            <div className="scm-send-error">
+                <span className="material-symbols-outlined">error</span>
+                {sendError}
+            </div>
+        )}
         </div>
     );
 };

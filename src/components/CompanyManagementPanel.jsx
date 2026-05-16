@@ -14,6 +14,7 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
         fields, catalog, productDraft, setProductDraft, catalogHandlers,
         saving, feedback,
         showSaveSuccess, setShowSaveSuccess,
+        fieldError,
         logoUploading, logoPreview, pendingLogoUrl, logoRedNotu,
         approvedTags, tagInput, setTagInput, tagSending, tagFeedback, pendingTagRequest,
         showDeleteConfirm, setShowDeleteConfirm, deleting,
@@ -62,8 +63,8 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                 </div>
             </div>
             <div className="cmp-form">
-                <CompanyGeneralInfoCard fields={fields} set={set} logoPreview={logoPreview} logoUploading={logoUploading} pendingLogoUrl={pendingLogoUrl} logoRedNotu={logoRedNotu} handleLogoUpload={handleLogoUpload} />
-                <CompanyContactCard fields={fields} set={set} setCity={setCity} districtOptions={districtOptions} ALL_CITIES={ALL_CITIES} />
+                <CompanyGeneralInfoCard fields={fields} set={set} logoPreview={logoPreview} logoUploading={logoUploading} pendingLogoUrl={pendingLogoUrl} logoRedNotu={logoRedNotu} handleLogoUpload={handleLogoUpload} fieldError={fieldError} />
+                <CompanyContactCard fields={fields} set={set} setCity={setCity} districtOptions={districtOptions} ALL_CITIES={ALL_CITIES} fieldError={fieldError} />
                 <div className="cmp-card">
                     <div className="cmp-card__head">
                         <span className="material-symbols-outlined">description</span>
@@ -74,10 +75,11 @@ const CompanyManagementPanel = ({ company, onCompanyUpdated, onSave, isNew, onDe
                     </div>
                     <label className="cmp-field">
                         <span>Açıklama</span>
-                        <textarea rows={6} value={fields.description} onChange={e => set('description', e.target.value)} placeholder="Örn: 1992 yılında kurulan firmamız, X sektöründe yurt içi ve yurt dışı pazarlara hizmet vermektedir…" />
+                        <textarea data-field-key="description" rows={6} value={fields.description} onChange={e => set('description', e.target.value)} placeholder="Örn: 1992 yılında kurulan firmamız, X sektöründe yurt içi ve yurt dışı pazarlara hizmet vermektedir…" />
+                        {fieldError.key === 'description' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                     </label>
                 </div>
-                <CompanyCatalogSection catalog={catalog} productDraft={productDraft} setProductDraft={setProductDraft} handlers={catalogHandlers} />
+                <CompanyCatalogSection catalog={catalog} productDraft={productDraft} setProductDraft={setProductDraft} handlers={catalogHandlers} fieldError={fieldError} />
                 {feedback.msg && feedback.type === 'err' && (
                     <div className="cmp-feedback cmp-feedback--err">
                         <span className="material-symbols-outlined">error</span>

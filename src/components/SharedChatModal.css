@@ -397,6 +397,13 @@
 
 .scm-closed .material-symbols-outlined { font-size: 17px; }
 
+/* Enes Doğanay | 16 Mayıs 2026: Input sarmalayıcı — input-row + hata mesajı bir arada */
+.scm-input-wrap {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
 /* Input row */
 .scm-input-row {
     display: flex;
@@ -406,6 +413,27 @@
     border-top: 1px solid #f1f5f9;
     background: #fff;
     flex-shrink: 0;
+}
+
+/* Enes Doğanay | 16 Mayıs 2026: Profanity / gönderim hata flash */
+.scm-send-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px 7px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #ef4444;
+    background: #fef2f2;
+    border-top: 1px solid #fecaca;
+    animation: scm-err-in 0.15s ease;
+}
+
+.scm-send-error .material-symbols-outlined { font-size: 14px; flex-shrink: 0; }
+
+@keyframes scm-err-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .scm-input {

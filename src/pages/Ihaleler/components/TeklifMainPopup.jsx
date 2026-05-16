@@ -1,6 +1,7 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: Teklif ver — ana popup penceresi koordinatör
-import React from 'react';
+import React, { useState } from 'react';
 import { formatTenderDate } from '../../../constants/tenderUtils';
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_ACCEPT, ALLOWED_EK_DOSYA_HATA, ALLOWED_EK_DOSYA_ETIKET } from '../../../constants/fileUpload';
 import TeklifDetaySection from './TeklifDetaySection';
 import TeklifPopupFooter from './TeklifPopupFooter';
 
@@ -13,6 +14,8 @@ const TeklifMainPopup = ({
     onClose, onSubmit, onUpdateKalem, getGroupedTotals, isTeklifDirty,
 }) => {
     if (!teklifTender) return null;
+    // Enes Doğanay | 16 Mayıs 2026: Dosya türü hatası — component yerel state
+    const [fileTypeError, setFileTypeError] = useState('');
     const tt = teklifTender;
     const gereksinimler = Array.isArray(tt.gereksinimler) ? tt.gereksinimler : [];
     const hasKalemler = teklifForm.kalemler.length > 0;
@@ -66,11 +69,21 @@ const TeklifMainPopup = ({
                             ) : (
                                 <button type="button" className="teklif-popup__file-upload" onClick={() => teklifDosyaRef.current?.click()}>
                                     <span className="material-symbols-outlined">cloud_upload</span>
-                                    <span>Dosya Yükle</span><small>PDF, Excel, Word — maks. 10 MB</small>
+                                    <span>Dosya Yükle</span><small>{ALLOWED_EK_DOSYA_ETIKET} — maks. 10 MB</small>
                                 </button>
                             )}
-                            <input ref={teklifDosyaRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f && f.size <= 10 * 1024 * 1024) setTeklifDosya(f); }} />
+                            <input ref={teklifDosyaRef} type="file" accept={ALLOWED_EK_DOSYA_ACCEPT} style={{ display: 'none' }} onChange={e => {
+                                const f = e.target.files?.[0];
+                                if (!f) return;
+                                const ext = f.name.split('.').pop()?.toLowerCase() || '';
+                                if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) { setFileTypeError(ALLOWED_EK_DOSYA_HATA); if (teklifDosyaRef.current) teklifDosyaRef.current.value = ''; return; }
+                                if (f.size > 10 * 1024 * 1024) { setFileTypeError('Dosya boyutu en fazla 10 MB olabilir.'); if (teklifDosyaRef.current) teklifDosyaRef.current.value = ''; return; }
+                                setFileTypeError('');
+                                setTeklifDosya(f);
+                            }} />
                         </div>
+                        {/* Enes Doğanay | 16 Mayıs 2026: Dosya türü hata mesajı */}
+                        {fileTypeError && <div className="teklif-popup__error" style={{ marginTop: 6 }}><span className="material-symbols-outlined">error</span>{fileTypeError}</div>}
                     </div>
                     <div className="teklif-popup__section">
                         <h3><span className="material-symbols-outlined">sticky_note_2</span> Ek Not <small>(opsiyonel)</small></h3>

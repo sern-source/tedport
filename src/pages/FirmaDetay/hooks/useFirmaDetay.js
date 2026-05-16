@@ -11,6 +11,7 @@ import { fetchFirmaSertifikalari } from '../../../services/sertifikaService';
 import { isMissingRelationError, parseHiyerarsikKategoriler } from '../utils/firmaDetayUtils';
 import { useFirmaDetayNotes } from './useFirmaDetayNotes';
 import { useFirmaDetayFavorites } from './useFirmaDetayFavorites';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 const TENDERS_PREVIEW = 3;
 // Enes Doğanay | 14 Mayıs 2026: miktar/birim kaldırıldı — kalemler dizisiyle yönetiliyor
@@ -45,6 +46,8 @@ export function useFirmaDetay(id) {
     const [quoteSending, setQuoteSending] = useState(false);
     const [quoteSent, setQuoteSent] = useState(false);
     const [quoteFile, setQuoteFile] = useState(null);
+    // Enes Doğanay | 16 Mayıs 2026: Teklif talebi popup'u alan bazlı hata mesajları
+    const [fdQuoteFieldError, setFdQuoteFieldError] = useState({ key: '', msg: '' });
 
     const sessionUserIdRef = useRef(null);
     const sessionUserEmailRef = useRef(null);
@@ -127,15 +130,29 @@ export function useFirmaDetay(id) {
         navigate(`/firmalar?search=${encodeURIComponent(term.trim())}${modeParam}`);
     };
     const toggleCategory = (categoryKey) => { const next = new Set(expandedCategories); if (next.has(categoryKey)) next.delete(categoryKey); else next.add(categoryKey); setExpandedCategories(next); };
-    const setQuoteField = (field, value) => setQuoteFormState(prev => ({ ...prev, [field]: value }));
+    const setQuoteField = (field, value) => {
+        setQuoteFormState(prev => ({ ...prev, [field]: value }));
+        // Enes Doğanay | 16 Mayıs 2026: Alan değişince hata mesajını temizle
+        setFdQuoteFieldError(fe => fe.key === field ? { key: '', msg: '' } : fe);
+    };
 
-    const handleSendQuoteRequest = async () => {
+    // Enes Doğanay | 16 Mayıs 2026: pendingKalem — kullanıcı + basmadan submit ederse otomatik eklenir
+    const handleSendQuoteRequest = async (pendingKalem = null) => {
         if (!quoteForm.konu.trim() || !quoteForm.mesaj.trim()) return;
         if (!sessionUserIdRef.current) { showFdToast('info', 'Lütfen önce giriş yapın.'); return; }
+        const finalForm = pendingKalem
+            ? { ...quoteForm, kalemler: [...(quoteForm.kalemler || []), pendingKalem] }
+            : quoteForm;
+        // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu — başlık, mesaj ve tüm talep kalemleri
+        if (containsProfanity(finalForm.konu)) { setFdQuoteFieldError({ key: 'konu', msg: PROFANITY_ERROR_MSG }); return; }
+        if (containsProfanity(finalForm.mesaj)) { setFdQuoteFieldError({ key: 'mesaj', msg: PROFANITY_ERROR_MSG }); return; }
+        if ((finalForm.kalemler || []).some(k => containsProfanity(k.madde) || containsProfanity(k.aciklama))) {
+            setFdQuoteFieldError({ key: 'kalemler', msg: PROFANITY_ERROR_MSG }); return;
+        }
         setQuoteSending(true);
         try {
             // Enes Doğanay | 14 Mayıs 2026: managedCompanyId geçirilmiyor — teklif talebi her zaman bireysel
-            await sendQuoteRequestService({ firmaId: id, userId: sessionUserIdRef.current, userProfile, quoteForm, quoteFile });
+            await sendQuoteRequestService({ firmaId: id, userId: sessionUserIdRef.current, userProfile, quoteForm: finalForm, quoteFile });
             setQuoteSent(true);
             setTimeout(() => { setShowQuoteModal(false); setQuoteSent(false); setQuoteFormState(EMPTY_QUOTE_FORM); setQuoteFile(null); }, 2000);
         } catch { showFdToast('error', 'Teklif talebi gönderilemedi.'); }
@@ -159,6 +176,7 @@ export function useFirmaDetay(id) {
         viewCount,
         showQuoteModal, setShowQuoteModal, quoteForm, setQuoteField,
         quoteSending, quoteSent, quoteFile, setQuoteFile, handleSendQuoteRequest,
+        fdQuoteFieldError, setFdQuoteFieldError,
         showEkipModal, setShowEkipModal,
         fdToast, setFdToast, showFdToast,
         adresText, encodedAddress, googleMapsLink,

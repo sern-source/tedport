@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import DatePicker from '../../../components/DatePicker';
 import CitySelect from '../../../components/CitySelect';
 import { useAuth } from '../../../AuthContext';
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_ACCEPT, ALLOWED_EK_DOSYA_HATA, ALLOWED_EK_DOSYA_ETIKET } from '../../../constants/fileUpload';
 import './FdQuoteModal.css';
 
 // Enes Doğanay | 14 Mayıs 2026: Kalem birim seçenekleri
@@ -15,7 +16,9 @@ const FdQuoteModal = ({
     quoteForm, onFormChange,
     quoteSending, quoteSent,
     quoteFile, setQuoteFile,
-    onClose, onSubmit, onFileWarning
+    onClose, onSubmit, onFileWarning,
+    // Enes Doğanay | 16 Mayıs 2026: Alan bazlı satır içi hata mesajları
+    fieldError = { key: '', msg: '' },
 }) => {
     // Enes Doğanay | 14 Mayıs 2026: Firma kullanıcısı mı tespiti + auto-close
     const { managedCompanyId } = useAuth();
@@ -62,6 +65,18 @@ const FdQuoteModal = ({
 
     const handleRemoveKalem = (id) =>
         onFormChange('kalemler', (quoteForm.kalemler || []).filter(k => k.id !== id));
+
+    // Enes Doğanay | 16 Mayıs 2026: + basılmadan submit edilirse pending kalemi otomatik dahil et
+    const handleSubmitClick = () => {
+        const pendingKalem = yeniMadde.trim() ? {
+            id: Date.now().toString(),
+            adet: Number(yeniAdet) || 1,
+            birim: yeniBirim,
+            madde: yeniMadde.trim(),
+            aciklama: yeniAciklama.trim(),
+        } : null;
+        onSubmit(pendingKalem);
+    };
 
     return (
     <div className="quote-modal-overlay">
@@ -114,7 +129,9 @@ const FdQuoteModal = ({
                                 value={quoteForm.konu}
                                 onChange={(e) => onFormChange('konu', e.target.value)}
                                 maxLength={200}
+                                data-field-key="konu"
                             />
+                            {fieldError.key === 'konu' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                         </div>
 
                         {/* Enes Doğanay | 14 Mayıs 2026: Kalem kalem ekleme sistemi */}
@@ -126,12 +143,15 @@ const FdQuoteModal = ({
                             <p className="quote-kalem-desc">Teklif alacağınız ürün ve malzemeleri miktar ve birimle birlikte ekleyin.</p>
                             <div className="quote-kalem-input-row">
                                 <div className="quote-kalem-adet-group">
+                                    {/* Enes Doğanay | 16 Mayıs 2026: Adet stepper butonları */}
+                                    <button type="button" className="quote-kalem-step-btn" tabIndex={-1} onClick={() => setYeniAdet(String(Math.max(1, (parseInt(yeniAdet) || 1) - 1)))}><span className="material-symbols-outlined">remove</span></button>
                                     <input
                                         type="number" min="1" max="99999" placeholder="1"
                                         value={yeniAdet} onChange={e => setYeniAdet(e.target.value)}
                                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
                                         className="quote-kalem-adet-input"
                                     />
+                                    <button type="button" className="quote-kalem-step-btn" tabIndex={-1} onClick={() => setYeniAdet(String(Math.min(99999, (parseInt(yeniAdet) || 1) + 1)))}><span className="material-symbols-outlined">add</span></button>
                                     <div className="quote-kalem-birim-wrap">
                                         <button
                                             ref={kalemBirimRef} type="button"
@@ -178,6 +198,7 @@ const FdQuoteModal = ({
                                     ))}
                                 </div>
                             )}
+                            {fieldError.key === 'kalemler' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                         </div>
 
                         <div className="quote-form-row">
@@ -206,7 +227,9 @@ const FdQuoteModal = ({
                                 onChange={(e) => onFormChange('mesaj', e.target.value)}
                                 rows={3}
                                 maxLength={2000}
+                                data-field-key="mesaj"
                             />
+                            {fieldError.key === 'mesaj' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
                         </div>
 
                         <div className="quote-form-group">
@@ -224,12 +247,15 @@ const FdQuoteModal = ({
                                 <input
                                     id="detay-quote-file"
                                     type="file"
-                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
+                                    accept={ALLOWED_EK_DOSYA_ACCEPT}
                                     style={{ display: 'none' }}
                                     onChange={(e) => {
                                         const f = e.target.files?.[0];
-                                        if (f && f.size <= 10 * 1024 * 1024) setQuoteFile(f);
-                                        else if (f) onFileWarning('Dosya boyutu en fazla 10 MB olabilir.');
+                                        if (!f) return;
+                                        const ext = f.name.split('.').pop()?.toLowerCase() || '';
+                                        if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) { onFileWarning(ALLOWED_EK_DOSYA_HATA); e.target.value = ''; return; }
+                                        if (f.size > 10 * 1024 * 1024) { onFileWarning('Dosya boyutu en fazla 10 MB olabilir.'); e.target.value = ''; return; }
+                                        setQuoteFile(f);
                                     }}
                                 />
                                 {quoteFile && (
@@ -256,7 +282,7 @@ const FdQuoteModal = ({
                         </button>
                         <button
                             className="btn btn-primary quote-btn-send"
-                            onClick={onSubmit}
+                            onClick={handleSubmitClick}
                             disabled={quoteSending || !quoteForm.konu.trim() || !quoteForm.mesaj.trim()}
                             type="button"
                         >

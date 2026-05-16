@@ -4,6 +4,7 @@ import * as ihaleService from '../services/ihaleService';
 import { enrichMessagesWithSender, fetchSenderAvatarUrl } from '../services/ihaleService';
 import { getAuthSession } from '../services/firmaService';
 import { supabase } from '../../../supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: sadece realtime channel için
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refreshCounts }) => {
     const [activeTenderChat, setActiveTenderChat] = useState(null);
@@ -140,6 +141,8 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
         const senderId = getUserId?.();
         if (!senderId) return;
         const messageText = tenderChatInput.trim();
+        // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu
+        if (containsProfanity(messageText)) throw new Error(PROFANITY_ERROR_MSG);
         setTenderChatSending(true);
         try {
             const data = await ihaleService.sendChatMessage({ teklif_id: activeTenderChat.offer.id, sender_id: senderId, sender_role: 'company', mesaj: messageText, okundu_firma: true });

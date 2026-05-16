@@ -340,6 +340,37 @@
     border: 1px solid #fca5a5;
 }
 
+/* Enes Doğanay | 16 Mayıs 2026: Alan bazlı satır içi hata mesajı */
+.cmp-field-err {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #dc2626;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+.cmp-field-err .material-symbols-outlined {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+/* Katalog header içinde yatay hizalı inline varyant */
+.cmp-field-err--inline {
+    margin-top: 0;
+    margin-left: 6px;
+}
+/* Ürün pill satırında blok varyant */
+.cmp-field-err--block {
+    display: flex;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+[data-theme="dark"] .cmp-field-err {
+    color: #f87171;
+}
+
 /* ── ACTIONS BAR ─────────────────────────────────────────────────────────── */
 /* Enes Doğanay | 4 Mayıs 2026: cmp-actions compact */
 .cmp-actions {

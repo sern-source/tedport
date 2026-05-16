@@ -1,6 +1,7 @@
 // Enes Doğanay | 7 Mayıs 2026: Teklif chat state + realtime + handler'lar
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../../../supabaseClient';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 import {
     fetchChatMessages, sendChatMessage as sendChatMessageService,
     enrichTeklifMessages,
@@ -123,6 +124,8 @@ export const useTeklifChat = ({
 
     const handleSendChatMessage = useCallback(async () => {
         if (!chatInput.trim() || !activeQuoteChat || chatSending) return;
+        // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu
+        if (containsProfanity(chatInput)) throw new Error(PROFANITY_ERROR_MSG);
         setChatSending(true);
         const isIncoming = incomingQuotes.some(q => q.id === activeQuoteChat.id);
         const senderRole = isIncoming ? 'company' : 'user';

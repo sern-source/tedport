@@ -1,5 +1,6 @@
 // Enes Doğanay | 7 Mayıs 2026: İhale oluşturma form handler'ları — gereksinim, email, firma, dosya, submit
 import * as ihaleService from '../services/ihaleService';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 // Enes Doğanay | 7 Mayıs 2026: Tüm form alan handler'ları ve submit — state dışarıdan gelir
 export const useIhaleCreateHandlers = ({
@@ -34,6 +35,16 @@ export const useIhaleCreateHandlers = ({
     };
 
     const handleCreateFormSubmit = async (forceDurum) => {
+        // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu — başlık, açıklama ve gereksinim kalemleri
+        const ihaleTexts = [
+            createForm.baslik,
+            createForm.aciklama,
+            ...(createForm.gereksinimler || []).flatMap(g => [g.madde, g.aciklama]),
+        ];
+        if (ihaleTexts.some(t => containsProfanity(t))) {
+            setStepperState(p => ({ ...p, error: PROFANITY_ERROR_MSG }));
+            return;
+        }
         setStepperState(p => ({ ...p, saving: true, error: '' }));
         try {
             const pendingEmail = emailState.input.trim().toLowerCase();

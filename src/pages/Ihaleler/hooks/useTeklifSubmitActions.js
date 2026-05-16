@@ -4,6 +4,7 @@ import {
     uploadTeklifDosya, submitTeklif, sendTeklifNotification,
     deleteDraftTeklif, withdrawTeklif, getAuthSession,
 } from '../services/teklifFormService';
+import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 const useTeklifSubmitActions = ({ formState, userOffers, setUserOffers, authManagedCompanyId, managedCompanyName, userProfile }) => {
     const {
@@ -32,6 +33,11 @@ const useTeklifSubmitActions = ({ formState, userOffers, setUserOffers, authMana
                 }
                 if (!teklifForm.teslim_suresi_gun) { setTeklifError('Tahmini teslim süresini belirtin.'); return; }
             }
+            // Enes Doğanay | 16 Mayıs 2026: İçerik moderasyonu — kalem açıklamaları, not ve teslim açıklaması
+            const profaneKalem = teklifForm.kalemler.find(k => k.aciklama && containsProfanity(k.aciklama));
+            if (profaneKalem) { setTeklifError(PROFANITY_ERROR_MSG); return; }
+            if (teklifForm.not && containsProfanity(teklifForm.not)) { setTeklifError(PROFANITY_ERROR_MSG); return; }
+            if (teklifForm.teslim_aciklamasi && containsProfanity(teklifForm.teslim_aciklamasi)) { setTeklifError(PROFANITY_ERROR_MSG); return; }
             let dosyaPath = null, dosyaAdi = null;
             if (teklifDosya) {
                 const result = await uploadTeklifDosya(session.user.id, teklifDosya);
