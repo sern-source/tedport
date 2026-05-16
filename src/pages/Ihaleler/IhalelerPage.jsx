@@ -27,8 +27,11 @@ const IhalelerPage = () => {
     const duzenleParam = searchParams.get("duzenle") || "";
     const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
 
+    // Enes Doğanay | 16 Mayıs 2026: Demo hesap tespiti — demo.* @tedport.com patternı
+    const isDemoUser = /^demo\.[^@]+@tedport\.com$/.test(userProfile?.email || '');
+
     // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleleri yükle — kullanıcı email ve firma bilgisi
-    const ihaleler = useIhaleler(firmaFilter, { userEmail: userProfile?.email, userFirmaId: authManagedCompanyId });
+    const ihaleler = useIhaleler(firmaFilter, { userEmail: userProfile?.email, userFirmaId: authManagedCompanyId, isDemoUser });
     const myTendersHook = useMyTenders({ fetchPublicTenders: ihaleler.fetchPublicTenders });
     const ihaleFormHook = useIhaleForm({
         managedFirmaId: myTendersHook.managedFirmaId,

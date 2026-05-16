@@ -21,7 +21,8 @@ const CTASection = () => {
                         <p>Kurumsal profilinizi oluşturun, yeni firmalarla bağlantı kurun ve iş fırsatlarına ulaşın.</p>
                         <div className="sc-cta-panel__btns">
                             <button className="sc-btn-white" onClick={() => navigate('/register')}>
-                                Ücretsiz Kayıt Ol
+                                {/* Enes Doğanay | 16 Mayıs 2026: "Ücretsiz Kayıt Ol" → "Platforma Katıl" */}
+                                Platforma Katıl
                             </button>
                             <button className="sc-btn-transparent" onClick={() => navigate('/firmalar')}>
                                 Firmalar

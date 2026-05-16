@@ -131,6 +131,27 @@ export const useLogin = () => {
     }
   };
 
+  // Enes Doğanay | 16 Mayıs 2026: Demo hesabı otomatik girişi — yatırımcı/sunum ortamı
+  // Tab kontrolü bypass edilir; e-posta türünden doğru yönlendirme yapılır
+  const [demoLoading, setDemoLoading] = useState(null); // null | email string
+  const handleDemoLogin = async (demoEmail) => {
+    setFeedback({ text: '', type: '' });
+    setDemoLoading(demoEmail);
+    try {
+      setValidatingLogin(true);
+      const data = await authService.signIn(demoEmail, 'Demo2026!', false);
+      setValidatingLogin(false);
+      await reloadUserData();
+      const firmaId = await authService.getOwnerFirma(data.user.id);
+      navigate(firmaId ? '/firma-profil?tab=panel' : '/ihaleler');
+    } catch {
+      setValidatingLogin(false);
+      setFeedback({ text: 'Demo girişi başarısız. Seed SQL çalıştırıldığından emin olun.', type: 'error' });
+    } finally {
+      setDemoLoading(null);
+    }
+  };
+
   return {
     email, setEmail,
     password, setPassword,
@@ -145,5 +166,7 @@ export const useLogin = () => {
     handleTabChange,
     handleGoogleLogin,
     handleLinkedInLogin,
+    demoLoading,
+    handleDemoLogin,
   };
 };

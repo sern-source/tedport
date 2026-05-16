@@ -38,6 +38,7 @@ const IhaleFormModal = ({
     const handleNext = () => {
         if (stepperStep === 0) {
             if (!form.baslik.trim()) { setFormError('İhale başlığı zorunludur.'); return; }
+            if (!form.aciklama.trim()) { setFormError('İhale açıklaması zorunludur.'); return; }
             if (!form.teslim_il) { setFormError('Teslim yeri il seçimi zorunludur.'); return; }
             if (!form.teslim_ilce) { setFormError('Teslim yeri ilçe seçimi zorunludur.'); return; }
         }

@@ -13,7 +13,7 @@ const IhaleFormStep1 = ({ form, setForm }) => (
             <input type="text" value={form.baslik} onChange={e => setForm(p => ({ ...p, baslik: e.target.value }))} placeholder="Örn. 500 adet laptop alımı" />
         </label>
         <label className="ihale-field ihale-field--full">
-            <span>Açıklama</span>
+            <span>Açıklama *</span>
             <textarea rows={4} value={form.aciklama} onChange={e => setForm(p => ({ ...p, aciklama: e.target.value }))} placeholder="İhale kapsamı, genel bilgiler, teknik gereksinimler…" />
         </label>
         {/* Enes Doğanay | 12 Mayıs 2026: Sektör — isteğe bağlı */}

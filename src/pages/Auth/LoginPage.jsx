@@ -1,6 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Login sayfası — useLogin hook ile tüm mantık ayrıştırıldı
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import SEO from '../../components/SEO';
@@ -20,12 +20,17 @@ const NAV = [
 ];
 
 export default function LoginPage() {
+  // Enes Doğanay | 16 Mayıs 2026: Demo paneli sadece ?demo=true URL parametresiyle görünür
+  const { search } = useLocation();
+  const isDemoVisible = new URLSearchParams(search).get('demo') === 'true';
+
   const {
     email, setEmail, password, setPassword,
     rememberMe, setRememberMe, showPassword, setShowPassword,
     activeTab, loading, forgotLoading, feedback,
     handleLogin, handleForgotPassword, handleTabChange,
     handleGoogleLogin, handleLinkedInLogin,
+    demoLoading, handleDemoLogin,
   } = useLogin();
 
   const isError = feedback.type === 'error';
@@ -140,6 +145,58 @@ export default function LoginPage() {
           </div>
 
         </div>
+
+        {/* Enes Doğanay | 16 Mayıs 2026: Demo ortamı — sadece ?demo=true ile görünür */}
+        {isDemoVisible && (
+        <div className="demo-panel">
+          <div className="demo-panel__header">
+            <span className="material-symbols-outlined">science</span>
+            <span>Demo Ortamı</span>
+          </div>
+          <p className="demo-panel__desc">Platforma katılmadan önce tüm özellikleri deneyin — gerçek sistem, hazır verilerle.</p>
+          <div className="demo-panel__btns">
+            <button
+              className="demo-btn"
+              onClick={() => handleDemoLogin('demo.alici@tedport.com')}
+              disabled={!!demoLoading}
+            >
+              <span className="material-symbols-outlined">request_quote</span>
+              <span className="demo-btn__label">
+                <strong>Alıcı Firma</strong>
+                <small>İhale açar, teklifleri yönetir</small>
+              </span>
+              {demoLoading === 'demo.alici@tedport.com' && <span className="demo-btn__spinner" />}
+            </button>
+
+            <button
+              className="demo-btn"
+              onClick={() => handleDemoLogin('demo.tedarikci@tedport.com')}
+              disabled={!!demoLoading}
+            >
+              <span className="material-symbols-outlined">factory</span>
+              <span className="demo-btn__label">
+                <strong>Tedarikçi Firma</strong>
+                <small>İhalelere teklif verir</small>
+              </span>
+              {demoLoading === 'demo.tedarikci@tedport.com' && <span className="demo-btn__spinner" />}
+            </button>
+
+            <button
+              className="demo-btn"
+              onClick={() => handleDemoLogin('demo.bireysel@tedport.com')}
+              disabled={!!demoLoading}
+            >
+              <span className="material-symbols-outlined">person</span>
+              <span className="demo-btn__label">
+                <strong>Bireysel Kullanıcı</strong>
+                <small>Firma olmadan teklif verir</small>
+              </span>
+              {demoLoading === 'demo.bireysel@tedport.com' && <span className="demo-btn__spinner" />}
+            </button>
+          </div>
+        </div>
+        )}
+
       </main>
     </div>
   );

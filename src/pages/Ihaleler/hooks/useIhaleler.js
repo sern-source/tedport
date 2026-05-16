@@ -15,7 +15,7 @@ const sortPageByStatus = (items) =>
         return aO - bO;
     });
 
-const useIhaleler = (firmaFilter, { userEmail, userFirmaId } = {}) => {
+const useIhaleler = (firmaFilter, { userEmail, userFirmaId, isDemoUser = false } = {}) => {
     const [tenders, setTenders] = useState([]);
     // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler — ayrı sorgu, merge edilir
     const [invitedTenders, setInvitedTenders] = useState([]);
@@ -60,7 +60,7 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId } = {}) => {
         setLoading(true);
         try {
             const { tenders: data, tableMissing: missing, total: tot } = await fetchPublicTenders({
-                page, firmaFilter, statusFilter, searchTerm: debouncedSearch, sortBy,
+                page, firmaFilter, statusFilter, searchTerm: debouncedSearch, sortBy, isDemoUser,
             });
             if (data === null) return;
             // Enes Doğanay | 13 Mayıs 2026: "Tümü" görünümünde sayfa içi durum gruplandırması
@@ -72,17 +72,17 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId } = {}) => {
         } catch (error) {
             if (error?.name !== 'AbortError') setTenders([]);
         } finally { setLoading(false); }
-    }, [page, firmaFilter, statusFilter, debouncedSearch, sortBy]);
+    }, [page, firmaFilter, statusFilter, debouncedSearch, sortBy, isDemoUser]);
 
     // Enes Doğanay | 13 Mayıs 2026: Header badge sayıları — firmaFilter dışındakilere bağlı değil
     const loadCounts = useCallback(async () => {
         try {
-            const counts = await fetchTenderCounts({ firmaFilter });
+            const counts = await fetchTenderCounts({ firmaFilter, isDemoUser });
             setLiveCount(counts.liveCount);
             setUpcomingCount(counts.upcomingCount);
             setClosedCount(counts.closedCount);
         } catch { /* sessiz — badge sayıları kritik değil */ }
-    }, [firmaFilter]);
+    }, [firmaFilter, isDemoUser]);
 
     useEffect(() => {
         const fallbackTimer = setTimeout(() => setLoading(false), 12000);

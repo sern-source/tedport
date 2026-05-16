@@ -51,7 +51,7 @@ export const formatTenderBudget = (budgetNote) => {
 export const buildInviteMailto = (email) => {
     const subject = encodeURIComponent('Tedport - İhale Bildirimleri Daveti');
     const body = encodeURIComponent(
-        `Merhaba,\n\nSizi Tedport Tedarik Portalı'na davet etmek istiyorum.\n\nTedport'a ücretsiz üye olarak ihale bildirimlerini alabilir, teklif süreçlerinizi kolayca yönetebilirsiniz.\n\nKayıt olmak için:\nhttps://tedport.com/register\n\nİyi çalışmalar!`
+        `Merhaba,\n\nSizi Tedport Tedarik Portalı'na davet etmek istiyorum.\n\nTedport'a hemen üye olarak ihale bildirimlerini alabilir, teklif süreçlerinizi kolayca yönetebilirsiniz.\n\nKayıt olmak için:\nhttps://tedport.com/register\n\nİyi çalışmalar!`
     );
     return `mailto:${email}?subject=${subject}&body=${body}`;
 };

@@ -9,7 +9,8 @@ import {
     deleteReminderService, upsertNotifPrefsService,
 } from '../services/notificationsService';
 
-export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showPrToast) => {
+// Enes Doğanay | 16 Mayıs 2026: refreshCounts — AuthContext header badge'ini anlık günceller
+export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showPrToast, refreshCounts = () => {}) => {
   const [notifications, setNotifications] = useState([]);
   const [upcomingReminders, setUpcomingReminders] = useState([]);
   const [showAllNotifications, setShowAllNotifications] = useState(false);
@@ -62,10 +63,11 @@ export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifP
     try {
       await markNotifReadService(userId, notifId);
       setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_read: true } : n));
+      refreshCounts();
     } catch (err) {
       if (!isMissingRelationError(err)) showPrToast('error', 'Bildirim güncellenemedi.');
     }
-  }, [userId, showPrToast]);
+  }, [userId, showPrToast, refreshCounts]);
 
   const handleMarkAllNotificationsRead = useCallback(async () => {
     const unread = notifications.filter(n => !n.is_read);
@@ -73,25 +75,28 @@ export const useNotifications = (userId, notifPrefs, setNotifPrefs, updateNotifP
     try {
       await markAllNotifsReadService(userId, unread.map(n => n.id));
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      refreshCounts();
     } catch (err) {
       if (!isMissingRelationError(err)) showPrToast('error', 'Bildirimler güncellenemedi.');
     }
-  }, [notifications, userId, showPrToast]);
+  }, [notifications, userId, showPrToast, refreshCounts]);
 
   const handleDeleteNotification = useCallback(async (notifId) => {
     try {
       await deleteNotifService(userId, notifId);
       setNotifications(prev => prev.filter(n => n.id !== notifId));
+      refreshCounts();
     } catch { showPrToast('error', 'Bildirim silinemedi.'); }
-  }, [userId, showPrToast]);
+  }, [userId, showPrToast, refreshCounts]);
 
   const handleDeleteAllNotifications = useCallback(async () => {
     if (!notifications.length) return;
     try {
       await deleteAllNotifsService(userId);
       setNotifications([]);
+      refreshCounts();
     } catch { showPrToast('error', 'Bildirimler silinemedi.'); }
-  }, [notifications.length, userId, showPrToast]);
+  }, [notifications.length, userId, showPrToast, refreshCounts]);
 
   const handleDeleteReminder = useCallback(async (reminder) => {
     try {

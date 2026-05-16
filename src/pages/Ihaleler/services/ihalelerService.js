@@ -36,7 +36,7 @@ const applyVisibility = (query, statusFilter) => {
 };
 
 // Enes Doğanay | 13 Mayıs 2026: Sunucu tarafı sayfalama + tüm filtreler
-export const fetchPublicTenders = async ({ page = 1, firmaFilter, statusFilter = 'all', searchTerm, sortBy = 'deadline' } = {}) => {
+export const fetchPublicTenders = async ({ page = 1, firmaFilter, statusFilter = 'all', searchTerm, sortBy = 'deadline', isDemoUser = false } = {}) => {
     const from = (page - 1) * PAGE_SIZE;
     const to   = from + PAGE_SIZE - 1;
 
@@ -46,6 +46,14 @@ export const fetchPublicTenders = async ({ page = 1, firmaFilter, statusFilter =
         .neq('durum', 'draft')
         // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler genel listeden gizlenir
         .neq('ihale_tipi', 'Davetli İhale');
+
+    // Enes Doğanay | 16 Mayıs 2026: Demo ayrımı — demo hesaplar sadece demo ihaleleri, gerçek kullanıcılar gerçek ihaleleri görür
+    // NULL slug'lar gerçek ihaleler olduğu için dahil edilir (or ile handle edilir)
+    if (isDemoUser) {
+        query = query.ilike('slug', 'demo-%');
+    } else {
+        query = query.or('slug.is.null,slug.not.ilike.demo-%');
+    }
 
     if (firmaFilter) query = query.eq('firma_id', firmaFilter);
 
@@ -110,7 +118,7 @@ export const fetchPublicTenders = async ({ page = 1, firmaFilter, statusFilter =
 };
 
 // Enes Doğanay | 13 Mayıs 2026: Header badge sayıları — 3 paralel COUNT sorgusu
-export const fetchTenderCounts = async ({ firmaFilter } = {}) => {
+export const fetchTenderCounts = async ({ firmaFilter, isDemoUser = false } = {}) => {
     const makeBase = () => {
         let q = supabase
             .from('firma_ihaleleri')
@@ -118,6 +126,12 @@ export const fetchTenderCounts = async ({ firmaFilter } = {}) => {
             .neq('durum', 'draft')
             // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler sayaçlara dahil edilmez
             .neq('ihale_tipi', 'Davetli İhale');
+        // Enes Doğanay | 16 Mayıs 2026: Demo ayrımı — NULL slug'lar gerçek ihaleler, or ile dahil edilir
+        if (isDemoUser) {
+            q = q.ilike('slug', 'demo-%');
+        } else {
+            q = q.or('slug.is.null,slug.not.ilike.demo-%');
+        }
         if (firmaFilter) q = q.eq('firma_id', firmaFilter);
         return q;
     };

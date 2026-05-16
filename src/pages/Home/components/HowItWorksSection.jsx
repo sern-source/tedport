@@ -68,7 +68,8 @@ const HowItWorksSection = () => {
                 <div className="sc-how-cta">
                     <button className="sc-how-cta-btn" onClick={() => navigate('/register')}>
                         <span className="material-symbols-outlined">rocket_launch</span>
-                        Hemen Başla — Ücretsiz
+                        {/* Enes Doğanay | 16 Mayıs 2026: "— Ücretsiz" kaldırıldı */}
+                        Hemen Başla
                     </button>
                 </div>
             </div>

@@ -43,7 +43,7 @@ const ProfilePage = () => {
   } = core;
 
   const currentTab = searchParams.get('tab') || 'profile';
-  const notifData = useNotifications(user?.id, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showPrToast);
+  const notifData = useNotifications(user?.id, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showPrToast, refreshCounts);
   const quotesData = useQuotes(user?.id, setActiveViewingTeklifId, notifData.notifications, notifData.setNotifications, refreshCounts);
   const favData = useFavorites(user?.id, showPrToast);
   const content = useProfileContent({ notifData, quotesData, navigate, setSearchParams, setMopChatTrigger });

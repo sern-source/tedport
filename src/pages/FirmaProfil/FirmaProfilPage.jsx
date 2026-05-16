@@ -27,7 +27,7 @@ const FirmaProfilPage = () => {
   // Enes Doğanay | 14 Mayıs 2026: myPagePermissions eklendi — analitik izin desteği
   const { companyId, firma, setFirma, userId, loading, myRole, myPagePermissions, showEkipPublic, ekipVisibilitySaving, handleEkipPublicToggle, isEmbedded, fromSirketim, currentTab, setTab, searchParams, setSearchParams, navigate, fpToast, showFpToast, notifPrefs, setNotifPrefs, handleLogout } = useFirmaCore();
 
-  const notifData = useNotifications(userId, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showFpToast);
+  const notifData = useNotifications(userId, notifPrefs, setNotifPrefs, updateNotifPrefsCache, showFpToast, refreshCounts);
   const favData = useFavorites(userId, showFpToast);
   const teklifData = useTeklifYonetimi({ companyId, userId, notifications: notifData.notifications, setNotifications: notifData.setNotifications, setActiveViewingTeklifId, refreshCounts, setTab, searchParams, setSearchParams, currentTab, showFpToast });
   const ekipData = useEkipYonetimi({ companyId, userId, firmaAdi: firma?.firma_adi, showFpToast });

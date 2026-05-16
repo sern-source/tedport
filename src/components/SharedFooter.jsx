@@ -44,7 +44,8 @@ const SharedFooter = () => {
                         <ul>
                             <li><Link to="/firmalar">Firmalar</Link></li>
                             <li><Link to="/ihaleler">İhaleler</Link></li>
-                            {!userProfile && <li><Link to="/register">Ücretsiz Kayıt Ol</Link></li>}
+                            {/* Enes Doğanay | 16 Mayıs 2026: "Ücretsiz Kayıt Ol" → "Platforma Katıl" */}
+                            {!userProfile && <li><Link to="/register">Platforma Katıl</Link></li>}
                             {!userProfile && <li><Link to="/login">Giriş Yap</Link></li>}
                         </ul>
                     </div>

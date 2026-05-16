@@ -255,33 +255,34 @@
 
 /* ═══════════════════════════════════════════════════
    YENİ İHALE OLUŞTUR BUTONU
+   Enes Doğanay | 16 Mayıs 2026: outline → fill on hover, compact
    ═══════════════════════════════════════════════════ */
 .tom-btn--create-tender {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
+    gap: 5px;
+    padding: 6px 13px;
+    border-radius: 8px;
+    background: transparent;
+    color: #2563eb;
     font-size: 0.78rem;
-    font-weight: 700;
-    border: none;
+    font-weight: 600;
+    border: 1.5px solid #2563eb;
     cursor: pointer;
     font-family: inherit;
-    transition: all 0.2s;
+    transition: all 0.18s ease;
     white-space: nowrap;
-    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
     letter-spacing: 0.01em;
 }
 
 .tom-btn--create-tender:hover {
-    background: linear-gradient(135deg, #1d4ed8, #1e40af);
-    box-shadow: 0 5px 18px rgba(37,99,235,0.4);
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.28);
     transform: translateY(-1px);
 }
 
-.tom-btn--create-tender .material-symbols-outlined { font-size: 18px; }
+.tom-btn--create-tender .material-symbols-outlined { font-size: 16px; }
 
 .tom-btn--repeat {
     background: linear-gradient(135deg, #059669, #10b981);

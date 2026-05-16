@@ -120,6 +120,9 @@
     /* Chat butonu daha kompakt */
     .tom-btn--chat { padding: 5px 10px; font-size: 0.75rem; }
 
+    /* Enes Doğanay | 16 Mayıs 2026: create-tender min-height override — küçük kalmalı */
+    .tom-btn--create-tender { min-height: unset; padding: 6px 13px; font-size: 0.78rem; }
+
     /* footer-right: yan yana kalsın — wrap ekleme, 2 buton %50 + %50 */
     .tom-offer-card__footer-right { flex-wrap: nowrap; }
 

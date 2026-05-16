@@ -8,7 +8,8 @@ const buildStats = ({ firmaCount }) => [
     { num: `${firmaCount}`, label: 'Firma',          icon: 'domain',      color: '#2563eb' },
     { num: '20',            label: 'Sektör',          icon: 'category',    color: '#0891b2' },
     { num: '81 İl',         label: 'Türkiye Geneli',  icon: 'location_on', color: '#059669' },
-    { num: '100%',          label: 'Ücretsiz Üyelik', icon: 'verified',    color: '#7c3aed' },
+    // Enes Doğanay | 16 Mayıs 2026: "Ücretsiz Üyelik" → platform kalite metriğine çevrildi
+    { num: '7/24',          label: 'Kesintisiz Erişim', icon: 'schedule',    color: '#7c3aed' },
 ];
 
 const AboutStats = () => {
