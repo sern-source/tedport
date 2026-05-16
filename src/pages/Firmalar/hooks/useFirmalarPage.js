@@ -10,7 +10,8 @@ import { useFirmalarState } from './useFirmalarState';
 // Enes Doğanay | 12 Mayıs 2026: sector eklendi — kart meta-info'da gösterilir
 const mapFirmaData = (item) => ({
     id: item.firmaID, name: item.firma_adi, isBest: item.best,
-    isVerified: item.onayli_hesap === true, location: formatLocation(item.il_ilce),
+    // Enes Doğanay | 17 Mayıs 2026: is_demo=true firmalarda badge gizlenir, isVerified butonu için true kalır
+    isVerified: item.onayli_hesap === true, isDemo: item.is_demo === true, location: formatLocation(item.il_ilce),
     // Enes Doğanay | 12 Mayıs 2026: ana_sektor yoksa category_name'e fall back — panel "Ana Sektör" alanı category_name'i yazar
     sector: item.ana_sektor || item.category_name || '',
     tags: degerleriDiziyeCevir(item.urun_kategorileri), description: item.description,

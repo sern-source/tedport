@@ -43,8 +43,9 @@ const buildSearchQuery = (query, search, searchMode = 'all') => {
 
 const buildFilterQuery = (query, filters) => {
   // Enes Doğanay | 12 Mayıs 2026: Onaylı firma quick-filter
+  // Enes Doğanay | 17 Mayıs 2026: Demo firmalar is_demo=true → onaylı filtresinden hariç tut
   if (filters.onlyVerified) {
-    query = query.eq('onayli_hesap', true);
+    query = query.eq('onayli_hesap', true).eq('is_demo', false);
   }
   if (filters.cities?.length > 0) {
     const parts = filters.cities.flatMap(city => {
@@ -112,7 +113,7 @@ export const fetchFirmalar = async ({ page, search, filters, sortMode, searchMod
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   let query = supabase.from('firmalar').select(
-    'firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres, onayli_hesap',
+    'firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres, onayli_hesap, is_demo',
     { count: 'exact' }
   );
   // Enes Doğanay | 11 Mayıs 2026: searchMode'a göre farklı alanlar aranır

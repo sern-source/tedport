@@ -8,6 +8,8 @@ import './FirmaDetayHero.css';
 const FirmaDetayHero = ({
     firma,
     isVerified,
+    // Enes Doğanay | 17 Mayıs 2026: Demo firmalar badge almaz
+    isDemo,
     isCurrentUserCompanyManager,
     firmaEkip,
     onShowEkipModal,
@@ -61,13 +63,13 @@ const FirmaDetayHero = ({
                                 <div>
                                     <h1 className="company-name">
                                         {firma.firma_adi}
-                                        {isVerified && (
+                                        {isVerified && !isDemo && (
                                             <span className="verified-badge">
                                                 <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>verified</span>
                                                 Onaylı Firma
                                             </span>
                                         )}
-                                        {!isVerified && (
+                                        {!isVerified && !isDemo && (
                                             <span className="platform-profile-badge">
                                                 <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>public</span>
                                                 Otomatik Profil

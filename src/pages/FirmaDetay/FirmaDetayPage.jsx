@@ -45,7 +45,7 @@ const FirmaDetayPage = () => {
             <FdToast toast={fd.fdToast} onClose={() => fd.setFdToast(null)} />
             <SharedHeader search={fd.detaySearch} setSearch={fd.setDetaySearch} showSearchBar={true} suggestions={fd.suggestions} onSuggestionClick={fd.handleSuggestionClick} onSearchSubmit={fd.handleSearchSubmit} noResults={fd.noResults} navItems={NAV_ITEMS} searchMode={fd.detaySearchMode} onSearchModeChange={fd.setDetaySearchMode} />
             {/* Enes Doğanay | 13 Mayıs 2026: viewCount — firma sahibine analitik badge */}
-            <FirmaDetayHero firma={fd.firma} isVerified={fd.isVerified} isCurrentUserCompanyManager={fd.isCurrentUserCompanyManager} firmaEkip={fd.firmaEkip} onShowEkipModal={() => fd.setShowEkipModal(true)} isLoggedIn={!!fd.userProfile} sertifikalar={fd.sertifikalar} viewCount={fd.viewCount} />
+            <FirmaDetayHero firma={fd.firma} isVerified={fd.isVerified} isDemo={fd.isDemo} isCurrentUserCompanyManager={fd.isCurrentUserCompanyManager} firmaEkip={fd.firmaEkip} onShowEkipModal={() => fd.setShowEkipModal(true)} isLoggedIn={!!fd.userProfile} sertifikalar={fd.sertifikalar} viewCount={fd.viewCount} />
             <FirmaDetayMain fd={fd} firmaId={id} />
             <FirmaDetayModals fd={fd} />
         </>

@@ -123,7 +123,7 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.firmalar (
   "firmaID", firma_adi, ana_sektor, category_name, il_ilce,
-  description, telefon, eposta, web_sitesi, onayli_hesap
+  description, telefon, eposta, web_sitesi, onayli_hesap, is_demo
 )
 VALUES
   -- Alıcı firma 1: Demir-Çelik sektöründen ihale açacak
@@ -131,28 +131,28 @@ VALUES
    'Kardemir Çelik A.Ş.',
    'Demir & Çelik', 'Demir & Çelik', 'İstanbul / Tuzla',
    'Türkiye''nin köklü demir-çelik üreticilerinden. İnşaat demiri, profil çelik ve sac ürünleri tedarik zinciri yönetimi için Tedport''u kullanmaktadır.',
-   '+90 212 555 01 01', 'tedarik@kardemir-demo.com', 'kardemir-demo.com', true),
+   '+90 212 555 01 01', 'tedarik@kardemir-demo.com', 'kardemir-demo.com', true, true),
 
   -- Alıcı firma 2: Gıda sektöründen ihale açacak
   ('da000002-0000-4000-8000-000000000000',
    'Keyifli Gıda ve İçecek A.Ş.',
    'Gıda & Tarım', 'Gıda & Tarım', 'İzmir / Bornova',
    'Batı Anadolu''nun önde gelen gıda üretim tesislerinden biri. Ambalaj, lojistik ve hammadde tedariği için Tedport''u kullanmaktadır.',
-   '+90 232 555 01 02', 'satin.alma@keyifli-demo.com', 'keyifli-demo.com', true),
+   '+90 232 555 01 02', 'satin.alma@keyifli-demo.com', 'keyifli-demo.com', true, true),
 
   -- Tedarikçi firma 1: Makine bakım-onarım
   ('b0000001-0000-4000-8000-000000000000',
    'Metalsan Makine San. A.Ş.',
    'Makine & Teçhizat', 'Makine & Teçhizat', 'Bursa / Nilüfer',
    'CNC tezgah bakımı, kaynak ve mekanik imalat alanında uzmanlaşmış tedarikçi. Ağır sanayi makineleri için OEM ve yedek parça tedariki yapmaktadır.',
-   '+90 224 555 02 02', 'teklif@metalsan-demo.com', 'metalsan-demo.com', true),
+   '+90 224 555 02 02', 'teklif@metalsan-demo.com', 'metalsan-demo.com', true, true),
 
   -- Tedarikçi firma 2: Lojistik
   ('b0000002-0000-4000-8000-000000000000',
    'FastLog Lojistik A.Ş.',
    'Lojistik & Taşımacılık', 'Lojistik & Taşımacılık', 'İstanbul / Pendik',
    'Soğuk zincir, parsiyel ve komple yük taşımacılığı alanında faaliyet gösteren lojistik firması. ATP sertifikalı araç filosuyla gıda sektörüne hizmet vermektedir.',
-   '+90 216 555 04 04', 'info@fastlog-demo.com', 'fastlog-demo.com', true)
+   '+90 216 555 04 04', 'info@fastlog-demo.com', 'fastlog-demo.com', true, true)
 
 ON CONFLICT ("firmaID") DO NOTHING;
 

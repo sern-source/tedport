@@ -61,14 +61,14 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
         <h3 className="supplier-name">
           <a href={`/firmadetay/${supplier.id}`} onClick={handleNavigate} style={{ color: 'inherit', textDecoration: 'none' }}>
             {supplier.name}
-            {supplier.isVerified && (
+            {supplier.isVerified && !supplier.isDemo && (
               <span className="verified-badge-inline">
                 <span className="material-symbols-outlined verified-icon">verified</span>
                 <span className="verified-text">Onaylı Firma</span>
               </span>
             )}
             {/* Enes Doğanay | 12 Mayıs 2026: Otomatik Profil → Firma Onayı Bekleniyor */}
-            {!supplier.isVerified && (
+            {!supplier.isVerified && !supplier.isDemo && (
               <span className="platform-badge-inline">
                 <span className="platform-badge-text">Firma Onayı Bekleniyor</span>
                 <span className="material-symbols-outlined platform-badge-icon">schedule</span>

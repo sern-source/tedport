@@ -23,6 +23,8 @@ export function useFirmaDetay(id) {
     const [loading, setLoading] = useState(true);
     const [firmaEkip, setFirmaEkip] = useState([]);
     const [isVerified, setIsVerified] = useState(false);
+    // Enes Doğanay | 17 Mayıs 2026: Demo firmalar badge almaz ama Teklif İste açık kalır
+    const [isDemo, setIsDemo] = useState(false);
     const [tenders, setTenders] = useState([]);
     const [tendersLoading, setTendersLoading] = useState(true);
     const [isTendersTableMissing, setIsTendersTableMissing] = useState(false);
@@ -75,7 +77,7 @@ export function useFirmaDetay(id) {
                 fetchFirmaTenders(id).catch(err => ({ __error: err })),
                 fetchFirmaSertifikalari(id).catch(() => []),
             ]);
-            if (firmaData) { setFirma(firmaData); setIsVerified(firmaData?.onayli_hesap === true); fetchFirmaEkip(id).then(notes.setSavedNotes && (ekip => setFirmaEkip(ekip))); }
+            if (firmaData) { setFirma(firmaData); setIsVerified(firmaData?.onayli_hesap === true); setIsDemo(firmaData?.is_demo === true); fetchFirmaEkip(id).then(notes.setSavedNotes && (ekip => setFirmaEkip(ekip))); }
             if (Array.isArray(tendersData)) { setTenders(tendersData); setIsTendersTableMissing(false); }
             else if (tendersData?.__error) { if (isMissingRelationError(tendersData.__error)) setIsTendersTableMissing(true); setTenders([]); }
             setSertifikalar(Array.isArray(sertData) ? sertData : []);
@@ -165,7 +167,7 @@ export function useFirmaDetay(id) {
     const isCurrentUserCompanyManager = Boolean(userProfile && managedCompanyId && String(managedCompanyId) === String(id));
 
     return {
-        firma, loading, firmaEkip, isVerified, isCurrentUserCompanyManager,
+        firma, loading, firmaEkip, isVerified, isDemo, isCurrentUserCompanyManager,
         userProfile, managedCompanyId,
         tenders, tendersLoading, isTendersTableMissing, showAllTenders, setShowAllTenders, TENDERS_PREVIEW,
         expandedCategories, toggleCategory, parseHiyerarsikKategoriler,
