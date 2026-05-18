@@ -69,10 +69,11 @@ const FirmaDetayHero = ({
                                                 Onaylı Firma
                                             </span>
                                         )}
+                                        {/* Enes Doğanay | 19 Mayıs 2026: Otomatik Profil → Firma Onayı Bekleniyor (schedule ikonu) */}
                                         {!isVerified && !isDemo && (
                                             <span className="platform-profile-badge">
-                                                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>public</span>
-                                                Otomatik Profil
+                                                Firma Onayı Bekleniyor
+                                                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>schedule</span>
                                             </span>
                                         )}
                                     </h1>
