@@ -96,7 +96,7 @@ const normalizeOptionalString = (value?: string | null) => {
     return trimmedValue || null;
 };
 
-const normalizeCoordinate = (value?: number | null) => {
+const normalizeCoordinate = (value?: number | string | null) => {
     if (value === null || value === undefined || value === "") {
         return null;
     }
@@ -410,6 +410,9 @@ Deno.serve(async (request) => {
         return jsonResponse({ error: "Firma adı zorunludur." }, 400);
     }
 
+    // Enes Doğanay | 18 Mayıs 2026: logo_url bu payload'a dahil edilmez —
+    // Logo yönetimi pending/onay akışı üzerinden yürür (uploadLogoToPending → admin onay).
+    // Dahil edilmesi durumunda, panel eski logo_url değeriyle kaydedilince onaylı logo sıfırlanır.
     const updatePayload = {
         firma_adi: companyName,
         web_sitesi: normalizeWebsiteUrl(nextCompany.web_sitesi),
@@ -429,7 +432,6 @@ Deno.serve(async (request) => {
                 ? nextCompany.urun_kategorileri
                 : [],
         ),
-        logo_url: normalizeOptionalString(nextCompany.logo_url),
         il_ilce: normalizeOptionalString(nextCompany.il_ilce),
     };
 
@@ -438,7 +440,7 @@ Deno.serve(async (request) => {
         .update(updatePayload)
         .eq("firmaID", managerResult.managerRow.firma_id)
         .select(
-            "firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best",
+            "firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best, pending_logo_url, pending_logo_red_notu, arama_etiketleri",
         )
         .single();
 
