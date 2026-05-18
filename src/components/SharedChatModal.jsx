@@ -20,6 +20,7 @@ const SharedChatModal = ({
     sending,
     endRef,
     isClosed,
+    closedMessage,
     onClose,
     onSend,
     onReport,
@@ -103,6 +104,7 @@ const SharedChatModal = ({
                     setInput={setInput}
                     sending={sending}
                     isClosed={isClosed}
+                    closedMessage={closedMessage}
                     onSend={onSend}
                 />
             </div>

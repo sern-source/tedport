@@ -10,7 +10,8 @@ const EMOJI_LIST = [
     '🤝','👏','🙌','💪','🚀','⭐','🌟','💎','📦','🏗️',
 ];
 
-const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
+// Enes Doğanay | 18 Mayıs 2026: closedMessage prop — bağlama göre farklı kapanış mesajı
+const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend, closedMessage }) => {
     // Enes Doğanay | 7 Mayıs 2026: Emoji picker açık/kapalı
     const [emojiOpen, setEmojiOpen] = useState(false);
     // Enes Doğanay | 16 Mayıs 2026: Gönderim hatası — profanity veya ağ hatası
@@ -47,7 +48,7 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend }) => {
         return (
             <div className="scm-closed">
                 <span className="material-symbols-outlined">lock</span>
-                Bu ihale kapalı — mesaj gönderilemez.
+                {closedMessage || 'Bu ihale kapalı — mesaj gönderilemez.'}
             </div>
         );
     }

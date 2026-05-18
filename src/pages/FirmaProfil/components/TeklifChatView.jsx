@@ -67,6 +67,7 @@ const TeklifChatView = ({
         sending={chatSending}
         endRef={chatEndRef}
         isClosed={isClosed}
+        closedMessage="Bu teklif talebi kapatılmıştır — mesaj gönderilemez."
         onClose={() => setActiveQuoteChat(null)}
         onSend={handleSendChatMessage}
         onReport={(msgId) => {
