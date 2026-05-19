@@ -182,14 +182,33 @@ export const fetchInvitedTenders = async (email, firmaId) => {
         );
     }
 
+    // Enes Doğanay | 19 Mayıs 2026: Firmanın kendi açtığı davetli ihaleler — sahibi olduğu için listede görünmeli
+    // ownQueryIndex: -1 ise kendi sorgusu eklenmedi (yalnızca email varsa)
+    let ownQueryIndex = -1;
+    if (firmaId) {
+        ownQueryIndex = queries.length;
+        queries.push(
+            supabase
+                .from('firma_ihaleleri')
+                .select('*')
+                .eq('ihale_tipi', 'Davetli İhale')
+                .neq('durum', 'draft')
+                .eq('firma_id', String(firmaId))
+        );
+    }
+
     const results = await Promise.all(queries);
     const seen = new Set();
     const all = [];
-    for (const { data } of results) {
+    results.forEach(({ data }, idx) => {
         for (const t of (data || [])) {
-            if (!seen.has(t.id)) { seen.add(t.id); all.push(t); }
+            if (!seen.has(t.id)) {
+                seen.add(t.id);
+                // Enes Doğanay | 19 Mayıs 2026: Kendi ihalesi → _isOwn; davetli → olduğu gibi
+                all.push(idx === ownQueryIndex ? { ...t, _isOwn: true } : t);
+            }
         }
-    }
+    });
     if (!all.length) return [];
 
     // Enes Doğanay | 14 Mayıs 2026: Firma bilgisi join

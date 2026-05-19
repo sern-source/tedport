@@ -115,6 +115,9 @@
 [data-theme="dark"] .ihale-req-adet-group { background: #0f172a; border-color: #334155; }
 [data-theme="dark"] .ihale-req-adet-group:focus-within { border-color: #3b82f6; background: #1e293b; }
 [data-theme="dark"] .ihale-req-adet-input { color: #e2e8f0; }
+/* Enes Doğanay | 19 Mayıs 2026: Stepper dark */
+[data-theme="dark"] .ihale-req-step-btn { color: #64748b; }
+[data-theme="dark"] .ihale-req-step-btn:hover { background: rgba(59,130,246,0.15); color: #93c5fd; }
 
 /* Enes Doğanay | 14 Mayıs 2026: Birim dropdown dark */
 [data-theme="dark"] .ihale-birim-wrap { border-left-color: #334155; }
@@ -128,6 +131,14 @@
 [data-theme="dark"] .ihale-birim-option-label { color: #e2e8f0; }
 [data-theme="dark"] .ihale-birim-option.active .ihale-birim-option-label { color: #93c5fd; }
 [data-theme="dark"] .ihale-birim-check { color: #93c5fd; }
+/* Enes Doğanay | 19 Mayıs 2026: Kategorili dropdown dark mode */
+[data-theme="dark"] .ihale-birim-category { color: #64748b; }
+[data-theme="dark"] .ihale-birim-category-divider { background: #334155; }
+[data-theme="dark"] .ihale-birim-option--custom .ihale-birim-option-label { color: #93c5fd; }
+[data-theme="dark"] .ihale-birim-option--custom:hover { background: #1e3a5f; }
+[data-theme="dark"] .ihale-birim-custom-input { background: #0f172a; border-color: #3b82f6; color: #e2e8f0; }
+[data-theme="dark"] .ihale-birim-custom-confirm { background: #3b82f6; }
+[data-theme="dark"] .ihale-birim-custom-confirm:disabled { background: #334155; }
 
 /* === Önizleme ek === */
 [data-theme="dark"] .ihale-preview__anonim-badge {

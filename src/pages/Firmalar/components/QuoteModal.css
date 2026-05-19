@@ -243,7 +243,7 @@
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   padding: 4px;
   overflow-y: auto;
-  max-height: 220px;
+  max-height: 340px;
 }
 .quote-birim-option {
   display: flex;
@@ -265,6 +265,29 @@
 .quote-birim-option-label { color: var(--text-dark); }
 .quote-birim-option.active .quote-birim-option-label { color: #2563eb; }
 .quote-birim-check { font-size: 14px; color: #2563eb; }
+/* Enes Doğanay | 19 Mayıs 2026: Kategori başlıkları + özel birim */
+.quote-birim-category {
+  font-size: 10px; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 6px 10px 2px; pointer-events: none; user-select: none;
+}
+.quote-birim-category-divider { height: 1px; background: var(--border); margin: 4px 6px; }
+.quote-birim-option--custom .quote-birim-option-label { color: #2563eb; font-style: italic; }
+.quote-birim-option--custom:hover { background: #eff6ff; }
+.quote-birim-custom-input-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 6px; }
+.quote-birim-custom-input {
+  flex: 1; min-width: 0; font-size: 12px; padding: 4px 7px;
+  border: 1px solid #3b82f6; border-radius: 5px;
+  background: var(--bg-white); color: var(--text-dark); outline: none; font-family: inherit;
+}
+.quote-birim-custom-confirm {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; flex-shrink: 0; border: none;
+  border-radius: 5px; background: #3b82f6; color: #fff;
+  cursor: pointer; padding: 0; transition: background 0.12s;
+}
+.quote-birim-custom-confirm:disabled { background: #cbd5e1; cursor: default; }
+.quote-birim-custom-confirm .material-symbols-outlined { font-size: 14px !important; }
 [data-theme="dark"] .quote-birim-trigger { background: #1e293b; border-color: #334155; color: #e2e8f0; }
 [data-theme="dark"] .quote-birim-trigger:hover,
 [data-theme="dark"] .quote-birim-trigger.open { border-color: #3b82f6; background: #1e3a5f; }
@@ -276,6 +299,14 @@
 [data-theme="dark"] .quote-birim-option-label { color: #e2e8f0; }
 [data-theme="dark"] .quote-birim-option.active .quote-birim-option-label { color: #93c5fd; }
 [data-theme="dark"] .quote-birim-check { color: #93c5fd; }
+/* Enes Doğanay | 19 Mayıs 2026: Kategori + özel birim dark mode */
+[data-theme="dark"] .quote-birim-category { color: #64748b; }
+[data-theme="dark"] .quote-birim-category-divider { background: #334155; }
+[data-theme="dark"] .quote-birim-option--custom .quote-birim-option-label { color: #93c5fd; }
+[data-theme="dark"] .quote-birim-option--custom:hover { background: #1e3a5f; }
+[data-theme="dark"] .quote-birim-custom-input { background: #0f172a; border-color: #3b82f6; color: #e2e8f0; }
+[data-theme="dark"] .quote-birim-custom-confirm { background: #3b82f6; }
+[data-theme="dark"] .quote-birim-custom-confirm:disabled { background: #334155; }
 @media (max-width: 480px) {
   .quote-miktar-row { flex-wrap: wrap; }
   .quote-birim-trigger { width: 100%; justify-content: space-between; }
@@ -332,8 +363,8 @@
 .quote-kalem-adet-group:focus-within { border-color: #3b82f6; background: var(--bg-white); }
 
 .quote-kalem-adet-input {
-  width: 26px !important;
-  min-width: 0;
+  min-width: 26px;
+  width: 26px;
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;

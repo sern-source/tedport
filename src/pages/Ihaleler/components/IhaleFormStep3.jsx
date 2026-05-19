@@ -1,13 +1,19 @@
 ﻿// Enes Doganay | 6 Mayis 2026: Ihale form adim 3 - Teknik/Ticari Sartlar
 // Enes Doganay | 14 Mayis 2026: Birim dropdown - position:fixed ile modal overflow'dan cikar
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-// Enes Doganay | 14 Mayis 2026: Desteklenen birim secenekleri
-const BIRIM_OPTIONS = [
-    'Adet', 'Kg', 'Ton', 'Gram', 'Litre',
-    'Metre', 'm²', 'Metreküp', 'Kutu', 'Paket',
-    'Set', 'Takım', 'Rulo', 'Palet', 'Lot',
+// Enes Doğanay | 19 Mayıs 2026: Kategorili birim listesi — geniş sektör kapsamı için
+const BIRIM_CATEGORIES = [
+    { label: '📦 Adet / Paketleme', options: ['Adet', 'Paket', 'Kutu', 'Koli', 'Palet', 'Rulo', 'Takım', 'Set', 'Çift', 'Deste', 'Varil', 'Bidon', 'Çuval', 'Şişe', 'Tüp', 'Konteyner'] },
+    { label: '⚖️ Ağırlık', options: ['Gram', 'Kilogram', 'Ton', 'Miligram'] },
+    { label: '📏 Uzunluk', options: ['Milimetre', 'Santimetre', 'Metre', 'Kilometre'] },
+    { label: '🧱 Alan / Hacim', options: ['m²', 'Dekar', 'Hektar', 'Mililitre', 'Litre', 'm³'] },
+    { label: '⏱️ Zaman', options: ['Saat', 'Gün', 'Hafta', 'Ay', 'Yıl'] },
+    { label: '👷 Hizmet / İş Gücü', options: ['Kişi', 'Adam/Saat', 'Sefer', 'Vardiya', 'Proje', 'Hizmet', 'İş Kalemi'] },
+    { label: '🚛 Lojistik', options: ['Tır', 'Kamyon', 'Yük', 'Parti'] },
+    { label: '⚡ Enerji / Teknik', options: ['Watt', 'Kilowatt', 'kWh', 'kVA', 'Volt', 'Amper'] },
+    { label: '💻 Yazılım / Dijital', options: ['Lisans', 'Kullanıcı', 'Abonelik'] },
 ];
 
 const IhaleFormStep3 = ({
@@ -22,20 +28,31 @@ const IhaleFormStep3 = ({
 }) => {
     const [birimOpen, setBirimOpen] = useState(false);
     const [menuPos, setMenuPos] = useState({ top: 0, left: 0, width: 0 });
+    // Enes Doğanay | 19 Mayıs 2026: Özel birim modu — kullanıcı istediği birimi yazar
+    const [customBirimMode, setCustomBirimMode] = useState(false);
+    const [customBirimInput, setCustomBirimInput] = useState('');
     const triggerRef = useRef(null);
+    const customBirimRef = useRef(null);
     const secilenBirim = yeniGereksinimBirim || 'Adet';
+
+    useEffect(() => {
+        if (customBirimMode && customBirimRef.current) customBirimRef.current.focus();
+    }, [customBirimMode]);
 
     const handleToggle = () => {
         if (!birimOpen && triggerRef.current) {
             const r = triggerRef.current.getBoundingClientRect();
-            setMenuPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 130) });
+            setMenuPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 170) });
         }
+        if (birimOpen) { setCustomBirimMode(false); setCustomBirimInput(''); }
         setBirimOpen(o => !o);
     };
 
     const handleSelect = (b) => {
         setYeniGereksinimBirim(b);
         setBirimOpen(false);
+        setCustomBirimMode(false);
+        setCustomBirimInput('');
     };
 
     return (
@@ -48,12 +65,22 @@ const IhaleFormStep3 = ({
                 <p className="ihale-section__desc">Teklif alacağınız ürün ve malzemeleri miktar ve birimle birlikte ekleyin.</p>
                 <div className="ihale-req-input-row">
                     <div className="ihale-req-adet-group">
+                        {/* Enes Doğanay | 19 Mayıs 2026: Stepper butonları — teklif iste popup ile tutarlılık */}
+                        <button type="button" className="ihale-req-step-btn" tabIndex={-1}
+                            onClick={() => setYeniGereksinimAdet(String(Math.max(1, (parseInt(yeniGereksinimAdet) || 1) - 1)))}>
+                            <span className="material-symbols-outlined">remove</span>
+                        </button>
                         <input
                             type="number" min="1" value={yeniGereksinimAdet}
                             onChange={e => setYeniGereksinimAdet(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addGereksinim(); } }}
                             className="ihale-req-adet-input"
+                            style={{ width: `calc(${Math.max(1, String(yeniGereksinimAdet || '').length)}ch + 8px)` }}
                         />
+                        <button type="button" className="ihale-req-step-btn" tabIndex={-1}
+                            onClick={() => setYeniGereksinimAdet(String(Math.min(99999, (parseInt(yeniGereksinimAdet) || 1) + 1)))}>
+                            <span className="material-symbols-outlined">add</span>
+                        </button>
                         <div className="ihale-birim-wrap">
                             <button
                                 ref={triggerRef}
@@ -80,22 +107,60 @@ const IhaleFormStep3 = ({
                     <>
                         <div
                             style={{ position: 'fixed', inset: 0, zIndex: 99998 }}
-                            onClick={() => setBirimOpen(false)}
+                            onClick={() => { setBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); }}
                         />
                         <div
                             className="ihale-birim-menu"
                             style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, minWidth: menuPos.width, zIndex: 99999 }}
                         >
-                            {BIRIM_OPTIONS.map(b => (
-                                <button
-                                    key={b} type="button"
-                                    className={secilenBirim === b ? 'ihale-birim-option active' : 'ihale-birim-option'}
-                                    onClick={() => handleSelect(b)}
-                                >
-                                    <span className="ihale-birim-option-label">{b}</span>
-                                    {secilenBirim === b && <span className="material-symbols-outlined ihale-birim-check">check</span>}
-                                </button>
+                            {BIRIM_CATEGORIES.map(cat => (
+                                <div key={cat.label}>
+                                    <div className="ihale-birim-category">{cat.label}</div>
+                                    {cat.options.map(b => (
+                                        <button
+                                            key={b} type="button"
+                                            className={secilenBirim === b ? 'ihale-birim-option active' : 'ihale-birim-option'}
+                                            onClick={() => handleSelect(b)}
+                                        >
+                                            <span className="ihale-birim-option-label">{b}</span>
+                                            {secilenBirim === b && <span className="material-symbols-outlined ihale-birim-check">check</span>}
+                                        </button>
+                                    ))}
+                                </div>
                             ))}
+                            <div className="ihale-birim-category-divider" />
+                            {customBirimMode ? (
+                                <div className="ihale-birim-custom-input-wrap">
+                                    <input
+                                        ref={customBirimRef}
+                                        type="text"
+                                        className="ihale-birim-custom-input"
+                                        placeholder="Birim adı girin..."
+                                        value={customBirimInput}
+                                        onChange={e => setCustomBirimInput(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter' && customBirimInput.trim()) { handleSelect(customBirimInput.trim()); }
+                                            if (e.key === 'Escape') { setCustomBirimMode(false); setCustomBirimInput(''); }
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="ihale-birim-custom-confirm"
+                                        disabled={!customBirimInput.trim()}
+                                        onClick={() => { if (customBirimInput.trim()) handleSelect(customBirimInput.trim()); }}
+                                    >
+                                        <span className="material-symbols-outlined">check</span>
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="ihale-birim-option ihale-birim-option--custom"
+                                    onClick={e => { e.stopPropagation(); setCustomBirimMode(true); }}
+                                >
+                                    <span className="ihale-birim-option-label">✏️ Özel Birim...</span>
+                                </button>
+                            )}
                         </div>
                     </>,
                     document.body

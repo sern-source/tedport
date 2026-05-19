@@ -49,7 +49,7 @@ export const useFirmalarPage = () => {
         const load = async () => {
             setLoading(true);
             try {
-                const { data, count } = await fetchFirmalar({ page: state.page, search: state.debouncedSearch, filters: state.filters, sortMode: state.sortMode, searchMode: state.searchMode });
+                const { data, count } = await fetchFirmalar({ page: state.page, search: state.debouncedSearch, filters: state.filters, sortMode: state.sortMode, searchMode: state.searchMode, sessionSeed: state.sessionSeed });
                 let mapped = data.map(mapFirmaData);
                 if (state.debouncedSearch.trim().length >= 2 && state.sortMode === 'default') mapped = sortByRelevance(mapped, state.debouncedSearch.trim());
                 setSuppliers(mapped); setTotalCount(count);

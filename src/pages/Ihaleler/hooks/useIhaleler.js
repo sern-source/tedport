@@ -93,13 +93,17 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId, isDemoUser = false }
     useEffect(() => { loadCounts(); }, [loadCounts]);
     useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [page]);
 
-    // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler — kullanıcı değişince yeniden yüklenir
-    useEffect(() => {
+    // Enes Doğanay | 19 Mayıs 2026: Davetli ihaleler yükleme fonksiyonu — callback olarak dışa açılır
+    const loadInvitedTenders = useCallback(() => {
         if (!userEmail && !userFirmaId) { setInvitedTenders([]); return; }
         fetchInvitedTenders(userEmail, userFirmaId)
-            .then(data => setInvitedTenders(data.map(t => ({ ...t, _isInvited: true }))))
+            // Enes Doğanay | 19 Mayıs 2026: Kendi davetli ihalelerinde (_isOwn) banner gösterilmez
+            .then(data => setInvitedTenders(data.map(t => t._isOwn ? t : { ...t, _isInvited: true })))
             .catch(() => setInvitedTenders([]));
     }, [userEmail, userFirmaId]);
+
+    // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleler — kullanıcı değişince yeniden yüklenir
+    useEffect(() => { loadInvitedTenders(); }, [loadInvitedTenders]);
 
     const toggleViewMode = () => {
         const next = viewMode === 'grid' ? 'list' : 'grid';
@@ -159,6 +163,7 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId, isDemoUser = false }
         total, totalPages, smartPages,
         liveCount, upcomingCount, closedCount,
         fetchPublicTenders: loadTenders,
+        reloadInvitedTenders: loadInvitedTenders,
     };
 };
 

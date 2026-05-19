@@ -42,10 +42,11 @@ const buildSearchQuery = (query, search, searchMode = 'all') => {
 };
 
 const buildFilterQuery = (query, filters) => {
+  // Enes Doğanay | 19 Mayıs 2026: Demo firmalar her zaman hariç
+  query = query.eq('is_demo', false);
   // Enes Doğanay | 12 Mayıs 2026: Onaylı firma quick-filter
-  // Enes Doğanay | 17 Mayıs 2026: Demo firmalar is_demo=true → onaylı filtresinden hariç tut
   if (filters.onlyVerified) {
-    query = query.eq('onayli_hesap', true).eq('is_demo', false);
+    query = query.eq('onayli_hesap', true);
   }
   if (filters.cities?.length > 0) {
     const parts = filters.cities.flatMap(city => {
@@ -93,6 +94,35 @@ const applySorting = (query, sortMode) => {
     .order('firmaID', { ascending: true });
 };
 
+// Enes Doğanay | 19 Mayıs 2026: Default sort → seeded RPC; a-z/z-a → PostgREST
+const fetchFirmalarSeeded = async ({ page, search, filters, searchMode, sessionSeed }) => {
+  const offset = (page - 1) * PAGE_SIZE;
+  const trimmed = (search || '').trim();
+  const safe = trimmed.length >= 2 ? sanitizeSearch(trimmed) : '';
+  const searchTerms = safe.length >= 2 ? expandSearchTerms(safe) : [];
+  const sectorKeywords = (filters.sectors || []).flatMap(s => getSektorKeywords(s)).map(sanitizeSearch);
+  const categoryKeywords = (filters.categories || []).flatMap(c => getSektorKeywords(c)).map(sanitizeSearch);
+
+  const { data, error } = await supabase.rpc('get_firmalar_seeded', {
+    p_seed: sessionSeed,
+    p_limit: PAGE_SIZE,
+    p_offset: offset,
+    p_search_terms: searchTerms,
+    p_search_mode: searchMode || 'all',
+    p_only_verified: filters.onlyVerified || false,
+    p_cities: filters.cities || [],
+    p_sector_keywords: sectorKeywords,
+    p_category_keywords: categoryKeywords,
+    p_istanbul_avrupa: ISTANBUL_AVRUPA,
+    p_istanbul_anadolu: ISTANBUL_ANADOLU,
+  });
+
+  if (error) throw new Error(error.message);
+  const count = Number(data?.[0]?.total_count ?? 0);
+  const rows = (data || []).map(({ total_count, ...rest }) => rest);
+  return { data: rows, count };
+};
+
 /* ── Dışa aktarılan servis fonksiyonları ───────────────────────────────── */
 export const fetchCurrentSession = async () => {
   const { data: { session } } = await supabase.auth.getSession();
@@ -109,7 +139,11 @@ export const fetchSidebarData = async () => {
   return { cityData, categoryData: catData };
 };
 
-export const fetchFirmalar = async ({ page, search, filters, sortMode, searchMode = 'all' }) => {
+export const fetchFirmalar = async ({ page, search, filters, sortMode, searchMode = 'all', sessionSeed }) => {
+  // Enes Doğanay | 19 Mayıs 2026: Default sort → tier-bazlı seed'li RPC; özel sort → PostgREST
+  if (sortMode === 'default' && sessionSeed != null) {
+    return fetchFirmalarSeeded({ page, search, filters, searchMode, sessionSeed });
+  }
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
   let query = supabase.from('firmalar').select(

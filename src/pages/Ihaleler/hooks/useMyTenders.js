@@ -4,7 +4,7 @@ import { getManagedCompanyId } from '../../../services/companyManagementApi';
 import { listMyTenders, updateTender, deleteTender } from '../../../services/ihaleManagementApi';
 import { fetchFirmaAuthStatus, generateTenderRefNo, getCurrentUserId } from '../services/myTendersService';
 
-const useMyTenders = ({ fetchPublicTenders }) => {
+const useMyTenders = ({ fetchPublicTenders, reloadInvitedTenders }) => {
     const [managedFirmaId, setManagedFirmaId] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const [isVerifiedUser, setIsVerifiedUser] = useState(false);
@@ -57,6 +57,8 @@ const useMyTenders = ({ fetchPublicTenders }) => {
             setDeleteConfirmId(null);
             await fetchMyTenders();
             await fetchPublicTenders();
+            // Enes Doğanay | 19 Mayıs 2026: Davetli ihale silindiğinde owned listesi güncellenir
+            reloadInvitedTenders?.();
         } catch (err) { showIhToast('error', err.message || 'Silinemedi.'); }
     };
 

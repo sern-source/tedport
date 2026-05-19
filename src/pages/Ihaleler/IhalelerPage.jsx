@@ -32,12 +32,13 @@ const IhalelerPage = () => {
 
     // Enes Doğanay | 14 Mayıs 2026: Davetli ihaleleri yükle — kullanıcı email ve firma bilgisi
     const ihaleler = useIhaleler(firmaFilter, { userEmail: userProfile?.email, userFirmaId: authManagedCompanyId, isDemoUser });
-    const myTendersHook = useMyTenders({ fetchPublicTenders: ihaleler.fetchPublicTenders });
+    const myTendersHook = useMyTenders({ fetchPublicTenders: ihaleler.fetchPublicTenders, reloadInvitedTenders: ihaleler.reloadInvitedTenders });
     const ihaleFormHook = useIhaleForm({
         managedFirmaId: myTendersHook.managedFirmaId,
         generateReferansNo: myTendersHook.generateReferansNo,
         fetchMyTenders: myTendersHook.fetchMyTenders,
         fetchPublicTenders: ihaleler.fetchPublicTenders,
+        reloadInvitedTenders: ihaleler.reloadInvitedTenders,
         yeniIhaleParam, duzenleParam, searchParams, setSearchParams,
         myTenders: myTendersHook.myTenders,
     });

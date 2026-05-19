@@ -31,6 +31,18 @@ export const useFirmalarState = ({ currentUserId }) => {
     const [searchMode, setSearchMode] = useState(validModes.includes(urlSearchMode) ? urlSearchMode : 'all');
     const [viewMode, setViewMode] = useState('grid');
     const [toast, setToast] = useState(null);
+    // Enes Doğanay | 19 Mayıs 2026: Oturum seed'i — her yeni oturumda random, oturum boyunca sabit
+    const [sessionSeed] = useState(() => {
+        try {
+            const stored = sessionStorage.getItem('tedport_firmalar_seed');
+            if (stored) return parseFloat(stored);
+            const seed = Math.random();
+            sessionStorage.setItem('tedport_firmalar_seed', String(seed));
+            return seed;
+        } catch {
+            return Math.random();
+        }
+    });
     const { history: searchHistory, addToHistory, removeFromHistory, clearHistory } = useSearchHistory();
 
     useEffect(() => {
@@ -49,7 +61,6 @@ export const useFirmalarState = ({ currentUserId }) => {
         const t = setTimeout(() => addToHistory(debouncedSearch.trim()), 1200);
         return () => clearTimeout(t);
     }, [debouncedSearch, addToHistory]);
-    useEffect(() => { if (page !== 1) setPage(1); }, [debouncedSearch, filters, sortMode]);
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setSearchParams(p => { const n = new URLSearchParams(p); n.set('page', page); return n; }, { replace: true });
@@ -65,10 +76,15 @@ export const useFirmalarState = ({ currentUserId }) => {
         if (currentUserId) { try { localStorage.setItem(`tedport_firmalar_view_${currentUserId}`, next); } catch {} }
     };
 
+    // Enes Doğanay | 19 Mayıs 2026: Arama/filtre/sort değişince sayfa 1'e reset — mount'ta değil, sadece kullanıcı aksiyon alınca
+    const handleSetSearch = (value) => { setSearch(value); setPage(1); };
+    const handleSetFilters = (value) => { setFilters(value); setPage(1); };
+    const handleSetSortMode = (value) => { setSortMode(value); setPage(1); };
+
     // Enes Doğanay | 12 Mayıs 2026: verified type → boolean toggle, diğerleri array filtre
     const removeFilterTag = (type, value) => {
-        if (type === 'verified') { setFilters(prev => ({ ...prev, onlyVerified: false })); return; }
-        setFilters(prev => ({ ...prev, [type]: prev[type].filter(x => x !== value) }));
+        if (type === 'verified') { setFilters(prev => ({ ...prev, onlyVerified: false })); setPage(1); return; }
+        setFilters(prev => ({ ...prev, [type]: prev[type].filter(x => x !== value) })); setPage(1);
     };
     // Enes Doğanay | 12 Mayıs 2026: verified tag eklendi
     const activeTags = [
@@ -79,9 +95,9 @@ export const useFirmalarState = ({ currentUserId }) => {
     ];
 
     return {
-        search, setSearch, debouncedSearch, filters, setFilters, page, setPage,
-        sortMode, setSortMode, searchMode, setSearchMode, viewMode, toggleViewMode,
+        search, setSearch: handleSetSearch, debouncedSearch, filters, setFilters: handleSetFilters, page, setPage,
+        sortMode, setSortMode: handleSetSortMode, searchMode, setSearchMode, viewMode, toggleViewMode,
         searchHistory, addToHistory, removeFromHistory, clearHistory,
-        activeTags, removeFilterTag, toast, setToast,
+        activeTags, removeFilterTag, toast, setToast, sessionSeed,
     };
 };

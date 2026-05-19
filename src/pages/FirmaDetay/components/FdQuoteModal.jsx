@@ -8,8 +8,18 @@ import { useAuth } from '../../../AuthContext';
 import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_ACCEPT, ALLOWED_EK_DOSYA_HATA, ALLOWED_EK_DOSYA_ETIKET } from '../../../constants/fileUpload';
 import './FdQuoteModal.css';
 
-// Enes Doğanay | 14 Mayıs 2026: Kalem birim seçenekleri
-const BIRIM_OPTIONS = ['Adet', 'Kg', 'Ton', 'Gram', 'Litre', 'Metre', 'm²', 'Metreküp', 'Kutu', 'Paket', 'Set', 'Takım', 'Rulo', 'Palet', 'Lot'];
+// Enes Doğanay | 19 Mayıs 2026: Kategorili birim listesi
+const BIRIM_CATEGORIES = [
+    { label: '📦 Adet / Paketleme', options: ['Adet', 'Paket', 'Kutu', 'Koli', 'Palet', 'Rulo', 'Takım', 'Set', 'Çift', 'Deste', 'Varil', 'Bidon', 'Çuval', 'Şişe', 'Tüp', 'Konteyner'] },
+    { label: '⚖️ Ağırlık', options: ['Gram', 'Kilogram', 'Ton', 'Miligram'] },
+    { label: '📏 Uzunluk', options: ['Milimetre', 'Santimetre', 'Metre', 'Kilometre'] },
+    { label: '🧱 Alan / Hacim', options: ['m²', 'Dekar', 'Hektar', 'Mililitre', 'Litre', 'm³'] },
+    { label: '⏱️ Zaman', options: ['Saat', 'Gün', 'Hafta', 'Ay', 'Yıl'] },
+    { label: '👷 Hizmet / İş Gücü', options: ['Kişi', 'Adam/Saat', 'Sefer', 'Vardiya', 'Proje', 'Hizmet', 'İş Kalemi'] },
+    { label: '🚛 Lojistik', options: ['Tır', 'Kamyon', 'Yük', 'Parti'] },
+    { label: '⚡ Enerji / Teknik', options: ['Watt', 'Kilowatt', 'kWh', 'kVA', 'Volt', 'Amper'] },
+    { label: '💻 Yazılım / Dijital', options: ['Lisans', 'Kullanıcı', 'Abonelik'] },
+];
 
 const FdQuoteModal = ({
     firma, userProfile,
@@ -30,9 +40,17 @@ const FdQuoteModal = ({
     const [yeniAciklama, setYeniAciklama] = useState('');
     const [kalemBirimOpen, setKalemBirimOpen] = useState(false);
     const [kalemBirimMenuPos, setKalemBirimMenuPos] = useState({ top: 0, left: 0, width: 0 });
+    // Enes Doğanay | 19 Mayıs 2026: Özel birim modu
+    const [customBirimMode, setCustomBirimMode] = useState(false);
+    const [customBirimInput, setCustomBirimInput] = useState('');
     const kalemBirimRef = useRef(null);
+    const customBirimRef = useRef(null);
     // Enes Doğanay | 14 Mayıs 2026: Kalem eklendikten sonra madde input'a fokuslan
     const maddeInputRef = useRef(null);
+
+    useEffect(() => {
+        if (customBirimMode && customBirimRef.current) customBirimRef.current.focus();
+    }, [customBirimMode]);
 
     // Enes Doğanay | 14 Mayıs 2026: Teklif gönderildikten 4 saniye sonra modalı otomatik kapat
     useEffect(() => {
@@ -44,8 +62,9 @@ const FdQuoteModal = ({
     const handleKalemBirimToggle = () => {
         if (!kalemBirimOpen && kalemBirimRef.current) {
             const r = kalemBirimRef.current.getBoundingClientRect();
-            setKalemBirimMenuPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 120) });
+            setKalemBirimMenuPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 170) });
         }
+        if (kalemBirimOpen) { setCustomBirimMode(false); setCustomBirimInput(''); }
         setKalemBirimOpen(o => !o);
     };
 
@@ -150,6 +169,7 @@ const FdQuoteModal = ({
                                         value={yeniAdet} onChange={e => setYeniAdet(e.target.value)}
                                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
                                         className="quote-kalem-adet-input"
+                                        style={{ width: `calc(${Math.max(1, String(yeniAdet || '').length)}ch + 8px)` }}
                                     />
                                     <button type="button" className="quote-kalem-step-btn" tabIndex={-1} onClick={() => setYeniAdet(String(Math.min(99999, (parseInt(yeniAdet) || 1) + 1)))}><span className="material-symbols-outlined">add</span></button>
                                     <div className="quote-kalem-birim-wrap">
@@ -294,17 +314,46 @@ const FdQuoteModal = ({
         </div>
         {kalemBirimOpen && createPortal(
             <>
-                <div style={{ position: 'fixed', inset: 0, zIndex: 99998 }} onClick={() => setKalemBirimOpen(false)} />
+                <div style={{ position: 'fixed', inset: 0, zIndex: 99998 }} onClick={() => { setKalemBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); }} />
                 <div className="quote-birim-menu" style={{ position: 'fixed', top: kalemBirimMenuPos.top, left: kalemBirimMenuPos.left, minWidth: kalemBirimMenuPos.width, zIndex: 99999 }}>
-                    {BIRIM_OPTIONS.map(b => (
-                        <button key={b} type="button"
-                            className={yeniBirim === b ? 'quote-birim-option active' : 'quote-birim-option'}
-                            onClick={() => { setYeniBirim(b); setKalemBirimOpen(false); }}
-                        >
-                            <span className="quote-birim-option-label">{b}</span>
-                            {yeniBirim === b && <span className="material-symbols-outlined quote-birim-check">check</span>}
-                        </button>
+                    {BIRIM_CATEGORIES.map(cat => (
+                        <div key={cat.label}>
+                            <div className="quote-birim-category">{cat.label}</div>
+                            {cat.options.map(b => (
+                                <button key={b} type="button"
+                                    className={yeniBirim === b ? 'quote-birim-option active' : 'quote-birim-option'}
+                                    onClick={() => { setYeniBirim(b); setKalemBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); }}
+                                >
+                                    <span className="quote-birim-option-label">{b}</span>
+                                    {yeniBirim === b && <span className="material-symbols-outlined quote-birim-check">check</span>}
+                                </button>
+                            ))}
+                        </div>
                     ))}
+                    <div className="quote-birim-category-divider" />
+                    {customBirimMode ? (
+                        <div className="quote-birim-custom-input-wrap">
+                            <input ref={customBirimRef} type="text" className="quote-birim-custom-input"
+                                placeholder="Birim adı girin..."
+                                value={customBirimInput} onChange={e => setCustomBirimInput(e.target.value)}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter' && customBirimInput.trim()) { setYeniBirim(customBirimInput.trim()); setKalemBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); }
+                                    if (e.key === 'Escape') { setCustomBirimMode(false); setCustomBirimInput(''); }
+                                }}
+                            />
+                            <button type="button" className="quote-birim-custom-confirm" disabled={!customBirimInput.trim()}
+                                onClick={() => { if (customBirimInput.trim()) { setYeniBirim(customBirimInput.trim()); setKalemBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); } }}
+                            >
+                                <span className="material-symbols-outlined">check</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <button type="button" className="quote-birim-option quote-birim-option--custom"
+                            onClick={e => { e.stopPropagation(); setCustomBirimMode(true); }}
+                        >
+                            <span className="quote-birim-option-label">✏️ Özel Birim...</span>
+                        </button>
+                    )}
                 </div>
             </>,
             document.body

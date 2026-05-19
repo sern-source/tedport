@@ -7,7 +7,7 @@ import { useIhaleFormInvites } from './useIhaleFormInvites';
 // Enes Doğanay | 11 Mayıs 2026: Şablon hook entegrasyonu
 import useIhaleTemplates from '../../FirmaProfil/hooks/useIhaleTemplates';
 
-const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetchPublicTenders, yeniIhaleParam, duzenleParam, searchParams, setSearchParams, myTenders }) => {
+const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetchPublicTenders, reloadInvitedTenders, yeniIhaleParam, duzenleParam, searchParams, setSearchParams, myTenders }) => {
     const [showModal, setShowModal] = useState(false);
     const [editingTender, setEditingTender] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
@@ -142,6 +142,8 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
                 }
             }
             setShowModal(false); await fetchMyTenders(); await fetchPublicTenders();
+            // Enes Doğanay | 19 Mayıs 2026: Davetli ihale oluşturulunca/güncellince owned liste de güncellenir
+            reloadInvitedTenders?.();
         } catch (err) { setFormError(err.message || 'Kaydedilemedi.'); }
         finally { setFormSaving(false); }
     };
