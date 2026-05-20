@@ -11,7 +11,7 @@ const TendersHero = ({ selectedFirmaName, liveCount, upcomingCount, closedCount 
             <p>
                 {selectedFirmaName
                     ? 'Bu firmaya ait aktif, yaklaşan ve kapanmış ihaleleri takip edin.'
-                    : 'Canlı B2B satın alma fırsatlarını keşfedin. Teklif verin, yeni müşteri kazanın.'}
+                    : 'Gerçek zamanlı ihaleleri keşfedin, satınalma süreçlerinizi hızlandırın ve kalıcı tedarik ortaklıkları kurun.'}
             </p>
         </div>
         <div className="tenders-hero-compact__stats">
