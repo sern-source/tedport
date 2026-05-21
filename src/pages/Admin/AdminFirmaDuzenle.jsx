@@ -294,8 +294,6 @@ const AdminFirmaDuzenle = () => {
             il_ilce: f.il_ilce, ana_sektor: f.ana_sektor, urun_kategorileri: f.urun_kategorileri,
             firma_turu: f.firma_turu, onayli_hesap: f.onayli_hesap, best: f.best,
         }));
-        console.log('%c[DUPLIKE SİLME YEDEĞİ] Silinecek kayıtlar:', 'color:#f59e0b;font-weight:700', JSON.stringify(backup, null, 2));
-
         let deleted = 0;
         let errors = [];
         for (const firma of purgePreview.remove) {
@@ -409,7 +407,6 @@ const AdminFirmaDuzenle = () => {
     const handleWeakDeleteSingle = async (firma) => {
         if (!window.confirm(`"${firma.firma_adi}" silinecek. Emin misiniz?`)) return;
         setWeakDeleting(prev => new Set(prev).add(firma.firmaID));
-        console.log('%c[ZAYIF FİRMA SİLME YEDEĞİ]', 'color:#ef4444;font-weight:700', JSON.stringify(firma, null, 2));
         try {
             const { error } = await supabase.functions.invoke('company-management', {
                 body: { action: 'admin_delete_company', firmaID: firma.firmaID }
@@ -429,7 +426,6 @@ const AdminFirmaDuzenle = () => {
         if (weakSelected.size === 0) return;
         if (!window.confirm(`${weakSelected.size} firma silinecek. Bu işlem geri alınamaz. Emin misiniz?`)) return;
         const toDelete = weakFirms.filter(f => weakSelected.has(f.firmaID));
-        console.log('%c[TOPLU ZAYIF FİRMA SİLME YEDEĞİ]', 'color:#ef4444;font-weight:700', JSON.stringify(toDelete, null, 2));
         let deleted = 0;
         let errors = [];
         for (const firma of toDelete) {

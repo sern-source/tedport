@@ -27,7 +27,7 @@
 
 .login-btn-secondary {
   background-color: var(--bg-light);
-  color: var(--text-main);
+  color: var(--text-dark);
 }
 
 .login-btn-secondary:hover {
@@ -72,7 +72,7 @@
 .login-card {
   width: 100%;
   max-width: 480px;
-  background-color: var(--surface-white);
+  background-color: var(--bg-white);
   border-radius: var(--radius-xl);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border-color);
@@ -155,7 +155,7 @@
 .form-group label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-main);
+  color: var(--text-dark);
 }
 
 .input-wrapper {
@@ -382,7 +382,7 @@
   padding: 1.5rem;
   text-align: center;
   border-top: 1px solid #f0f2f4;
-  background-color: var(--surface-white);
+  background-color: var(--bg-white);
 }
 
 .main-footer p {

@@ -1,6 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Platform istatistikleri
 // Enes Doğanay | 13 Mayıs 2026: Gerçek DB count — firma + aktif ihale sayısı canlı
-import React from 'react';
+import React, { useMemo } from 'react';
 import './StatsSection.css';
 import { useHomePlatformStats } from '../hooks/useHomePlatformStats';
 
@@ -22,7 +22,8 @@ const buildStats = ({ firmaCount }) => [
 
 const StatsSection = () => {
     const { stats, loading } = useHomePlatformStats();
-    const items = buildStats(stats);
+    // Enes Doğanay | 22 Mayıs 2026: useMemo — firmaCount değişmediğinde dizi yeniden oluşturulmasın
+    const items = useMemo(() => buildStats(stats), [stats]);
 
     return (
         <section className="sc-stats">

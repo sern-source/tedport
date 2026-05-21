@@ -39,8 +39,8 @@ const IletisimPage = () => {
               <img alt="Modern building" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1920" loading="lazy" />
             </div>
             <div className="contact-container contact-hero-content">
-              <h1>Türkiye&apos;nin Dijital Ticaret Ağıyla Bağlantıya Geçin</h1>
-              <p>İş birliği, teknik destek veya platforma katılım için buradayız. Ekibimiz en kısa sürede size dönüş yapar.</p>
+              <h1>Türkiye&apos;nin Kurumsal İş Ağıyla Bağlantıya Geçin</h1>
+              <p>Çözüm ortaklığı, teknik destek veya platforma katılım için buradayız. Ekibimiz en kısa sürede size dönüş yapar.</p>
             </div>
           </div>
           <section className="contact-section">

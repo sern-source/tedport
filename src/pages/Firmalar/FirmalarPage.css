@@ -328,3 +328,8 @@ body {
 [data-theme="dark"] .contact-dropdown-teklif:hover { background: #1e1a2e; color: #c4b5fd; }
 
 [data-theme="dark"] .contact-gated-lock { color: var(--text-light); }
+
+/* Enes Doğanay | 22 Mayıs 2026: Toast dark mode */
+[data-theme="dark"] .fl-toast--error   { background: #2d1515; border-color: #7f1d1d; color: #fca5a5; }
+[data-theme="dark"] .fl-toast--warning { background: #2d2000; border-color: #78350f; color: #fcd34d; }
+[data-theme="dark"] .fl-toast--info    { background: #0f1e3a; border-color: #1e3a7c; color: #93c5fd; }

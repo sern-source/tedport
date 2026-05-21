@@ -89,3 +89,8 @@
         width: 100%;
     }
 }
+
+/* Enes Doğanay | 22 Mayıs 2026: CloseVisibilityPopup dark mode shadow */
+[data-theme="dark"] .ihale-close-visibility-card {
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
