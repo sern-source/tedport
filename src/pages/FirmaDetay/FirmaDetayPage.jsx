@@ -1,5 +1,7 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: FirmaDetay sayfa koordinatörü
 // Enes Doğanay | 13 Mayıs 2026: SEO bileşeni eklendi — firma başlığı + açıklama + og:image
+// Enes Doğanay | 23 Mayıs 2026: 'use client' — Server Component'ten import edildiği için zorunlu
+'use client';
 import React from 'react';
 import { useParams } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
@@ -21,10 +23,11 @@ const NAV_ITEMS = [
     { label: 'İletişim', href: '/iletisim' }
 ];
 
-const FirmaDetayPage = () => {
+// Enes Doğanay | 23 Mayıs 2026: initialFirma — SSR Server Component'ten gelen ön-çekilmiş firma verisi
+const FirmaDetayPage = ({ initialFirma = null }) => {
     // Enes Doğanay | 23 Mayıs 2026: slug bazlı routing — /firmalar/:slug
     const { slug } = useParams();
-    const fd = useFirmaDetay(slug);
+    const fd = useFirmaDetay(slug, initialFirma);
 
     if (fd.loading) return <PageLoader />;
     if (!fd.firma) return (

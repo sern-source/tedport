@@ -18,16 +18,19 @@ const TENDERS_PREVIEW = 3;
 const EMPTY_QUOTE_FORM = { konu: '', mesaj: '', kalemler: [], teslim_tarihi: '', teslim_yeri: '' };
 
 // Enes Doğanay | 23 Mayıs 2026: slug parametresi — /firmalar/:slug URL dönüşümü
-export function useFirmaDetay(slug) {
+// Enes Doğanay | 23 Mayıs 2026: initialFirma — SSR Server Component'ten gelen firma verisi, client fetch'ini atlar
+export function useFirmaDetay(slug, initialFirma = null) {
     const router = useRouter();
-    // Enes Doğanay | 23 Mayıs 2026: firmaID slug'dan çözümlenir, tüm iç sorgularda kullanılır
-    const firmaIdRef = useRef(null);
-    const [firma, setFirma] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // Enes Doğanay | 23 Mayıs 2026: firmaID slug'dan çözümlenir veya SSR'dan gelir
+    const firmaIdRef = useRef(initialFirma?.firmaID || null);
+    // Enes Doğanay | 23 Mayıs 2026: SSR'dan initialFirma geldi mi — fetchFirma'da slug fetch'ini atla
+    const hasInitialFirmaRef = useRef(!!initialFirma);
+    const [firma, setFirma] = useState(initialFirma || null);
+    const [loading, setLoading] = useState(!initialFirma);
     const [firmaEkip, setFirmaEkip] = useState([]);
-    const [isVerified, setIsVerified] = useState(false);
+    const [isVerified, setIsVerified] = useState(initialFirma?.onayli_hesap === true);
     // Enes Doğanay | 17 Mayıs 2026: Demo firmalar badge almaz ama Teklif İste açık kalır
-    const [isDemo, setIsDemo] = useState(false);
+    const [isDemo, setIsDemo] = useState(initialFirma?.is_demo === true);
     const [tenders, setTenders] = useState([]);
     const [tendersLoading, setTendersLoading] = useState(true);
     const [isTendersTableMissing, setIsTendersTableMissing] = useState(false);
@@ -73,22 +76,34 @@ export function useFirmaDetay(slug) {
     const favorites = useFirmaDetayFavorites({ userId: sessionUserIdRef.current, firmaId: firmaIdRef.current, showFdToast });
 
     const fetchFirma = async () => {
-        setLoading(true); setTendersLoading(true);
+        // Enes Doğanay | 23 Mayıs 2026: SSR'dan initialFirma geldiyse firma fetch atlanır — tenders/sertifika/ekip hâlâ çekilir
+        if (!hasInitialFirmaRef.current) setLoading(true);
+        setTendersLoading(true);
         try {
-            // Enes Doğanay | 23 Mayıs 2026: Önce slug ile firma çek, firmaID'yi al
-            const firmaData = await fetchFirmaBySlug(slug).catch(() => null);
-            if (!firmaData) { setLoading(false); setTendersLoading(false); return; }
-            const id = firmaData.firmaID;
-            firmaIdRef.current = id;
+            let id;
+            if (hasInitialFirmaRef.current) {
+                id = firmaIdRef.current;
+            } else {
+                const firmaData = await fetchFirmaBySlug(slug).catch(() => null);
+                if (!firmaData) { setLoading(false); setTendersLoading(false); return; }
+                id = firmaData.firmaID;
+                firmaIdRef.current = id;
+                setFirma(firmaData);
+                setIsVerified(firmaData?.onayli_hesap === true);
+                setIsDemo(firmaData?.is_demo === true);
+            }
             const [tendersData, sertData] = await Promise.all([
                 fetchFirmaTenders(id).catch(err => ({ __error: err })),
                 fetchFirmaSertifikalari(id).catch(() => []),
             ]);
-            setFirma(firmaData); setIsVerified(firmaData?.onayli_hesap === true); setIsDemo(firmaData?.is_demo === true); fetchFirmaEkip(id).then(notes.setSavedNotes && (ekip => setFirmaEkip(ekip)));
+            fetchFirmaEkip(id).then(notes.setSavedNotes && (ekip => setFirmaEkip(ekip)));
             if (Array.isArray(tendersData)) { setTenders(tendersData); setIsTendersTableMissing(false); }
             else if (tendersData?.__error) { if (isMissingRelationError(tendersData.__error)) setIsTendersTableMissing(true); setTenders([]); }
             setSertifikalar(Array.isArray(sertData) ? sertData : []);
-        } finally { setLoading(false); setTendersLoading(false); }
+        } finally {
+            if (!hasInitialFirmaRef.current) setLoading(false);
+            setTendersLoading(false);
+        }
     };
 
     const checkUserSessionAndNotes = async () => {
