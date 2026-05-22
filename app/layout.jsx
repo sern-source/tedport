@@ -1,6 +1,7 @@
 // Enes Doğanay | 22 Mayıs 2026: Next.js root layout — index.html + Layout.jsx yerine geçer
 // Dark mode flash prevention, Google Fonts, global CSS, providers buraya taşındı
 import '../src/index.css';
+import Script from 'next/script';
 import Providers from './providers';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
@@ -63,6 +64,23 @@ export default function RootLayout({ children }) {
                     {children}
                 </Providers>
                 <SpeedInsights />
+                {/* Enes Doğanay | 23 Mayıs 2026: Google Analytics 4 — afterInteractive ile sayfa yüklenmesini bloklamaz */}
+                {process.env.NEXT_PUBLIC_GA_ID && (
+                    <>
+                        <Script
+                            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+                            strategy="afterInteractive"
+                        />
+                        <Script id="google-analytics" strategy="afterInteractive">
+                            {`
+                                window.dataLayer = window.dataLayer || [];
+                                function gtag(){dataLayer.push(arguments);}
+                                gtag('js', new Date());
+                                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+                            `}
+                        </Script>
+                    </>
+                )}
             </body>
         </html>
     );
