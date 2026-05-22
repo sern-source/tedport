@@ -1,7 +1,8 @@
 // Enes Doğanay | 6 Mayıs 2026: SSS sayfası — hook ile yeniden yazıldı
+'use client';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import SharedHeader from '../../components/SharedHeader';
 import SharedFooter from '../../components/SharedFooter';
 import SEO from '../../components/SEO';
@@ -180,7 +181,7 @@ export default function SSSPage() {
             <h2>Aradığınız cevabı bulamadınız mı?</h2>
             <p>Ekibimiz size yardımcı olmaktan memnuniyet duyar.</p>
             <div className="sss-cta-btns">
-              <Link to="/iletisim" className="sss-cta-btn sss-cta-btn--primary">
+              <Link href="/iletisim" className="sss-cta-btn sss-cta-btn--primary">
                 <span className="material-symbols-outlined">mail</span>
                 İletişime Geç
               </Link>

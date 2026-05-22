@@ -1,16 +1,17 @@
 // Enes Doğanay | 6 Mayıs 2026: İletişime Geç dropdown içeriği — kart ve liste görünümü paylaşımlı
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 const ContactDropdown = ({ supplier, isLoggedIn, onQuoteRequest }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   return (
     <div className="contact-dropdown">
       {!isLoggedIn ? (
         <div className="contact-gated-panel">
           <span className="material-symbols-outlined contact-gated-lock">lock</span>
           <p className="contact-gated-text">Teklif istemek ve iletişim bilgilerini görmek için giriş yapın.</p>
-          <button onClick={() => navigate('/login')} className="contact-gated-btn">Giriş Yap</button>
+          <button onClick={() => router.push('/login')} className="contact-gated-btn">Giriş Yap</button>
         </div>
       ) : (
         <>

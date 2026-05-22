@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: SharedHeader — slim wrapper, alt bileşenlere delege eder
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '../AuthContext';
 import './SharedHeader.css';
 import { useTheme } from '../hooks/useTheme';
@@ -25,8 +26,8 @@ const SharedHeader = ({
     // Enes Doğanay | 11 Mayıs 2026: Gelişmiş arama modu — sadece FirmalarPage'den gelir
     searchMode = null, onSearchModeChange = null,
 }) => {
-    const navigate = useNavigate();
-    const location = useLocation();
+    const router = useRouter();
+    const pathname = usePathname();
     const { authChecked, userProfile, isCurrentUserAdmin, managedCompanyId, managedCompanyName, unreadNotifCount, pendingQuoteCount, myOffersUnreadCount, ihaleYonetimiUnreadCount, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -68,23 +69,23 @@ const SharedHeader = ({
         await logout();
         setIsDropdownOpen(false);
         setIsMobileMenuOpen(false);
-        navigate('/');
+        router.push('/');
     };
 
-    const items = (navItems || DEFAULT_NAV_ITEMS).filter(item => item.href !== location.pathname);
-    const isHomePage = location.pathname === '/';
+    const items = (navItems || DEFAULT_NAV_ITEMS).filter(item => item.href !== pathname);
+    const isHomePage = pathname === '/';
 
     return (
         <header className="shared-header" ref={headerRef}>
             <div className="shared-header-inner">
                 {/* Enes Doğanay | 14 Nisan 2026: Sol grup — geri butonu + logo */}
                 <div className="shared-header-left">
-                    <button type="button" className="shared-back-btn" onClick={() => navigate(-1)}
+                    <button type="button" className="shared-back-btn" onClick={() => router.back()}
                         aria-label="Geri dön"
                         style={isHomePage ? { visibility: 'hidden' } : undefined}>
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
-                    <Link to="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
+                    <Link href="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
                         <img className="shared-logo-image"
                             src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'}
                             alt="Tedport Logo" />
@@ -115,8 +116,8 @@ const SharedHeader = ({
                     </button>
                     <div className="shared-nav">
                         <div className="shared-nav-links">
-                            {items.map((item) => <Link key={item.href} to={item.href}>{item.label}</Link>)}
-                            {authChecked && !userProfile && location.pathname !== '/login' && <Link to="/login">Giriş Yap</Link>}
+                            {items.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+                            {authChecked && !userProfile && pathname !== '/login' && <Link href="/login">Giriş Yap</Link>}
                         </div>
                         <div className="shared-user-actions">
                             {!authChecked ? null : userProfile ? (
@@ -129,8 +130,8 @@ const SharedHeader = ({
                                     myOffersUnreadCount={myOffersUnreadCount} handleLogout={handleLogout}
                                 />
                             ) : (
-                                location.pathname !== '/register' && (
-                                    <button className="shared-register-btn" onClick={() => navigate('/register')} type="button">
+                                pathname !== '/register' && (
+                                    <button className="shared-register-btn" onClick={() => router.push('/register')} type="button">
                                         Kayıt Ol
                                     </button>
                                 )
@@ -149,7 +150,7 @@ const SharedHeader = ({
             {isMobileMenuOpen && (
                 <HeaderMobileMenu
                     items={items} authChecked={authChecked} userProfile={userProfile}
-                    locationPathname={location.pathname} managedCompanyId={managedCompanyId}
+                    locationPathname={pathname} managedCompanyId={managedCompanyId}
                     isCurrentUserAdmin={isCurrentUserAdmin} pendingQuoteCount={pendingQuoteCount}
                     ihaleYonetimiUnreadCount={ihaleYonetimiUnreadCount} unreadNotifCount={unreadNotifCount}
                     myOffersUnreadCount={myOffersUnreadCount} handleLogout={handleLogout}

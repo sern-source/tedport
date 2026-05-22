@@ -1,4 +1,4 @@
-﻿@media (max-width: 768px) {
+@media (max-width: 768px) {
   .sirketim-panel { padding: 0 0 12px; }
   .ekip-hero__inner { flex-direction: column; align-items: flex-start; gap: 10px; }
   .ekip-kpis { flex-wrap: wrap; gap: 5px; }

@@ -1,11 +1,12 @@
 // Enes Doğanay | 6 Mayıs 2026: Firma kartı — grid görünümü için
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import ContactDropdown from './ContactDropdown';
 import './SupplierCard.css';
 
 const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQuoteRequest, onTagClick }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [showContact, setShowContact] = useState(false);
   const contactRef = useRef(null);
 
@@ -20,7 +21,7 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
 
   const handleNavigate = (e) => {
     e.preventDefault();
-    navigate(`/firmadetay/${supplier.id}`);
+    router.push(`/firmadetay/${supplier.id}`);
   };
 
   return (

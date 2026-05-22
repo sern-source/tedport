@@ -1,6 +1,7 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: MyOffersTab — İhale Tekliflerim sekmesi koordinatörü
+'use client';
 import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useMyOffers } from '../hooks/useMyOffers';
 import MyOfferCard from './MyOfferCard';
 import MyOfferChatView from './MyOfferChatView';
@@ -14,7 +15,7 @@ import './MyOffersTab.css';
 import './MyOffersTab.dark.css';
 
 const MyOffersTab = ({ userId, companyId, mopChatTrigger, onChatOpened, onUnreadCountChange }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
     const state = useMyOffers({ userId, companyId, mopChatTrigger, onChatOpened, onUnreadCountChange });
     const {
         loading, tenderMap, firmaMap,
@@ -74,7 +75,7 @@ const MyOffersTab = ({ userId, companyId, mopChatTrigger, onChatOpened, onUnread
                     <span className="material-symbols-outlined">gavel</span>
                     <h3>{search || filter !== 'all' ? 'Arama kriterinize uygun teklif bulunamadı.' : 'Henüz ihale teklifiniz yok.'}</h3>
                     {!search && filter === 'all' && (
-                        <button className="mop-btn mop-btn--primary" onClick={() => navigate('/ihaleler')}>İhalelere Göz At</button>
+                        <button className="mop-btn mop-btn--primary" onClick={() => router.push('/ihaleler')}>İhalelere Göz At</button>
                     )}
                 </div>
             )}

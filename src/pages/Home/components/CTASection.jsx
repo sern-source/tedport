@@ -1,10 +1,11 @@
 // Enes Doğanay | 13 Mayıs 2026: CTASection — alıcı + tedarikçi iki taraflı panel tasarımı
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './CTASection.css';
 
 const CTASection = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <section className="sc-cta">
@@ -20,11 +21,11 @@ const CTASection = () => {
                         <h3>Tedarikçiyim</h3>
                         <p>Kurumsal profilinizi oluşturun, yeni firmalarla bağlantı kurun ve iş fırsatlarına ulaşın.</p>
                         <div className="sc-cta-panel__btns">
-                            <button className="sc-btn-white" onClick={() => navigate('/register')}>
+                            <button className="sc-btn-white" onClick={() => router.push('/register')}>
                                 {/* Enes Doğanay | 16 Mayıs 2026: "Ücretsiz Kayıt Ol" → "Platforma Katıl" */}
                                 Platforma Katıl
                             </button>
-                            <button className="sc-btn-transparent" onClick={() => navigate('/firmalar')}>
+                            <button className="sc-btn-transparent" onClick={() => router.push('/firmalar')}>
                                 Firmalar
                             </button>
                         </div>
@@ -42,10 +43,10 @@ const CTASection = () => {
                         <h3>Satınalmacıyım</h3>
                         <p>Satınalma taleplerinizi yönetin, farklı firmalardan teklifler alın ve doğru çözüm ortağını bulun.</p>
                         <div className="sc-cta-panel__btns">
-                            <button className="sc-btn-white" onClick={() => navigate('/ihaleler')}>
+                            <button className="sc-btn-white" onClick={() => router.push('/ihaleler')}>
                                 İhale Aç
                             </button>
-                            <button className="sc-btn-transparent" onClick={() => navigate('/register?type=corporate')}>
+                            <button className="sc-btn-transparent" onClick={() => router.push('/register?type=corporate')}>
                                 Kurumsal Başvur
                             </button>
                         </div>

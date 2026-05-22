@@ -1,4 +1,4 @@
-﻿/* Enes Doğanay | 7 Mayıs 2026: notif-hero dark — hero zaten koyu gradient, sadece action buton renkleri */
+/* Enes Doğanay | 7 Mayıs 2026: notif-hero dark — hero zaten koyu gradient, sadece action buton renkleri */
 [data-theme="dark"] .notif-hero { filter: brightness(0.92); }
 
 [data-theme="dark"] .notifications-panel {

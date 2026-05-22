@@ -1,6 +1,7 @@
 ﻿// Enes Doğanay | 11 Mayıs 2026: Alt bileşenlere bölündü (150 satır kuralı)
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './HakkimizdaPage.css';
 import './HakkimizdaPage.sections.css';
 import './HakkimizdaPage.dark.css';
@@ -24,7 +25,7 @@ const NAV_ITEMS = [
 ];
 
 const About = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <>
@@ -33,15 +34,15 @@ const About = () => {
 
             <div className="about-page-wrapper">
                 <main className="about-main">
-                    <AboutHero onContact={() => navigate('/iletisim')} />
+                    <AboutHero onContact={() => router.push('/iletisim')} />
                     <AboutStats />
                     <AboutProblem />
                     <AboutValues />
                     <AboutFeatures />
                     <AboutTimeline />
                     <AboutCTA
-                        onRegister={() => navigate('/register')}
-                        onFirmalar={() => navigate('/firmalar')}
+                        onRegister={() => router.push('/register')}
+                        onFirmalar={() => router.push('/firmalar')}
                     />
                 </main>
 

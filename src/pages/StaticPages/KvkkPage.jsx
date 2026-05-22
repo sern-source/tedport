@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: src/pages/StaticPages/ taşındı
+'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import SharedFooter from '../../components/SharedFooter';
@@ -220,7 +221,7 @@ const Kvkk = () => {
 
                     {fromRegister && (
                         <div className="kvkk-footer-nav">
-                            <Link to="/register" className="kvkk-back-btn">
+                            <Link href="/register" className="kvkk-back-btn">
                                 <span className="material-symbols-outlined">arrow_back</span>
                                 Kayıt Sayfasına Dön
                             </Link>

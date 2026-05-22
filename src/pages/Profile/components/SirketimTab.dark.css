@@ -1,4 +1,4 @@
-﻿/* Enes Doğanay | 7 Mayıs 2026: Ekip hero — gradient kendi dark yeterli, KPI pill ek kural */
+/* Enes Doğanay | 7 Mayıs 2026: Ekip hero — gradient kendi dark yeterli, KPI pill ek kural */
 [data-theme="dark"] .ekip-global-visibility-card {
   background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(109,40,217,0.06));
   border-color: rgba(167,139,250,0.25);

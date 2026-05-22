@@ -1,7 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale çekirdek state — yükleme, ihaleler, teklifler, filtreler, realtime
 // Enes Doğanay | 13 Mayıs 2026: supabase doğrudan import kaldırıldı — subscribeToTenderOffers servise taşındı
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as ihaleService from '../services/ihaleService';
 import { getTenderStatus, TOM_PAGE_SIZE } from '../constants/ihaleConstants';
 import { getTenderStatusMeta } from '../../../constants/tenderUtils';
@@ -15,7 +15,21 @@ const useIhaleCore = ({ companyId, refreshCounts }) => {
     const [tenderSearch, setTenderSearch] = useState('');
     const [tenderFilter, setTenderFilter] = useState('all');
     const [tenderPage, setTenderPage] = useState(1);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    // Enes Doğanay | 22 Mayıs 2026: react-router setSearchParams uyumlu yardımcı
+    const setSearchParams = useCallback((paramsOrFn, _opts) => {
+        let next;
+        if (typeof paramsOrFn === 'function') {
+            const current = new URLSearchParams(searchParams.toString());
+            next = paramsOrFn(current);
+        } else if (paramsOrFn instanceof URLSearchParams) {
+            next = paramsOrFn;
+        } else {
+            next = new URLSearchParams(paramsOrFn);
+        }
+        router.replace('?' + next.toString(), { scroll: false });
+    }, [searchParams, router]);
 
     // Enes Doğanay | 6 Mayıs 2026: companyId yoksa yüklemeyi kapat
     useEffect(() => {

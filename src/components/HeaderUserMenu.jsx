@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Masaüstü kullanıcı dropdown menüsü alt bileşeni
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 /* Enes Doğanay | 6 Mayıs 2026: Tek bir menü butonu — icon + label + opsiyonel badge */
 const MenuItem = ({ icon, label, onClick, badge }) => (
@@ -17,9 +18,9 @@ const HeaderUserMenu = ({
     pendingQuoteCount, ihaleYonetimiUnreadCount, unreadNotifCount, myOffersUnreadCount,
     handleLogout,
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
     // Enes Doğanay | 6 Mayıs 2026: Dropdown kapat + yönlendir
-    const go = (path) => { setIsDropdownOpen(false); navigate(path); };
+    const go = (path) => { setIsDropdownOpen(false); router.push(path); };
 
     return (
         <div className="shared-user-dropdown" ref={dropdownRef}>

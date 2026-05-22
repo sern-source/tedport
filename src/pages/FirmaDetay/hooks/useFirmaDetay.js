@@ -1,6 +1,6 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: FirmaDetay koordinatör — veri, arama, teklif, toast + alt hook'lar
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import {
     fetchFirmaById, fetchFirmaTenders, fetchFirmaEkip,
     fetchUserSessionData, sendQuoteRequestService, fetchSuggestionsService,
@@ -18,7 +18,7 @@ const TENDERS_PREVIEW = 3;
 const EMPTY_QUOTE_FORM = { konu: '', mesaj: '', kalemler: [], teslim_tarihi: '', teslim_yeri: '' };
 
 export function useFirmaDetay(id) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [firma, setFirma] = useState(null);
     const [loading, setLoading] = useState(true);
     const [firmaEkip, setFirmaEkip] = useState([]);
@@ -123,13 +123,13 @@ export function useFirmaDetay(id) {
         return () => clearTimeout(timeout);
     }, [detaySearch]);
 
-    const handleSuggestionClick = (item) => { setSuggestions([]); setNoResults(false); if (!item) return; setDetaySearch(''); navigate(`/firmadetay/${item.id}`); };
+    const handleSuggestionClick = (item) => { setSuggestions([]); setNoResults(false); if (!item) return; setDetaySearch(''); router.push(`/firmadetay/${item.id}`); };
     const handleSearchSubmit = (term) => {
         setSuggestions([]); setNoResults(false);
         if (term.trim().length < 2) return;
         // Enes Doğanay | 11 Mayıs 2026: searchMode URL param olarak firmalar sayfasına taşınır
         const modeParam = detaySearchMode !== 'all' ? `&searchMode=${detaySearchMode}` : '';
-        navigate(`/firmalar?search=${encodeURIComponent(term.trim())}${modeParam}`);
+        router.push(`/firmalar?search=${encodeURIComponent(term.trim())}${modeParam}`);
     };
     const toggleCategory = (categoryKey) => { const next = new Set(expandedCategories); if (next.has(categoryKey)) next.delete(categoryKey); else next.add(categoryKey); setExpandedCategories(next); };
     const setQuoteField = (field, value) => {

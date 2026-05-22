@@ -1,7 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: src/pages/StaticPages/ taşındı
-{/* Enes Doğanay | 16 Nisan 2026: 404 — Sayfa Bulunamadı */}
+'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import SharedHeader from '../../components/SharedHeader';
 import SharedFooter from '../../components/SharedFooter';
 import SEO from '../../components/SEO';
@@ -21,7 +21,7 @@ export default function NotFound() {
         <p style={{ color: '#64748b', marginBottom: '1.5rem', maxWidth: '400px' }}>
           Aradığınız sayfa mevcut değil veya taşınmış olabilir.
         </p>
-        <Link to="/" style={{
+        <Link href="/" style={{
           padding: '0.625rem 1.5rem', background: '#1a56db', color: '#fff',
           borderRadius: '8px', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500,
         }}>

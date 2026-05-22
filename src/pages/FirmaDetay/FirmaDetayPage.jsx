@@ -1,7 +1,7 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: FirmaDetay sayfa koordinatörü
 // Enes Doğanay | 13 Mayıs 2026: SEO bileşeni eklendi — firma başlığı + açıklama + og:image
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import PageLoader from '../../components/PageLoader';

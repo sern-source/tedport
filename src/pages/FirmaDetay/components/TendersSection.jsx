@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale listesi bölümü
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { formatTenderDate, getTenderStatusMeta } from '../../../constants/tenderUtils';
 import './TendersSection.css';
 
@@ -10,13 +11,13 @@ const TendersSection = ({
     tenders, tendersLoading, isTendersTableMissing,
     showAllTenders, onToggleAll, userProfile, firmaId
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <section id="tenders" className="tenders-section">
             <div className="tenders-section-header">
                 <h2 className="section-title">İhalerimiz</h2>
-                <button type="button" className="tenders-section-link" onClick={() => navigate(`/ihaleler?firma=${firmaId}`)}>
+                <button type="button" className="tenders-section-link" onClick={() => router.push(`/ihaleler?firma=${firmaId}`)}>
                     Tümünü Gör
                     <span className="material-symbols-outlined">arrow_forward</span>
                 </button>
@@ -29,10 +30,10 @@ const TendersSection = ({
                             <span className="material-symbols-outlined">lock</span>
                             <h3>İhaleleri görüntülemek için giriş yapın</h3>
                             <p>İhale detaylarını görmek için hesabınıza giriş yapın.</p>
-                            <button type="button" className="tenders-blur-login-btn" onClick={() => navigate(`/login?redirect=/firmadetay/${firmaId}`)}>Giriş Yap</button>
+                            <button type="button" className="tenders-blur-login-btn" onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)}>Giriş Yap</button>
                             <span className="tenders-blur-register">
                                 Hesabınız yok mu?{' '}
-                                <button type="button" onClick={() => navigate('/register')}>Kayıt Ol</button>
+                                <button type="button" onClick={() => router.push('/register')}>Kayıt Ol</button>
                             </span>
                         </div>
                     </div>
@@ -56,10 +57,10 @@ const TendersSection = ({
                                     <div
                                         key={tender.id}
                                         className="tender-item tender-item--clickable"
-                                        onClick={() => navigate(`/ihaleler?ihale=${tender.id}`)}
+                                        onClick={() => router.push(`/ihaleler?ihale=${tender.id}`)}
                                         role="button"
                                         tabIndex={0}
-                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/ihaleler?ihale=${tender.id}`); }}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/ihaleler?ihale=${tender.id}`); }}
                                     >
                                         <div className="tender-item-row">
                                             <div className="tender-item-left">

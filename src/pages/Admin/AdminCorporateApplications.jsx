@@ -1,5 +1,6 @@
+'use client';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import './AdminCorporateApplications.css';
@@ -26,7 +27,7 @@ const formatApplicationDate = (value) => {
 };
 
 const AdminCorporateApplicationsPage = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [sessionChecked, setSessionChecked] = useState(false);
     const [accessDenied, setAccessDenied] = useState(false);
     const [accessToken, setAccessToken] = useState('');
@@ -50,7 +51,7 @@ const AdminCorporateApplicationsPage = () => {
             const session = sessionResult.session;
 
             if (!session?.user) {
-                navigate('/login');
+                router.push('/login');
                 return;
             }
 

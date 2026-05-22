@@ -1,6 +1,8 @@
 // Enes Doğanay | 12 Mayıs 2026: Sektör bazlı ihale landing sayfası — SEO optimizasyonlu
 import React from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import './SektorLandingPage.css';
 import SEO from '../../components/SEO';
 import TenderCard from '../Ihaleler/components/TenderCard';
@@ -35,7 +37,7 @@ const SEKTOR_ICONS = {
 
 const SektorLandingPage = () => {
     const { slug } = useParams();
-    const navigate = useNavigate();
+    const router = useRouter();
     const sektorAdi = slugToSektor(slug);
     const { tenders, loading, error } = useSektorLanding(sektorAdi);
 
@@ -48,7 +50,7 @@ const SektorLandingPage = () => {
                     <span className="material-symbols-outlined">search_off</span>
                     <h3>Sektör bulunamadı</h3>
                     <p>Aradığınız sektör mevcut değil veya URL hatalı.</p>
-                    <Link to="/ihaleler" className="sektor-landing__state-link">
+                    <Link href="/ihaleler" className="sektor-landing__state-link">
                         <span className="material-symbols-outlined">arrow_back</span>
                         Tüm İhalelere Git
                     </Link>
@@ -103,9 +105,9 @@ const SektorLandingPage = () => {
 
             {/* ─── Breadcrumb ─── */}
             <nav className="sektor-landing__breadcrumb" aria-label="Konum">
-                <Link to="/">Anasayfa</Link>
+                <Link href="/">Anasayfa</Link>
                 <span className="material-symbols-outlined">chevron_right</span>
-                <Link to="/ihaleler">İhaleler</Link>
+                <Link href="/ihaleler">İhaleler</Link>
                 <span className="material-symbols-outlined">chevron_right</span>
                 <span>{sektorAdi}</span>
             </nav>
@@ -118,7 +120,7 @@ const SektorLandingPage = () => {
                             <><span>{tenders.length}</span> ihale bulundu</>
                         )}
                     </span>
-                    <button className="sektor-landing__back-btn" onClick={() => navigate('/ihaleler')}>
+                    <button className="sektor-landing__back-btn" onClick={() => router.push('/ihaleler')}>
                         <span className="material-symbols-outlined">arrow_back</span>
                         Tüm İhaleler
                     </button>
@@ -147,7 +149,7 @@ const SektorLandingPage = () => {
                         <span className="material-symbols-outlined">inbox</span>
                         <h3>Henüz ihale yok</h3>
                         <p>Bu sektörde şu an aktif ihale bulunmuyor. Bildirimleri açarak yeni ihalelerden haberdar olabilirsiniz.</p>
-                        <Link to="/ihaleler" className="sektor-landing__state-link">
+                        <Link href="/ihaleler" className="sektor-landing__state-link">
                             <span className="material-symbols-outlined">search</span>
                             Tüm İhale Listesi
                         </Link>
@@ -161,8 +163,8 @@ const SektorLandingPage = () => {
                             <TenderCard
                                 key={tender.id}
                                 tender={tender}
-                                onDetail={() => navigate(`/ihaleler?ihale=${tender.id}`)}
-                                onNavigateFirma={() => navigate(`/firmadetay/${tender.firma_id}`)}
+                                onDetail={() => router.push(`/ihaleler?ihale=${tender.id}`)}
+                                onNavigateFirma={() => router.push(`/firmadetay/${tender.firma_id}`)}
                             />
                         ))}
                     </div>

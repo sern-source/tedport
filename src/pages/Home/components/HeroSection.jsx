@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Hero arama bölümü — koordinatör
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import HeroSearchDropdown from './HeroSearchDropdown';
 import './HeroSection.css';
 
@@ -24,7 +25,7 @@ const HeroSection = ({
     // Enes Doğanay | 13 Mayıs 2026: Canlı firma sayısı — fallback 5000
     firmaCount = 5000,
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <section className="sc-hero-section">
@@ -99,11 +100,11 @@ const HeroSection = ({
                         {/* Enes Doğanay | 12 Mayıs 2026: Popüler etiketler — arama terimi label ile tam eşleşir */}
                         <div className="sc-popular-tags">
                             <span>Popüler:</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Çelik%20Boru')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Çelik%20Boru'); }}>Çelik Boru</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Ambalaj')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Ambalaj'); }}>Ambalaj</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Elektronik')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Elektronik'); }}>Elektronik</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Makine')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Makine'); }}>Makine</span>
-                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => navigate('/firmalar?search=Tekstil')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar?search=Tekstil'); }}>Tekstil</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => router.push('/firmalar?search=Çelik%20Boru')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push('/firmalar?search=Çelik%20Boru'); }}>Çelik Boru</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => router.push('/firmalar?search=Ambalaj')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push('/firmalar?search=Ambalaj'); }}>Ambalaj</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => router.push('/firmalar?search=Elektronik')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push('/firmalar?search=Elektronik'); }}>Elektronik</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => router.push('/firmalar?search=Makine')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push('/firmalar?search=Makine'); }}>Makine</span>
+                            <span className="sc-popular-tag" role="button" tabIndex={0} onClick={() => router.push('/firmalar?search=Tekstil')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push('/firmalar?search=Tekstil'); }}>Tekstil</span>
                         </div>
                     </div>
                 </div>

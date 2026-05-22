@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Örnek tedarikçiler grid — data hook'tan gelir
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './SuppliersSection.css';
 
 // Enes Doğanay | 8 Mayıs 2026: IIFE anti-pattern kaldırıldı — module-level helper
@@ -15,7 +16,7 @@ const parseFirmaTags = (raw) => {
 };
 
 const SuppliersSection = ({ topSuppliers, isLoading }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <section className="sc-suppliers">
@@ -40,20 +41,20 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                                                 className="sc-sup-avatar"
                                                 src={validLogo}
                                                 alt={firma.firma_adi}
-                                                onClick={() => navigate(`/firmadetay/${firma.firmaID}`)}
+                                                onClick={() => router.push(`/firmadetay/${firma.firmaID}`)}
                                                 style={{ objectFit: 'contain', background: '#fff', border: '1px solid #e0e7ff', cursor: 'pointer' }}
                                                 role="button"
                                                 tabIndex={0}
-                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${firma.firmaID}`); }}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${firma.firmaID}`); }}
                                             />
                                         ) : (
                                             <div
                                                 className="sc-sup-avatar"
-                                                onClick={() => navigate(`/firmadetay/${firma.firmaID}`)}
+                                                onClick={() => router.push(`/firmadetay/${firma.firmaID}`)}
                                                 style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', cursor: 'pointer' }}
                                                 role="button"
                                                 tabIndex={0}
-                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${firma.firmaID}`); }}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${firma.firmaID}`); }}
                                             >
                                                 {firma.firma_adi?.charAt(0)}
                                             </div>
@@ -67,11 +68,11 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                                     <div>
                                         <h3
                                             className="sc-sup-name"
-                                            onClick={() => navigate(`/firmadetay/${firma.firmaID}`)}
+                                            onClick={() => router.push(`/firmadetay/${firma.firmaID}`)}
                                             style={{ cursor: 'pointer' }}
                                             role="button"
                                             tabIndex={0}
-                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${firma.firmaID}`); }}
+                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${firma.firmaID}`); }}
                                         >
                                             {firma.firma_adi}
                                         </h3>

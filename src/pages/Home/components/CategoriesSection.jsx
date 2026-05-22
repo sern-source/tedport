@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Öne çıkan kategoriler — statik grid
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './CategoriesSection.css';
 
 // Enes Doğanay | 11 Mayıs 2026: 20 geniş sektörden 6 seçilmiş — sidebar Sektör filtresiyle tam eşleşme
@@ -14,7 +15,7 @@ const CATEGORIES = [
 ];
 
 const CategoriesSection = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <section className="sc-categories">
@@ -25,7 +26,7 @@ const CategoriesSection = () => {
                         <p className="sc-section-desc">Faaliyet gösterdiğiniz sektördeki firmaları keşfedin ve yeni iş bağlantıları kurun.</p>
                     </div>
                     {/* Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği */}
-                    <span className="sc-view-all" onClick={() => navigate('/firmalar')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/firmalar'); }} style={{ cursor: 'pointer' }}>
+                    <span className="sc-view-all" onClick={() => router.push('/firmalar')} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push('/firmalar'); }} style={{ cursor: 'pointer' }}>
                         Tüm sektörleri gör <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
                     </span>
                 </div>
@@ -33,11 +34,11 @@ const CategoriesSection = () => {
                 <div className="sc-cat-grid">
                     {CATEGORIES.map(({ icon, name, search }) => (
                         <div className="sc-cat-card" key={name}
-                            onClick={() => navigate(`/firmalar?sector=${encodeURIComponent(search)}`)}
+                            onClick={() => router.push(`/firmalar?sector=${encodeURIComponent(search)}`)}
                             role="button"
                             tabIndex={0}
                             aria-label={`${name} sektörünü filtrele`}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmalar?sector=${encodeURIComponent(search)}`); }}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmalar?sector=${encodeURIComponent(search)}`); }}
                             style={{ cursor: 'pointer' }}>
                             <div className="sc-cat-icon">
                                 <span className="material-symbols-outlined">{icon}</span>

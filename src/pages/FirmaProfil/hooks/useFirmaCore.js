@@ -1,11 +1,24 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Firma profil koordinatör — embedded, toast, tab + data
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useFirmaCoreInit } from './useFirmaCoreInit';
 
 export const useFirmaCore = () => {
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    // Enes Doğanay | 22 Mayıs 2026: react-router setSearchParams uyumlu yardımcı
+    const setSearchParams = useCallback((paramsOrFn, _opts) => {
+        let next;
+        if (typeof paramsOrFn === 'function') {
+            const current = new URLSearchParams(searchParams.toString());
+            next = paramsOrFn(current);
+        } else if (paramsOrFn instanceof URLSearchParams) {
+            next = paramsOrFn;
+        } else {
+            next = new URLSearchParams(paramsOrFn);
+        }
+        router.replace('?' + next.toString(), { scroll: false });
+    }, [searchParams, router]);
     const isEmbedded = searchParams.get('embedded') === '1';
     // Enes Doğanay | 8 Mayıs 2026: Şirketim sayfasından navigate ile gelindi mi?
     const fromSirketim = searchParams.get('from') === 'sirketim';
@@ -14,7 +27,7 @@ export const useFirmaCore = () => {
     const [fpToast, setFpToast] = useState(null);
     const fpToastTimerRef = useRef(null);
 
-    const coreInit = useFirmaCoreInit({ navigate });
+    const coreInit = useFirmaCoreInit({ navigate: (path) => router.push(path) });
 
     const showFpToast = useCallback((type, message) => {
         if (fpToastTimerRef.current) clearTimeout(fpToastTimerRef.current);
@@ -27,7 +40,7 @@ export const useFirmaCore = () => {
         // Enes Doğanay | 8 Mayıs 2026: from=sirketim parametresini koru
         else if (fromSirketim) setSearchParams({ ...params, from: 'sirketim' });
         else setSearchParams(params);
-    }, [isEmbedded, fromSirketim, setSearchParams]);
+    }, [isEmbedded, fromSirketim, router, setSearchParams]);
 
     // Enes Doğanay | 7 Mayıs 2026: Embedded modda yatay scroll engelle
     useEffect(() => {
@@ -61,7 +74,7 @@ export const useFirmaCore = () => {
     return {
         ...coreInit,
         isEmbedded, fromSirketim, currentTab, setTab,
-        searchParams, setSearchParams, navigate,
+        searchParams, setSearchParams, navigate: (path) => router.push(path),
         fpToast, showFpToast,
     };
 };

@@ -1,4 +1,4 @@
-﻿[data-theme="dark"] .notes-card {
+[data-theme="dark"] .notes-card {
   background: linear-gradient(180deg, #1e1a12 0%, #191510 100%);
   border-color: rgba(180, 130, 55, 0.22);
   box-shadow: 0 18px 38px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(180, 130, 55, 0.08), inset 0 1px 0 rgba(255, 220, 120, 0.06);

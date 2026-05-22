@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Register sayfası — ince shell, tüm mantık hook/service/component'te
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import SharedHeader from '../../components/SharedHeader';
 import SEO from '../../components/SEO';
 import RegistrationTabs from './components/RegistrationTabs';
@@ -22,7 +23,8 @@ const REGISTER_NAV = [
 ];
 
 const RegisterPage = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [registrationType, setRegistrationType] = useState(
         searchParams.get('type') === 'corporate' ? 'corporate' : 'individual'
     );
@@ -63,7 +65,7 @@ const RegisterPage = () => {
     const handleTabChange = (nextType) => {
         setRegistrationType(nextType);
         setNotification({ show: false, type: '', message: '' });
-        setSearchParams(nextType === 'corporate' ? { type: 'corporate' } : {});
+        router.replace(nextType === 'corporate' ? '?type=corporate' : '?', { scroll: false });
     };
 
     const individual = useIndividualRegister({ kvkkAccepted, marketingConsent, onMessage: showMessage });
@@ -127,7 +129,7 @@ const RegisterPage = () => {
                     <div className="card-footer">
                         <div className="footerText">
                             Zaten bir hesabınız var mı?{' '}
-                            <Link to={registrationType === 'corporate' ? '/login?type=corporate' : '/login'} className="text-link footer-login-link">
+                            <Link href={registrationType === 'corporate' ? '/login?type=corporate' : '/login'} className="text-link footer-login-link">
                                 Giriş Yap
                             </Link>
                         </div>

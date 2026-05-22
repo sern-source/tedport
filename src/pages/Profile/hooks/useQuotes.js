@@ -1,6 +1,6 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Teklif talepleri hook — liste, filtre, sil, şikayet (chat → useQuoteChat)
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
     fetchAndEnrichQuotes, deleteQuoteService, submitMessageReportService,
 } from '../services/quotesService';
@@ -9,7 +9,21 @@ import useQuoteChat from './useQuoteChat';
 const STATUS_PRIORITY = { replied: 1, awaiting_reply: 1, read: 1, pending: 2, rejected: 3, closed: 3 };
 
 export const useQuotes = (userId, setActiveViewingTeklifId, notifications, setNotifications, refreshCounts) => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    // Enes Doğanay | 22 Mayıs 2026: react-router setSearchParams uyumlu yardımcı
+    const setSearchParams = useCallback((paramsOrFn, _opts) => {
+        let next;
+        if (typeof paramsOrFn === 'function') {
+            const current = new URLSearchParams(searchParams.toString());
+            next = paramsOrFn(current);
+        } else if (paramsOrFn instanceof URLSearchParams) {
+            next = paramsOrFn;
+        } else {
+            next = new URLSearchParams(paramsOrFn);
+        }
+        router.replace('?' + next.toString(), { scroll: false });
+    }, [searchParams, router]);
     const [myQuotes, setMyQuotes] = useState([]);
     const [myQuotesLoading, setMyQuotesLoading] = useState(true);
     const [activeQuoteId, setActiveQuoteId] = useState(null);

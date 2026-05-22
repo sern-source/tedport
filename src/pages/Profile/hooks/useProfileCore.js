@@ -1,6 +1,6 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Profil core koordinatör — yükleme, avatar, davet, marketing + email sub-hook
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTheme } from '../../../hooks/useTheme';
 import {
     fetchSession, fetchProfileData, fetchCompanyMembership,
@@ -18,8 +18,21 @@ const DEFAULT_NOTIF_PREFS = {
 };
 
 export const useProfileCore = () => {
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    // Enes Doğanay | 22 Mayıs 2026: react-router setSearchParams uyumlu yardımcı
+    const setSearchParams = useCallback((paramsOrFn, _opts) => {
+        let next;
+        if (typeof paramsOrFn === 'function') {
+            const current = new URLSearchParams(searchParams.toString());
+            next = paramsOrFn(current);
+        } else if (paramsOrFn instanceof URLSearchParams) {
+            next = paramsOrFn;
+        } else {
+            next = new URLSearchParams(paramsOrFn);
+        }
+        router.replace('?' + next.toString(), { scroll: false });
+    }, [searchParams, router]);
     const { theme } = useTheme();
     const fileInputRef = useRef(null);
     const prToastTimerRef = useRef(null);
@@ -52,10 +65,10 @@ export const useProfileCore = () => {
         const fetchInitial = async () => {
             try {
                 const session = await fetchSession();
-                if (!session) { if (!cancelled) { setLoading(false); navigate('/login'); } return; }
+                if (!session) { if (!cancelled) { setLoading(false); router.push('/login'); } return; }
                 const currentUser = session.user;
                 const companyData = await fetchCompanyMembership(currentUser.id);
-                if (companyData?.firma_id && companyData.role === 'owner') { if (!cancelled) { setLoading(false); navigate('/firma-profil'); } return; }
+                if (companyData?.firma_id && companyData.role === 'owner') { if (!cancelled) { setLoading(false); router.push('/firma-profil'); } return; }
                 if (cancelled) return;
                 setUser(currentUser);
                 if (currentUser.new_email) emailHandlers.setPendingEmail(currentUser.new_email);
@@ -91,7 +104,7 @@ export const useProfileCore = () => {
         fetchPendingInvites(user.id).then(invites => setPendingInvites(invites)).catch(() => {});
     }, [searchParams, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const handleLogout = useCallback(async () => { await signOutService(); navigate('/'); }, [navigate]);
+    const handleLogout = useCallback(async () => { await signOutService(); router.push('/'); }, []);
 
     const handleAvatarUpload = useCallback(async (event) => {
         const file = event.target.files[0]; if (!file) return;
@@ -134,7 +147,7 @@ export const useProfileCore = () => {
         mopChatTrigger, setMopChatTrigger,
         prToast, setPrToast, showPrToast, notifPrefs, setNotifPrefs,
         marketingConsent, marketingConsentSaving,
-        fileInputRef, theme, searchParams, setSearchParams, navigate,
+        fileInputRef, theme, searchParams, setSearchParams, navigate: (path) => router.push(path),
         handleLogout, handleAvatarUpload, handleDavetKabul, handleDavetRed, handleToggleMarketing,
         ...emailHandlers,
     };

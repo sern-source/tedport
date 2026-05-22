@@ -1,6 +1,6 @@
 // Enes Doğanay | 7 Mayıs 2026: Firmalar sayfası state + URL senkronizasyon + oturum
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSearchHistory } from '../../../hooks/useSearchHistory';
 
 const readSavedState = () => {
@@ -10,7 +10,21 @@ const readSavedState = () => {
 
 // Enes Doğanay | 11 Mayıs 2026: ?sector= URL paramı okunup sidebar Sektör filtresi pre-select edilir
 export const useFirmalarState = ({ currentUserId }) => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    // Enes Doğanay | 22 Mayıs 2026: react-router setSearchParams uyumlu yardımcı
+    const setSearchParams = useCallback((paramsOrFn, _opts) => {
+        let next;
+        if (typeof paramsOrFn === 'function') {
+            const current = new URLSearchParams(searchParams.toString());
+            next = paramsOrFn(current);
+        } else if (paramsOrFn instanceof URLSearchParams) {
+            next = paramsOrFn;
+        } else {
+            next = new URLSearchParams(paramsOrFn);
+        }
+        router.replace('?' + next.toString(), { scroll: false });
+    }, [searchParams, router]);
     const savedState = readSavedState();
     const urlSearch = searchParams.get('search') || '';
     const urlSector = searchParams.get('sector') || '';

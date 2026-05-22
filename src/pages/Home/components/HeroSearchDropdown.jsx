@@ -1,9 +1,10 @@
 // Enes Doğanay | 6 Mayıs 2026: Hero arama dropdown paneli — öneriler, sonuç yok, geçmiş
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, setSearchTerm, setHeroDidYouMean, heroHistoryVisible, searchHistory, searchTerm, removeFromHistory, clearHistory, handleCloseSuggestions, handleSearch }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     // Enes Doğanay | 6 Mayıs 2026: Canlı firma önerileri
     if (heroSuggestions.length > 0) return (
@@ -11,10 +12,10 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
             {heroSuggestions.map((item) => (
                 // Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği
                 <div key={item.id} className="sc-hero-suggestion-item"
-                    onClick={() => { handleCloseSuggestions(); navigate(`/firmadetay/${item.id}`); }}
+                    onClick={() => { handleCloseSuggestions(); router.push(`/firmadetay/${item.id}`); }}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); navigate(`/firmadetay/${item.id}`); } }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); router.push(`/firmadetay/${item.id}`); } }}
                 >
                     <div className="sc-hero-suggestion-avatar">
                         {item.logo ? <img src={item.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} /> : item.name?.charAt(0)}
@@ -70,10 +71,10 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
                 <div key={term} className="sc-history-item">
                     {/* Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği */}
                     <div className="sc-history-item-main"
-                        onClick={() => { handleCloseSuggestions(); navigate(`/firmalar?search=${encodeURIComponent(term)}`); }}
+                        onClick={() => { handleCloseSuggestions(); router.push(`/firmalar?search=${encodeURIComponent(term)}`); }}
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); navigate(`/firmalar?search=${encodeURIComponent(term)}`); } }}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); router.push(`/firmalar?search=${encodeURIComponent(term)}`); } }}
                     >
                         <span className="material-symbols-outlined sc-history-icon">history</span>
                         <span>{term}</span>

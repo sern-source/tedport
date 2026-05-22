@@ -1,6 +1,7 @@
 /* Enes Doğanay | 13 Nisan 2026: Admin — Firma Düzenleme sayfası */
+'use client';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import './AdminFirmaDuzenle.css';
@@ -18,7 +19,7 @@ const EMPTY_COMPANY = {
 };
 
 const AdminFirmaDuzenle = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [accessDenied, setAccessDenied] = useState(false);
 
@@ -66,7 +67,7 @@ const AdminFirmaDuzenle = () => {
         const checkAccess = async () => {
             const { data: sessionResult } = await supabase.auth.getSession();
             const session = sessionResult.session;
-            if (!session?.user) { navigate('/login'); return; }
+            if (!session?.user) { router.push('/login'); return; }
             if (!(await resolveIsAdminUser(session.user.email, isAdminEmail))) {
                 if (isMounted) { setAccessDenied(true); setLoading(false); }
                 return;
@@ -532,7 +533,7 @@ const AdminFirmaDuzenle = () => {
                         <span className="material-symbols-outlined">lock</span>
                         <h2>Erişim Engellendi</h2>
                         <p>Bu sayfa yalnızca admin kullanıcılara açıktır.</p>
-                        <button onClick={() => navigate('/')}>Ana Sayfaya Dön</button>
+                        <button onClick={() => router.push('/')}>Ana Sayfaya Dön</button>
                     </div>
                 </div>
             </>

@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: FirmaDetay hero bölümü + claim banner
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 // Enes Doğanay | 12 Mayıs 2026: Sertifika badge renk meta
 import { SERTIFIKA_META } from '../../../constants/sertifikaConstants';
 import './FirmaDetayHero.css';
@@ -19,7 +20,7 @@ const FirmaDetayHero = ({
     // Enes Doğanay | 13 Mayıs 2026: Aylık profil görüntüleme sayısı (sadece firma sahibi görür)
     viewCount,
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const handleClaimProfile = () => {
         const params = new URLSearchParams({
@@ -32,7 +33,7 @@ const FirmaDetayHero = ({
             webSitesi: firma.web_sitesi || '',
             eposta: firma.eposta || ''
         });
-        navigate(`/register?${params.toString()}`);
+        router.push(`/register?${params.toString()}`);
     };
 
     return (
@@ -103,7 +104,7 @@ const FirmaDetayHero = ({
                                     {isCurrentUserCompanyManager && (
                                         <button
                                             className="firma-edit-hero-btn"
-                                            onClick={() => navigate('/firma-profil?tab=panel')}
+                                            onClick={() => router.push('/firma-profil?tab=panel')}
                                         >
                                             <span className="material-symbols-outlined">edit</span>
                                             Firma Bilgilerini Düzenle

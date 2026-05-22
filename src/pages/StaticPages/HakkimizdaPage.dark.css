@@ -1,4 +1,4 @@
-﻿[data-theme="dark"] .about-page-wrapper {
+[data-theme="dark"] .about-page-wrapper {
   background-color: var(--bg-light);
   color: var(--text-dark);
 }

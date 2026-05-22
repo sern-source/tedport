@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Kurumsal başvuru başarı durumu
+'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import './CorporateSuccess.css';
 
 const CorporateSuccess = ({ application, onNewApplication }) => (

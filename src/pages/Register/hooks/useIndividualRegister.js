@@ -1,6 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Bireysel kayıt formu — state + submit mantığı
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import {
     checkEmailAvailability,
     signUpUser,
@@ -11,7 +11,7 @@ import {
 } from '../services/registerService';
 
 const useIndividualRegister = ({ kvkkAccepted, marketingConsent, onMessage }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     // Enes Doğanay | 6 Mayıs 2026: Bireysel form alanları
     const [firstName, setFirstName] = useState('');
@@ -62,7 +62,8 @@ const useIndividualRegister = ({ kvkkAccepted, marketingConsent, onMessage }) =>
             });
 
             await logConsentRecord(userId, { kvkkAccepted, marketingConsent });
-            navigate('/emailconfirmation', { state: { email, password } });
+            sessionStorage.setItem('ec_pending', JSON.stringify({ email, password }));
+            router.push('/emailconfirmation');
         } catch (err) {
             let msg = err.message;
             if (msg.includes('User already registered')) msg = 'Bu e-posta adresiyle zaten bir hesap mevcut. Lütfen giriş yaparak devam ediniz.';

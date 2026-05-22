@@ -1,12 +1,13 @@
 // Enes Doğanay | 6 Mayıs 2026: Login hook — form state ve auth mantığı
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useAuth } from '../../../AuthContext';
 import * as authService from '../services/authService';
 
 export const useLogin = () => {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { setValidatingLogin, reloadUserData } = useAuth();
 
   // Enes Doğanay | 6 Mayıs 2026: Form state
@@ -43,17 +44,17 @@ export const useLogin = () => {
       const key = `tedport_firma_visited_${firmaId}`;
       if (!localStorage.getItem(key)) {
         localStorage.setItem(key, '1');
-        navigate('/firma-profil?tab=panel');
+        router.push('/firma-profil?tab=panel');
         return;
       }
     }
-    navigate(redirectTo || '/');
+    router.push(redirectTo || '/');
   };
 
   // Enes Doğanay | 6 Mayıs 2026: Sekme değişimi — URL ile senkron
   const handleTabChange = (nextTab) => {
     setActiveTab(nextTab);
-    setSearchParams(nextTab === 'corporate' ? { type: 'corporate' } : {});
+    router.replace(nextTab === 'corporate' ? pathname + '?type=corporate' : pathname, { scroll: false });
   };
 
   // Enes Doğanay | 6 Mayıs 2026: Giriş — sekme doğrulaması + bireysel/kurumsal ayrımı
@@ -143,7 +144,7 @@ export const useLogin = () => {
       setValidatingLogin(false);
       await reloadUserData();
       const firmaId = await authService.getOwnerFirma(data.user.id);
-      navigate(firmaId ? '/firma-profil?tab=panel' : '/ihaleler');
+      router.push(firmaId ? '/firma-profil?tab=panel' : '/ihaleler');
     } catch {
       setValidatingLogin(false);
       setFeedback({ text: 'Demo girişi başarısız. Seed SQL çalıştırıldığından emin olun.', type: 'error' });

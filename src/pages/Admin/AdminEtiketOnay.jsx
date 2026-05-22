@@ -1,6 +1,7 @@
 /* Enes Doğanay | 2 Mayıs 2026: Admin Onay Merkezi — etiket ve logo onay/red yönetimi */
+'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { supabase } from '../../supabaseClient';
 import { isAdminEmail } from './adminAccess';
 import { resolveIsAdminUser } from '../../services/corporateApplicationsApi';
@@ -19,7 +20,7 @@ const TABS = [
 ];
 
 export default function AdminEtiketOnay() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [authChecked, setAuthChecked] = useState(false);
 
   // ── Etiket talepleri state ──
@@ -46,11 +47,11 @@ export default function AdminEtiketOnay() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       resolveIsAdminUser(session?.user?.email, isAdminEmail).then(isAdmin => {
-        if (!isAdmin) { navigate('/'); return; }
+        if (!isAdmin) { router.push('/'); return; }
         setAuthChecked(true);
       });
     });
-  }, [navigate]);
+  }, []);
 
   // ── Etiket taleplerini çek ──
   const fetchEtiketler = useCallback(async () => {
@@ -221,7 +222,7 @@ export default function AdminEtiketOnay() {
   return (
     <div className="aeo-page">
       <div className="aeo-header">
-        <button className="aeo-back" onClick={() => navigate(-1)} type="button">
+        <button className="aeo-back" onClick={() => router.back()} type="button">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <span className="material-symbols-outlined aeo-header-icon">verified</span>
@@ -325,7 +326,7 @@ export default function AdminEtiketOnay() {
                       </button>
                       <button
                         className="aeo-btn aeo-btn--ghost"
-                        onClick={() => navigate(`/admin/firma-duzenle?firmaId=${talep.firma_id}`)}
+                        onClick={() => router.push(`/admin/firma-duzenle?firmaId=${talep.firma_id}`)}
                         type="button"
                       >
                         <span className="material-symbols-outlined">open_in_new</span>
@@ -407,7 +408,7 @@ export default function AdminEtiketOnay() {
                     </button>
                     <button
                       className="aeo-btn aeo-btn--ghost"
-                      onClick={() => navigate(`/admin/firma-duzenle?firmaId=${firma.firmaID}`)}
+                      onClick={() => router.push(`/admin/firma-duzenle?firmaId=${firma.firmaID}`)}
                       type="button"
                     >
                       <span className="material-symbols-outlined">open_in_new</span>
@@ -536,7 +537,7 @@ export default function AdminEtiketOnay() {
                           </button>
                           <button
                             className="aeo-btn aeo-btn--ghost"
-                            onClick={() => navigate(`/firmadetay/${talep.firma_id}`)}
+                            onClick={() => router.push(`/firmadetay/${talep.firma_id}`)}
                             type="button"
                           >
                             <span className="material-symbols-outlined">open_in_new</span>

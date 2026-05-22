@@ -1,7 +1,8 @@
 // Enes Doğanay | 7 Mayıs 2026: SirketimTab — şirket üyeliği ve panel erişimi
 // Enes Doğanay | 8 Mayıs 2026: Panel butonları iframe yerine tam sayfa navigasyona geçirildi
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './SirketimTab.css';
 import './SirketimTab.ekip.css';
 import './SirketimTab.dark.css';
@@ -12,7 +13,7 @@ const SirketimTab = ({
   handleDavetKabul, handleDavetRed,
 }) => {
   // Enes Doğanay | 8 Mayıs 2026: Tam sayfa navigasyon
-  const navigate = useNavigate();
+  const router = useRouter();
   /* Enes Doğanay | 7 Mayıs 2026: Hero KPI hesapları */
   const pendingCount = pendingInvites.length;
   const activePermCount = myCompany?.page_permissions
@@ -113,28 +114,28 @@ const SirketimTab = ({
           </div>
           <div className="sc-firma-actions">
             {myCompany.page_permissions?.firma_paneli && (
-              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=panel&from=sirketim')}>
+              <button className="sc-panel-btn" onClick={() => router.push('/firma-profil?tab=panel&from=sirketim')}>
                 <span className="material-symbols-outlined">storefront</span>
                 Firma Paneli
                 <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
             {myCompany.page_permissions?.teklif_yonetimi && (
-              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=teklifler&from=sirketim')}>
+              <button className="sc-panel-btn" onClick={() => router.push('/firma-profil?tab=teklifler&from=sirketim')}>
                 <span className="material-symbols-outlined">request_quote</span>
                 Teklif Yönetimi
                 <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
             {myCompany.page_permissions?.ihale_yonetimi && (
-              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=ihale-yonetimi&from=sirketim')}>
+              <button className="sc-panel-btn" onClick={() => router.push('/firma-profil?tab=ihale-yonetimi&from=sirketim')}>
                 <span className="material-symbols-outlined">gavel</span>
                 İhale Yönetimi
                 <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
               </button>
             )}
             {myCompany.page_permissions?.ekip_yonetimi && (
-              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=ekip&from=sirketim')}>
+              <button className="sc-panel-btn" onClick={() => router.push('/firma-profil?tab=ekip&from=sirketim')}>
                 <span className="material-symbols-outlined">group</span>
                 Ekip Yönetimi
                 <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>
@@ -142,7 +143,7 @@ const SirketimTab = ({
             )}
             {/* Enes Doğanay | 14 Mayıs 2026: Analitik panel butonu */}
             {myCompany.page_permissions?.analitik && (
-              <button className="sc-panel-btn" onClick={() => navigate('/firma-profil?tab=analitik&from=sirketim')}>
+              <button className="sc-panel-btn" onClick={() => router.push('/firma-profil?tab=analitik&from=sirketim')}>
                 <span className="material-symbols-outlined">bar_chart</span>
                 Analitik
                 <span className="material-symbols-outlined sc-panel-btn__arrow">arrow_forward</span>

@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Şifre sıfırlama sayfası — useResetPassword hook ile ayrıştırıldı
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import './Login.css';
@@ -16,7 +17,7 @@ const NAV = [
 ];
 
 export default function ResetPasswordPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {
     password, setPassword,
     confirmPassword, setConfirmPassword,
@@ -43,7 +44,7 @@ export default function ResetPasswordPage() {
             ) : !hasSession ? (
               <div className="reset-password-state">
                 <p className="login-error">Bu şifre yenileme bağlantısı geçersiz veya süresi dolmuş olabilir.</p>
-                <button type="button" className="login-btn login-btn-full login-btn-primary mt-4" onClick={() => navigate('/login')}>
+                <button type="button" className="login-btn login-btn-full login-btn-primary mt-4" onClick={() => router.push('/login')}>
                   Girişe Dön
                 </button>
               </div>

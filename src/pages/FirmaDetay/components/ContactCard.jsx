@@ -1,13 +1,14 @@
 // Enes Doğanay | 6 Mayıs 2026: İletişim sidebar kartı
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './ContactCard.css';
 
 const ContactCard = ({
     firma, userProfile, isVerified,
     onQuoteRequest, googleMapsLink, encodedAddress, adresText, firmaId
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <div className="card sidebar-card sidebar-card-contact">
@@ -41,7 +42,7 @@ const ContactCard = ({
             {!userProfile && (
                 <div className="contact-gated-panel">
                     <p className="contact-gated-text">Teklif istemek ve telefon bilgisini görmek için giriş yapın.</p>
-                    <button onClick={() => navigate(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn contact-login-btn">Giriş Yap</button>
+                    <button onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn contact-login-btn">Giriş Yap</button>
                 </div>
             )}
 

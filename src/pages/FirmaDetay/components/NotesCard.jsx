@@ -1,6 +1,7 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: Kişisel notlar sidebar kartı — koordinatör
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import NotesComposer from './NotesComposer';
 import NotesFeed from './NotesFeed';
 import './NotesCard.css';
@@ -20,7 +21,7 @@ const NotesCard = ({
     handleSaveNote, handleEditNote, handleCancelNoteEditing, handleDeleteNote,
     groupedSavedNotes, orderedNoteGroups
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const handleReminderToggle = () => {
         setReminderEnabled((prev) => {
@@ -53,7 +54,7 @@ const NotesCard = ({
                 <div className="notes-login-prompt">
                     <span className="material-symbols-outlined notes-lock-icon">lock</span>
                     <p className="notes-login-text">Bu tedarikçi için özel notlar almak istiyorsanız lütfen giriş yapın.</p>
-                    <button onClick={() => navigate(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn">Giriş Yap</button>
+                    <button onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn">Giriş Yap</button>
                 </div>
             ))}
         </div>

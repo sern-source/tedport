@@ -1,13 +1,14 @@
 // Enes Doğanay | 6 Mayıs 2026: E-posta onay sayfası — useEmailConfirmation hook ile ayrıştırıldı
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import './EmailConfirmation.css';
 import { useEmailConfirmation } from './hooks/useEmailConfirmation';
 
 export default function EmailConfirmationPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { displayEmail, resendStatus, resendStatusType, handleResend } = useEmailConfirmation();
 
   return (
@@ -30,7 +31,7 @@ export default function EmailConfirmationPage() {
             Onayladıktan sonra sayfa sizi otomatik olarak yönlendirecektir.
           </p>
 
-          <button className="ec-btn-primary" onClick={() => navigate('/login')}>
+          <button className="ec-btn-primary" onClick={() => router.push('/login')}>
             <span>Giriş Sayfasına Git</span>
           </button>
 

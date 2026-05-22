@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Login sayfası — useLogin hook ile tüm mantık ayrıştırıldı
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import SEO from '../../components/SEO';
@@ -21,8 +22,8 @@ const NAV = [
 
 export default function LoginPage() {
   // Enes Doğanay | 16 Mayıs 2026: Demo paneli sadece ?demo=true URL parametresiyle görünür
-  const { search } = useLocation();
-  const isDemoVisible = new URLSearchParams(search).get('demo') === 'true';
+  const searchParams = useSearchParams();
+  const isDemoVisible = searchParams.get('demo') === 'true';
 
   const {
     email, setEmail, password, setPassword,
@@ -130,12 +131,12 @@ export default function LoginPage() {
               <div className="corporate-login-callout">
                 <strong>Kurumsal hesabın henüz yok mu?</strong>
                 <p>Önce başvuru formunu doldurun. Firma doğrulaması tamamlanınca size şifre belirleme bağlantısı gönderilir.</p>
-                <Link to="/register?type=corporate" className="corporate-login-link">Kurumsal Başvuru Formuna Git</Link>
+                <Link href="/register?type=corporate" className="corporate-login-link">Kurumsal Başvuru Formuna Git</Link>
               </div>
             )}
 
             <div className="signup-prompt">
-              <p>Henüz hesabın yok mu? <Link to={activeTab === 'corporate' ? '/register?type=corporate' : '/register'}>Kayıt Ol</Link></p>
+              <p>Henüz hesabın yok mu? <Link href={activeTab === 'corporate' ? '/register?type=corporate' : '/register'}>Kayıt Ol</Link></p>
             </div>
           </div>
 

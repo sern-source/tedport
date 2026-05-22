@@ -1,11 +1,12 @@
 // Enes Doğanay | 6 Mayıs 2026: Firma listesi — liste görünümü (tablo düzeni)
+'use client';
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import ContactDropdown from './ContactDropdown';
 import './FirmalarListView.css';
 
 const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite, onQuoteRequest }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [openContactId, setOpenContactId] = useState(null);
   const contactRef = useRef(null);
 
@@ -33,7 +34,7 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
           <a
             href={`/firmadetay/${supplier.id}`}
             className="firmalar-list-col firmalar-list-col--logo"
-            onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${supplier.id}`); }}
+            onClick={(e) => { e.preventDefault(); router.push(`/firmadetay/${supplier.id}`); }}
           >
             <img
               src={supplier.images || '/tedport_default_company_logo.png'}
@@ -45,7 +46,7 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
           <a
             href={`/firmadetay/${supplier.id}`}
             className="firmalar-list-col firmalar-list-col--name"
-            onClick={(e) => { e.preventDefault(); navigate(`/firmadetay/${supplier.id}`); }}
+            onClick={(e) => { e.preventDefault(); router.push(`/firmadetay/${supplier.id}`); }}
             style={{ color: 'inherit', textDecoration: 'none' }}
           >
             <span className="firmalar-list-name-text">{supplier.name}</span>
@@ -66,18 +67,18 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
 
           {/* Enes Doğanay | 12 Mayıs 2026: Grid ile uyumluluk — supplier.sector pill */}
           <span className="firmalar-list-col firmalar-list-col--sector"
-            onClick={() => navigate(`/firmadetay/${supplier.id}`)}
+            onClick={() => router.push(`/firmadetay/${supplier.id}`)}
             role="button" tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${supplier.id}`); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${supplier.id}`); }}
           >
             {supplier.sector
               ? <span className="list-sector-pill" title={supplier.sector}>{supplier.sector}</span>
               : <span style={{ color: 'var(--text-muted)' }}>—</span>}
           </span>
           <span className="firmalar-list-col firmalar-list-col--location"
-            onClick={() => navigate(`/firmadetay/${supplier.id}`)}
+            onClick={() => router.push(`/firmadetay/${supplier.id}`)}
             role="button" tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/firmadetay/${supplier.id}`); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${supplier.id}`); }}
           >
             {supplier.location || '—'}
           </span>

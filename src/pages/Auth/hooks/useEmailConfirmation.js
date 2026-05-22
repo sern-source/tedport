@@ -1,14 +1,19 @@
 // Enes Doğanay | 6 Mayıs 2026: E-posta onay hook — polling + yeniden gönderim
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import * as authService from '../services/authService';
 
 export const useEmailConfirmation = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  // Enes Doğanay | 22 Mayıs 2026: react-router location.state yerine sessionStorage — lazy useState ile tek okuma
+  const [credentials] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    return JSON.parse(sessionStorage.getItem('ec_pending') || 'null');
+  });
+  useEffect(() => { sessionStorage.removeItem('ec_pending'); }, []);
 
-  const userEmail = location.state?.email || null;
-  const userPassword = location.state?.password || null;
+  const userEmail = credentials?.email || null;
+  const userPassword = credentials?.password || null;
   const displayEmail = userEmail || 'kayıt sırasında girdiğiniz e-posta adresi';
 
   const [resendStatus, setResendStatus] = useState('');
@@ -29,13 +34,13 @@ export const useEmailConfirmation = () => {
         const data = await authService.signIn(userEmail, userPassword, false);
         if (data.session) {
           clearInterval(pollingRef.current);
-          navigate('/profile');
+          router.push('/profile');
         }
       } catch { /* onay bekleniyor */ }
     }, 5000);
 
     return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
-  }, [userEmail, userPassword, navigate]);
+  }, [userEmail, userPassword]);
 
   // Enes Doğanay | 6 Mayıs 2026: Onay e-postasını yeniden gönder
   const handleResend = async () => {

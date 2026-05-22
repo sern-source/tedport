@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Favoriler & listeler sidebar kartı
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './FavoritesCard.css';
 
 const FavoritesCard = ({
@@ -11,7 +12,7 @@ const FavoritesCard = ({
     toggleFavorite, handleCreateList, handleListInputKeyDown,
     activeFavoriteListName
 }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <div className="card sidebar-card sidebar-card-favorites">
@@ -121,7 +122,7 @@ const FavoritesCard = ({
                 <div className="notes-login-prompt">
                     <span className="material-symbols-outlined notes-lock-icon">lock</span>
                     <p className="notes-login-text">Bu firmayı listelerinize eklemek için lütfen giriş yapın.</p>
-                    <button onClick={() => navigate(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn">Giriş Yap</button>
+                    <button onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn">Giriş Yap</button>
                 </div>
             )}
         </div>

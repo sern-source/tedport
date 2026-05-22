@@ -1,6 +1,7 @@
-/* Enes Doğanay | 2 Mayıs 2026: Admin — Mesaj Şikayetleri yönetim paneli */
+/* Enes Doğanay | 2 Mayıs 2026: Admin — Mesaj Şikayet leri yönetim paneli */
+'use client';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import './AdminContactMessages.css';
@@ -37,7 +38,7 @@ const formatDate = (val) => {
 };
 
 const AdminMesajSikayetleri = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [sessionChecked, setSessionChecked] = useState(false);
   const [accessDenied, setAccessDenied] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -52,7 +53,7 @@ const AdminMesajSikayetleri = () => {
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { navigate('/login'); return; }
+      if (!session?.user) { router.push('/login'); return; }
       if (!(await resolveIsAdminUser(session.user.email, isAdminEmail))) {
         setAccessDenied(true);
         setLoading(false);
@@ -280,7 +281,7 @@ const AdminMesajSikayetleri = () => {
               <span className="material-symbols-outlined" style={{ fontSize: 48, color: '#ef4444' }}>block</span>
               <h2>Erişim Reddedildi</h2>
               <p>Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
-              <button onClick={() => navigate('/')} className="acm-btn-primary">Ana Sayfaya Dön</button>
+              <button onClick={() => router.push('/')} className="acm-btn-primary">Ana Sayfaya Dön</button>
             </div>
           </div>
         </div>

@@ -1,10 +1,10 @@
 // Enes Doğanay | 6 Mayıs 2026: Şifre sıfırlama hook
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import * as authService from '../services/authService';
 
 export const useResetPassword = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Enes Doğanay | 6 Mayıs 2026: Form state
   const [password, setPassword] = useState('');
@@ -58,7 +58,7 @@ export const useResetPassword = () => {
       await authService.updatePassword(password);
       setFeedback({ text: 'Şifreniz güncellendi. Giriş ekranına yönlendiriliyorsunuz.', type: 'success' });
       await authService.signOut();
-      window.setTimeout(() => navigate('/login'), 1600);
+      window.setTimeout(() => router.push('/login'), 1600);
     } catch {
       setFeedback({ text: 'Şifre güncellenemedi. Lütfen bağlantıyı yeniden açıp tekrar deneyin.', type: 'error' });
     } finally {

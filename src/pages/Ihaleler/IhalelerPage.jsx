@@ -1,6 +1,8 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: İhaleler sayfası — koordinatör, tüm mantığı hook ve alt bileşenlere delege eder
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+'use client';
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import "./components/IhalelerPage.css";
 import "../../components/SharedHeader.css";
 import SharedHeader from "../../components/SharedHeader";
@@ -18,8 +20,21 @@ import IhalelerModals from "./components/IhalelerModals";
 import AlertSubscriptionPanel from "./components/AlertSubscriptionPanel";
 
 const IhalelerPage = () => {
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    // Enes Doğanay | 22 Mayıs 2026: react-router setSearchParams uyumlu yardımcı
+    const setSearchParams = useCallback((paramsOrFn, _opts) => {
+        let next;
+        if (typeof paramsOrFn === 'function') {
+            const current = new URLSearchParams(searchParams.toString());
+            next = paramsOrFn(current);
+        } else if (paramsOrFn instanceof URLSearchParams) {
+            next = paramsOrFn;
+        } else {
+            next = new URLSearchParams(paramsOrFn);
+        }
+        router.replace('?' + next.toString(), { scroll: false });
+    }, [searchParams, router]);
     const firmaFilter = searchParams.get("firma") || "";
     const ihaleParam = searchParams.get("ihale") || "";
     const teklifParam = searchParams.get("teklif") || "";
@@ -76,7 +91,7 @@ const IhalelerPage = () => {
                 <IhalelerModals
                     ihaleler={ihaleler} myTendersHook={myTendersHook} ihaleFormHook={ihaleFormHook} teklifHook={teklifHook}
                     detailTender={detailTender} setDetailTender={setDetailTender}
-                    authManagedCompanyId={authManagedCompanyId} userProfile={userProfile} navigate={navigate}
+                    authManagedCompanyId={authManagedCompanyId} userProfile={userProfile} navigate={(path) => router.push(path)}
                 />
                 <TendersHero
                     selectedFirmaName={ihaleler.selectedFirmaName}
@@ -107,9 +122,9 @@ const IhalelerPage = () => {
                     page={ihaleler.page} setPage={ihaleler.setPage} totalPages={ihaleler.totalPages} smartPages={ihaleler.smartPages}
                     onDetail={setDetailTender} onEdit={ihaleFormHook.openEdit}
                     onTeklif={teklifHook.openTeklifPopup} onContact={teklifHook.openFirmaContact}
-                    onNavigateFirma={(t) => navigate("/firmadetay/" + t.firma_id)}
-                    onLoginRedirect={() => navigate("/login?redirect=/ihaleler")}
-                    onRegisterRedirect={() => navigate("/register")}
+                    onNavigateFirma={(t) => router.push("/firmadetay/" + t.firma_id)}
+                    onLoginRedirect={() => router.push("/login?redirect=/ihaleler")}
+                    onRegisterRedirect={() => router.push("/register")}
                 />
             </main>
         </div>

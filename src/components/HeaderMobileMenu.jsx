@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Mobil navigasyon menüsü alt bileşeni
+'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 // Enes Doğanay | 14 Mayıs 2026: Nav linkleri için ikon eşlemesi — kullanıcı linklerle görsel tutarlılık
 const NAV_ICON_MAP = {
@@ -13,7 +14,7 @@ const NAV_ICON_MAP = {
 
 /* Enes Doğanay | 6 Mayıs 2026: Mobil menü link satırı — icon + label + opsiyonel badge */
 const MobileLink = ({ href, icon, label, onClick, badge }) => (
-    <Link to={href} onClick={onClick}>
+    <Link href={href} onClick={onClick}>
         <span className="material-symbols-outlined shared-mobile-menu-icon">{icon}</span>
         {label}
         {badge > 0 && <span className="shared-mobile-badge">{badge}</span>}
@@ -31,7 +32,7 @@ const HeaderMobileMenu = ({
     return (
         <div className="shared-mobile-menu" id="mobile-menu">
             {items.map((item) => (
-                <Link key={item.href} to={item.href} onClick={close}>
+                <Link key={item.href} href={item.href} onClick={close}>
                     <span className="material-symbols-outlined shared-mobile-menu-icon">
                         {NAV_ICON_MAP[item.href] || 'arrow_forward'}
                     </span>
@@ -39,13 +40,13 @@ const HeaderMobileMenu = ({
                 </Link>
             ))}
             {authChecked && !userProfile && locationPathname !== '/login' && (
-                <Link to="/login" onClick={close}>
+                <Link href="/login" onClick={close}>
                     <span className="material-symbols-outlined shared-mobile-menu-icon">login</span>
                     Giriş Yap
                 </Link>
             )}
             {authChecked && !userProfile && locationPathname !== '/register' && (
-                <Link to="/register" onClick={close} className="shared-mobile-register">
+                <Link href="/register" onClick={close} className="shared-mobile-register">
                     <span className="material-symbols-outlined shared-mobile-menu-icon">person_add</span>
                     Kayıt Ol
                 </Link>

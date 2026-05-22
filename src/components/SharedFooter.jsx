@@ -1,6 +1,7 @@
 /* Enes Doğanay | 14 Nisan 2026: Ortak site footer bileşeni — tüm sayfalarda kullanılır */
+'use client';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useAuth } from '../AuthContext';
 // Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo
 import { useTheme } from '../hooks/useTheme';
@@ -21,7 +22,7 @@ const SharedFooter = () => {
                 <div className="sf-grid">
                     {/* Brand */}
                     <div className="sf-brand">
-                        <Link to="/" className="sf-logo-link">
+                        <Link href="/" className="sf-logo-link">
                             {/* Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo */}
                             <img src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'} alt="Tedport Logo" className="sf-logo" loading="lazy" />
                         </Link>
@@ -42,11 +43,11 @@ const SharedFooter = () => {
                     <div className="sf-links">
                         <h4>Platform</h4>
                         <ul>
-                            <li><Link to="/firmalar">Firmalar</Link></li>
-                            <li><Link to="/ihaleler">İhaleler</Link></li>
-                            {/* Enes Doğanay | 16 Mayıs 2026: "Ücretsiz Kayıt Ol" → "Platforma Katıl" */}
-                            {!userProfile && <li><Link to="/register">Platforma Katıl</Link></li>}
-                            {!userProfile && <li><Link to="/login">Giriş Yap</Link></li>}
+                            <li><Link href="/firmalar">Firmalar</Link></li>
+                            <li><Link href="/ihaleler">İhaleler</Link></li>
+                            {/* Enes Doğanay | 16 Mayıs 2026: "Ücretsız Kayıt Ol" → "Platforma Katıl" */}
+                            {!userProfile && <li><Link href="/register">Platforma Katıl</Link></li>}
+                            {!userProfile && <li><Link href="/login">Giriş Yap</Link></li>}
                         </ul>
                     </div>
 
@@ -54,9 +55,9 @@ const SharedFooter = () => {
                     <div className="sf-links">
                         <h4>Kurumsal</h4>
                         <ul>
-                            <li><Link to="/hakkimizda">Hakkımızda</Link></li>
-                            <li><Link to="/sss">Sıkça Sorulan Sorular</Link></li>
-                            <li><Link to="/iletisim">İletişim</Link></li>
+                            <li><Link href="/hakkimizda">Hakkımızda</Link></li>
+                            <li><Link href="/sss">Sıkça Sorulan Sorular</Link></li>
+                            <li><Link href="/iletisim">İletişim</Link></li>
                             <li><a href="https://www.linkedin.com/company/tedport/about/" target="_blank" rel="noopener noreferrer">Kariyer</a></li>
                         </ul>
                     </div>
@@ -77,9 +78,9 @@ const SharedFooter = () => {
                 <div className="sf-bottom">
                     <p>© {CURRENT_YEAR} Tedport. Tüm hakları saklıdır.</p>
                     <div className="sf-legal-links">
-                        <Link to="/hizmet-sartlari">Hizmet Şartları</Link>
-                        <Link to="/gizlilik-politikasi">Gizlilik Politikası</Link>
-                        <Link to="/kvkk">KVKK Aydınlatma Metni</Link>
+                        <Link href="/hizmet-sartlari">Hizmet Şartları</Link>
+                        <Link href="/gizlilik-politikasi">Gizlilik Politikası</Link>
+                        <Link href="/kvkk">KVKK Aydınlatma Metni</Link>
                     </div>
                 </div>
             </div>

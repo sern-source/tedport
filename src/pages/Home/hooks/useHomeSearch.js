@@ -1,12 +1,12 @@
 // Enes Doğanay | 6 Mayıs 2026: Hero arama — öneriler, geçmiş, yazım düzeltme
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useSearchHistory } from '../../../hooks/useSearchHistory';
 import { suggestCorrection } from '../../../constants/synonyms';
 import { fetchHeroSuggestions } from '../services/homeService';
 
 export function useHomeSearch() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const { history: searchHistory, addToHistory, removeFromHistory, clearHistory } = useSearchHistory();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -63,12 +63,12 @@ export function useHomeSearch() {
         const trimmed = searchTerm.trim();
         if (trimmed) {
             addToHistory(trimmed);
-            navigate(`/firmalar?search=${encodeURIComponent(trimmed)}`);
+            router.push(`/firmalar?search=${encodeURIComponent(trimmed)}`);
         } else {
-            navigate('/firmalar');
+            router.push('/firmalar');
         }
         setHeroHistoryVisible(false);
-    }, [searchTerm, addToHistory, navigate]);
+    }, [searchTerm, addToHistory, router]);
 
     const handleClearSearch = useCallback(() => {
         setSearchTerm('');

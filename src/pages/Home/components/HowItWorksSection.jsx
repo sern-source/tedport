@@ -1,6 +1,7 @@
 // Enes Doğanay | 12 Mayıs 2026: "Nasıl Çalışır?" — 3 adımlı platform akışı
+'use client';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import './HowItWorksSection.css';
 
 const STEPS = [
@@ -28,7 +29,7 @@ const STEPS = [
 ];
 
 const HowItWorksSection = () => {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <section className="sc-how">
@@ -66,7 +67,7 @@ const HowItWorksSection = () => {
 
                 {/* Enes Doğanay | 12 Mayıs 2026: CTA buton */}
                 <div className="sc-how-cta">
-                    <button className="sc-how-cta-btn" onClick={() => navigate('/register')}>
+                    <button className="sc-how-cta-btn" onClick={() => router.push('/register')}>
                         <span className="material-symbols-outlined">rocket_launch</span>
                         {/* Enes Doğanay | 16 Mayıs 2026: "— Ücretsiz" kaldırıldı */}
                         Hemen Başla

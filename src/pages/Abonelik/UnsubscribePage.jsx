@@ -1,12 +1,13 @@
 // Enes Doğanay | 13 Mayıs 2026: E-posta abonelik iptal sayfası — token tabanlı
 // KVKK / GDPR gereği: e-postadaki link ile login gerekmeden iptal
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { unsubscribeByToken } from '../../services/alertService';
 import './UnsubscribePage.css';
 
 const UnsubscribePage = () => {
-    const [searchParams] = useSearchParams();
+    const searchParams = useSearchParams();
     const token = searchParams.get('token');
     // Enes Doğanay | 13 Mayıs 2026: 'loading' | 'success' | 'already' | 'error' | 'invalid'
     const [status, setStatus] = useState('loading');
@@ -47,7 +48,7 @@ const UnsubscribePage = () => {
                         <p>Yeni ihale e-posta uyarıları artık gönderilmeyecek.</p>
                         <p className="unsub-hint">
                             Tekrar abone olmak için{' '}
-                            <Link to="/ihaleler">ihaleler sayfasına</Link> gidin.
+                            <Link href="/ihaleler">ihaleler sayfasına</Link> gidin.
                         </p>
                     </>
                 )}
@@ -58,7 +59,7 @@ const UnsubscribePage = () => {
                         <h2>Zaten İptal Edilmiş</h2>
                         <p>Bu abonelik daha önce iptal edilmiş.</p>
                         <p className="unsub-hint">
-                            <Link to="/ihaleler">İhaleler sayfasına</Link> dönebilirsiniz.
+                            <Link href="/ihaleler">İhaleler sayfasına</Link> dönebilirsiniz.
                         </p>
                     </>
                 )}
@@ -68,7 +69,7 @@ const UnsubscribePage = () => {
                         <span className="material-symbols-outlined unsub-icon unsub-icon--error">error</span>
                         <h2>Geçersiz Bağlantı</h2>
                         <p>Bu iptal bağlantısı geçerli değil veya süresi dolmuş olabilir.</p>
-                        <Link to="/" className="unsub-home-btn">Ana Sayfaya Dön</Link>
+                        <Link href="/" className="unsub-home-btn">Ana Sayfaya Dön</Link>
                     </>
                 )}
             </div>

@@ -1,6 +1,6 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Kurumsal kayıt formu koordinatör — state, URL params, validate, submit
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'next/navigation';
 import { checkEmailAvailability, uploadAuthorizationDoc } from '../services/registerService';
 import { submitCorporateApplication } from '../../../services/corporateApplicationsApi';
 import { useCorporateFirmaSearch, parseIlIlce } from './useCorporateFirmaSearch';
@@ -49,7 +49,7 @@ const validateCorporateForm = (form) => {
 };
 
 const useCorporateRegister = ({ kvkkAccepted, onMessage }) => {
-    const [searchParams] = useSearchParams();
+    const searchParams = useSearchParams();
     const [corporateForm, setCorporateForm] = useState(INITIAL_CORPORATE_FORM);
     const [corporateErrors, setCorporateErrors] = useState({});
     const [loading, setLoading] = useState(false);

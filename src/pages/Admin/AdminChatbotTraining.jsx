@@ -1,5 +1,6 @@
+'use client';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import './AdminChatbotTraining.css';
@@ -36,7 +37,7 @@ const strToKw = (str) =>
 
 /* ─── Bileşen ─────────────────────────────────────────────────── */
 const AdminChatbotTraining = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   /* Yetki */
   const [sessionChecked, setSessionChecked] = useState(false);
@@ -76,7 +77,7 @@ const AdminChatbotTraining = () => {
   useEffect(() => {
     const check = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { navigate('/login'); return; }
+      if (!session?.user) { router.push('/login'); return; }
       if (!(await resolveIsAdminUser(session.user.email, isAdminEmail))) {
         setAccessDenied(true);
         setSessionChecked(true);
@@ -253,7 +254,7 @@ const AdminChatbotTraining = () => {
               <span className="material-symbols-outlined" style={{ fontSize: 48, color: '#ef4444' }}>block</span>
               <h2>Erişim Reddedildi</h2>
               <p>Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
-              <button onClick={() => navigate('/')} className="act-btn act-btn-primary">Ana Sayfaya Dön</button>
+              <button onClick={() => router.push('/')} className="act-btn act-btn-primary">Ana Sayfaya Dön</button>
             </div>
           </div>
         </div>
