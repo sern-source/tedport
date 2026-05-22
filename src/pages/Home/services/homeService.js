@@ -9,7 +9,8 @@ export async function fetchHeroSuggestions(term) {
 
     const { data, error } = await supabase
         .from('firmalar')
-        .select('firmaID, firma_adi, il_ilce, logo_url')
+        // Enes Doğanay | 23 Mayıs 2026: slug eklendi — hero öneri slug URL kullanacak
+        .select('firmaID, slug, firma_adi, il_ilce, logo_url')
         .or(
             expandSearchTerms(safe).flatMap(t => [
                 `firma_adi.ilike."%${t}%"`,
@@ -22,8 +23,10 @@ export async function fetchHeroSuggestions(term) {
         .limit(6);
 
     if (error) throw new Error(error.message);
+    // Enes Doğanay | 23 Mayıs 2026: slug eklendi
     return (data || []).map(f => ({
         id: f.firmaID,
+        slug: f.slug,
         name: f.firma_adi,
         location: f.il_ilce || '',
         logo: f.logo_url?.includes('firma-logolari') ? f.logo_url : null,
@@ -34,7 +37,8 @@ export async function fetchHeroSuggestions(term) {
 export async function fetchTopSuppliers() {
     const { data, error } = await supabase
         .from('firmalar')
-        .select('firmaID, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri, onayli_hesap, best, has_logo')
+        // Enes Doğanay | 23 Mayıs 2026: slug eklendi
+        .select('firmaID, slug, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri, onayli_hesap, best, has_logo')
         .order('has_logo', { ascending: false, nullsFirst: false })
         .order('onayli_hesap', { ascending: false, nullsFirst: false })
         .order('best', { ascending: false })

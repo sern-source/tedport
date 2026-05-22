@@ -31,9 +31,10 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                             const validLogo = firma.logo_url?.includes('firma-logolari') ? firma.logo_url : null;
                             // Enes Doğanay | 8 Mayıs 2026: IIFE → module-level parseFirmaTags
                             const tags = parseFirmaTags(firma.urun_kategorileri);
+                            // Enes Doğanay | 23 Mayıs 2026: slug bazlı URL — slug yoksa ID fallback
+                            const firmaUrl = firma.slug ? `/firmalar/${firma.slug}` : `/firmadetay/${firma.firmaID}`;
 
                             return (
-                                // Enes Doğanay | 8 Mayıs 2026: firmaID tabanlı stabil key
                                 <div className="sc-sup-card" key={firma.firmaID || `supplier-${index}`}>
                                     <div className="sc-sup-header">
                                         {validLogo ? (
@@ -41,20 +42,20 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                                                 className="sc-sup-avatar"
                                                 src={validLogo}
                                                 alt={firma.firma_adi}
-                                                onClick={() => router.push(`/firmadetay/${firma.firmaID}`)}
+                                                onClick={() => router.push(firmaUrl)}
                                                 style={{ objectFit: 'contain', background: '#fff', border: '1px solid #e0e7ff', cursor: 'pointer' }}
                                                 role="button"
                                                 tabIndex={0}
-                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${firma.firmaID}`); }}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(firmaUrl); }}
                                             />
                                         ) : (
                                             <div
                                                 className="sc-sup-avatar"
-                                                onClick={() => router.push(`/firmadetay/${firma.firmaID}`)}
+                                                onClick={() => router.push(firmaUrl)}
                                                 style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe', cursor: 'pointer' }}
                                                 role="button"
                                                 tabIndex={0}
-                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${firma.firmaID}`); }}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(firmaUrl); }}
                                             >
                                                 {firma.firma_adi?.charAt(0)}
                                             </div>
@@ -68,11 +69,11 @@ const SuppliersSection = ({ topSuppliers, isLoading }) => {
                                     <div>
                                         <h3
                                             className="sc-sup-name"
-                                            onClick={() => router.push(`/firmadetay/${firma.firmaID}`)}
+                                            onClick={() => router.push(firmaUrl)}
                                             style={{ cursor: 'pointer' }}
                                             role="button"
                                             tabIndex={0}
-                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${firma.firmaID}`); }}
+                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(firmaUrl); }}
                                         >
                                             {firma.firma_adi}
                                         </h3>

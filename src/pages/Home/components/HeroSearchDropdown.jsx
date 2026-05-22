@@ -12,10 +12,11 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
             {heroSuggestions.map((item) => (
                 // Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği
                 <div key={item.id} className="sc-hero-suggestion-item"
-                    onClick={() => { handleCloseSuggestions(); router.push(`/firmadetay/${item.id}`); }}
+                    // Enes Doğanay | 23 Mayıs 2026: slug bazlı URL
+                    onClick={() => { handleCloseSuggestions(); router.push(item.slug ? `/firmalar/${item.slug}` : `/firmadetay/${item.id}`); }}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); router.push(`/firmadetay/${item.id}`); } }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); router.push(item.slug ? `/firmalar/${item.slug}` : `/firmadetay/${item.id}`); } }}
                 >
                     <div className="sc-hero-suggestion-avatar">
                         {item.logo ? <img src={item.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} /> : item.name?.charAt(0)}

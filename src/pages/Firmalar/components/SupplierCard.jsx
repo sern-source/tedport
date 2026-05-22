@@ -19,9 +19,12 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
     return () => document.removeEventListener('mousedown', handler);
   }, [showContact]);
 
+  // Enes Doğanay | 23 Mayıs 2026: slug bazlı URL — slug yoksa eski ID URL'e fallback
+  const firmaUrl = supplier.slug ? `/firmalar/${supplier.slug}` : `/firmadetay/${supplier.id}`;
+
   const handleNavigate = (e) => {
     e.preventDefault();
-    router.push(`/firmadetay/${supplier.id}`);
+    router.push(firmaUrl);
   };
 
   return (
@@ -42,7 +45,7 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
         </span>
       </div>
 
-      <a href={`/firmadetay/${supplier.id}`} className="card-images" onClick={handleNavigate}>
+      <a href={firmaUrl} className="card-images" onClick={handleNavigate}>
         <div className="main-image">
           {supplier.images ? (
             <img
@@ -60,7 +63,7 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
 
       <div className="card-content">
         <h3 className="supplier-name">
-          <a href={`/firmadetay/${supplier.id}`} onClick={handleNavigate} style={{ color: 'inherit', textDecoration: 'none' }}>
+          <a href={firmaUrl} onClick={handleNavigate} style={{ color: 'inherit', textDecoration: 'none' }}>
             {supplier.name}
             {supplier.isVerified && !supplier.isDemo && (
               <span className="verified-badge-inline">

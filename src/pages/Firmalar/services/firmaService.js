@@ -146,8 +146,9 @@ export const fetchFirmalar = async ({ page, search, filters, sortMode, searchMod
   }
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
+  // Enes Doğanay | 23 Mayıs 2026: slug eklendi — kart navigasyonu slug URL kullanacak
   let query = supabase.from('firmalar').select(
-    'firmaID, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres, onayli_hesap, is_demo',
+    'firmaID, slug, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres, onayli_hesap, is_demo',
     { count: 'exact' }
   );
   // Enes Doğanay | 11 Mayıs 2026: searchMode'a göre farklı alanlar aranır

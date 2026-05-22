@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-    fetchFirmaById, fetchFirmaTenders, fetchFirmaEkip,
+    fetchFirmaById, fetchFirmaBySlug, fetchFirmaTenders, fetchFirmaEkip,
     fetchUserSessionData, sendQuoteRequestService, fetchSuggestionsService,
     trackFirmaView, fetchFirmaViewCount,
 } from '../services/firmaDetayService';
@@ -17,8 +17,11 @@ const TENDERS_PREVIEW = 3;
 // Enes Doğanay | 14 Mayıs 2026: miktar/birim kaldırıldı — kalemler dizisiyle yönetiliyor
 const EMPTY_QUOTE_FORM = { konu: '', mesaj: '', kalemler: [], teslim_tarihi: '', teslim_yeri: '' };
 
-export function useFirmaDetay(id) {
+// Enes Doğanay | 23 Mayıs 2026: slug parametresi — /firmalar/:slug URL dönüşümü
+export function useFirmaDetay(slug) {
     const router = useRouter();
+    // Enes Doğanay | 23 Mayıs 2026: firmaID slug'dan çözümlenir, tüm iç sorgularda kullanılır
+    const firmaIdRef = useRef(null);
     const [firma, setFirma] = useState(null);
     const [loading, setLoading] = useState(true);
     const [firmaEkip, setFirmaEkip] = useState([]);
@@ -66,18 +69,22 @@ export function useFirmaDetay(id) {
         return () => { if (fdToastTimerRef.current) clearTimeout(fdToastTimerRef.current); };
     }, []);
 
-    const notes = useFirmaDetayNotes({ userId: sessionUserIdRef.current, userEmail: sessionUserEmailRef.current, firmaId: id, showFdToast });
-    const favorites = useFirmaDetayFavorites({ userId: sessionUserIdRef.current, firmaId: id, showFdToast });
+    const notes = useFirmaDetayNotes({ userId: sessionUserIdRef.current, userEmail: sessionUserEmailRef.current, firmaId: firmaIdRef.current, showFdToast });
+    const favorites = useFirmaDetayFavorites({ userId: sessionUserIdRef.current, firmaId: firmaIdRef.current, showFdToast });
 
     const fetchFirma = async () => {
         setLoading(true); setTendersLoading(true);
         try {
-            const [firmaData, tendersData, sertData] = await Promise.all([
-                fetchFirmaById(id).catch(() => null),
+            // Enes Doğanay | 23 Mayıs 2026: Önce slug ile firma çek, firmaID'yi al
+            const firmaData = await fetchFirmaBySlug(slug).catch(() => null);
+            if (!firmaData) { setLoading(false); setTendersLoading(false); return; }
+            const id = firmaData.firmaID;
+            firmaIdRef.current = id;
+            const [tendersData, sertData] = await Promise.all([
                 fetchFirmaTenders(id).catch(err => ({ __error: err })),
                 fetchFirmaSertifikalari(id).catch(() => []),
             ]);
-            if (firmaData) { setFirma(firmaData); setIsVerified(firmaData?.onayli_hesap === true); setIsDemo(firmaData?.is_demo === true); fetchFirmaEkip(id).then(notes.setSavedNotes && (ekip => setFirmaEkip(ekip))); }
+            setFirma(firmaData); setIsVerified(firmaData?.onayli_hesap === true); setIsDemo(firmaData?.is_demo === true); fetchFirmaEkip(id).then(notes.setSavedNotes && (ekip => setFirmaEkip(ekip)));
             if (Array.isArray(tendersData)) { setTenders(tendersData); setIsTendersTableMissing(false); }
             else if (tendersData?.__error) { if (isMissingRelationError(tendersData.__error)) setIsTendersTableMissing(true); setTenders([]); }
             setSertifikalar(Array.isArray(sertData) ? sertData : []);
@@ -85,6 +92,8 @@ export function useFirmaDetay(id) {
     };
 
     const checkUserSessionAndNotes = async () => {
+        const id = firmaIdRef.current;
+        if (!id) return;
         const sessionData = await fetchUserSessionData(id);
         if (!sessionData) { setUserProfile(null); setManagedCompanyId(null); trackFirmaView(id, null); return; }
         sessionUserIdRef.current = sessionData.userId;
@@ -106,7 +115,7 @@ export function useFirmaDetay(id) {
         if (sessionData.favorite) { favorites.setIsFavorited(true); favorites.setSelectedListId(sessionData.favorite.liste_id || ''); }
     };
 
-    useEffect(() => { fetchFirma(); checkUserSessionAndNotes(); }, [id]);
+    useEffect(() => { fetchFirma().then(() => checkUserSessionAndNotes()); }, [slug]);
 
     useEffect(() => {
         const handleKeyDown = (e) => { if (e.key === 'Escape') setShowEkipModal(false); };
@@ -123,7 +132,8 @@ export function useFirmaDetay(id) {
         return () => clearTimeout(timeout);
     }, [detaySearch]);
 
-    const handleSuggestionClick = (item) => { setSuggestions([]); setNoResults(false); if (!item) return; setDetaySearch(''); router.push(`/firmadetay/${item.id}`); };
+    // Enes Doğanay | 23 Mayıs 2026: Öneri tıklaması — slug varsa /firmalar/:slug, yoksa /firmadetay/:id
+    const handleSuggestionClick = (item) => { setSuggestions([]); setNoResults(false); if (!item) return; setDetaySearch(''); router.push(item.slug ? `/firmalar/${item.slug}` : `/firmadetay/${item.id}`); };
     const handleSearchSubmit = (term) => {
         setSuggestions([]); setNoResults(false);
         if (term.trim().length < 2) return;

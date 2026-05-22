@@ -2,14 +2,38 @@
 import { supabase } from '../../../supabaseClient';
 import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 
+// Enes Doğanay | 23 Mayıs 2026: slug alanı eklendi — SEO URL geçişi
+const FIRMA_SELECT = 'firmaID, slug, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best, onayli_hesap, show_ekip_public';
+
 export async function fetchFirmaById(id) {
     const { data, error } = await supabase
         .from('firmalar')
-        .select('firmaID, firma_adi, web_sitesi, category_name, description, firma_turu, telefon, eposta, adres, latitude, longitude, ana_sektor, urun_kategorileri, logo_url, il_ilce, best, onayli_hesap, show_ekip_public')
+        .select(FIRMA_SELECT)
         .eq('firmaID', id)
         .single();
     if (error) throw error;
     return data;
+}
+
+// Enes Doğanay | 23 Mayıs 2026: Slug bazlı fetch — /firmalar/:slug route için
+export async function fetchFirmaBySlug(slug) {
+    const { data, error } = await supabase
+        .from('firmalar')
+        .select(FIRMA_SELECT)
+        .eq('slug', slug)
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+// Enes Doğanay | 23 Mayıs 2026: ID → slug çözümleyici — /firmadetay/:id 301 redirect için
+export async function fetchFirmaSlugById(id) {
+    const { data } = await supabase
+        .from('firmalar')
+        .select('slug')
+        .eq('firmaID', id)
+        .single();
+    return data?.slug || null;
 }
 
 export async function fetchFirmaTenders(id) {
@@ -192,7 +216,8 @@ export async function fetchSuggestionsService(search) {
     if (safeSearch.length < 2) return [];
     const { data } = await supabase
         .from('firmalar')
-        .select('firmaID, firma_adi, il_ilce, best')
+        // Enes Doğanay | 23 Mayıs 2026: slug eklendi
+        .select('firmaID, slug, firma_adi, il_ilce, best')
         .or(`firma_adi.ilike."%${safeSearch}%",description.ilike."%${safeSearch}%",ana_sektor.ilike."%${safeSearch}%",urun_kategorileri.ilike."%${safeSearch}%"`)
         .limit(6);
     if (!data) return [];
@@ -207,7 +232,8 @@ export async function fetchSuggestionsService(search) {
             const scoreB = bName === lower ? 3 : bName.startsWith(lower) ? 2 : bName.includes(lower) ? 1 : 0;
             return scoreB - scoreA;
         })
-        .map(f => ({ id: f.firmaID, name: f.firma_adi, location: f.il_ilce }));
+        // Enes Doğanay | 23 Mayıs 2026: slug eklendi — öneri tıklaması slug URL'e gidecek
+        .map(f => ({ id: f.firmaID, slug: f.slug, name: f.firma_adi, location: f.il_ilce }));
 }
 
 // Enes Doğanay | 13 Mayıs 2026: Profil görüntüleme kaydı — anonim veya kayıtlı

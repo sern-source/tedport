@@ -29,12 +29,15 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
         <span className="firmalar-list-col firmalar-list-col--action" />
       </div>
 
-      {suppliers.map(supplier => (
+      {suppliers.map(supplier => {
+        // Enes Doğanay | 23 Mayıs 2026: slug bazlı URL — slug yoksa ID fallback
+        const firmaUrl = supplier.slug ? `/firmalar/${supplier.slug}` : `/firmadetay/${supplier.id}`;
+        return (
         <div key={supplier.id} className="firmalar-list-row">
           <a
-            href={`/firmadetay/${supplier.id}`}
+            href={firmaUrl}
             className="firmalar-list-col firmalar-list-col--logo"
-            onClick={(e) => { e.preventDefault(); router.push(`/firmadetay/${supplier.id}`); }}
+            onClick={(e) => { e.preventDefault(); router.push(firmaUrl); }}
           >
             <img
               src={supplier.images || '/tedport_default_company_logo.png'}
@@ -44,9 +47,9 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
           </a>
 
           <a
-            href={`/firmadetay/${supplier.id}`}
+            href={firmaUrl}
             className="firmalar-list-col firmalar-list-col--name"
-            onClick={(e) => { e.preventDefault(); router.push(`/firmadetay/${supplier.id}`); }}
+            onClick={(e) => { e.preventDefault(); router.push(firmaUrl); }}
             style={{ color: 'inherit', textDecoration: 'none' }}
           >
             <span className="firmalar-list-name-text">{supplier.name}</span>
@@ -67,18 +70,18 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
 
           {/* Enes Doğanay | 12 Mayıs 2026: Grid ile uyumluluk — supplier.sector pill */}
           <span className="firmalar-list-col firmalar-list-col--sector"
-            onClick={() => router.push(`/firmadetay/${supplier.id}`)}
+            onClick={() => router.push(firmaUrl)}
             role="button" tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${supplier.id}`); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(firmaUrl); }}
           >
             {supplier.sector
               ? <span className="list-sector-pill" title={supplier.sector}>{supplier.sector}</span>
               : <span style={{ color: 'var(--text-muted)' }}>—</span>}
           </span>
           <span className="firmalar-list-col firmalar-list-col--location"
-            onClick={() => router.push(`/firmadetay/${supplier.id}`)}
+            onClick={() => router.push(firmaUrl)}
             role="button" tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(`/firmadetay/${supplier.id}`); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push(firmaUrl); }}
           >
             {supplier.location || '—'}
           </span>
@@ -112,7 +115,8 @@ const FirmalarListView = ({ suppliers, favoriteIds, isLoggedIn, onToggleFavorite
             </div>
           </span>
         </div>
-      ))}
+      );
+      })}
     </section>
   );
 };
