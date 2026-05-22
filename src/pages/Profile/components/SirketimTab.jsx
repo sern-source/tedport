@@ -2,6 +2,7 @@
 // Enes Doğanay | 8 Mayıs 2026: Panel butonları iframe yerine tam sayfa navigasyona geçirildi
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import './SirketimTab.css';
 import './SirketimTab.ekip.css';
@@ -88,8 +89,9 @@ const SirketimTab = ({
         <div className="sc-firma-card">
           <div className="sc-firma-card__head">
             <div className="sc-firma-avatar">
+              {/* Enes Doğanay | 23 Mayıs 2026: next/image — WebP optimizasyon */}
               {myCompanyFirma.logo_url
-                ? <img src={myCompanyFirma.logo_url} alt={myCompanyFirma.firma_adi} className="sc-firma-avatar__img" />
+                ? <Image src={myCompanyFirma.logo_url} alt={myCompanyFirma.firma_adi} width={44} height={44} style={{ objectFit: 'contain', borderRadius: '11px', padding: '4px' }} />
                 : <span className="material-symbols-outlined">business</span>
               }
             </div>

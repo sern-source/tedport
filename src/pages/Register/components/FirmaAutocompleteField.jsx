@@ -1,5 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Firma arama + autocomplete dropdown
 import React from 'react';
+import Image from 'next/image';
 
 const FirmaAutocompleteField = ({ corporateForm, corporateErrors, firmaSuggestions, showFirmaSuggestions, setShowFirmaSuggestions, firmaSearchRef, handleFirmaSearch, handleFirmaSelect }) => (
     <div className="input-group" ref={firmaSearchRef} style={{ position: 'relative' }}>
@@ -30,7 +31,8 @@ const FirmaAutocompleteField = ({ corporateForm, corporateErrors, firmaSuggestio
                 {firmaSuggestions.map(firma => (
                     <button key={firma.firmaID} type="button" className={`firma-autocomplete-item${firma.isManaged ? ' firma-autocomplete-item--managed' : ''}`} onClick={() => !firma.isManaged && handleFirmaSelect(firma)} disabled={firma.isManaged}>
                         <div className="firma-autocomplete-avatar">
-                            {firma.logo_url ? <img src={firma.logo_url} alt="" loading="lazy" /> : <span>{firma.firma_adi?.charAt(0)}</span>}
+                            {/* Enes Doğanay | 23 Mayıs 2026: next/image — 36×36 WebP thumbnail */}
+                            {firma.logo_url ? <Image src={firma.logo_url} alt="" width={36} height={36} style={{ objectFit: 'contain', borderRadius: '8px' }} /> : <span>{firma.firma_adi?.charAt(0)}</span>}
                         </div>
                         <div className="firma-autocomplete-info">
                             <span className="firma-autocomplete-name">{firma.firma_adi}</span>

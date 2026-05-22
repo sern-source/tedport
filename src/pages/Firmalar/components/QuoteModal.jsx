@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif talebi modalı — kart ve liste görünümü paylaşımlı
 // Enes Doğanay | 14 Mayıs 2026: Kalem kalem ekleme sistemi — ihale formuyla aynı mantık
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import CitySelect from '../../../components/CitySelect';
 import DatePicker from '../../../components/DatePicker';
@@ -116,8 +117,9 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
           <div className="quote-modal-header">
             <div className="quote-modal-header__identity">
               <div className="quote-modal-logo">
+                {/* Enes Doğanay | 23 Mayıs 2026: next/image — WebP optimizasyon */}
                 {supplier.images
-                  ? <img src={supplier.images} alt={supplier.name} className="quote-modal-logo__img" />
+                  ? <Image src={supplier.images} alt={supplier.name || 'Logo'} width={44} height={44} style={{ objectFit: 'contain' }} />
                   : <span className="quote-modal-logo__fallback">{(supplier.name || '?')[0].toUpperCase()}</span>
                 }
               </div>

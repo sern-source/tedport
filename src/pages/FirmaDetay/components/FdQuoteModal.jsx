@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif İste modal bileşeni
 // Enes Doğanay | 14 Mayıs 2026: Kalem kalem ekleme sistemi — ihale formuyla aynı mantık
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import DatePicker from '../../../components/DatePicker';
 import CitySelect from '../../../components/CitySelect';
@@ -123,7 +124,8 @@ const FdQuoteModal = ({
                         <div className="quote-modal-header__identity">
                             <div className="quote-modal-logo">
                                 {firma?.logo_url?.includes('firma-logolari')
-                                    ? <img src={firma.logo_url} alt={firma.firma_adi} className="quote-modal-logo__img" />
+                                    /* Enes Doğanay | 23 Mayıs 2026: next/image — WebP optimizasyon */
+                    ? <Image src={firma.logo_url} alt={firma.firma_adi} width={44} height={44} style={{ objectFit: 'contain' }} />
                                     : <span className="quote-modal-logo__fallback">{(firma?.firma_adi || '?')[0].toUpperCase()}</span>
                                 }
                             </div>

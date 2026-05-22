@@ -279,7 +279,9 @@
   letter-spacing: 1px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   transition: transform 0.2s, border-radius 0.2s;
+  /* Enes Doğanay | 23 Mayıs 2026: next/image fill için position:relative + overflow:hidden */
   position: relative;
+  overflow: hidden;
 }
 
 .fav-avatar::after {

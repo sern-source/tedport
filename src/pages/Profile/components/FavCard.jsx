@@ -1,8 +1,25 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: FavCard — tek favori kart bileşeni
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import './FavCard.css';
 import './FavCard.dark.css';
 import './FavCard.notes.css';
+
+// Enes Doğanay | 23 Mayıs 2026: next/image fill — logo yüklenemezse default logo göster
+const FavCardLogo = ({ logo_url, name }) => {
+  const [err, setErr] = useState(false);
+  return (
+    <Image
+      src={err || !logo_url ? '/tedport_default_company_logo.png' : logo_url}
+      alt={name || 'Logo'}
+      fill
+      sizes="42px"
+      style={{ objectFit: 'contain' }}
+      onError={() => setErr(true)}
+    />
+  );
+};
 
 const FavCard = ({
   fav, myLists, navigate, openMenuId, setOpenMenuId,
@@ -46,8 +63,8 @@ const FavCard = ({
       </div>
     )}
     <div className="fav-avatar" style={fav.logo_url ? { background: '#ffffff' } : { background: fav.color }}>
-      {fav.logo_url && <img src={fav.logo_url} alt={fav.name} className="fav-avatar-logo" onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'block'; }} />}
-      <img src="/tedport_default_company_logo.png" alt="Logo" className="fav-avatar-logo" style={{ display: fav.logo_url ? 'none' : 'block' }} />
+      {/* Enes Doğanay | 23 Mayıs 2026: next/image fill — fill için position:relative parent'tan geliyor */}
+      <FavCardLogo logo_url={fav.logo_url} name={fav.name} />
     </div>
     <div className="fav-body">
       <h3 className="fav-name"><span className="fav-name-text" title={fav.name}>{fav.name}</span></h3>

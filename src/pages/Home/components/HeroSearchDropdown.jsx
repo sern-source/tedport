@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Hero arama dropdown paneli — öneriler, sonuç yok, geçmiş
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, setSearchTerm, setHeroDidYouMean, heroHistoryVisible, searchHistory, searchTerm, removeFromHistory, clearHistory, handleCloseSuggestions, handleSearch }) => {
@@ -18,8 +19,11 @@ const HeroSearchDropdown = ({ heroSuggestions, heroNoResults, heroDidYouMean, se
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { handleCloseSuggestions(); router.push(item.slug ? `/firmalar/${item.slug}` : `/firmadetay/${item.id}`); } }}
                 >
+                    {/* Enes Doğanay | 23 Mayıs 2026: next/image — WebP otomatik, 38×38 thumbnail */}
                     <div className="sc-hero-suggestion-avatar">
-                        {item.logo ? <img src={item.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} /> : item.name?.charAt(0)}
+                        {item.logo
+                            ? <Image src={item.logo} alt="" width={38} height={38} style={{ objectFit: 'contain' }} />
+                            : item.name?.charAt(0)}
                     </div>
                     <div className="sc-hero-suggestion-info">
                         <span className="sc-hero-suggestion-name">{item.name}</span>
