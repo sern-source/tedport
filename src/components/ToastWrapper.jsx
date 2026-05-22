@@ -6,6 +6,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../AuthContext';
 import { markNotificationRead } from '../services/authService';
+// Enes Doğanay | 25 Mayıs 2026: slug navigasyonu — firma_id toast tıklamasında slug URL kullanılır
+import { fetchFirmaSlugById } from '../services/authService';
 import ToastNotification from './ToastNotification';
 
 const ToastWrapper = () => {
@@ -52,7 +54,9 @@ const ToastWrapper = () => {
         router.push(`/profile?tab=quotes&teklif_id=${teklifId}`);
       }
     } else if (toast.firma_id) {
-      router.push(`/firmadetay/${toast.firma_id}`);
+      // Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli — slug yoksa eski id URL'e fallback (server redirect)
+      const slug = await fetchFirmaSlugById(toast.firma_id);
+      router.push(slug ? `/firmalar/${slug}` : `/firmadetay/${toast.firma_id}`);
     }
   };
 

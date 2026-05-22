@@ -10,7 +10,7 @@ import './NotesCard.responsive.css';
 import './NotesCard.dark.css';
 
 const NotesCard = ({
-    firmaId, userProfile,
+    firmaId, firmaSlug, userProfile,
     noteTitle, setNoteTitle, noteText, setNoteText,
     savedNotes, isNoteSaving, editingNoteId,
     pendingDeleteNoteId, setPendingDeleteNoteId,
@@ -54,7 +54,8 @@ const NotesCard = ({
                 <div className="notes-login-prompt">
                     <span className="material-symbols-outlined notes-lock-icon">lock</span>
                     <p className="notes-login-text">Bu tedarikçi için özel notlar almak istiyorsanız lütfen giriş yapın.</p>
-                    <button onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn">Giriş Yap</button>
+                    {/* Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli login redirect */}
+                    <button onClick={() => router.push(`/login?redirect=${firmaSlug ? `/firmalar/${firmaSlug}` : `/firmadetay/${firmaId}`}`)} className="notes-login-btn">Giriş Yap</button>
                 </div>
             ))}
         </div>

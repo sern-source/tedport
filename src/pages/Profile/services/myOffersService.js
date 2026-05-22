@@ -31,12 +31,22 @@ export async function fetchMyOffers(userId, companyId) {
     (tenders || []).forEach(t => { tenderMap[String(t.id)] = t; });
 
     const firmaIds = [...new Set((tenders || []).map(t => t.firma_id).filter(Boolean))];
+    // Enes Doğanay | 25 Mayıs 2026: slug eklendi — MyOfferCard firma navigasyonu slug URL kullanacak
     const { data: firmalar } = firmaIds.length > 0
-        ? await supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', firmaIds)
+        ? await supabase.from('firmalar').select('firmaID, firma_adi, slug').in('firmaID', firmaIds)
         : { data: [] };
 
     const firmaMap = {};
-    (firmalar || []).forEach(f => { firmaMap[String(f.firmaID)] = f.firma_adi; });
+    const firmaSlugMap = {};
+    (firmalar || []).forEach(f => {
+        firmaMap[String(f.firmaID)] = f.firma_adi;
+        firmaSlugMap[String(f.firmaID)] = f.slug || null;
+    });
+    // Enes Doğanay | 25 Mayıs 2026: tenderMap'e firma_slug ekle — firma kart navigasyonu için
+    Object.keys(tenderMap).forEach(id => {
+        const t = tenderMap[id];
+        tenderMap[id] = { ...t, firma_slug: firmaSlugMap[String(t.firma_id)] || null };
+    });
 
     return { offers: myOffers, tenderMap, firmaMap };
 }

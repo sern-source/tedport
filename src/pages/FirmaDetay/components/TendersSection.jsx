@@ -9,7 +9,7 @@ const TENDERS_PREVIEW = 3;
 
 const TendersSection = ({
     tenders, tendersLoading, isTendersTableMissing,
-    showAllTenders, onToggleAll, userProfile, firmaId
+    showAllTenders, onToggleAll, userProfile, firmaId, firmaSlug
 }) => {
     const router = useRouter();
 
@@ -30,7 +30,8 @@ const TendersSection = ({
                             <span className="material-symbols-outlined">lock</span>
                             <h3>İhaleleri görüntülemek için giriş yapın</h3>
                             <p>İhale detaylarını görmek için hesabınıza giriş yapın.</p>
-                            <button type="button" className="tenders-blur-login-btn" onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)}>Giriş Yap</button>
+                            {/* Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli login redirect */}
+                            <button type="button" className="tenders-blur-login-btn" onClick={() => router.push(`/login?redirect=${firmaSlug ? `/firmalar/${firmaSlug}` : `/firmadetay/${firmaId}`}`)}>Giriş Yap</button>
                             <span className="tenders-blur-register">
                                 Hesabınız yok mu?{' '}
                                 <button type="button" onClick={() => router.push('/register')}>Kayıt Ol</button>

@@ -1,12 +1,15 @@
 // Enes Doğanay | 6 Mayıs 2026: Profil içerik yardımcı hook — bildirim türevi state ve notif tıklama
 import { NOTIF_LIMIT } from '../utils/profileUtils';
+// Enes Doğanay | 25 Mayıs 2026: firma_id bildirim navigasyonu için slug servisi
+import { fetchFirmaSlugById } from '../../../services/authService';
 
 const useProfileContent = ({ notifData, quotesData, navigate, setSearchParams, setMopChatTrigger }) => {
     const { handleMarkNotificationRead, getFilteredNotifications, showAllNotifications, upcomingReminders, notifications } = notifData;
     const { openQuoteChat } = quotesData;
 
     // Enes Doğanay | 6 Mayıs 2026: Bildirim tıklama — navigasyon + okundu işlemi
-    const handleNotifClick = (notification) => {
+    // Enes Doğanay | 25 Mayıs 2026: async — firma_id slug lookup eklendi
+    const handleNotifClick = async (notification) => {
         const { type, is_read, id, metadata, firma_id } = notification;
         if (type === 'tender_offer_status') {
             if (!is_read) handleMarkNotificationRead(id);
@@ -36,7 +39,9 @@ const useProfileContent = ({ notifData, quotesData, navigate, setSearchParams, s
             openQuoteChat(metadata.teklif_id);
         } else if (firma_id) {
             if (!is_read) handleMarkNotificationRead(id);
-            navigate(`/firmadetay/${firma_id}`);
+            // Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli — slug yoksa eski id URL'e fallback
+            const slug = await fetchFirmaSlugById(firma_id);
+            navigate(slug ? `/firmalar/${slug}` : `/firmadetay/${firma_id}`);
         }
     };
 

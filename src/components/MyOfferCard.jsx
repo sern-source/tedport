@@ -66,13 +66,13 @@ const MyOfferCard = ({
                                 <span className="material-symbols-outlined">apartment</span>Anonim Firma
                             </span>
                         ) : (
-                            // Enes Doğanay | 8 Mayıs 2026: role="button" + klavye desteği
+                            // Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli — slug yoksa eski id URL'e fallback
                             <span
                                 className="mop-card__firma"
-                                onClick={e => { e.stopPropagation(); if (tender?.firma_id) navigate(`/firmadetay/${tender.firma_id}`); }}
+                                onClick={e => { e.stopPropagation(); if (tender?.firma_id) navigate(tender.firma_slug ? `/firmalar/${tender.firma_slug}` : `/firmadetay/${tender.firma_id}`); }}
                                 role="button"
                                 tabIndex={0}
-                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); if (tender?.firma_id) navigate(`/firmadetay/${tender.firma_id}`); } }}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); if (tender?.firma_id) navigate(tender.firma_slug ? `/firmalar/${tender.firma_slug}` : `/firmadetay/${tender.firma_id}`); } }}
                             >
                                 <span className="material-symbols-outlined">apartment</span>{firmaAdi}
                             </span>

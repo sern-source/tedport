@@ -6,7 +6,7 @@ import './ContactCard.css';
 
 const ContactCard = ({
     firma, userProfile, isVerified,
-    onQuoteRequest, googleMapsLink, encodedAddress, adresText, firmaId
+    onQuoteRequest, googleMapsLink, encodedAddress, adresText, firmaId, firmaSlug
 }) => {
     const router = useRouter();
 
@@ -42,7 +42,8 @@ const ContactCard = ({
             {!userProfile && (
                 <div className="contact-gated-panel">
                     <p className="contact-gated-text">Teklif istemek ve telefon bilgisini görmek için giriş yapın.</p>
-                    <button onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn contact-login-btn">Giriş Yap</button>
+                    {/* Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli login redirect */}
+                    <button onClick={() => router.push(`/login?redirect=${firmaSlug ? `/firmalar/${firmaSlug}` : `/firmadetay/${firmaId}`}`)} className="notes-login-btn contact-login-btn">Giriş Yap</button>
                 </div>
             )}
 

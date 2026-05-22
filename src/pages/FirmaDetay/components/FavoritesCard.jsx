@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import './FavoritesCard.css';
 
 const FavoritesCard = ({
-    firmaId, userProfile,
+    firmaId, firmaSlug, userProfile,
     isFavorited, myLists, selectedListId, setSelectedListId,
     isCreatingList, setIsCreatingList, newListName, setNewListName,
     isListCreating, listDropdownOpen, setListDropdownOpen, listDropdownRef,
@@ -122,7 +122,8 @@ const FavoritesCard = ({
                 <div className="notes-login-prompt">
                     <span className="material-symbols-outlined notes-lock-icon">lock</span>
                     <p className="notes-login-text">Bu firmayı listelerinize eklemek için lütfen giriş yapın.</p>
-                    <button onClick={() => router.push(`/login?redirect=/firmadetay/${firmaId}`)} className="notes-login-btn">Giriş Yap</button>
+                    {/* Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli login redirect */}
+                    <button onClick={() => router.push(`/login?redirect=${firmaSlug ? `/firmalar/${firmaSlug}` : `/firmadetay/${firmaId}`}`)} className="notes-login-btn">Giriş Yap</button>
                 </div>
             )}
         </div>

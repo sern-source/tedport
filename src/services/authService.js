@@ -32,6 +32,17 @@ export async function fetchUnreadNotifications(userId) {
   return data || [];
 }
 
+// Enes Doğanay | 25 Mayıs 2026: firma_id → slug çözümleyici — bildirim/toast navigasyonu için
+export async function fetchFirmaSlugById(firmaId) {
+  if (!firmaId) return null;
+  const { data } = await supabase
+    .from('firmalar')
+    .select('slug')
+    .eq('firmaID', firmaId)
+    .maybeSingle();
+  return data?.slug || null;
+}
+
 // Enes Doğanay | 6 Mayıs 2026: Kullanıcı bildirim tercihleri
 export async function fetchNotifPrefs(userId) {
   const { data } = await supabase
