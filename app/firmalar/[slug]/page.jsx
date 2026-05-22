@@ -41,8 +41,35 @@ export async function generateMetadata({ params }) {
 }
 
 // Enes Doğanay | 23 Mayıs 2026: Server Component — firma verisini SSR olarak çek, Client Component'e geç
+// Enes Doğanay | 23 Mayıs 2026: JSON-LD Organization schema — Google Knowledge Panel + rich results
+function buildOrganizationJsonLd(firma, slug) {
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: firma.firma_adi,
+        url: `https://tedport.com/firmalar/${slug}`,
+        ...(firma.description ? { description: firma.description } : {}),
+        ...(firma.web_sitesi ? { sameAs: [firma.web_sitesi] } : {}),
+        ...(firma.logo_url?.includes('firma-logolari') ? { logo: firma.logo_url } : {}),
+        ...(firma.il_ilce ? { address: { '@type': 'PostalAddress', addressLocality: firma.il_ilce, addressCountry: 'TR' } } : {}),
+        ...(firma.ana_sektor ? { knowsAbout: firma.ana_sektor } : {}),
+    };
+    // Enes Doğanay | 23 Mayıs 2026: </script> injection'ı önle
+    return JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+}
+
 export default async function FirmaDetayRoute({ params }) {
     const { slug } = await params;
     const initialFirma = await fetchFirmaSSR(slug);
-    return <FirmaDetayPage initialFirma={initialFirma} />;
+    return (
+        <>
+            {initialFirma && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: buildOrganizationJsonLd(initialFirma, slug) }}
+                />
+            )}
+            <FirmaDetayPage initialFirma={initialFirma} />
+        </>
+    );
 }
