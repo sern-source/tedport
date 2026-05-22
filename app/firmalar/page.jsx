@@ -1,4 +1,18 @@
 // Enes Doğanay | 22 Mayıs 2026: Firmalar — Next.js App Router page
-'use client';
+// Enes Doğanay | 23 Mayıs 2026: Server Component — metadata için 'use client' kaldırıldı
 import FirmalarPage from '../../src/pages/Firmalar/FirmalarPage';
-export default FirmalarPage;
+
+// Enes Doğanay | 23 Mayıs 2026: Statik metadata — layout template '%s | Tedport' uygular
+export const metadata = {
+    title: 'Firmalar',
+    description: 'Türkiye\'nin kurumsal firma rehberi — tedarikçi ara, firma profillerini incele, teklif talebi gönder.',
+    openGraph: {
+        title: 'Firmalar | Tedport',
+        description: 'Türkiye\'nin kurumsal firma rehberi — tedarikçi ara, firma profillerini incele, teklif talebi gönder.',
+        url: 'https://tedport.com/firmalar',
+    },
+};
+
+export default function FirmalarRoute() {
+    return <FirmalarPage />;
+}

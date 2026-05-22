@@ -1,4 +1,6 @@
 // Enes Doğanay | 12 Mayıs 2026: Sektör bazlı ihale landing sayfası — SEO optimizasyonlu
+// Enes Doğanay | 23 Mayıs 2026: 'use client' — Server Component'ten import edildiği için zorunlu
+'use client';
 import React from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
@@ -177,7 +179,7 @@ const SektorLandingPage = () => {
                         {otherSektorler.map(s => (
                             <Link
                                 key={s}
-                                to={`/ihaleler/sektor/${toSlug(s)}`}
+                                href={`/ihaleler/sektor/${toSlug(s)}`}
                                 className="sektor-landing__other-chip"
                             >
                                 <span className="material-symbols-outlined">{SEKTOR_ICONS[s] || 'domain'}</span>

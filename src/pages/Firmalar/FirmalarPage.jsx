@@ -1,4 +1,6 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: Firmalar sayfası — kompozisyon katmanı, sayfa düzeni
+// Enes Doğanay | 23 Mayıs 2026: 'use client' — Server Component'ten import edildiği için zorunlu
+'use client';
 import React, { useState } from 'react';
 import SharedHeader from '../../components/SharedHeader';
 import FirmaFilterSidebar from './components/FirmaFilterSidebar';
