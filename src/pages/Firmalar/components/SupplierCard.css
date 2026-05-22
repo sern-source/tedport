@@ -145,6 +145,8 @@
 }
 
 .main-image {
+  /* Enes Doğanay | 23 Mayıs 2026: position:relative — next/image fill gerektirir */
+  position: relative;
   flex: 2;
   aspect-ratio: 4/3;
   border-radius: var(--radius);

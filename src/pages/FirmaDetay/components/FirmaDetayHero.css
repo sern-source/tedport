@@ -367,7 +367,8 @@
   border: 1.5px solid rgba(37,99,235,0.14);
   width: 96px;
   height: 96px;
-  padding: 8px;
+  /* Enes Doğanay | 23 Mayıs 2026: overflow:hidden — next/image fill görselini border-radius'e kliplemek için */
+  overflow: hidden;
   font-size: 1.6rem;
   font-weight: 700;
   display: flex;

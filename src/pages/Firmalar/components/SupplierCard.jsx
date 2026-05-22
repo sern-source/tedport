@@ -1,12 +1,15 @@
 // Enes Doğanay | 6 Mayıs 2026: Firma kartı — grid görünümü için
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ContactDropdown from './ContactDropdown';
 import './SupplierCard.css';
 
 const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQuoteRequest, onTagClick }) => {
   const router = useRouter();
+  // Enes Doğanay | 23 Mayıs 2026: next/image fallback — Supabase URL yüklenemezse default logo
+  const [logoError, setLogoError] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const contactRef = useRef(null);
 
@@ -46,17 +49,15 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
       </div>
 
       <a href={firmaUrl} className="card-images" onClick={handleNavigate}>
+        {/* Enes Doğanay | 23 Mayıs 2026: next/image fill — WebP optimizasyon + lazy load otomatik */}
         <div className="main-image">
-          {supplier.images ? (
-            <img
-              src={supplier.images} alt={supplier.name}
-              style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px' }}
-              onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
-            />
-          ) : null}
-          <img
-            src="/tedport_default_company_logo.png" alt="Logo"
-            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '8px', display: supplier.images ? 'none' : 'block' }}
+          <Image
+            src={logoError || !supplier.images ? '/tedport_default_company_logo.png' : supplier.images}
+            alt={supplier.name || 'Firma logosu'}
+            fill
+            sizes="(max-width: 540px) 72px, (max-width: 768px) 84px, 96px"
+            style={{ objectFit: 'contain' }}
+            onError={() => setLogoError(true)}
           />
         </div>
       </a>

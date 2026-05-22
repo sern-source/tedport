@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: FirmaDetay hero bölümü + claim banner
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 // Enes Doğanay | 12 Mayıs 2026: Sertifika badge renk meta
 import { SERTIFIKA_META } from '../../../constants/sertifikaConstants';
@@ -21,6 +22,8 @@ const FirmaDetayHero = ({
     viewCount,
 }) => {
     const router = useRouter();
+    // Enes Doğanay | 23 Mayıs 2026: Firma logo yükleme hatası — default logo'ya fallback
+    const [logoError, setLogoError] = useState(false);
 
     const handleClaimProfile = () => {
         const params = new URLSearchParams({
@@ -41,23 +44,17 @@ const FirmaDetayHero = ({
             <section className="profile-hero">
                 <div className="container">
                     <div className="hero-flex">
-                        {firma.logo_url?.includes('firma-logolari') ? (
-                            <img
-                                src={firma.logo_url}
+                    {/* Enes Doğanay | 23 Mayıs 2026: next/image priority — LCP görseli, WebP otomatik */}
+                        <div className="supp-avatar2">
+                            <Image
+                                src={!logoError && firma.logo_url?.includes('firma-logolari') ? firma.logo_url : '/tedport_default_company_logo.png'}
                                 alt={firma.firma_adi}
-                                className="supp-avatar2"
-                                style={{ objectFit: 'contain', background: '#fff', padding: '6px' }}
-                                // Enes Doğanay | 13 Mayıs 2026: outerHTML injection kaldırıldı — src swap ile güvenli fallback
-                                onError={e => { e.currentTarget.src = '/tedport_default_company_logo.png'; }}
+                                fill
+                                priority
+                                style={{ objectFit: 'contain', padding: '6px' }}
+                                onError={() => setLogoError(true)}
                             />
-                        ) : (
-                            <img
-                                src="/tedport_default_company_logo.png"
-                                alt="Default Logo"
-                                className="supp-avatar2"
-                                style={{ objectFit: 'contain', background: '#fff', padding: '6px' }}
-                            />
-                        )}
+                        </div>
 
                         <div className="info-content">
                             <div className="title-row">
