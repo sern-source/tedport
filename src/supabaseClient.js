@@ -5,7 +5,8 @@ export const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 export const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Enes Doğanay | 6 Nisan 2026: Beni Hatırla durumuna göre auth session'i localStorage veya sessionStorage'a yaz
-const authProjectRef = new URL(supabaseUrl).host.split('.')[0];
+// Enes Doğanay | 23 Mayıs 2026: SSR güvenli — supabaseUrl undefined olduğunda new URL() patlamasın
+const authProjectRef = supabaseUrl ? new URL(supabaseUrl).host.split('.')[0] : '';
 const authStorageKey = `sb-${authProjectRef}-auth-token`;
 const authStorageModeKey = 'tedport-auth-storage-mode';
 const isBrowser = typeof window !== 'undefined';
