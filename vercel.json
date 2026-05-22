@@ -1,13 +1,5 @@
 {
   "framework": "nextjs",
   "buildCommand": "next build",
-  "outputDirectory": ".next",
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "header", "key": "x-forwarded-proto", "value": "http" }],
-      "destination": "https://www.tedport.com/$1",
-      "permanent": true
-    }
-  ]
+  "outputDirectory": ".next"
 }
