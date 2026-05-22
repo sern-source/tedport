@@ -48,7 +48,8 @@ const QuoteChatView = ({
                 {activeQuote.konu}
               </h2>
               {activeQuote.firma_id ? (
-                <button className="qcv-card__firma-btn" onClick={() => navigate(`/firmadetay/${activeQuote.firma_id}`)}>
+              {/* Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli — slug yoksa eski id URL'e fallback */}
+              <button className="qcv-card__firma-btn" onClick={() => navigate(activeQuote._firma_slug ? `/firmalar/${activeQuote._firma_slug}` : `/firmadetay/${activeQuote.firma_id}`)}>
                   <span className="material-symbols-outlined">storefront</span>
                   {activeQuote._firma_adi}
                   <span className="material-symbols-outlined qcv-card__ext-icon">open_in_new</span>

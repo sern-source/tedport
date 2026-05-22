@@ -66,17 +66,19 @@ export const fetchAndEnrichQuotes = async (userId) => {
   const firmaIds = [...new Set(data.map(q => q.firma_id))];
   const quoteIds = data.map(q => q.id);
   const [firmsRes, lastMsgsRes] = await Promise.all([
-    supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', firmaIds),
+    // Enes Doğanay | 25 Mayıs 2026: slug eklendi — QuoteChatView firma navigasyonu slug URL kullanacak
+    supabase.from('firmalar').select('firmaID, firma_adi, slug').in('firmaID', firmaIds),
     supabase.from('teklif_mesajlari').select('teklif_id, sender_role').in('teklif_id', quoteIds).order('created_at', { ascending: false }),
   ]);
   const firmMap = new Map((firmsRes.data || []).map(f => [f.firmaID, f.firma_adi]));
+  const firmSlugMap = new Map((firmsRes.data || []).map(f => [f.firmaID, f.slug || null]));
   const lastMsgMap = new Map();
   for (const msg of (lastMsgsRes.data || [])) { if (!lastMsgMap.has(msg.teklif_id)) lastMsgMap.set(msg.teklif_id, msg.sender_role); }
   return data.map(q => {
     const lastSender = lastMsgMap.get(q.id);
     let _displayStatus = q.durum;
     if (q.durum !== 'rejected' && q.durum !== 'closed' && lastSender) _displayStatus = lastSender === 'company' ? 'replied' : 'awaiting_reply';
-    return { ...q, _firma_adi: firmMap.get(q.firma_id) || 'Firma', _displayStatus };
+    return { ...q, _firma_adi: firmMap.get(q.firma_id) || 'Firma', _firma_slug: firmSlugMap.get(q.firma_id) || null, _displayStatus };
   });
 };
 
