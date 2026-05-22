@@ -15,7 +15,8 @@ export const enrichFavorites = async (userId, favs, reminders) => {
   const firmaIds = favs.map((f) => f.firma_id);
   const reminderMap = new Map((reminders || []).map((r) => [String(r.note_id), r]));
   const [firmsRes, notesRes] = await Promise.all([
-    supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce, logo_url').in('firmaID', firmaIds),
+    // Enes Doğanay | 23 Mayıs 2026: slug eklendi — favori kart navigasyonu slug URL kullanacak
+    supabase.from('firmalar').select('firmaID, slug, firma_adi, category_name, il_ilce, logo_url').in('firmaID', firmaIds),
     supabase.from('kisisel_notlar').select('*').eq('user_id', userId).in('firma_id', firmaIds),
   ]);
   return favs.map((fav) => {
@@ -26,6 +27,7 @@ export const enrichFavorites = async (userId, favs, reminders) => {
     return {
       id: fav.id,
       firma_id: fav.firma_id,
+      firma_slug: firm.slug || null,
       liste_id: fav.liste_id,
       created_at: fav.created_at,
       name: firm.firma_adi || 'Bilinmeyen Firma',
@@ -98,5 +100,13 @@ export const deleteNoteService = async (noteId) => {
 // Enes Doğanay | 7 Mayıs 2026: Kullanıcı hatırlatıcılarını çek
 export const fetchUserReminders = async (userId) => {
   const { data } = await supabase.from('kullanici_hatirlaticilari').select('*').eq('user_id', userId).in('status', ['pending', 'sent']);
-  return data || [];
+  const rows = data || [];
+  if (!rows.length) return [];
+  // Enes Doğanay | 23 Mayıs 2026: slug eklendi — hatırlayıcı navigasyonu slug URL kullanacak
+  const firmaIds = [...new Set(rows.map(r => r.firma_id).filter(Boolean))];
+  const { data: firmsData } = firmaIds.length
+    ? await supabase.from('firmalar').select('firmaID, slug').in('firmaID', firmaIds)
+    : { data: [] };
+  const slugMap = Object.fromEntries((firmsData || []).map(f => [String(f.firmaID), f.slug]));
+  return rows.map(r => ({ ...r, firma_slug: slugMap[String(r.firma_id)] || null }));
 };

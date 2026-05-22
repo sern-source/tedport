@@ -122,7 +122,7 @@ const IhalelerPage = () => {
                     page={ihaleler.page} setPage={ihaleler.setPage} totalPages={ihaleler.totalPages} smartPages={ihaleler.smartPages}
                     onDetail={setDetailTender} onEdit={ihaleFormHook.openEdit}
                     onTeklif={teklifHook.openTeklifPopup} onContact={teklifHook.openFirmaContact}
-                    onNavigateFirma={(t) => router.push("/firmadetay/" + t.firma_id)}
+                    onNavigateFirma={(t) => router.push(t.firma_slug ? `/firmalar/${t.firma_slug}` : `/firmadetay/${t.firma_id}`)}
                     onLoginRedirect={() => router.push("/login?redirect=/ihaleler")}
                     onRegisterRedirect={() => router.push("/register")}
                 />

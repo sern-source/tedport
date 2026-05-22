@@ -99,7 +99,8 @@ export const fetchPublicTenders = async ({ page = 1, firmaFilter, statusFilter =
     // Firma adı + konum join (mevcut sayfadaki firmalar için)
     const firmaIds = [...new Set((tenderData || []).map(t => t.firma_id).filter(Boolean))];
     const { data: firmsData, error: firmsError } = firmaIds.length > 0
-        ? await supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
+        // Enes Doğanay | 23 Mayıs 2026: slug eklendi — firma navigasyonu slug URL kullanacak
+        ? await supabase.from('firmalar').select('firmaID, slug, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
         : { data: [], error: null };
 
     if (firmsError) throw firmsError;
@@ -111,6 +112,7 @@ export const fetchPublicTenders = async ({ page = 1, firmaFilter, statusFilter =
             firma_adi:      firm.firma_adi      || tender.firma_adi || 'Firma bilgisi bulunamadı',
             firma_kategori: firm.category_name  || '',
             firma_konum:    firm.il_ilce         || tender.il_ilce  || 'Konum belirtilmedi',
+            firma_slug:     firm.slug            || null,
         };
     });
 
@@ -214,7 +216,8 @@ export const fetchInvitedTenders = async (email, firmaId) => {
     // Enes Doğanay | 14 Mayıs 2026: Firma bilgisi join
     const firmaIds = [...new Set(all.map(t => t.firma_id).filter(Boolean))];
     const { data: firmsData } = firmaIds.length
-        ? await supabase.from('firmalar').select('firmaID, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
+        // Enes Doğanay | 23 Mayıs 2026: slug eklendi — firma navigasyonu slug URL kullanacak
+        ? await supabase.from('firmalar').select('firmaID, slug, firma_adi, category_name, il_ilce').in('firmaID', firmaIds)
         : { data: [] };
 
     return all.map(tender => {
@@ -224,6 +227,7 @@ export const fetchInvitedTenders = async (email, firmaId) => {
             firma_adi:      tender.anonim ? null : (firm.firma_adi || tender.firma_adi || 'Firma bilgisi bulunamadı'),
             firma_kategori: firm.category_name || '',
             firma_konum:    firm.il_ilce || tender.il_ilce || 'Konum belirtilmedi',
+            firma_slug:     firm.slug || null,
         };
     });
 };

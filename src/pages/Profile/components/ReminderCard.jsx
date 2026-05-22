@@ -11,7 +11,7 @@ const ReminderCard = ({ reminder, badge, badgeClass, isOverdue, confirmDeleteRem
         <h4>{reminder.note_title || 'Başlıksız Not'}</h4>
         <p>{reminder.note_body || 'Not içeriği belirtilmemiş.'}</p>
         <div className="upcoming-reminder-actions">
-            <button type="button" className="upcoming-reminder-link" onClick={() => navigate(`/firmadetay/${reminder.firma_id}`)}>
+            <button type="button" className="upcoming-reminder-link" onClick={() => navigate(reminder.firma_slug ? `/firmalar/${reminder.firma_slug}` : `/firmadetay/${reminder.firma_id}`)}>
                 <span className="material-symbols-outlined">open_in_new</span><span>Firmaya Git</span>
             </button>
             {confirmDeleteReminder?.id === reminder.id ? (

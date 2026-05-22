@@ -61,7 +61,7 @@ const FavCard = ({
       )}
     </div>
     <div className="fav-actions">
-      <button className="fav-btn-primary" onClick={() => navigate(`/firmadetay/${fav.firma_id}`)}>
+      <button className="fav-btn-primary" onClick={() => navigate(fav.firma_slug ? `/firmalar/${fav.firma_slug}` : `/firmadetay/${fav.firma_id}`)}>
         <span className="material-symbols-outlined">visibility</span> Profili Gör
       </button>
     </div>

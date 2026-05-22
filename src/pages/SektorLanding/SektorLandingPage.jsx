@@ -166,7 +166,7 @@ const SektorLandingPage = () => {
                                 key={tender.id}
                                 tender={tender}
                                 onDetail={() => router.push(`/ihaleler?ihale=${tender.id}`)}
-                                onNavigateFirma={() => router.push(`/firmadetay/${tender.firma_id}`)}
+                                onNavigateFirma={() => router.push(tender.firma_slug ? `/firmalar/${tender.firma_slug}` : `/firmadetay/${tender.firma_id}`)}
                             />
                         ))}
                     </div>

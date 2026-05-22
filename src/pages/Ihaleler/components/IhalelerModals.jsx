@@ -89,7 +89,7 @@ const IhalelerModals = ({
                 onClose={() => setDetailTender(null)}
                 onTeklif={(e) => { if (!userProfile) { teklifHook.openTeklifPopup(detailTender, e); } else { setDetailTender(null); teklifHook.openTeklifPopup(detailTender, e); } }}
                 onEdit={() => { setDetailTender(null); ihaleFormHook.openEdit(detailTender); }}
-                onNavigateFirma={() => { setDetailTender(null); navigate(`/firmadetay/${detailTender.firma_id}`); }}
+                onNavigateFirma={() => { setDetailTender(null); navigate(detailTender.firma_slug ? `/firmalar/${detailTender.firma_slug}` : `/firmadetay/${detailTender.firma_id}`); }}
                 onLogin={() => navigate(`/login?redirect=${encodeURIComponent('/ihaleler?ihale=' + detailTender.id)}`)}
                 onRegister={() => navigate('/register')}
             />
