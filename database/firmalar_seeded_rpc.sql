@@ -20,6 +20,7 @@ CREATE OR REPLACE FUNCTION get_firmalar_seeded(
 )
 RETURNS TABLE(
   "firmaID"         UUID,
+  slug              TEXT,
   firma_adi         TEXT,
   il_ilce           TEXT,
   description       TEXT,
@@ -47,6 +48,7 @@ BEGIN
       f."firmaID",
       f.firma_adi,
       f.il_ilce,
+      f.slug,
       f.description,
       f.ana_sektor,
       f.urun_kategorileri,
@@ -164,6 +166,7 @@ BEGIN
   )
   SELECT
     base."firmaID",
+    base.slug,
     base.firma_adi,
     base.il_ilce,
     base.description,
