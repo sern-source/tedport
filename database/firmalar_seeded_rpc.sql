@@ -5,6 +5,9 @@
 --
 -- Supabase Dashboard > SQL Editor'de bu dosyayı çalıştırın.
 
+-- Enes Doğanay | 25 Mayıs 2026: Return tipi değişti (slug eklendi) — önce drop gerekli
+DROP FUNCTION IF EXISTS get_firmalar_seeded(float8,int,int,text[],text,boolean,text[],text[],text[],text[],text[]);
+
 CREATE OR REPLACE FUNCTION get_firmalar_seeded(
   p_seed            FLOAT8,       -- Oturum seed'i (0.0 - 1.0), sessionStorage'dan gelir
   p_limit           INT,          -- Sayfa boyutu (genellikle 10)
