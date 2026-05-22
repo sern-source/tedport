@@ -24,7 +24,7 @@ const SharedFooter = () => {
                     <div className="sf-brand">
                         <Link href="/" className="sf-logo-link">
                             {/* Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo */}
-                            <img src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'} alt="Tedport Logo" className="sf-logo" loading="lazy" />
+                            <img src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'} alt="Tedport Logo" className="sf-logo" loading="lazy" suppressHydrationWarning />
                         </Link>
                         <p className="sf-brand-desc">
                             Türkiye'nin güvenilir B2B tedarik platformu. Firmalar arası ticareti dijitalleştiriyoruz.

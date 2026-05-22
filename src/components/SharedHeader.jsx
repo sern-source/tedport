@@ -88,7 +88,8 @@ const SharedHeader = ({
                     <Link href="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
                         <img className="shared-logo-image"
                             src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'}
-                            alt="Tedport Logo" />
+                            alt="Tedport Logo"
+                            suppressHydrationWarning />
                     </Link>
                 </div>
 
@@ -140,8 +141,9 @@ const SharedHeader = ({
                     </div>
                     {/* Enes Doğanay | 3 Mayıs 2026: Dark mode toggle */}
                     <button type="button" className="shared-theme-toggle" onClick={toggleTheme}
-                        aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Karanlık temaya geç'}>
-                        <span className="material-symbols-outlined">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+                        aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Karanlık temaya geç'}
+                        suppressHydrationWarning>
+                        <span className="material-symbols-outlined" suppressHydrationWarning>{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
                     </button>
                 </div>
             </div>

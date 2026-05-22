@@ -1,22 +1,28 @@
 // Enes Doğanay | 23 Mayıs 2026: /firmadetay/:id → /firmalar/:slug 301 redirect (Server Component)
 // Eski ID bazlı URL'ler SEO kaybı olmadan yeni slug URL'e yönlendirilir
-import { redirect } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+// fetch() kullanılıyor — @supabase bağımlılığından kaynaklanan Turbopack vendor-chunk hatası önlendi
+import { permanentRedirect, redirect } from 'next/navigation';
 
 export default async function FirmaDetayRedirect({ params }) {
     const { id } = await params;
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    );
-    const { data } = await supabase
-        .from('firmalar')
-        .select('slug')
-        .eq('firmaID', id)
-        .single();
 
-    if (data?.slug) {
-        redirect(`/firmalar/${data.slug}`);
+    const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/firmalar?firmaID=eq.${encodeURIComponent(id)}&select=slug`,
+        {
+            headers: {
+                apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+            cache: 'no-store',
+        }
+    );
+
+    if (res.ok) {
+        const rows = await res.json();
+        if (rows?.[0]?.slug) {
+            permanentRedirect(`/firmalar/${rows[0].slug}`);
+        }
     }
+
     redirect('/firmalar');
 }
