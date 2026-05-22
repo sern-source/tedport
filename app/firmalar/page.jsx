@@ -13,6 +13,7 @@ export const metadata = {
     },
 };
 
+import { Suspense } from 'react';
 export default function FirmalarRoute() {
-    return <FirmalarPage />;
+    return <Suspense fallback={null}><FirmalarPage /></Suspense>;
 }

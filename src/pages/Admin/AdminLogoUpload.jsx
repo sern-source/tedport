@@ -48,7 +48,7 @@ const AdminLogoUpload = () => {
         };
         checkAccess();
         return () => { isMounted = false; };
-    }, [navigate]);
+    }, [router]);
 
     /* Enes Doğanay | 13 Nisan 2026: Debounced firma arama — 400ms bekle, en az 2 karakter */
     useEffect(() => {

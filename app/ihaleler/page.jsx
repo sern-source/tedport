@@ -13,6 +13,7 @@ export const metadata = {
     },
 };
 
+import { Suspense } from 'react';
 export default function IhalelerRoute() {
-    return <IhalelerPage />;
+    return <Suspense fallback={null}><IhalelerPage /></Suspense>;
 }

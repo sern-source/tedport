@@ -76,7 +76,7 @@ const AdminFirmaDuzenle = () => {
         };
         checkAccess();
         return () => { isMounted = false; };
-    }, [navigate]);
+    }, [router]);
 
     /* Enes Doğanay | 15 Nisan 2026: Debounced firma arama — boşken tüm firmalar, yazınca filtrele */
     /* Enes Doğanay | 1 Mayıs 2026: Pagination desteği eklendi */

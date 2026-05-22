@@ -1,6 +1,5 @@
 // Enes Doğanay | 6 Mayıs 2026: MyOffersService — shared servise yönlendirme
 import { supabase } from '../../../supabaseClient';
-export * from '../../../services/myOffersService';
 
 // Enes Doğanay | 6 Mayıs 2026: Kullanıcı/firma tekliflerini ihale ve firma bilgileriyle çek
 export async function fetchMyOffers(userId, companyId) {

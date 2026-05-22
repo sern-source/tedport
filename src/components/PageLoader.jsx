@@ -4,8 +4,8 @@
 // Enes Doğanay | 8 Mayıs 2026: Stiller component içine taşındı — modül yüklenme anında değil render anında tema okunuyor
 
 const PageLoader = () => {
-    // Enes Doğanay | 8 Mayıs 2026: Render anında tema oku
-    const dark = document.documentElement.dataset.theme === 'dark';
+    // Enes Doğanay | 23 Mayıs 2026: SSR güvenli tema oku — document SSR'da mevcut değil
+    const dark = typeof document !== 'undefined' && document.documentElement.dataset.theme === 'dark';
 
     const loaderStyle = {
         position: 'fixed',

@@ -9,7 +9,8 @@ import SEO from '../../components/SEO';
 import './KvkkPage.css';
 
 const Kvkk = () => {
-    const fromRegister = document.referrer.includes('/register');
+    // Enes Doğanay | 23 Mayıs 2026: SSR güvenli — document SSR'da mevcut değil
+    const fromRegister = typeof document !== 'undefined' && document.referrer.includes('/register');
 
     return (
         <>

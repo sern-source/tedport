@@ -97,7 +97,7 @@ const AdminCorporateApplicationsPage = () => {
         return () => {
             isMounted = false;
         };
-    }, [navigate]);
+    }, [router]);
 
     const visibleApplications = useMemo(() => {
         const normalizedQuery = searchTerm.trim().toLocaleLowerCase('tr-TR');

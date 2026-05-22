@@ -5,7 +5,8 @@ import '../../components/SharedHeader.css';
 import './EmailConfirmation.css';
 
 export default function EmailChangeSuccessPage() {
-  const params = new URLSearchParams(window.location.search);
+  // Enes Doğanay | 23 Mayıs 2026: SSR güvenli — window SSR'da mevcut değil
+  const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const newEmail = params.get('email');
   const { theme } = useTheme();
 
