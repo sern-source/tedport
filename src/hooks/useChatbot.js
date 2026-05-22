@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Chatbot state, effects ve mesaj mantığı
+// Enes Doğanay | 22 Mayıs 2026: react-router useLocation → next/navigation usePathname (Next.js geçişi)
 import { useState, useRef, useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
 import { fetchChatbotQA, fetchChatbotQuickQuestions } from '../services/chatbotService';
 
 const FALLBACK_ANSWER =
@@ -24,19 +25,19 @@ function findAnswer(text, qaList) {
 }
 
 const useChatbot = () => {
-    const location = useLocation();
-    const [chatSearchParams] = useSearchParams();
-    // Enes Doğanay | 8 Mayıs 2026: Mobil ekran takibi (≤768px)
-    const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+    const pathname = usePathname();
+    // Enes Doğanay | 22 Mayıs 2026: SSR-safe başlangıç değeri — window sunucu tarafında yok
+    const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
         const mq = window.matchMedia('(max-width: 768px)');
+        setIsMobile(mq.matches);
         const handler = (e) => setIsMobile(e.matches);
         mq.addEventListener('change', handler);
         return () => mq.removeEventListener('change', handler);
     }, []);
     // Enes Doğanay | 11 Mayıs 2026: Admin her zaman gizli, mobilde ana sayfa ('/') dışında gizli
-    const isHomePage = location.pathname === '/';
-    const isHidden = location.pathname.startsWith('/admin') || (isMobile && !isHomePage);
+    const isHomePage = pathname === '/';
+    const isHidden = pathname?.startsWith('/admin') || (isMobile && !isHomePage);
     const [open, setOpen] = useState(false);
     const [qaList, setQaList] = useState([]);
     const [quickQuestions, setQuickQuestions] = useState([]);

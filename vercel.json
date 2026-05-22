@@ -6,11 +6,5 @@
       "destination": "https://www.tedport.com/$1",
       "permanent": true
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!assets/).*)",
-      "destination": "/index.html"
-    }
   ]
 }

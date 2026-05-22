@@ -1,4 +1,5 @@
-﻿// Enes Doğanay | 6 Mayıs 2026: AuthContext — slim provider, yükler iki hook'a delege eder
+﻿'use client';
+// Enes Doğanay | 6 Mayıs 2026: AuthContext — slim provider, yükler iki hook'a delege eder
 import React, { createContext, useContext, useEffect, useCallback, useMemo } from 'react';
 import { supabase, supabaseUrl } from './supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: onAuthStateChange için
 import { setRealtimeAuth, signOutGlobal } from './services/authService';

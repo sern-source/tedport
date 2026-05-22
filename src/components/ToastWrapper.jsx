@@ -1,14 +1,16 @@
+'use client';
 /* Enes Doğanay | 8 Nisan 2026: AuthContext'ten toast verilerini alıp ToastNotification bileşenini render eden wrapper */
 /* Enes Doğanay | 9 Nisan 2026: Toast tıklandığında ilgili sayfaya yönlendirme + okundu işaretleme */
+/* Enes Doğanay | 22 Mayıs 2026: react-router useNavigate → next/navigation useRouter (Next.js geçişi) */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../AuthContext';
 import { markNotificationRead } from '../services/authService';
 import ToastNotification from './ToastNotification';
 
 const ToastWrapper = () => {
   const { toasts, dismissToast, managedCompanyId, refreshCounts } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleClickToast = async (toast) => {
     // Enes Doğanay | 9 Nisan 2026: Toast bildirimi okundu olarak işaretle
@@ -22,35 +24,35 @@ const ToastWrapper = () => {
     if (tenderOfferTypes.includes(toast.type) && toast.metadata?.ihale_id) {
       const params = new URLSearchParams({ tab: 'ihale-yonetimi', ihale: toast.metadata.ihale_id });
       if (toast.metadata?.teklif_user_id) params.set('teklif_user', toast.metadata.teklif_user_id);
-      navigate(`/firma-profil?${params.toString()}`);
+      router.push(`/firma-profil?${params.toString()}`);
     } else if (tenderStatusTypes.includes(toast.type) && toast.metadata?.ihale_id) {
-      navigate(`/ihaleler?ihale=${toast.metadata.ihale_id}`);
+      router.push(`/ihaleler?ihale=${toast.metadata.ihale_id}`);
     } else if (toast.type === 'tender_offer_status') {
       /* Enes Doğanay | 13 Nisan 2026: Teklif durumu toast — İhale Yönetimi > Katıldığım İhaleler */
       if (toast.metadata?.ihale_id) {
         sessionStorage.setItem('mop_highlight_ihale', String(toast.metadata.ihale_id));
       }
-      navigate(managedCompanyId ? '/firma-profil?tab=ihale-yonetimi&subtab=katildigim' : '/profile?tab=my-offers');
+      router.push(managedCompanyId ? '/firma-profil?tab=ihale-yonetimi&subtab=katildigim' : '/profile?tab=my-offers');
     } else if (toast.type === 'tender_offer_message' && toast.metadata?.teklif_id) {
       // Enes Doğanay | 4 Mayıs 2026: İhale teklif mesajı — bireysel: my-offers chat, kurumsal: ihale-yonetimi chat
       if (managedCompanyId) {
         const params = new URLSearchParams({ tab: 'ihale-yonetimi' });
         if (toast.metadata.ihale_id) params.set('ihale', String(toast.metadata.ihale_id));
         if (toast.metadata.teklif_id) params.set('open_tender_chat', String(toast.metadata.teklif_id));
-        navigate(`/firma-profil?${params.toString()}`);
+        router.push(`/firma-profil?${params.toString()}`);
       } else {
-        navigate(`/profile?tab=my-offers&open_mop_chat=${toast.metadata.teklif_id}`);
+        router.push(`/profile?tab=my-offers&open_mop_chat=${toast.metadata.teklif_id}`);
       }
     } else if (toast.metadata?.teklif_id) {
       // Enes Doğanay | 9 Nisan 2026: Teklif bildirimi — teklif_id ile direkt ilgili chat'e yönlendir
       const teklifId = toast.metadata.teklif_id;
       if (managedCompanyId) {
-        navigate(`/firma-profil?tab=teklifler&teklif_id=${teklifId}`);
+        router.push(`/firma-profil?tab=teklifler&teklif_id=${teklifId}`);
       } else {
-        navigate(`/profile?tab=quotes&teklif_id=${teklifId}`);
+        router.push(`/profile?tab=quotes&teklif_id=${teklifId}`);
       }
     } else if (toast.firma_id) {
-      navigate(`/firmadetay/${toast.firma_id}`);
+      router.push(`/firmadetay/${toast.firma_id}`);
     }
   };
 
