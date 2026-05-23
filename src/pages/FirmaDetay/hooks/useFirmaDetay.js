@@ -56,6 +56,8 @@ export function useFirmaDetay(slug, initialFirma = null) {
     const [quoteFile, setQuoteFile] = useState(null);
     // Enes Doğanay | 16 Mayıs 2026: Teklif talebi popup'u alan bazlı hata mesajları
     const [fdQuoteFieldError, setFdQuoteFieldError] = useState({ key: '', msg: '' });
+    // Enes Doğanay | 23 Mayıs 2026: Auth flash önleme — session kontrol tamamlanmadan login prompt gösterilmez
+    const [sessionChecked, setSessionChecked] = useState(false);
 
     const sessionUserIdRef = useRef(null);
     const sessionUserEmailRef = useRef(null);
@@ -110,7 +112,7 @@ export function useFirmaDetay(slug, initialFirma = null) {
         const id = firmaIdRef.current;
         if (!id) return;
         const sessionData = await fetchUserSessionData(id);
-        if (!sessionData) { setUserProfile(null); setManagedCompanyId(null); trackFirmaView(id, null); return; }
+        if (!sessionData) { setUserProfile(null); setManagedCompanyId(null); trackFirmaView(id, null); setSessionChecked(true); return; }
         sessionUserIdRef.current = sessionData.userId;
         sessionUserEmailRef.current = sessionData.userEmail;
         setUserProfile(sessionData.profile);
@@ -128,6 +130,7 @@ export function useFirmaDetay(slug, initialFirma = null) {
         if (sessionData.remindersError && !isMissingRelationError(sessionData.remindersError)) { /* sessiz — hatırlatıcı yüklenemedi, kritik değil */ }
         notes.setNoteReminders(sessionData.reminders || []);
         if (sessionData.favorite) { favorites.setIsFavorited(true); favorites.setSelectedListId(sessionData.favorite.liste_id || ''); }
+        setSessionChecked(true);
     };
 
     useEffect(() => { fetchFirma().then(() => checkUserSessionAndNotes()); }, [slug]);
@@ -194,7 +197,7 @@ export function useFirmaDetay(slug, initialFirma = null) {
 
     return {
         firma, loading, firmaEkip, isVerified, isDemo, isCurrentUserCompanyManager,
-        userProfile, managedCompanyId,
+        userProfile, managedCompanyId, sessionChecked,
         tenders, tendersLoading, isTendersTableMissing, showAllTenders, setShowAllTenders, TENDERS_PREVIEW,
         expandedCategories, toggleCategory, parseHiyerarsikKategoriler,
         detaySearch, setDetaySearch, suggestions, noResults,

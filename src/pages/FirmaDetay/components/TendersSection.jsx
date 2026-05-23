@@ -9,7 +9,7 @@ const TENDERS_PREVIEW = 3;
 
 const TendersSection = ({
     tenders, tendersLoading, isTendersTableMissing,
-    showAllTenders, onToggleAll, userProfile, firmaId, firmaSlug
+    showAllTenders, onToggleAll, userProfile, sessionChecked, firmaId, firmaSlug
 }) => {
     const router = useRouter();
 
@@ -24,7 +24,7 @@ const TendersSection = ({
             </div>
 
             <div className="firma-tenders-gate">
-                {!userProfile && (
+                {sessionChecked && !userProfile && (
                     <div className="tenders-blur-overlay">
                         <div className="tenders-blur-cta">
                             <span className="material-symbols-outlined">lock</span>
@@ -39,7 +39,7 @@ const TendersSection = ({
                         </div>
                     </div>
                 )}
-                <div className={!userProfile ? 'tenders-blurred-content' : undefined}>
+                <div className={sessionChecked && !userProfile ? 'tenders-blurred-content' : undefined}>
                     {isTendersTableMissing ? (
                         <div className="tenders-empty-state-inline">
                             İhale tablosu Supabase üzerinde kurulduğunda bu alan otomatik olarak dinamik verilerle dolacak.

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import './FavoritesCard.css';
 
 const FavoritesCard = ({
-    firmaId, firmaSlug, userProfile,
+    firmaId, firmaSlug, userProfile, sessionChecked,
     isFavorited, myLists, selectedListId, setSelectedListId,
     isCreatingList, setIsCreatingList, newListName, setNewListName,
     isListCreating, listDropdownOpen, setListDropdownOpen, listDropdownRef,
@@ -18,7 +18,7 @@ const FavoritesCard = ({
         <div className="card sidebar-card sidebar-card-favorites">
             <h3 className="sidebar-heading">Listelere Ekle</h3>
 
-            {userProfile ? (
+            {!sessionChecked ? null : userProfile ? (
                 <>
                     {!isFavorited && (
                         <div className="list-selector-card">

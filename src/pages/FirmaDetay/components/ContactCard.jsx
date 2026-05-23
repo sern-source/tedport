@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import './ContactCard.css';
 
 const ContactCard = ({
-    firma, userProfile, isVerified,
+    firma, userProfile, sessionChecked, isVerified,
     onQuoteRequest, googleMapsLink, encodedAddress, adresText, firmaId, firmaSlug
 }) => {
     const router = useRouter();
@@ -16,11 +16,11 @@ const ContactCard = ({
 
             <button
                 className="btn btn-primary btn-full btn-request-quote"
-                disabled={!userProfile || !isVerified}
+                disabled={sessionChecked && (!userProfile || !isVerified)}
                 onClick={onQuoteRequest}
                 title={!isVerified ? 'Bu firma henüz kurumsal profilini yönetmiyor' : ''}
             >
-                {!userProfile && <span className="material-symbols-outlined btn-request-quote-icon">lock</span>}
+                {sessionChecked && !userProfile && <span className="material-symbols-outlined btn-request-quote-icon">lock</span>}
                 {!isVerified && userProfile && <span className="material-symbols-outlined btn-request-quote-icon">block</span>}
                 Teklif İste
             </button>
@@ -39,7 +39,7 @@ const ContactCard = ({
                 </a>
             )}
 
-            {!userProfile && (
+            {sessionChecked && !userProfile && (
                 <div className="contact-gated-panel">
                     <p className="contact-gated-text">Teklif istemek ve telefon bilgisini görmek için giriş yapın.</p>
                     {/* Enes Doğanay | 25 Mayıs 2026: slug URL öncelikli login redirect */}

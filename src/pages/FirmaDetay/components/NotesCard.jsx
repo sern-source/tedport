@@ -10,7 +10,7 @@ import './NotesCard.responsive.css';
 import './NotesCard.dark.css';
 
 const NotesCard = ({
-    firmaId, firmaSlug, userProfile,
+    firmaId, firmaSlug, userProfile, sessionChecked,
     noteTitle, setNoteTitle, noteText, setNoteText,
     savedNotes, isNoteSaving, editingNoteId,
     pendingDeleteNoteId, setPendingDeleteNoteId,
@@ -45,7 +45,7 @@ const NotesCard = ({
                 </div>
             </button>
 
-            {isNotesOpen && (userProfile ? (
+            {isNotesOpen && (!sessionChecked ? null : userProfile ? (
                 <>
                     <NotesComposer noteTitle={noteTitle} setNoteTitle={setNoteTitle} noteText={noteText} setNoteText={setNoteText} editingNoteId={editingNoteId} reminderEnabled={reminderEnabled} reminderDate={reminderDate} setReminderDate={setReminderDate} reminderTime={reminderTime} setReminderTime={setReminderTime} reminderError={reminderError} handleReminderToggle={handleReminderToggle} handleSaveNote={handleSaveNote} handleCancelNoteEditing={handleCancelNoteEditing} isNoteSaving={isNoteSaving} formatReminderLabel={formatReminderLabel} />
                     <NotesFeed savedNotes={savedNotes} orderedNoteGroups={orderedNoteGroups} groupedSavedNotes={groupedSavedNotes} pendingDeleteNoteId={pendingDeleteNoteId} setPendingDeleteNoteId={setPendingDeleteNoteId} getReminderForNote={getReminderForNote} formatReminderLabel={formatReminderLabel} handleEditNote={handleEditNote} handleDeleteNote={handleDeleteNote} />
