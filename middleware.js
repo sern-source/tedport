@@ -15,9 +15,9 @@ export function middleware(request) {
     const sessionCookie = request.cookies.get('tedport-session');
     if (sessionCookie?.value === '1') return NextResponse.next();
 
-    // Enes Doğanay | 23 Mayıs 2026: Giriş yapılmamış — login'e yönlendir, redirect param ekle
+    // Enes Doğanay | 23 Mayıs 2026: Giriş yapılmamış — login'e yönlendir, tam URL (path + query) redirect param'a aktar
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
+    loginUrl.searchParams.set('redirect', pathname + request.nextUrl.search);
     return NextResponse.redirect(loginUrl);
 }
 

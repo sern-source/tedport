@@ -36,9 +36,13 @@ export const useLogin = () => {
     return () => { cancelled = true; };
   }, []);
 
-  // Enes Doğanay | 6 Mayıs 2026: Giriş sonrası yönlendirme — ilk kez firma profili, sonra normal akış
+  // Enes Doğanay | 23 Mayıs 2026: Giriş sonrası yönlendirme — redirectTo öncelikli; yoksa ilk ziyarette firma profili
   const handleRedirect = async (userId) => {
     const redirectTo = searchParams.get('redirect');
+    if (redirectTo) {
+      router.push(redirectTo);
+      return;
+    }
     const firmaId = await authService.getOwnerFirma(userId);
     if (firmaId) {
       const key = `tedport_firma_visited_${firmaId}`;
@@ -48,7 +52,7 @@ export const useLogin = () => {
         return;
       }
     }
-    router.push(redirectTo || '/');
+    router.push('/');
   };
 
   // Enes Doğanay | 6 Mayıs 2026: Sekme değişimi — URL ile senkron
