@@ -206,7 +206,8 @@
 /* Enes Doğanay | 14 Nisan 2026: Grid 6 sütun — para birimi sütunu eklendi */
 .teklif-kalem-table__head {
     display: grid;
-    grid-template-columns: 28px 1fr 70px 100px 100px 100px;
+    /* Enes Doğanay | 23 Mayıs 2026: Row ile senkronize — minmax(70px,auto) */
+    grid-template-columns: 28px 1fr minmax(70px, auto) 100px 100px 100px;
     gap: 6px;
     padding: 7px 12px;
     background: var(--bg-light);
@@ -219,13 +220,18 @@
     align-items: center;
 }
 
+/* Enes Doğanay | 23 Mayıs 2026: TOPLAM başlık sağa hizalı — amount cell ile uyumlu */
+.teklif-kalem-col--toplam { text-align: right; }
+
 .teklif-kalem-table__row {
     display: grid;
-    grid-template-columns: 28px 1fr 70px 100px 100px 100px;
+    grid-template-columns: 28px 1fr minmax(70px, auto) 100px 100px 100px;
     gap: 6px;
     padding: 8px 12px;
     border-bottom: 1px solid var(--border);
-    align-items: center;
+    /* Enes Doğanay | 23 Mayıs 2026: start — madde sütunu uzayınca diğer hücreler
+       artık orta-havasında kalmıyor, tepe hizasından başlıyor */
+    align-items: start;
 }
 
 .teklif-kalem-table__row:last-child { border-bottom: none; }
@@ -235,6 +241,8 @@
     color: #94a3b8;
     font-weight: 700;
     text-align: center;
+    /* Enes Doğanay | 23 Mayıs 2026: kalem adı ilk satırıyla görsel hizalama */
+    padding-top: 3px;
 }
 
 .teklif-kalem-col--madde strong {
@@ -242,6 +250,20 @@
     font-size: 0.79rem;
     color: var(--text-dark);
     margin-bottom: 3px;
+}
+
+/* Enes Doğanay | 23 Mayıs 2026: İhale talep kalemi açıklaması — read-only bilgi etiketi */
+.teklif-kalem-ihale-aciklama {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 6px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+    font-style: italic;
 }
 
 /* Enes Doğanay | 14 Mayıs 2026: Miktar kolonu — input + birim badge */
@@ -289,6 +311,27 @@
     font-size: 0.78rem;
     color: #64748b;
     border-style: dashed;
+    /* Enes Doğanay | 23 Mayıs 2026: sadece dikey genişleme, maks 3 satır */
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
+    min-height: 26px;
+    max-height: 66px;
+    line-height: 1.4;
+}
+
+/* Enes Doğanay | 23 Mayıs 2026: Birim fiyat textarea — dikey genişleme, yatay sabit */
+.teklif-kalem-input--fiyat {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
+    min-height: 28px;
+    line-height: 1.4;
+    text-align: right;
 }
 
 /* Enes Doğanay | 16 Mayıs 2026: Miktar stepper grup */
@@ -298,7 +341,9 @@
     border: 1px solid var(--border);
     border-radius: 7px;
     background: var(--bg-white);
-    width: 100%;
+    /* Enes Doğanay | 23 Mayıs 2026: min-width=100% → kolonu doldurur, auto → içerikle büyür */
+    width: auto;
+    min-width: 70px;
     transition: border-color 0.2s, box-shadow 0.2s;
     overflow: hidden;
 }
@@ -312,9 +357,11 @@
     border-radius: 0 !important;
     background: transparent !important;
     box-shadow: none !important;
-    min-width: 0;
+    /* Enes Doğanay | 23 Mayıs 2026: field-sizing ile input içerik genişliğine göre büyür */
+    field-sizing: content;
+    min-width: 26px;
     text-align: center;
-    padding: 5px 2px !important;
+    padding: 5px 4px !important;
     -moz-appearance: textfield;
 }
 .teklif-kalem-input--miktar::-webkit-outer-spin-button,
@@ -352,7 +399,10 @@
     color: var(--text-dark);
     font-size: 0.8rem;
     text-align: right;
-    white-space: nowrap;
+    /* Enes Doğanay | 23 Mayıs 2026: uzun tutar satır sonuna sarılır, taşmaz */
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    padding-top: 3px;
 }
 
 /* Enes Doğanay | 2 Mayıs 2026: Kalem tablo footer */
@@ -392,8 +442,9 @@
 
 /* Enes Doğanay | 14 Nisan 2026: Kalem satırındaki para birimi seçici */
 /* Enes Doğanay | 2 Mayıs 2026: Kalem para birimi — compact SimpleSelect override */
+/* Enes Doğanay | 23 Mayıs 2026: Dropdown min-width + compact options */
 .teklif-kalem-col--currency .simple-select-trigger {
-    padding: 6px 8px;
+    padding: 5px 8px;
     font-size: 0.78rem;
     border-radius: 8px;
     gap: 4px;
@@ -402,6 +453,18 @@
 }
 .teklif-kalem-col--currency .simple-select-arrow {
     font-size: 16px;
+}
+.teklif-kalem-col--currency .simple-select-dropdown {
+    min-width: 130px;
+}
+.teklif-kalem-col--currency .simple-select-option {
+    padding: 5px 10px;
+    font-size: 0.79rem;
+    white-space: nowrap;
+}
+.teklif-kalem-col--currency .simple-select-opt-check {
+    font-size: 14px;
+    margin-left: auto;
 }
 
 /* Enes Doğanay | 14 Nisan 2026: Footer gruplu tutar */

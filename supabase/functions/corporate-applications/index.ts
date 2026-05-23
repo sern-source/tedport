@@ -1069,8 +1069,14 @@ Deno.serve(async (request) => {
             tax_number: String(submitPayload.taxNumber || "").trim() || null,
             company_address:
                 // Enes Doğanay | 23 Mayıs 2026: companyOpenAddress → company_address düzeltildi; companyAddress alanı artık gönderilmiyor
-                [submitPayload.companyIl, submitPayload.companyIlce, submitPayload.companyOpenAddress]
-                    .map((v) => String(v || "").trim()).filter(Boolean).join(", ") ||
+                [
+                    submitPayload.companyIl,
+                    submitPayload.companyIlce,
+                    submitPayload.companyOpenAddress,
+                ]
+                    .map((v) => String(v || "").trim()).filter(Boolean).join(
+                        ", ",
+                    ) ||
                 String(submitPayload.companyAddress || "").trim() || null,
             verification_note:
                 String(submitPayload.verificationNote || "").trim() || null,
@@ -1081,17 +1087,24 @@ Deno.serve(async (request) => {
                     ? {
                         company_il: submitPayload.companyIl,
                         company_ilce: submitPayload.companyIlce || "",
-                        company_open_address: submitPayload.companyOpenAddress || "",
+                        company_open_address:
+                            submitPayload.companyOpenAddress || "",
                     }
                     : {}),
                 ...(submitPayload.companyPhone
-                    ? { company_phone: String(submitPayload.companyPhone).trim() }
+                    ? {
+                        company_phone: String(submitPayload.companyPhone)
+                            .trim(),
+                    }
                     : {}),
                 ...(submitPayload.selectedFirmaId
                     ? { requested_firma_id: submitPayload.selectedFirmaId }
                     : {}),
                 ...(submitPayload.authorizationDocUrl
-                    ? { authorization_doc_url: submitPayload.authorizationDocUrl }
+                    ? {
+                        authorization_doc_url:
+                            submitPayload.authorizationDocUrl,
+                    }
                     : {}),
             },
         }])

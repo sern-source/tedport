@@ -392,8 +392,21 @@
 }
 
 /* Enes Doğanay | 7 Mayıs 2026: TendersSection responsive */
-@media (max-width: 480px) {
-  .tender-item-row { flex-wrap: wrap; gap: 6px; }
-  .tender-item-right { flex-wrap: wrap; }
+/* Enes Doğanay | 23 Mayıs 2026: Mobil düzeltme — flex-wrap çalışmıyor çünkü left flex-basis:0, right flex-shrink:0
+   Gerçek fix: column layout ile başlık tam genişlik alıyor */
+@media (max-width: 600px) {
+  .tender-item-row {
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+  .tender-item-left {
+    width: 100%;
+  }
+  .tender-item-right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
   .tender-header { flex-direction: column; align-items: flex-start; gap: 8px; }
 }

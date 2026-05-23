@@ -192,21 +192,36 @@
 }
 
 .teklif-popup__inline-field input,
-.teklif-popup__inline-field select {
+.teklif-popup__inline-field select,
+.teklif-popup__inline-textarea {
     padding: 6px 9px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.82rem;
     font-family: inherit;
     color: var(--text-dark);
+    background: var(--bg-white);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .teklif-popup__inline-field input:focus,
-.teklif-popup__inline-field select:focus {
+.teklif-popup__inline-field select:focus,
+.teklif-popup__inline-textarea:focus {
     border-color: #93c5fd;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Enes Doğanay | 23 Mayıs 2026: Satır içi textarea — dikey genişleme, maks 3 satır */
+.teklif-popup__inline-textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
+    min-height: 34px;
+    max-height: 66px;
+    line-height: 1.4;
 }
 
 /* Toggle */

@@ -83,6 +83,7 @@ type CompanyManagementPayload =
     | {
         action: "send_quote_request_email";
         firma_id: string;
+        teklif_id?: string;
         requester_name: string;
         konu: string;
         mesaj: string;
@@ -399,7 +400,19 @@ Deno.serve(async (request) => {
 
         const resendApiKey = Deno.env.get("RESEND_API_KEY");
         const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL");
-        if (!resendApiKey || !fromEmail) return jsonResponse({ success: true }); // env eksikse sessizce geç
+        // Enes Doğanay | 23 Mayıs 2026: debug log — env kontrolü
+        console.log(
+            "[quote-email] env check — resendApiKey:",
+            !!resendApiKey,
+            "fromEmail:",
+            fromEmail,
+        );
+        if (!resendApiKey || !fromEmail) {
+            console.error(
+                "[quote-email] RESEND_API_KEY veya REMINDER_FROM_EMAIL eksik, mail atlanamadı.",
+            );
+            return jsonResponse({ success: true });
+        }
 
         // 1. Firma kayıtlı e-postası + adı
         const { data: firma } = await supabaseAdmin
@@ -409,44 +422,85 @@ Deno.serve(async (request) => {
             .maybeSingle();
         const firmaAdi = String(firma?.firma_adi || "Firma").trim();
         const firmaEposta = String(firma?.eposta || "").trim().toLowerCase();
+        console.log(
+            "[quote-email] firmaId:",
+            firmaId,
+            "firmaEposta:",
+            firmaEposta,
+        );
 
         // 2. Teklif yönetimi yetkili ekip üyeleri
-        const { data: ekipRows } = await supabaseAdmin
+        const { data: ekipRows, error: ekipErr } = await supabaseAdmin
             .from("kurumsal_firma_yoneticileri")
             .select("user_id, role, page_permissions")
             .eq("firma_id", firmaId);
+        console.log(
+            "[quote-email] ekipRows:",
+            ekipRows?.length ?? 0,
+            "ekipErr:",
+            ekipErr?.message,
+        );
 
-        // Enes Doğanay | 23 Mayıs 2026: owner/admin rolleri page_permissions'dan bağımsız olarak dahil edilmeli
-        const authorizedUserIds = (ekipRows || [])
+        // Enes Doğanay | 23 Mayıs 2026: owner + teklif_yonetimi üyelerini rol bilgisiyle topla — URL ayrımı için
+        const authorizedMembers = (ekipRows || [])
             .filter((
                 m: {
                     role?: string;
                     page_permissions?: { teklif_yonetimi?: boolean };
                 },
             ) => m.role === "owner" ||
-                m.role === "admin" ||
                 m.page_permissions?.teklif_yonetimi === true
             )
-            .map((m: { user_id: string }) => m.user_id);
+            .map((m: { user_id: string; role?: string }) => ({
+                userId: m.user_id,
+                isOwner: m.role === "owner",
+            }));
+        console.log(
+            "[quote-email] authorizedMembers:",
+            authorizedMembers.length,
+        );
 
-        // Enes Doğanay | 23 Mayıs 2026: profiles.email yerine auth.users'dan çek — profiles.email bazı üyeler için null olabilir
-        let teamEmails: string[] = [];
-        for (const uid of authorizedUserIds) {
+        // Enes Doğanay | 23 Mayıs 2026: email → panelUrl map; owner URL önceliklidir; teklif_id varsa direkt detaya
+        const teklifIdParam = payload.teklif_id
+            ? `&teklif_id=${payload.teklif_id}`
+            : "";
+        const OWNER_URL =
+            `https://tedport.com/firma-profil?tab=teklifler${teklifIdParam}`;
+        const TEAM_URL =
+            `https://tedport.com/firma-profil?tab=teklifler&from=sirketim${teklifIdParam}`;
+        const emailToUrl = new Map<string, string>();
+        if (firmaEposta) emailToUrl.set(firmaEposta, OWNER_URL);
+        for (const { userId, isOwner } of authorizedMembers) {
             try {
                 const { data: authUser } = await supabaseAdmin.auth.admin
-                    .getUserById(uid);
-                const email = (authUser?.user?.email || "").trim().toLowerCase();
-                if (email) teamEmails.push(email);
-            } catch {
-                // kullanıcı bulunamazsa atla
+                    .getUserById(userId);
+                const email = (authUser?.user?.email || "").trim()
+                    .toLowerCase();
+                console.log(
+                    "[quote-email] uid:",
+                    userId,
+                    "email:",
+                    email,
+                    "isOwner:",
+                    isOwner,
+                );
+                if (email) {
+                    const url = isOwner ? OWNER_URL : TEAM_URL;
+                    if (!emailToUrl.has(email) || isOwner) {
+                        emailToUrl.set(email, url);
+                    }
+                }
+            } catch (e) {
+                console.error("[quote-email] getUserById hata uid:", userId, e);
             }
         }
 
         // 3. Benzersiz alıcı listesi
-        const allEmails = [
-            ...new Set([firmaEposta, ...teamEmails].filter(Boolean)),
-        ];
-        if (allEmails.length === 0) return jsonResponse({ success: true });
+        console.log("[quote-email] emailToUrl:", [...emailToUrl.keys()]);
+        if (emailToUrl.size === 0) {
+            console.error("[quote-email] emailToUrl boş — mail gönderilmedi.");
+            return jsonResponse({ success: true });
+        }
 
         // 4. E-posta şablonu
         const safe = (s: string) =>
@@ -457,9 +511,10 @@ Deno.serve(async (request) => {
         const safeKonu = safe(payload.konu);
         const safeMesaj = safe(payload.mesaj);
         const safeFirmaAdi = safe(firmaAdi);
-        const panelUrl = "https://tedport.com/firma-profil?tab=teklifler";
 
-        const html = `<!DOCTYPE html>
+        // Enes Doğanay | 23 Mayıs 2026: HTML şablonu fonksiyon — panelUrl alıcı rolüne göre belirlenir
+        const buildHtml = (panelUrl: string) =>
+            `<!DOCTYPE html>
 <html lang="tr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="UTF-8">
@@ -661,7 +716,8 @@ Deno.serve(async (request) => {
 </html>`;
 
         const subject = `${safeRequester} teklif talebinde bulundu — Tedport`;
-        for (const email of allEmails) {
+        for (const [email, panelUrl] of emailToUrl) {
+            const html = buildHtml(panelUrl);
             const resp = await fetch("https://api.resend.com/emails", {
                 method: "POST",
                 headers: {

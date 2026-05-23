@@ -54,7 +54,31 @@ const TeklifMainPopup = ({
                         <h3><span className="material-symbols-outlined">local_shipping</span> Teslimat</h3>
                         <div className="teklif-popup__inline-row">
                             <div className="teklif-popup__inline-field"><label>Tahmini Teslim Süresi (gün)</label><input type="number" min="1" placeholder="ör: 15" value={teklifForm.teslim_suresi_gun} onChange={e => setTeklifForm(p => ({ ...p, teslim_suresi_gun: e.target.value }))} /></div>
-                            <div className="teklif-popup__inline-field teklif-popup__inline-field--grow"><label>Teslim Açıklaması <small className="teklif-popup__optional">(opsiyonel)</small></label><input type="text" placeholder="ör: Fabrikadan teslim, kargo dahil" value={teklifForm.teslim_aciklamasi} onChange={e => setTeklifForm(p => ({ ...p, teslim_aciklamasi: e.target.value }))} /></div>
+                            <div className="teklif-popup__inline-field teklif-popup__inline-field--grow">
+                                <label>Teslim Açıklaması <small className="teklif-popup__optional">(opsiyonel)</small></label>
+                                {/* Enes Doğanay | 23 Mayıs 2026: 3 satır maks, scrollHeight kontrolü */}
+                                <textarea
+                                    rows={1}
+                                    placeholder="ör: Fabrikadan teslim, kargo dahil"
+                                    value={teklifForm.teslim_aciklamasi}
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter' && e.target.value.split('\n').length >= 3) e.preventDefault();
+                                    }}
+                                    onChange={e => {
+                                        // Enes Doğanay | 23 Mayıs 2026: 3 satır (66px) aşılırsa geri al
+                                        const el = e.target;
+                                        el.style.height = 'auto';
+                                        if (el.scrollHeight > 66) {
+                                            el.value = teklifForm.teslim_aciklamasi;
+                                            el.style.height = 'auto';
+                                            el.style.height = el.scrollHeight + 'px';
+                                            return;
+                                        }
+                                        setTeklifForm(p => ({ ...p, teslim_aciklamasi: el.value }));
+                                        el.style.height = el.scrollHeight + 'px';
+                                    }}
+                                    className="teklif-popup__inline-textarea" />
+                            </div>
                         </div>
                     </div>
                     <div className="teklif-popup__section">

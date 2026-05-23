@@ -289,12 +289,12 @@ const CompletedTendersReport = ({ completedReport, reportLoading, onClose }) => 
 // Enes Doğanay | 23 Mayıs 2026: completedReport, reportLoading, loadCompletedReport prop eklendi
 const FirmaDashboardTab = ({ stats, loading, error, completedReport, reportLoading, loadCompletedReport }) => {
     const [showReport, setShowReport] = useState(false);
+    // Enes Doğanay | 23 Mayıs 2026: loadCompletedReport updater içinde değil, doğrudan handler'da çağrılmalı
     const handleTamamlandiClick = useCallback(() => {
-        setShowReport((prev) => {
-            if (!prev) loadCompletedReport?.();
-            return !prev;
-        });
-    }, [loadCompletedReport]);
+        const next = !showReport;
+        if (next) loadCompletedReport?.();
+        setShowReport(next);
+    }, [showReport, loadCompletedReport]);
     if (loading) return (
         <div className="fdb-loading">
             <span className="material-symbols-outlined fdb-loading-icon">bar_chart</span>
@@ -375,11 +375,6 @@ const FirmaDashboardTab = ({ stats, loading, error, completedReport, reportLoadi
                     <div className="fdb-section-header">
                         <span className="material-symbols-outlined">pie_chart</span>
                         İhale Durumları
-                        {(tenderStats?.tamamlandi ?? 0) > 0 && (
-                            <span className="fdb-section-badge">
-                                {showReport ? 'Raporu Kapat' : 'Tamamlananları Gör'}
-                            </span>
-                        )}
                     </div>
                     <div className="fdb-section-body">
                         <TenderStatusRow
@@ -389,6 +384,15 @@ const FirmaDashboardTab = ({ stats, loading, error, completedReport, reportLoadi
                         />
                     </div>
                 </div>
+
+                {/* Enes Doğanay | 23 Mayıs 2026: Tamamlanan ihaleler detay raporu — İhale Durumları ile Teklif Dağılımı arasında accordion */}
+                {showReport && (
+                    <CompletedTendersReport
+                        completedReport={completedReport}
+                        reportLoading={reportLoading}
+                        onClose={() => setShowReport(false)}
+                    />
+                )}
 
                 {/* Teklif dağılımı */}
                 <div className="fdb-section fdb-section--wide">
@@ -415,15 +419,6 @@ const FirmaDashboardTab = ({ stats, loading, error, completedReport, reportLoadi
                     </div>
                 </div>
             </div>
-
-            {/* Enes Doğanay | 23 Mayıs 2026: Tamamlanan ihaleler detay raporu — accordion */}
-            {showReport && (
-                <CompletedTendersReport
-                    completedReport={completedReport}
-                    reportLoading={reportLoading}
-                    onClose={() => setShowReport(false)}
-                />
-            )}
         </div>
     );
 };

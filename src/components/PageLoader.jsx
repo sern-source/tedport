@@ -2,14 +2,22 @@
 // Enes Doğanay | 8 Nisan 2026: CSS yüklenmeden stilsiz kalmaması için tüm stiller inline yapıldı
 // Enes Doğanay | 2 Mayıs 2026: Dark mode desteği — data-theme kontrolü
 // Enes Doğanay | 8 Mayıs 2026: Stiller component içine taşındı — modül yüklenme anında değil render anında tema okunuyor
+import { useState, useEffect } from 'react';
 
 const PageLoader = () => {
-    // Enes Doğanay | 23 Mayıs 2026: SSR güvenli tema oku — document SSR'da mevcut değil
-    const dark = typeof document !== 'undefined' && document.documentElement.dataset.theme === 'dark';
+    // Enes Doğanay | 23 Mayıs 2026: useState ile defer et — SSR false, client hydration sonrası güncellenir (mismatch önlenir)
+    const [dark, setDark] = useState(false);
+
+    useEffect(() => {
+        setDark(document.documentElement.dataset.theme === 'dark');
+    }, []);
 
     const loaderStyle = {
         position: 'fixed',
-        inset: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         zIndex: 9999,
         display: 'flex',
         alignItems: 'center',

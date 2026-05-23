@@ -80,6 +80,8 @@
 
 [data-theme="dark"] .teklif-popup__section h3 { color: #e2e8f0; }
 [data-theme="dark"] .teklif-kalem-col--madde strong { color: #e2e8f0; }
+/* Enes Doğanay | 23 Mayıs 2026: İhale açıklaması dark mode */
+[data-theme="dark"] .teklif-kalem-ihale-aciklama { color: #94a3b8; background: #1e293b; border-color: #334155; }
 [data-theme="dark"] .teklif-kalem-table__footer span { color: #64748b; }
 [data-theme="dark"] .teklif-kalem-table__footer strong { color: #e2e8f0; }
 [data-theme="dark"] .teklif-kalem-table__footer-totals strong { color: #e2e8f0; }
@@ -96,8 +98,10 @@
 
 [data-theme="dark"] .teklif-popup__inline-field label { color: #94a3b8; }
 [data-theme="dark"] .teklif-popup__optional { color: #475569; }
-[data-theme="dark"] .teklif-popup__inline-field input { background: #0f172a; border-color: #334155; color: #e2e8f0; }
-[data-theme="dark"] .teklif-popup__inline-field input:focus { border-color: #3b9eff; }
+[data-theme="dark"] .teklif-popup__inline-field input,
+[data-theme="dark"] .teklif-popup__inline-textarea { background: #0f172a; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .teklif-popup__inline-field input:focus,
+[data-theme="dark"] .teklif-popup__inline-textarea:focus { border-color: #3b9eff; }
 
 [data-theme="dark"] .teklif-popup__toggle-slider { background: #334155; }
 [data-theme="dark"] .teklif-popup__file-upload small { color: #475569; }

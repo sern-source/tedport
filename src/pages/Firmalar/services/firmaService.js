@@ -234,7 +234,8 @@ export const sendQuoteRequest = async ({ supplier, form, file, userId, userProfi
     ekDosyaUrl = uploaded.url;
     ekDosyaAdi = uploaded.name;
   }
-  const { error } = await supabase.from('teklif_talepleri').insert([{
+  // Enes Doğanay | 23 Mayıs 2026: teklif_id alınıyor — e-postada direkt link için
+  const { data: insertedRow, error } = await supabase.from('teklif_talepleri').insert([{
     firma_id: String(supplier.id),
     user_id: userId,
     gonderen_firma_id: null,
@@ -251,6 +252,22 @@ export const sendQuoteRequest = async ({ supplier, form, file, userId, userProfi
     teslim_yeri: form.teslim_yeri || null,
     ek_dosya_url: ekDosyaUrl,
     ek_dosya_adi: ekDosyaAdi,
-  }]);
+  }]).select('id').single();
   if (error) throw new Error(error.message);
+
+  // Enes Doğanay | 23 Mayıs 2026: Firma + teklif_yonetimi yetkili ekip üyelerine bildirim maili
+  const requesterName = `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim() || 'Bir kullanıcı';
+  supabase.functions.invoke('company-management', {
+    body: {
+      action: 'send_quote_request_email',
+      firma_id: String(supplier.id),
+      teklif_id: insertedRow?.id ? String(insertedRow.id) : undefined,
+      requester_name: requesterName,
+      konu: form.konu.trim(),
+      mesaj: form.mesaj.trim(),
+    },
+  }).then(() => {
+  }).catch((err) => {
+    console.error('[quote-email] invoke hata:', err);
+  });
 };

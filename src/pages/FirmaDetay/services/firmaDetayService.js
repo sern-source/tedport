@@ -190,7 +190,8 @@ export async function sendQuoteRequestService({ firmaId, userId, userProfile, qu
         ekDosyaAdi = result.name;
     }
 
-    const { error } = await supabase.from('teklif_talepleri').insert([{
+    // Enes Doğanay | 23 Mayıs 2026: teklif_id alınıyor — e-postada direkt link için
+    const { data: insertedRow, error } = await supabase.from('teklif_talepleri').insert([{
         firma_id: String(firmaId),
         user_id: userId,
         gonderen_firma_id: null,
@@ -207,8 +208,24 @@ export async function sendQuoteRequestService({ firmaId, userId, userProfile, qu
         teslim_yeri: quoteForm.teslim_yeri || null,
         ek_dosya_url: ekDosyaUrl,
         ek_dosya_adi: ekDosyaAdi
-    }]);
+    }]).select('id').single();
     if (error) throw error;
+
+    // Enes Doğanay | 23 Mayıs 2026: Firma + teklif_yonetimi yetkili ekip üyelerine bildirim maili
+    const requesterName = `${userProfile?.first_name || ''} ${userProfile?.last_name || ''}`.trim() || 'Bir kullanıcı';
+    supabase.functions.invoke('company-management', {
+        body: {
+            action: 'send_quote_request_email',
+            firma_id: String(firmaId),
+            teklif_id: insertedRow?.id ? String(insertedRow.id) : undefined,
+            requester_name: requesterName,
+            konu: quoteForm.konu.trim(),
+            mesaj: quoteForm.mesaj.trim(),
+        },
+    }).then(() => {
+    }).catch((err) => {
+        console.error('[quote-email] invoke hata:', err);
+    });
 }
 
 export async function fetchSuggestionsService(search) {
