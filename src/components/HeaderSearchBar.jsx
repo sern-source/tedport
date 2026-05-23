@@ -1,5 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Arama çubuğu alt bileşeni — öneriler + arama geçmişi
 import React from 'react';
+import Image from 'next/image';
 import SearchModeToggle from './SearchModeToggle';
 
 const HeaderSearchBar = ({
@@ -58,7 +59,12 @@ const HeaderSearchBar = ({
             <div className="shared-search-suggestions">
                 {suggestions.map((item) => (
                     <div key={item.id} className="shared-suggestion-item" onClick={() => onSuggestionClick && onSuggestionClick(item)}>
-                        <div className="shared-suggestion-avatar">{item.name?.charAt(0)}</div>
+                        {/* Enes Doğanay | 23 Mayıs 2026: Logo varsa göster, yoksa ilk harf */}
+                        <div className="shared-suggestion-avatar">
+                            {item.logo
+                                ? <Image src={item.logo} alt="" width={36} height={36} style={{ objectFit: 'contain' }} />
+                                : item.name?.charAt(0)}
+                        </div>
                         <div className="shared-suggestion-info">
                             <span className="shared-suggestion-name">{item.name}</span>
                             <span className="shared-suggestion-location">{item.location}</span>

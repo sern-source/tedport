@@ -60,7 +60,7 @@ const TenderDetailBody = ({ dt }) => {
                     <h3><span className="material-symbols-outlined">attach_file</span> Ek Dokümanlar ({ekDosyalar.length})</h3>
                     <div className="tender-detail__files">
                         {ekDosyalar.map((f, i) => (
-                            <button key={i} type="button" className="tender-detail__file-link" onClick={() => handleFileOpen(f)}>
+                            <button key={f.name || f.url || `dosya-${i}`} type="button" className="tender-detail__file-link" onClick={() => handleFileOpen(f)}>
                                 <span className="material-symbols-outlined">download</span>
                                 {f.name || `Dosya ${i + 1}`}
                             </button>

@@ -116,7 +116,7 @@ const QuoteChatHeader = ({
                 </thead>
                 <tbody>
                   {q.kalemler.map((k, i) => (
-                    <tr key={i}>
+                    <tr key={`${k.madde || 'kalem'}-${i}`}>
                       <td>{i + 1}</td>
                       <td>
                         <strong>{k.adet}</strong>

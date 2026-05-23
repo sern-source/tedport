@@ -112,3 +112,6 @@
 [data-theme="dark"] .teklif-popup__footer-total span { color: #64748b; }
 [data-theme="dark"] .teklif-popup__footer-total strong { color: #e2e8f0; }
 [data-theme="dark"] .teklif-popup-overlay { background: rgba(0,0,0,0.65); }
+
+/* Enes Doğanay | 23 Mayıs 2026: firma-contact-overlay dark (panel overlay ayrı arka plan) */
+[data-theme="dark"] .firma-contact-overlay { background: rgba(0, 0, 0, 0.65); }

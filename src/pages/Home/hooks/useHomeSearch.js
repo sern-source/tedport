@@ -70,10 +70,12 @@ export function useHomeSearch() {
         setHeroHistoryVisible(false);
     }, [searchTerm, addToHistory, router]);
 
+    // Enes Doğanay | 23 Mayıs 2026: X butonu — text + öneriler + geçmiş paneli temizler
     const handleClearSearch = useCallback(() => {
         setSearchTerm('');
         setHeroSuggestions([]);
         setHeroNoResults(false);
+        setHeroHistoryVisible(false);
     }, []);
 
     const handleCloseSuggestions = useCallback(() => {

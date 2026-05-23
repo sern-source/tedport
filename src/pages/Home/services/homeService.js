@@ -1,6 +1,8 @@
 // Enes Doğanay | 6 Mayıs 2026: Home sayfası Supabase servisleri
 import { supabase } from '../../../supabaseClient';
 import { expandSearchTerms } from '../../../constants/synonyms';
+// Enes Doğanay | 23 Mayıs 2026: "İlçe, İl" formatı — Firmalar sayfasıyla aynı
+import { formatLocation } from '../../Firmalar/utils/firmaUtils';
 
 // Enes Doğanay | 6 Mayıs 2026: Canlı firma önerileri — hero arama
 export async function fetchHeroSuggestions(term) {
@@ -9,8 +11,8 @@ export async function fetchHeroSuggestions(term) {
 
     const { data, error } = await supabase
         .from('firmalar')
-        // Enes Doğanay | 23 Mayıs 2026: slug eklendi — hero öneri slug URL kullanacak
-        .select('firmaID, slug, firma_adi, il_ilce, logo_url')
+        // Enes Doğanay | 23 Mayıs 2026: has_logo + onayli_hesap eklendi — sıralama önceliği
+        .select('firmaID, slug, firma_adi, il_ilce, logo_url, has_logo, onayli_hesap, best')
         .or(
             expandSearchTerms(safe).flatMap(t => [
                 `firma_adi.ilike."%${t}%"`,
@@ -19,18 +21,32 @@ export async function fetchHeroSuggestions(term) {
                 `arama_etiketleri.ilike."%${t}%"`,
             ]).join(',')
         )
-        .order('best', { ascending: false })
-        .limit(6);
+        .order('has_logo',     { ascending: false, nullsFirst: false })
+        .order('onayli_hesap', { ascending: false, nullsFirst: false })
+        .order('best',         { ascending: false })
+        .limit(10);
 
     if (error) throw new Error(error.message);
-    // Enes Doğanay | 23 Mayıs 2026: slug eklendi
-    return (data || []).map(f => ({
-        id: f.firmaID,
-        slug: f.slug,
-        name: f.firma_adi,
-        location: f.il_ilce || '',
-        logo: f.logo_url?.includes('firma-logolari') ? f.logo_url : null,
-    }));
+    const lower = safe.toLowerCase();
+    // Enes Doğanay | 23 Mayıs 2026: Client sıralama — onaylı → logolu → best → metin eşleşme
+    return (data || [])
+        .sort((a, b) => {
+            if ((b.onayli_hesap ? 1 : 0) !== (a.onayli_hesap ? 1 : 0)) return (b.onayli_hesap ? 1 : 0) - (a.onayli_hesap ? 1 : 0);
+            if ((b.has_logo ? 1 : 0) !== (a.has_logo ? 1 : 0)) return (b.has_logo ? 1 : 0) - (a.has_logo ? 1 : 0);
+            if ((b.best ? 1 : 0) !== (a.best ? 1 : 0)) return (b.best ? 1 : 0) - (a.best ? 1 : 0);
+            const aName = (a.firma_adi || '').toLowerCase();
+            const bName = (b.firma_adi || '').toLowerCase();
+            const sc = n => (n === lower ? 3 : n.startsWith(lower) ? 2 : n.includes(lower) ? 1 : 0);
+            return sc(bName) - sc(aName);
+        })
+        .slice(0, 6)
+        .map(f => ({
+            id: f.firmaID,
+            slug: f.slug,
+            name: f.firma_adi,
+            location: formatLocation(f.il_ilce),
+            logo: f.logo_url?.includes('firma-logolari') ? f.logo_url : null,
+        }));
 }
 
 // Enes Doğanay | 6 Mayıs 2026: Öne çıkan tedarikçiler — rastgele 4 firma

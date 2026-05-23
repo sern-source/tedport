@@ -41,7 +41,7 @@ const GizlilikPolitikasi = () => {
                         <section className="kvkk-section">
                             <h2>1. Genel Bakış</h2>
                             <p>
-                                <strong>Tedport Teknoloji A.Ş.</strong> olarak gizliliğinize saygı duyuyor ve kişisel verilerinizi
+                                <strong>Tedport</strong> olarak gizliliğinize saygı duyuyor ve kişisel verilerinizi
                                 koruma taahhüdünü ciddiye alıyoruz. Bu politika, platformumuzu kullandığınızda hangi verileri
                                 topladığımızı, nasıl kullandığımızı ve haklarınızın neler olduğunu açıklamaktadır.
                             </p>

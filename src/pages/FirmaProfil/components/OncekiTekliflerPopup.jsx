@@ -177,7 +177,7 @@ const OncekiTekliflerPopup = ({ offer, onClose }) => {
                                                     const kCur = k.para_birimi || selected.para_birimi || 'TRY';
                                                     const kTotal = (Number(k.birim_fiyat) || 0) * (Number(k.miktar) || 0);
                                                     return (
-                                                        <tr key={i}>
+                                                        <tr key={`${k.madde || 'kalem'}-${i}`}>
                                                             <td><strong>{k.madde || '—'}</strong></td>
                                                             <td>{k.miktar || '—'}</td>
                                                             <td>{k.birim_fiyat ? formatMoney(Number(k.birim_fiyat), kCur) : '—'}</td>

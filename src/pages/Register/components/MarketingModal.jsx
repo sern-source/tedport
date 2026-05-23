@@ -21,7 +21,7 @@ const MarketingModal = ({ onClose, onAccept }) => (
                 </div>
                 <section className="reg-modal-section">
                     <h3>Açık Rıza Beyanı</h3>
-                    <p>Tarafıma, Tedport Teknoloji A.Ş. tarafından sunulan ürün ve hizmetlere ilişkin kampanya, tanıtım, fırsat ve bilgilendirme içeriklerinin e-posta ve/veya SMS yoluyla gönderilmesini kabul ediyorum.</p>
+                    <p>Tarafıma, Tedport tarafından sunulan ürün ve hizmetlere ilişkin kampanya, tanıtım, fırsat ve bilgilendirme içeriklerinin e-posta ve/veya SMS yoluyla gönderilmesini kabul ediyorum.</p>
                     <p>Bu kapsamında kişisel verilerimin iletişim faaliyetlerinin yürütülmesi amacıyla işlenmesine izin veriyorum.</p>
                 </section>
                 <div className="reg-modal-notice reg-modal-notice--green">

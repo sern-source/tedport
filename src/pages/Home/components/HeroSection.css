@@ -4,7 +4,8 @@
     padding-bottom: 28px;
 }
 
-/* Enes Doğanay | 12 Mayıs 2026: Premium depth — overflow:hidden blob'ları kırpar */
+/* Enes Doğanay | 12 Mayıs 2026: Premium depth — border-radius background'u kendisi kırpar, overflow:visible arama dropdown'ının taşmasına izin verir */
+/* Enes Doğanay | 23 Mayıs 2026: isolation:isolate KALDIRILDI — stacking context hapsini önler, z-index:400 root context'e taşar */
 .supplier-connect-wrapper .sc-hero-box {
     border-radius: 14px;
     min-height: 280px;
@@ -20,7 +21,7 @@
     background-size: cover;
     background-position: center;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Enes Doğanay | 12 Mayıs 2026: Radial mavi glow — sağ üst köşe */
@@ -159,10 +160,11 @@
     }
 }
 
+/* Enes Doğanay | 23 Mayıs 2026: z-index yükseltildi — dropdown altındaki bölümlerin üstünde kalır */
 .supplier-connect-wrapper .sc-search-container {
     width: 100%;
     max-width: 580px;
-    z-index: 10;
+    z-index: 400;
     margin-top: 12px;
     position: relative;
 }
@@ -200,7 +202,17 @@
     }
 }
 
-.supplier-connect-wrapper .sc-search-input-group input,
+/* Enes Doğanay | 23 Mayıs 2026: flex:1 + min-width:0 — width:100% X butonunu tıklanamaz yapıyordu */
+.supplier-connect-wrapper .sc-search-input-group input {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: transparent;
+}
 .supplier-connect-wrapper .sc-search-select select {
     border: none;
     outline: none;
@@ -224,6 +236,25 @@
         width: 33%;
         height: 44px;
     }
+}
+
+/* Enes Doğanay | 23 Mayıs 2026: pointer-events:auto — material-symbols-outlined global pointer-events:none'ı override eder */
+.supplier-connect-wrapper .sc-search-clear {
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 20px;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+    pointer-events: auto;
+}
+.supplier-connect-wrapper .sc-search-clear:hover {
+    background: rgba(0, 0, 0, 0.07);
+    color: #64748b;
 }
 
 .supplier-connect-wrapper .sc-search-btn {
@@ -299,6 +330,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    flex: 1;
 }
 
 .sc-hero-suggestion-name {

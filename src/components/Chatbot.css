@@ -371,3 +371,17 @@
   color: #fff;
   border-color: #1a56db;
 }
+
+/* Enes Doğanay | 23 Mayıs 2026: Chatbot 480px breakpoint */
+@media (max-width: 480px) {
+  .cb-window {
+    width: calc(100vw - 16px);
+    right: 8px;
+    bottom: 76px;
+    max-height: 55vh;
+  }
+  .cb-fab {
+    right: 12px;
+    bottom: 14px;
+  }
+}

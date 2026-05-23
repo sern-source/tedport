@@ -13,7 +13,7 @@ const PreviewItem = ({ icon, label, value }) => (
 const PreviewSection = ({ icon, label, tags }) => (
     <div className="ihale-preview__section">
         <strong><span className="material-symbols-outlined">{icon}</span> {label}</strong>
-        <div className="ihale-preview__tags">{tags.map((t, i) => <span key={i}>{t}</span>)}</div>
+        <div className="ihale-preview__tags">{tags.map((t) => <span key={t}>{t}</span>)}</div>
     </div>
 );
 

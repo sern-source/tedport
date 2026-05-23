@@ -56,7 +56,7 @@ const FirmalarToolbar = ({ totalCount, hasSearch, loading, page, totalPages, onP
           type="button"
           className={`firmalar-verified-btn${onlyVerified ? ' firmalar-verified-btn--active' : ''}`}
           onClick={onVerifiedToggle}
-          aria-pressed={onlyVerified}
+          aria-pressed={!!onlyVerified}
         >
           <span className="material-symbols-outlined">verified</span>
           Onaylı

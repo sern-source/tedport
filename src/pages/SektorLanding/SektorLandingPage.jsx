@@ -14,6 +14,7 @@ import useSektorLanding from './hooks/useSektorLanding';
 import { getTenderStatusMeta } from '../../constants/tenderUtils';
 
 // Enes Doğanay | 12 Mayıs 2026: Sektör ikonları
+// Enes Doğanay | 23 Mayıs 2026: 12 yeni sektör ikonu eklendi
 const SEKTOR_ICONS = {
     'Makine ve Endüstriyel Ekipmanlar': 'precision_manufacturing',
     'Metal ve Metal İşleme Sanayi': 'factory',
@@ -35,6 +36,19 @@ const SEKTOR_ICONS = {
     'Bilişim, Yazılım ve BT Çözümleri': 'computer',
     'Güvenlik Sistemleri ve Teknolojileri': 'security',
     'Endüstriyel ve Kurumsal Hizmetler': 'handyman',
+    // Enes Doğanay | 23 Mayıs 2026: 12 yeni sektör ikonları
+    'Cam ve Cam Ürünleri': 'window',
+    'Seramik, Porselen ve Refrakter Malzemeler': 'layers',
+    'Ahşap, Orman Ürünleri ve Mobilya': 'forest',
+    'Kağıt, Karton ve Baskı Sanayi': 'print',
+    'Tarım, Hayvancılık ve Tarımsal Teknolojiler': 'agriculture',
+    'Madencilik ve Mineral İşleme': 'terrain',
+    'Boya, Vernik ve Yüzey Kaplama Sistemleri': 'format_paint',
+    'Petrol, Doğalgaz ve Petrokimya': 'oil_barrel',
+    'Savunma ve Havacılık Sanayi': 'military_tech',
+    'Denizcilik, Gemi ve Su Araçları': 'directions_boat',
+    'İlaç, Eczacılık ve Biyoteknoloji': 'biotech',
+    'Çevre Teknolojileri ve Atık Yönetimi': 'eco',
 };
 
 const SektorLandingPage = () => {

@@ -627,12 +627,14 @@
     font-size: 14px;
     flex-shrink: 0;
     border: 1px solid #c7d2fe;
+    overflow: hidden;
 }
 
 .shared-suggestion-info {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    flex: 1;
 }
 
 .shared-suggestion-name {

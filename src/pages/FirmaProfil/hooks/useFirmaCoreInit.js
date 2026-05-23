@@ -23,23 +23,27 @@ export const useFirmaCoreInit = ({ navigate }) => {
     const [notifPrefs, setNotifPrefs] = useState(DEFAULT_NOTIF_PREFS);
 
     useEffect(() => {
+        let cancelled = false;
         const fallbackTimer = setTimeout(() => setLoading(false), 12000);
         const init = async () => {
             try {
                 // Enes Doğanay | 23 Mayıs 2026: Önce session — giriş yoksa redirect param'lı login; sonra firma kontrolü
                 const session = await getAuthSession();
+                if (cancelled) return;
                 if (!session?.user) {
                     const fullPath = window.location.pathname + window.location.search;
                     navigate('/login?redirect=' + encodeURIComponent(fullPath));
                     return;
                 }
                 const cid = await getManagedCompanyId();
+                if (cancelled) return;
                 if (!cid) { navigate('/'); return; }
                 setCompanyId(cid);
                 setUserId(session.user.id);
                 const [firmaData, notifPrefsData, roleData] = await Promise.all([
                     fetchFirmaData(cid), fetchNotifPrefs(session.user.id), fetchUserRole(session.user.id, cid),
                 ]);
+                if (cancelled) return;
                 setFirma(firmaData);
                 setShowEkipPublic(firmaData?.show_ekip_public !== false);
                 if (notifPrefsData) {
@@ -65,7 +69,7 @@ export const useFirmaCoreInit = ({ navigate }) => {
             }
         };
         init().finally(() => clearTimeout(fallbackTimer));
-        return () => clearTimeout(fallbackTimer);
+        return () => { cancelled = true; clearTimeout(fallbackTimer); };
     }, [navigate]);
 
     const handleLogout = useCallback(async () => {

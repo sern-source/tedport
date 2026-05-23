@@ -115,6 +115,8 @@ const fetchFirmalarSeeded = async ({ page, search, filters, searchMode, sessionS
     p_category_keywords: categoryKeywords,
     p_istanbul_avrupa: ISTANBUL_AVRUPA,
     p_istanbul_anadolu: ISTANBUL_ANADOLU,
+    // Enes Doğanay | 23 Mayıs 2026: Tam sektör adları — RPC'de ana_sektor eşleşme önceliği için
+    p_sector_names: filters.sectors || [],
   });
 
   if (error) throw new Error(error.message);

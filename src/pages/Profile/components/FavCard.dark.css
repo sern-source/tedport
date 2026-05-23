@@ -308,3 +308,10 @@
   background: rgba(30, 22, 0, 0.5);
   border-color: rgba(160, 120, 40, 0.45);
 }
+
+/* Enes Doğanay | 23 Mayıs 2026: note-save-feedback dark */
+[data-theme="dark"] .note-save-feedback {
+  background: rgba(21, 128, 61, 0.15);
+  border-color: rgba(21, 128, 61, 0.3);
+  color: #4ade80;
+}

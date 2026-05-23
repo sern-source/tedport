@@ -52,7 +52,7 @@ export const downloadYetkilendirmePdf = () => {
   </div>
   <div class="between">— ile —</div>
   <div class="box">
-    <p><span class="party-name">Tedport Teknoloji A.Ş.</span></p>
+    <p><span class="party-name">Tedport</span></p>
     <p>("Tedport")</p>
   </div>
   <p style="margin-top:8px">arasında düzenlenmiştir.</p>
@@ -128,7 +128,7 @@ export const downloadYetkilendirmePdf = () => {
       <div style="height:70px"></div>
     </div>
   </div>
-  <div class="footer">Tedport Teknoloji A.Ş. | info@tedport.com | www.tedport.com</div>
+  <div class="footer">Tedport | info@tedport.com | www.tedport.com</div>
 </body>
 </html>`;
 

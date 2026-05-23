@@ -181,3 +181,27 @@
 [data-theme="dark"] .notif-pref-switch.active .notif-pref-switch-knob {
   background: #fff;
 }
+
+/* Enes Doğanay | 23 Mayıs 2026: Eksik dark overrides — notification butonları */
+[data-theme="dark"] .notification-read-btn {
+  background: #1e293b;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .notification-open-btn {
+  background: rgba(29, 78, 216, 0.15);
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .notification-read-btn:hover,
+[data-theme="dark"] .notification-open-btn:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .reminder-inline-confirm-label { color: #94a3b8; }
+
+[data-theme="dark"] .reminder-delete-btn:hover,
+[data-theme="dark"] .notification-delete-btn:hover {
+  color: #f87171;
+  background: rgba(127, 29, 29, 0.2);
+}

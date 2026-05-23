@@ -385,3 +385,13 @@
     .otp-detail__summary--split { flex-direction: column; }
     .otp-detail__summary-col--right { border-left: none; padding-left: 0; margin-left: 0; border-top: 1px solid #e2e8f0; padding-top: 8px; }
 }
+
+/* Enes Doğanay | 23 Mayıs 2026: Küçük telefon ek düzeltmeler */
+@media (max-width: 480px) {
+    .otp-panel { max-height: 92vh; border-radius: 16px 16px 0 0; }
+    .otp-header { padding: 12px 14px; }
+    .otp-header__title { font-size: 0.88rem; }
+    .otp-body { padding: 10px 12px; }
+    .otp-kalemler__wrap { overflow-x: auto; }
+    .otp-kalemler__wrap table { min-width: 320px; }
+}

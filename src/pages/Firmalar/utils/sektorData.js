@@ -32,6 +32,19 @@ const KEYWORD_OVERRIDES = {
   'Güvenlik Sistemleri ve Teknolojileri':              ['Güvenlik', 'Güvenlik Sistemleri'],
   'Endüstriyel Otomasyon Sistemleri':                  ['Otomasyon', 'Endüstriyel Otomasyon'],
   'Endüstriyel ve Kurumsal Hizmetler':                 ['Endüstriyel', 'Kurumsal', 'Hizmet'],
+  // Enes Doğanay | 23 Mayıs 2026: 12 yeni sektör override'ları
+  'Cam ve Cam Ürünleri':                               ['Cam', 'Düz Cam', 'Cam Elyaf'],
+  'Seramik, Porselen ve Refrakter Malzemeler':         ['Seramik', 'Porselen', 'Refrakter'],
+  'Ahşap, Orman Ürünleri ve Mobilya':                  ['Ahşap', 'Orman', 'Mobilya'],
+  'Kağıt, Karton ve Baskı Sanayi':                     ['Kağıt', 'Karton', 'Baskı'],
+  'Tarım, Hayvancılık ve Tarımsal Teknolojiler':       ['Tarım', 'Hayvancılık', 'Tarımsal'],
+  'Madencilik ve Mineral İşleme':                      ['Madencilik', 'Mineral', 'Maden'],
+  'Boya, Vernik ve Yüzey Kaplama Sistemleri':          ['Boya', 'Vernik', 'Kaplama'],
+  'Petrol, Doğalgaz ve Petrokimya':                    ['Petrol', 'Doğalgaz', 'Petrokimya'],
+  'Savunma ve Havacılık Sanayi':                       ['Savunma', 'Havacılık', 'Uzay'],
+  'Denizcilik, Gemi ve Su Araçları':                   ['Denizcilik', 'Gemi', 'Tersane'],
+  'İlaç, Eczacılık ve Biyoteknoloji':                  ['İlaç', 'Eczacılık', 'Biyoteknoloji'],
+  'Çevre Teknolojileri ve Atık Yönetimi':              ['Çevre', 'Atık', 'Geri Dönüşüm'],
 };
 
 /* ── Keyword extraction ─────────────────────────────────────────────────
@@ -54,6 +67,7 @@ export const getSektorKeywords = (sectorName) => {
 };
 
 // Enes Doğanay | 11 Mayıs 2026: 20 geniş ana sektör — DB ana_sektor alanıyla eşleşir
+// Enes Doğanay | 23 Mayıs 2026: 32 sektöre genişletildi — 12 yeni sektör eklendi
 export const SEKTORLER = [
   'Makine ve Endüstriyel Ekipmanlar',
   'Metal ve Metal İşleme Sanayi',
@@ -75,4 +89,17 @@ export const SEKTORLER = [
   'Bilişim, Yazılım ve BT Çözümleri',
   'Güvenlik Sistemleri ve Teknolojileri',
   'Endüstriyel ve Kurumsal Hizmetler',
+  // Enes Doğanay | 23 Mayıs 2026: 12 yeni sektör
+  'Cam ve Cam Ürünleri',
+  'Seramik, Porselen ve Refrakter Malzemeler',
+  'Ahşap, Orman Ürünleri ve Mobilya',
+  'Kağıt, Karton ve Baskı Sanayi',
+  'Tarım, Hayvancılık ve Tarımsal Teknolojiler',
+  'Madencilik ve Mineral İşleme',
+  'Boya, Vernik ve Yüzey Kaplama Sistemleri',
+  'Petrol, Doğalgaz ve Petrokimya',
+  'Savunma ve Havacılık Sanayi',
+  'Denizcilik, Gemi ve Su Araçları',
+  'İlaç, Eczacılık ve Biyoteknoloji',
+  'Çevre Teknolojileri ve Atık Yönetimi',
 ];

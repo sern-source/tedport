@@ -45,20 +45,16 @@ const Kvkk = () => {
                             <h2>1. Veri Sorumlusunun Kimliği</h2>
                             <p>
                                 İşbu Aydınlatma Metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, veri sorumlusu
-                                sıfatıyla hareket eden <strong>Tedport Teknoloji A.Ş.</strong> ("Tedport" veya "Şirket") tarafından hazırlanmıştır.
+                                sıfatıyla hareket eden <strong>Tedport</strong> ("Platform") tarafından hazırlanmıştır.
                             </p>
                             <div className="kvkk-info-box">
                                 <div className="kvkk-info-row">
                                     <span className="material-symbols-outlined">location_on</span>
-                                    <span><strong>Adres:</strong> [Şirket adresi]</span>
+                                    <span><strong>Adres:</strong> İstanbul, Türkiye</span>
                                 </div>
                                 <div className="kvkk-info-row">
                                     <span className="material-symbols-outlined">mail</span>
                                     <span><strong>E-posta:</strong> <a href="mailto:info@tedport.com">info@tedport.com</a></span>
-                                </div>
-                                <div className="kvkk-info-row">
-                                    <span className="material-symbols-outlined">badge</span>
-                                    <span><strong>MERSİS No:</strong> [●]</span>
                                 </div>
                             </div>
                         </section>
@@ -204,7 +200,7 @@ const Kvkk = () => {
                                 </div>
                                 <div className="kvkk-info-row">
                                     <span className="material-symbols-outlined">location_on</span>
-                                    <span><strong>Yazılı başvuru:</strong> [Şirket adresi]</span>
+                                    <span><strong>Yazılı başvuru:</strong> info@tedport.com adresine e-posta yoluyla</span>
                                 </div>
                             </div>
                             <p className="kvkk-note">Başvurularınız, mevzuata uygun olarak en geç <strong>30 gün</strong> içerisinde sonuçlandırılacaktır.</p>

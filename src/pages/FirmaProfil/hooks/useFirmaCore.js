@@ -27,7 +27,11 @@ export const useFirmaCore = () => {
     const [fpToast, setFpToast] = useState(null);
     const fpToastTimerRef = useRef(null);
 
-    const coreInit = useFirmaCoreInit({ navigate: (path) => router.push(path) });
+    // Enes Doğanay | 23 Mayıs 2026: useCallback ile stable ref — inline arrow function her render'da
+    // yeni referans üretir, useFirmaCoreInit'in useEffect([navigate]) dep'ini sürekli tetikler ve
+    // async init her tamamlandığında setFirma → form reset döngüsüne girer
+    const navigate = useCallback((path) => router.push(path), [router]);
+    const coreInit = useFirmaCoreInit({ navigate });
 
     const showFpToast = useCallback((type, message) => {
         if (fpToastTimerRef.current) clearTimeout(fpToastTimerRef.current);
@@ -74,7 +78,7 @@ export const useFirmaCore = () => {
     return {
         ...coreInit,
         isEmbedded, fromSirketim, currentTab, setTab,
-        searchParams, setSearchParams, navigate: (path) => router.push(path),
+        searchParams, setSearchParams, navigate,
         fpToast, showFpToast,
     };
 };

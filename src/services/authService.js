@@ -70,7 +70,8 @@ export async function upsertOAuthProfile(userId, meta, userEmail, userAgent, pro
     email: meta.email || userEmail || '',
     avatar: meta.avatar_url || null,
   };
-  const { error } = await supabase.from('profiles').insert(profileData);
+  // Enes Doğanay | 23 Mayıs 2026: onConflict:'id' ile duplicate-safe — aynı user tekrar gelirse row yoksayılır, mevcut profil bozulmaz
+  const { error } = await supabase.from('profiles').insert(profileData).onConflict('id').ignoreDuplicates();
   if (!error) {
     await supabase.from('consent_logs').insert({
       user_id: userId,

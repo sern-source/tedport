@@ -6,7 +6,9 @@
 -- Supabase Dashboard > SQL Editor'de bu dosyayı çalıştırın.
 
 -- Enes Doğanay | 25 Mayıs 2026: Return tipi değişti (slug eklendi) — önce drop gerekli
+-- Enes Doğanay | 23 Mayıs 2026: p_sector_names eklendi — ana_sektor tam eşleşme önceliği
 DROP FUNCTION IF EXISTS get_firmalar_seeded(float8,int,int,text[],text,boolean,text[],text[],text[],text[],text[]);
+DROP FUNCTION IF EXISTS get_firmalar_seeded(float8,int,int,text[],text,boolean,text[],text[],text[],text[],text[],text[]);
 
 CREATE OR REPLACE FUNCTION get_firmalar_seeded(
   p_seed            FLOAT8,       -- Oturum seed'i (0.0 - 1.0), sessionStorage'dan gelir
@@ -19,7 +21,8 @@ CREATE OR REPLACE FUNCTION get_firmalar_seeded(
   p_sector_keywords TEXT[],       -- getSektorKeywords() ile genişletilmiş sektör kelimeleri
   p_category_keywords TEXT[],     -- getSektorKeywords() ile genişletilmiş kategori kelimeleri
   p_istanbul_avrupa TEXT[],       -- ISTANBUL_AVRUPA sabiti (client'tan gelir)
-  p_istanbul_anadolu TEXT[]       -- ISTANBUL_ANADOLU sabiti (client'tan gelir)
+  p_istanbul_anadolu TEXT[],      -- ISTANBUL_ANADOLU sabiti (client'tan gelir)
+  p_sector_names     TEXT[]       -- Seçilen sektör adları (tam eşleşme için) — boşsa {}
 )
 RETURNS TABLE(
   "firmaID"         UUID,
@@ -72,7 +75,13 @@ BEGIN
           AND f.urun_kategorileri IS NOT NULL
           AND f.urun_kategorileri <> '' THEN 1
         ELSE 0
-      END) AS tier_score
+      END) AS tier_score,
+      -- Enes Doğanay | 23 Mayıs 2026: Sektör tam eşleşme skoru — ana_sektor = ANY(seçilen sektörler) ise 1
+      (CASE
+        WHEN array_length(p_sector_names, 1) IS NOT NULL
+          AND f.ana_sektor = ANY(p_sector_names) THEN 1
+        ELSE 0
+      END) AS sektor_match_score
     FROM firmalar f
     WHERE TRUE
 
@@ -187,6 +196,8 @@ BEGIN
     base.total_count
   FROM base
   ORDER BY
+    -- Enes Doğanay | 23 Mayıs 2026: Önce ana_sektor tam eşleşmesi, sonra tier, sonra seed'li random
+    base.sektor_match_score DESC,
     base.tier_score DESC,
     md5(base."firmaID"::text || p_seed::text)
   LIMIT p_limit

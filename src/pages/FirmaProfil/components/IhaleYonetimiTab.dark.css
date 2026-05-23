@@ -1568,3 +1568,120 @@
 [data-theme="dark"] .tom-cmp__plain-val  { color: #94a3b8; }
 [data-theme="dark"] .tom-cmp__fast-tag   { background: rgba(16,185,129,0.12); color: #34d399; }
 
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 23 Mayıs 2026: PANEL dark overrides
+   ═══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-info-card {
+  background: #1e293b;
+  border-color: rgba(51, 65, 85, 0.8);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+[data-theme="dark"] .tom-info-card__toggle:hover { background: rgba(15, 23, 42, 0.4); }
+[data-theme="dark"] .tom-info-card__title-row h2 { color: #f1f5f9; }
+[data-theme="dark"] .tom-info-card__desc { color: #94a3b8; border-left-color: rgba(59, 130, 246, 0.3); }
+[data-theme="dark"] .tom-info-card__chevron { background: #243447; color: #64748b; }
+[data-theme="dark"] .tom-info-card__files { border-top-color: rgba(51, 65, 85, 0.5); }
+[data-theme="dark"] .tom-info-card__files h4 { color: #64748b; }
+[data-theme="dark"] .tom-info-card__file-btn {
+  background: rgba(29, 78, 216, 0.15);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+[data-theme="dark"] .tom-info-card__file-btn:hover { background: rgba(29, 78, 216, 0.25); border-color: rgba(59, 130, 246, 0.35); }
+
+[data-theme="dark"] .tom-info-cell { background: rgba(15, 23, 42, 0.4); border-color: rgba(51, 65, 85, 0.5); }
+[data-theme="dark"] .tom-info-cell:hover { background: rgba(30, 58, 95, 0.3); border-color: rgba(59, 130, 246, 0.25); }
+[data-theme="dark"] .tom-info-cell .material-symbols-outlined { background: rgba(29, 78, 216, 0.2); }
+[data-theme="dark"] .tom-info-cell strong { color: #e2e8f0; }
+
+[data-theme="dark"] .tom-tag {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .tom-info-gereksinimler h4 { color: #94a3b8; }
+[data-theme="dark"] .tom-info-gereksinimler__wrap { border-color: rgba(51, 65, 85, 0.6); }
+[data-theme="dark"] .tom-info-gereksinimler__wrap thead { background: rgba(15, 23, 42, 0.5); }
+[data-theme="dark"] .tom-info-gereksinimler__wrap th { color: #475569; border-bottom-color: rgba(51, 65, 85, 0.5); }
+[data-theme="dark"] .tom-info-gereksinimler__wrap td { color: #cbd5e1; border-bottom-color: rgba(51, 65, 85, 0.3); }
+[data-theme="dark"] .tom-info-gereksinimler__wrap td strong { color: #f1f5f9; }
+[data-theme="dark"] .tom-info-gereksinimler__wrap tbody tr:nth-child(even) { background: rgba(15, 23, 42, 0.25); }
+
+[data-theme="dark"] .tom-offers-section { background: #1e293b; border-color: rgba(51, 65, 85, 0.8); }
+[data-theme="dark"] .tom-offers-toolbar__left h3 { color: #f1f5f9; }
+[data-theme="dark"] .tom-btn-icon { background: #243447; border-color: #334155; color: #64748b; }
+[data-theme="dark"] .tom-btn-icon:hover { background: #1e3a5f; border-color: rgba(59, 130, 246, 0.4); color: #93c5fd; }
+[data-theme="dark"] .tom-sort-trigger { background: #243447; border-color: #334155; }
+[data-theme="dark"] .tom-sort-label { color: #e2e8f0; }
+[data-theme="dark"] .tom-sort-menu { background: #1e293b; border-color: #334155; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4); }
+[data-theme="dark"] .tom-sort-option { color: #cbd5e1; }
+[data-theme="dark"] .tom-sort-option:hover { background: rgba(15, 23, 42, 0.5); }
+[data-theme="dark"] .tom-sort-option.active { color: #93c5fd; background: rgba(29, 78, 216, 0.15); }
+[data-theme="dark"] .tom-chip { background: #1e293b; border-color: #334155; color: #64748b; }
+[data-theme="dark"] .tom-chip:hover { background: rgba(29, 78, 216, 0.15); border-color: rgba(59, 130, 246, 0.35); color: #93c5fd; }
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 23 Mayıs 2026: ACTIONS dark overrides
+   ═══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-loading__spinner { border-color: #334155; border-top-color: #3b82f6; }
+[data-theme="dark"] .tom-empty .material-symbols-outlined { background: #243447; }
+[data-theme="dark"] .tom-empty h3 { color: #94a3b8; }
+
+[data-theme="dark"] .tom-link-copy-btn { background: rgba(29, 78, 216, 0.15); color: #93c5fd; border-color: rgba(59, 130, 246, 0.25); }
+[data-theme="dark"] .tom-link-copy-btn:hover { background: rgba(29, 78, 216, 0.25); }
+[data-theme="dark"] .tom-link-copy-btn--done { background: rgba(5, 150, 105, 0.15); color: #34d399; border-color: rgba(5, 150, 105, 0.3); }
+[data-theme="dark"] .tom-share-link-row { background: linear-gradient(135deg, rgba(29, 78, 216, 0.12), rgba(29, 78, 216, 0.08)); border-color: rgba(59, 130, 246, 0.25); }
+[data-theme="dark"] .tom-share-link-row__input { color: #93c5fd; }
+[data-theme="dark"] .tom-tender-actions { border-top-color: rgba(51, 65, 85, 0.5); }
+
+[data-theme="dark"] .tom-btn--edit { background: rgba(29, 78, 216, 0.12); color: #93c5fd; border-color: rgba(59, 130, 246, 0.2); }
+[data-theme="dark"] .tom-btn--edit:hover { background: #2563eb; border-color: #2563eb; color: #fff; }
+[data-theme="dark"] .tom-btn--edit:disabled { background: #1e293b; color: #475569; border-color: #334155; }
+[data-theme="dark"] .tom-btn--close-tender { background: rgba(180, 83, 9, 0.12); color: #fbbf24; border-color: rgba(180, 83, 9, 0.25); }
+[data-theme="dark"] .tom-btn--close-tender:hover { background: #d97706; border-color: #d97706; color: #fff; }
+[data-theme="dark"] .tom-btn--delete-tender { background: rgba(127, 29, 29, 0.12); color: #f87171; border-color: rgba(239, 68, 68, 0.2); }
+[data-theme="dark"] .tom-btn--delete-tender:hover { background: #ef4444; border-color: #ef4444; color: #fff; }
+[data-theme="dark"] .tom-btn--complete-tender { background: rgba(5, 150, 105, 0.12); color: #34d399; border-color: rgba(5, 150, 105, 0.2); }
+[data-theme="dark"] .tom-btn--complete-tender:hover { background: #16a34a; border-color: #16a34a; color: #fff; }
+[data-theme="dark"] .tom-confirm-inline { background: rgba(120, 53, 15, 0.25); border-color: rgba(251, 191, 36, 0.3); color: #fbbf24; }
+[data-theme="dark"] .tom-confirm-inline--success { background: rgba(5, 150, 105, 0.15); border-color: rgba(52, 211, 153, 0.3); color: #34d399; }
+[data-theme="dark"] .tom-btn--cancel-sm { background: #243447; color: #64748b; border-color: #334155; }
+[data-theme="dark"] .tom-btn--cancel-sm:hover { background: #334155; color: #e2e8f0; }
+
+/* ═══════════════════════════════════════════════════
+   Enes Doğanay | 23 Mayıs 2026: MODALS dark overrides
+   ═══════════════════════════════════════════════════ */
+[data-theme="dark"] .tom-edit-modal { background: #1e293b; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+[data-theme="dark"] .tom-edit-modal__header {
+  background: linear-gradient(135deg, #1e293b, #162033);
+  border-bottom-color: rgba(51, 65, 85, 0.8);
+}
+[data-theme="dark"] .tom-edit-modal__header h2 { color: #f1f5f9; }
+[data-theme="dark"] .tom-edit-modal__header h2 .material-symbols-outlined { background: rgba(29, 78, 216, 0.2); }
+[data-theme="dark"] .tom-edit-modal__close { background: #243447; color: #94a3b8; }
+[data-theme="dark"] .tom-edit-modal__close:hover { background: #334155; color: #f1f5f9; }
+[data-theme="dark"] .tom-edit-error { background: rgba(127, 29, 29, 0.2); border-color: rgba(239, 68, 68, 0.3); }
+[data-theme="dark"] .tom-edit-section h3 { color: #94a3b8; border-bottom-color: rgba(51, 65, 85, 0.6); }
+[data-theme="dark"] .tom-edit-field input,
+[data-theme="dark"] .tom-edit-field select,
+[data-theme="dark"] .tom-edit-field textarea {
+  background: #162032;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+[data-theme="dark"] .tom-edit-field input:focus,
+[data-theme="dark"] .tom-edit-field select:focus,
+[data-theme="dark"] .tom-edit-field textarea:focus { background: #1e293b; border-color: #3b82f6; }
+[data-theme="dark"] .tom-edit-req-input input { background: #162032; border-color: #334155; color: #e2e8f0; }
+[data-theme="dark"] .tom-edit-req-input input:focus { background: #1e293b; border-color: #3b82f6; }
+[data-theme="dark"] .tom-edit-req-row { background: rgba(15, 23, 42, 0.4); border-color: rgba(51, 65, 85, 0.5); }
+[data-theme="dark"] .tom-edit-req-row:hover { border-color: rgba(59, 130, 246, 0.25); }
+[data-theme="dark"] .tom-edit-req-num { background: rgba(29, 78, 216, 0.2); color: #93c5fd; }
+[data-theme="dark"] .tom-edit-req-madde { color: #e2e8f0; }
+[data-theme="dark"] .tom-edit-req-remove { background: rgba(127, 29, 29, 0.2); color: #f87171; }
+[data-theme="dark"] .tom-edit-req-remove:hover { background: rgba(127, 29, 29, 0.35); }
+[data-theme="dark"] .tom-edit-modal__footer { background: #162032; border-top-color: rgba(51, 65, 85, 0.6); }
+[data-theme="dark"] .tom-btn--cancel { background: #243447; color: #94a3b8; border-color: #334155; }
+[data-theme="dark"] .tom-btn--cancel:hover { background: #334155; color: #e2e8f0; border-color: #475569; }
+

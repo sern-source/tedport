@@ -9,6 +9,99 @@
     gap: 24px;
 }
 
+/* ─── Hero Banner ─── */
+/* Enes Doğanay | 23 Mayıs 2026: Analitik hero — diğer sayfalarla aynı sistem (notif-hero, tv-hero) */
+.fdb-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #4338ca 100%);
+    border-radius: 14px;
+    padding: 14px 20px;
+}
+
+.fdb-hero__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.fdb-hero__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.fdb-hero__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.fdb-hero__icon .material-symbols-outlined { font-size: 22px; color: #fff; }
+.fdb-hero__title h2 { font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 2px; }
+.fdb-hero__title p  { font-size: 0.76rem; color: rgba(255, 255, 255, 0.6); margin: 0; }
+
+.fdb-hero__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fdb-hero__kpis {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fdb-kpi {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 7px 13px;
+    min-width: 52px;
+}
+
+.fdb-kpi__value { font-size: 0.92rem; font-weight: 800; color: #fff; line-height: 1; }
+.fdb-kpi__label { font-size: 0.65rem; color: rgba(255, 255, 255, 0.55); margin-top: 3px; white-space: nowrap; }
+
+.fdb-kpi--views .fdb-kpi__value   { color: #a5f3fc; }
+.fdb-kpi--tenders .fdb-kpi__value { color: #6ee7b7; }
+.fdb-kpi--offers .fdb-kpi__value  { color: #fde68a; }
+
+.fdb-hero__actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Butonlar hero içinde şeffaf/beyaz görünüm */
+.fdb-hero .fdb-btn-extended {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e0e7ff;
+}
+.fdb-hero .fdb-btn-extended:hover {
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.fdb-hero .fdb-print-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+}
+.fdb-hero .fdb-print-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+
 /* ─── Header ─── */
 .fdb-header {
     display: flex;
@@ -413,6 +506,9 @@
 [data-theme="dark"] .fdb-section-badge { color: #60a5fa; background: rgba(59,130,246,0.12); }
 [data-theme="dark"] .fdb-header-title .material-symbols-outlined { color: #60a5fa; }
 
+/* Enes Doğanay | 23 Mayıs 2026: Hero dark mode — gradient zaten koyu, sadece hafif dimle */
+[data-theme="dark"] .fdb-hero { filter: brightness(0.92); }
+
 [data-theme="dark"] .fdb-chart-bar-wrap { background: rgba(255,255,255,0.05); }
 [data-theme="dark"] .fdb-chart-bar { background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); }
 
@@ -451,6 +547,10 @@
 /* Enes Doğanay | 14 Mayıs 2026: 768px — tablet geçiş */
 @media (max-width: 768px) {
     .fdb-root { padding: 20px 16px 32px; }
+    .fdb-hero { padding: 12px 14px; }
+    .fdb-hero__inner { gap: 10px; }
+    .fdb-hero__right { gap: 8px; width: 100%; justify-content: space-between; }
+    .fdb-hero__kpis { gap: 6px; }
     .fdb-header-title { font-size: 1.1rem; }
     .fdb-section-header { padding: 11px 14px; font-size: 0.8rem; }
     .fdb-top-tender-row { gap: 8px; }
@@ -495,303 +595,4 @@
     .fdb-top-tender-count { min-width: 18px; font-size: 0.75rem; }
     .fdb-top-tender-name { font-size: 0.73rem; }
     .fdb-top-tender-rank { font-size: 0.65rem; min-width: 18px; }
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   Enes Doğanay | 23 Mayıs 2026: Tamamlanan İhaleler Raporu stilleri
-═══════════════════════════════════════════════════════════════════ */
-
-/* ─── Tamamlandi pill — kliklenilebilir ─── */
-.fdb-status-pill--clickable {
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-}
-.fdb-status-pill--clickable:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(20, 184, 166, 0.22);
-    border-color: rgba(20, 184, 166, 0.45) !important;
-}
-.fdb-status-pill--active {
-    box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.3);
-    border-color: rgba(20, 184, 166, 0.55) !important;
-}
-.fdb-pill-chevron {
-    font-size: 0.82rem !important;
-    vertical-align: middle;
-    margin-left: 1px;
-    line-height: 1;
-    display: inline-flex;
-}
-
-/* ─── Rapor section — slide-down animasyonu ─── */
-.fdb-completed-report {
-    animation: fdbSlideDown 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-}
-@keyframes fdbSlideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ─── Kapat butonu ─── */
-.fdb-report-close {
-    margin-left: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 0.71rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 3px 8px 3px 5px;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-.fdb-report-close:hover {
-    background: var(--bg-light);
-    color: var(--text-dark);
-    border-color: rgba(37, 99, 235, 0.25);
-}
-.fdb-report-close .material-symbols-outlined { font-size: 0.88rem; }
-
-/* ─── Özet metrik satırı ─── */
-.fdb-report-summary {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-bottom: 18px;
-    margin-bottom: 18px;
-    border-bottom: 1px solid var(--border);
-}
-.fdb-report-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    padding: 10px 18px;
-    background: var(--bg-light);
-    border-radius: 10px;
-    min-width: 96px;
-    flex: 1;
-    text-align: center;
-}
-.fdb-report-stat .material-symbols-outlined { font-size: 1rem; color: #2563eb; }
-.fdb-report-stat--spend .material-symbols-outlined { color: #16a34a; }
-.fdb-report-stat-val {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--text-dark);
-    line-height: 1.2;
-    letter-spacing: -0.3px;
-}
-.fdb-report-stat-lbl {
-    font-size: 0.63rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.35px;
-}
-
-/* ─── İki kolonlu grid ─── */
-.fdb-report-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-.fdb-report-col-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-bottom: 10px;
-}
-.fdb-report-col-title .material-symbols-outlined { font-size: 0.92rem; color: #2563eb; }
-
-/* ─── İhale kartı ─── */
-.fdb-report-tender-item {
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    margin-bottom: 8px;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.fdb-report-tender-item:last-child { margin-bottom: 0; }
-.fdb-report-tender-item:hover {
-    border-color: rgba(37, 99, 235, 0.22);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
-}
-.fdb-report-tender-head {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-    flex-wrap: wrap;
-}
-.fdb-report-tender-name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    flex: 1;
-    min-width: 0;
-}
-.fdb-report-tender-cat {
-    font-size: 0.62rem;
-    font-weight: 700;
-    color: #7c3aed;
-    background: rgba(124, 58, 237, 0.08);
-    padding: 2px 7px;
-    border-radius: 999px;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-.fdb-report-offer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-.fdb-report-offer-firm {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.71rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    min-width: 0;
-}
-.fdb-report-offer-firm .material-symbols-outlined { font-size: 0.78rem; }
-.fdb-report-offer-amount {
-    margin-left: auto;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #16a34a;
-    white-space: nowrap;
-}
-.fdb-report-kdv {
-    font-size: 0.61rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    margin-left: 3px;
-}
-.fdb-report-no-offer {
-    font-size: 0.67rem;
-    color: var(--text-muted);
-    font-style: italic;
-}
-
-/* ─── Ürün listesi ─── */
-.fdb-report-product-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-}
-.fdb-report-product-row:last-child { border-bottom: none; }
-.fdb-report-product-rank {
-    font-size: 0.65rem;
-    font-weight: 800;
-    color: var(--text-muted);
-    min-width: 18px;
-    text-align: center;
-}
-.fdb-report-product-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-.fdb-report-product-name {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-dark);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.fdb-report-product-price {
-    font-size: 0.64rem;
-    color: var(--text-muted);
-}
-.fdb-report-product-qty {
-    font-size: 0.74rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-/* ─── Loading state ─── */
-.fdb-report-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 36px 0;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-}
-.fdb-report-spin {
-    color: #0d9488;
-    animation: fdbSpin 1s linear infinite;
-}
-@keyframes fdbSpin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-
-/* ─── Empty state ─── */
-.fdb-report-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 36px 0;
-    color: var(--text-muted);
-    font-size: 0.79rem;
-    text-align: center;
-}
-.fdb-report-empty .material-symbols-outlined {
-    font-size: 2rem;
-    color: #0d9488;
-    opacity: 0.45;
-}
-
-/* ─── Dark mode ─── */
-[data-theme="dark"] .fdb-status-pill--clickable:hover {
-    box-shadow: 0 4px 14px rgba(45, 212, 191, 0.14);
-}
-[data-theme="dark"] .fdb-status-pill--active {
-    box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.25);
-}
-[data-theme="dark"] .fdb-report-close:hover { background: var(--bg-light); }
-[data-theme="dark"] .fdb-report-stat { background: var(--bg-light); }
-[data-theme="dark"] .fdb-report-stat .material-symbols-outlined { color: #60a5fa; }
-[data-theme="dark"] .fdb-report-stat--spend .material-symbols-outlined { color: #4ade80; }
-[data-theme="dark"] .fdb-report-col-title .material-symbols-outlined { color: #60a5fa; }
-[data-theme="dark"] .fdb-report-tender-cat { color: #a78bfa; background: rgba(139, 92, 246, 0.12); }
-[data-theme="dark"] .fdb-report-offer-amount { color: #4ade80; }
-[data-theme="dark"] .fdb-report-product-row { border-color: var(--border); }
-[data-theme="dark"] .fdb-report-spin { color: #2dd4bf; }
-[data-theme="dark"] .fdb-report-empty .material-symbols-outlined { color: #2dd4bf; }
-
-/* ─── Responsive ─── */
-@media (max-width: 768px) {
-    .fdb-report-grid { grid-template-columns: 1fr; gap: 16px; }
-    .fdb-report-summary { gap: 8px; }
-    .fdb-report-stat { min-width: 80px; padding: 8px 12px; }
-}
-@media (max-width: 480px) {
-    .fdb-report-stat { padding: 7px 10px; min-width: 68px; }
-    .fdb-report-stat-val { font-size: 0.92rem; }
-    .fdb-report-tender-item { padding: 8px 10px; }
-    .fdb-report-tender-name { font-size: 0.73rem; }
-    .fdb-report-offer-amount { font-size: 0.73rem; }
-    .fdb-report-product-name { font-size: 0.72rem; }
 }

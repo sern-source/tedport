@@ -44,6 +44,19 @@ const SEKTOR_DESCRIPTIONS = {
     'Bilişim, Yazılım ve BT Çözümleri': 'Bilişim ve yazılım ihaleleri — sunucu, lisans, yazılım geliştirme ve BT hizmetleri.',
     'Güvenlik Sistemleri ve Teknolojileri': 'Güvenlik sistemleri ihaleleri — kamera, alarm, erişim kontrol ve güvenlik yazılımları.',
     'Endüstriyel ve Kurumsal Hizmetler': 'Endüstriyel ve kurumsal hizmet ihaleleri — bakım, onarım, temizlik ve dış kaynak hizmetleri.',
+    // Enes Doğanay | 23 Mayıs 2026: 12 yeni sektör SEO açıklamaları
+    'Cam ve Cam Ürünleri': 'Cam ve cam ürünleri ihaleleri — düz cam, cam şişe, cam elyaf, temperli cam ve endüstriyel cam alımları.',
+    'Seramik, Porselen ve Refrakter Malzemeler': 'Seramik ve refrakter malzeme ihaleleri — fayans, sıhhi tesisat, ateşe dayanıklı tuğla ve porselen alımları.',
+    'Ahşap, Orman Ürünleri ve Mobilya': 'Ahşap ve mobilya ihaleleri — kereste, kontrplak, MDF, sunta, parke ve mobilya alımları.',
+    'Kağıt, Karton ve Baskı Sanayi': 'Kağıt ve baskı sanayi ihaleleri — ofset kağıdı, kraft, karton, gazete kağıdı ve baskı malzemeleri.',
+    'Tarım, Hayvancılık ve Tarımsal Teknolojiler': 'Tarım ve hayvancılık ihaleleri — tohum, gübre, tarım makineleri, sulama sistemleri ve yem alımları.',
+    'Madencilik ve Mineral İşleme': 'Madencilik ve mineral işleme ihaleleri — mermer, granit, bor, krom, bakır ve maden ekipmanı alımları.',
+    'Boya, Vernik ve Yüzey Kaplama Sistemleri': 'Boya ve yüzey kaplama ihaleleri — endüstriyel boya, epoksi, toz boya, vernik ve kaplama sistemleri.',
+    'Petrol, Doğalgaz ve Petrokimya': 'Petrol ve doğalgaz ihaleleri — boru, vana, sondaj ekipmanı, LPG, rafine ürün ve petrokimya alımları.',
+    'Savunma ve Havacılık Sanayi': 'Savunma ve havacılık sanayi ihaleleri — askeri ekipman, uçak parçaları, insansız hava aracı ve sistemleri.',
+    'Denizcilik, Gemi ve Su Araçları': 'Denizcilik ve gemi sanayi ihaleleri — tekne, yat, deniz ekipmanları, liman ve tersane malzemeleri.',
+    'İlaç, Eczacılık ve Biyoteknoloji': 'İlaç ve biyoteknoloji ihaleleri — API hammadde, ilaç makineleri, laboratuvar ürünleri ve sarf malzemeleri.',
+    'Çevre Teknolojileri ve Atık Yönetimi': 'Çevre ve atık yönetimi ihaleleri — su arıtma, atık işleme, hava filtrasyonu ve geri dönüşüm ekipmanları.',
 };
 
 export const getSektorDescription = (sektorAdi) =>

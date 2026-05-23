@@ -1,0 +1,171 @@
+/* Enes Doğanay | 23 Mayıs 2026: PDF / baskı stilleri */
+
+/* ─── Print styles ─── */
+/* Enes Doğanay | 23 Mayıs 2026: margin üst 0 — table-header-group header tekrarını sağlar; yanlar 16mm sayfa marjini */
+@page {
+    size: A4;
+    margin: 0 16mm 12mm 16mm;
+
+    @top-left   { content: ''; }
+    @top-center { content: ''; }
+    @top-right  { content: ''; }
+    @bottom-left   { content: ''; }
+    @bottom-center { content: ''; }
+    @bottom-right  {
+        content: 'Sayfa ' counter(page) ' / ' counter(pages);
+        font-size: 7.5pt;
+        color: #94a3b8;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+}
+
+/* Enes Doğanay | 23 Mayıs 2026: Baskıda gizlenecek UI öğeleri */
+@media print {
+    body { margin: 0 !important; }
+
+    /* Enes Doğanay | 23 Mayıs 2026: PDF her zaman açık tema — dark mode JS ile kaldırılır ama CSS fallback da var */
+    [data-theme="dark"] .fdb-print-wrap,
+    [data-theme="dark"] .fdb-root,
+    [data-theme="dark"] .fdb-section,
+    [data-theme="dark"] .fdb-metrics-grid,
+    [data-theme="dark"] .fdb-print-header-inner { filter: none !important; }
+
+    /* Arka plan rengi/gradyan baskıya geçsin */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    /* Navigasyon, geri butonu, sidebar, chatbot, filtre butonları */
+    .shared-header,
+    .fp-back-bar,
+    .sidebar,
+    .cb-fab,
+    .fdb-filter-bar,
+    .fdb-btn-extended,
+    .fdb-print-btn,
+    .fdb-report-close,
+    .fdb-header-actions,
+    .fdb-hero { display: none !important; }
+
+    /* ─ Native <table> → <thead> mekanizması: Chrome native table öğesini her sayfada kesinlikle tekrar eder ─ */
+    .fdb-print-wrap { display: table !important; width: 100%; table-layout: fixed; border-collapse: collapse; }
+    .fdb-print-wrap > thead { display: table-header-group !important; }
+    .fdb-print-wrap > tbody { display: table-row-group !important; }
+    .fdb-print-wrap tr { display: table-row !important; }
+    .fdb-print-wrap td { display: table-cell !important; padding: 0 !important; border: none !important; vertical-align: top !important; }
+    .fdb-print-header-inner {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4mm 0 !important;
+        border-bottom: 0.5px solid #e2e8f0 !important;
+        background: white !important;
+        width: 100%;
+    }
+
+    /* İçerik: display:table → header-group ile uyumlu tablo yapısı; @page margin yanları ve altı sağlar */
+    .fdb-root {
+        display: table !important;
+        table-layout: fixed;
+        width: 100%;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+        gap: 0 !important;
+    }
+
+    /* Bölümler: bölünürsek büyük boşluk kalmasın; başlık + ilk öğe birlikte kalsın */
+    .fdb-section {
+        box-shadow: none !important;
+        overflow: visible !important;
+        width: 100% !important;
+        /* Enes Doğanay | 23 Mayıs 2026: Her seksiyon bloğu kendi içinde bölünmez */
+        break-inside: avoid;
+    }
+
+    /* Enes Doğanay | 23 Mayıs 2026: 2-kolonlu grid baskıda tek kolona düşer — her section birlikte akar */
+    .fdb-sections {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    /* Enes Doğanay | 23 Mayıs 2026: Metrik kartlar satırı bölünmez */
+    .fdb-metrics-grid { break-inside: avoid; }
+
+    /* Bölüm başlığı ile ilk içeriği birbirinden ayrılmasın */
+    .fdb-section-header { break-after: avoid; }
+    .fdb-section-header + * { break-before: avoid; }
+
+    /* Liste satırları ortasından bölünmesin */
+    .fdb-visitor-row,
+    .fdb-top-tender-row,
+    .fdb-offer-funnel-row,
+    .fdb-cat-row,
+    .fdb-month-col,
+    .fdb-status-pill { break-inside: avoid; }
+
+    /* Enes Doğanay | 23 Mayıs 2026: Sektör kıyaslaması kutusu bölünmesin; verdict ayrı sayfaya geçmesin */
+    .fdb-benchmark { break-inside: avoid; }
+    .fdb-benchmark-verdict { break-before: avoid; }
+
+    /* Enes Doğanay | 23 Mayıs 2026: Tamamlanan rapor — tüm blok bölünmez, grid layout korunur */
+    .fdb-completed-report { break-inside: avoid; }
+    .fdb-report-grid { break-inside: avoid; }
+    .fdb-report-col { break-inside: avoid; }
+    .fdb-report-col-title { break-after: avoid; }
+    .fdb-report-tender-item { break-inside: avoid; }
+    .fdb-report-product-row { break-inside: avoid; }
+    .fdb-report-summary { break-inside: avoid; }
+
+    /* Chart — bar renkleri baskıda görünsün */
+    .fdb-chart-bar      { background: #2563eb !important; }
+    .fdb-chart-bar-wrap { background: #e2e8f0 !important; }
+
+    /* Sayfa content alanı tam genişlik */
+    .page, main.content { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+}
+
+/* ─── Print wrap: ekranda şeffaf, baskıda native table — Enes Doğanay | 23 Mayıs 2026 ─── */
+.fdb-print-wrap { display: block; width: 100%; }
+.fdb-print-wrap > thead { display: none; }
+.fdb-print-wrap > tbody,
+.fdb-print-wrap > tbody > tr,
+.fdb-print-wrap > tbody > tr > td { display: block; padding: 0; border: none; }
+.fdb-print-header-img {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.fdb-print-header-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-align: center;
+}
+.fdb-print-header-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+/* Enes Doğanay | 23 Mayıs 2026: Rapor dönemi alt başlığı */
+.fdb-print-header-sub {
+    font-size: 0.67rem;
+    font-weight: 500;
+    color: #2563eb;
+    letter-spacing: 0.02em;
+}
+.fdb-print-header-date {
+    font-size: 0.72rem;
+    color: #64748b;
+    white-space: nowrap;
+    flex-shrink: 0;
+}

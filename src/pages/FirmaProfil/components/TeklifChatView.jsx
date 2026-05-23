@@ -27,7 +27,7 @@ const TeklifChatView = ({
   setReportNeden,
   setReportAciklama,
 }) => {
-  const isIncoming = incomingQuotes.some((iq) => iq.id === q.id);
+  const isIncoming = incomingQuotes?.some((iq) => iq.id === q.id) ?? false;
   const isClosed = q.durum === 'closed' || q.durum === 'rejected';
 
   // Enes Doğanay | 7 Mayıs 2026: Mesajları SharedChatModal formatına normalize et

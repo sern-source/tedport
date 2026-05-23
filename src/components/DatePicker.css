@@ -465,6 +465,39 @@
     font-size: 0.8rem;
 }
 
+/* Enes Doğanay | 23 Mayıs 2026: DatePicker mobil responsive */
+@media (max-width: 480px) {
+    .dp-panel {
+        border-radius: 12px;
+    }
+    .dp-header {
+        padding: 6px 8px;
+    }
+    .dp-grid {
+        padding: 4px 6px 2px;
+    }
+    .dp-day {
+        font-size: 0.72rem;
+        min-height: 36px;
+    }
+    .dp-nav {
+        width: 32px;
+        height: 32px;
+    }
+    .dp-year-btn {
+        padding: 8px 4px;
+        font-size: 0.82rem;
+        min-height: 40px;
+    }
+    .dp-footer {
+        padding: 6px 8px 8px;
+    }
+    .dp-footer-clear,
+    .dp-footer-today {
+        padding: 5px 10px;
+    }
+}
+
 /* ═══════════════════════════════════ */
 /*  Dark mode — blue (default)        */
 /* ═══════════════════════════════════ */

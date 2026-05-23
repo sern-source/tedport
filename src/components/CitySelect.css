@@ -274,3 +274,17 @@
 [data-theme="dark"] .city-select-empty {
   color: #64748b;
 }
+
+/* Enes Doğanay | 23 Mayıs 2026: CitySelect mobil responsive */
+@media (max-width: 480px) {
+  .city-select-list {
+    max-height: 40vh;
+  }
+  .city-select-option {
+    padding: 9px 12px;
+    font-size: 0.82rem;
+  }
+  .city-select-option-icon {
+    font-size: 18px;
+  }
+}

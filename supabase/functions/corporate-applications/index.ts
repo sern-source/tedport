@@ -176,7 +176,7 @@ const renderReviewEmail = ({ application, decision, actionLink, reviewNote }: {
         <!-- FOOTER -->
         <tr>
           <td align="center" style="padding:20px 0 0 0;">
-            <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#94a3b8;">Tedport Teknoloji A.S. &nbsp;|&nbsp; <a href="https://tedport.com" style="color:#94a3b8; text-decoration:none;">tedport.com</a></p>
+            <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#94a3b8;">Tedport &nbsp;|&nbsp; <a href="https://tedport.com" style="color:#94a3b8; text-decoration:none;">tedport.com</a></p>
             <p style="margin:6px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#cbd5e1;">Sorulariniz icin <a href="mailto:info@tedport.com" style="color:#94a3b8;">info@tedport.com</a> adresine yazabilirsiniz.</p>
           </td>
         </tr>

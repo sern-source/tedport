@@ -41,7 +41,7 @@ const HizmetSartlari = () => {
                         <section className="kvkk-section">
                             <h2>1. Taraflar ve Kapsam</h2>
                             <p>
-                                Bu Hizmet Şartları, <strong>Tedport Teknoloji A.Ş.</strong> ("Tedport" veya "Biz") ile Tedport platformunu kullanan
+                                Bu Hizmet Şartları, <strong>Tedport</strong> ("Biz") ile Tedport platformunu kullanan
                                 gerçek veya tüzel kişiler ("Kullanıcı") arasındaki hukuki ilişkiyi düzenlemektedir.
                             </p>
                             <p>

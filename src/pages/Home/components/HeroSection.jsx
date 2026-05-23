@@ -77,15 +77,14 @@ const HeroSection = ({
                                     }}
                                 />
                                 {searchTerm.length > 0 && (
-                                    // Enes Doğanay | 8 Mayıs 2026: role=button + klavye desteği — DatePicker/CitySelect ile aynı pattern
+                                    // Enes Doğanay | 23 Mayıs 2026: onMouseDown+preventDefault — input focus kaymadan X çalışır
                                     <span
                                         className="material-symbols-outlined sc-search-clear"
-                                        onClick={handleClearSearch}
+                                        onMouseDown={(e) => { e.preventDefault(); handleClearSearch(); }}
                                         role="button"
                                         tabIndex={0}
                                         aria-label="Aramayı temizle"
                                         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClearSearch(); }}
-                                        style={{ cursor: 'pointer', color: '#94a3b8', fontSize: '20px', marginLeft: '4px' }}
                                     >close</span>
                                 )}
                             </div>

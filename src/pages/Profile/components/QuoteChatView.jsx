@@ -93,7 +93,7 @@ const QuoteChatView = ({
                   </thead>
                   <tbody>
                     {activeQuote.kalemler.map((k, i) => (
-                      <tr key={i}>
+                      <tr key={`${k.madde || 'kalem'}-${i}`}>
                         <td>{i + 1}</td>
                         <td>{k.adet}{k.birim && <span className="qcv-birim-badge">{k.birim}</span>}</td>
                         <td><strong>{k.madde}</strong></td>

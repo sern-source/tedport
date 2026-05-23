@@ -2,70 +2,70 @@ import { createAdminClient } from "../_shared/supabaseAdmin.ts";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
 const isAuthorizedRequest = (request: Request) => {
-    const requestSecret = request.headers.get("X-Edge-Function-Secret");
-    const expectedSecret = Deno.env.get("EDGE_FUNCTION_SECRET");
+  const requestSecret = request.headers.get("X-Edge-Function-Secret");
+  const expectedSecret = Deno.env.get("EDGE_FUNCTION_SECRET");
 
-    if (!expectedSecret) {
-        return true;
-    }
+  if (!expectedSecret) {
+    return true;
+  }
 
-    return requestSecret === expectedSecret;
+  return requestSecret === expectedSecret;
 };
 
 const sendReminderEmail = async (
-    { to, subject, html }: { to: string; subject: string; html: string },
+  { to, subject, html }: { to: string; subject: string; html: string },
 ) => {
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL");
+  const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  const fromEmail = Deno.env.get("REMINDER_FROM_EMAIL");
 
-    if (!resendApiKey || !fromEmail) {
-        throw new Error("RESEND_API_KEY veya REMINDER_FROM_EMAIL eksik.");
-    }
+  if (!resendApiKey || !fromEmail) {
+    throw new Error("RESEND_API_KEY veya REMINDER_FROM_EMAIL eksik.");
+  }
 
-    const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            from: fromEmail,
-            to: [to],
-            subject,
-            html,
-        }),
-    });
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromEmail,
+      to: [to],
+      subject,
+      html,
+    }),
+  });
 
-    if (!response.ok) {
-        throw new Error(await response.text());
-    }
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
 };
 
 const renderReminderEmail = (
-    { reminder, detailUrl }: {
-        reminder: Record<string, unknown>;
-        detailUrl: string;
-    },
+  { reminder, detailUrl }: {
+    reminder: Record<string, unknown>;
+    detailUrl: string;
+  },
 ) => {
-    const reminderDate = new Date(String(reminder.reminder_at || ""));
-    const formattedDate = `${reminderDate.toLocaleDateString("tr-TR")} ${
-        reminderDate.toLocaleTimeString("tr-TR", {
-            hour: "2-digit",
-            minute: "2-digit",
-        })
-    }`;
-    const safe = (s: unknown) =>
-        String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
-            />/g,
-            "&gt;",
-        ).replace(/"/g, "&quot;");
-    const safeTitle = safe(reminder.note_title || "Hatırlatma Notu");
-    const safeBody = safe(
-        reminder.note_body || "Hatırlatma içeriği bulunmuyor.",
-    );
-    const safeUrl = detailUrl;
+  const reminderDate = new Date(String(reminder.reminder_at || ""));
+  const formattedDate = `${reminderDate.toLocaleDateString("tr-TR")} ${
+    reminderDate.toLocaleTimeString("tr-TR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }`;
+  const safe = (s: unknown) =>
+    String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(
+      />/g,
+      "&gt;",
+    ).replace(/"/g, "&quot;");
+  const safeTitle = safe(reminder.note_title || "Hatırlatma Notu");
+  const safeBody = safe(
+    reminder.note_body || "Hatırlatma içeriği bulunmuyor.",
+  );
+  const safeUrl = detailUrl;
 
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="tr" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <meta charset="UTF-8">
@@ -185,7 +185,7 @@ const renderReminderEmail = (
         <!-- FOOTER -->
         <tr>
           <td align="center" style="padding:20px 0 0 0;">
-            <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#94a3b8;">Tedport Teknoloji A.S. &nbsp;|&nbsp; <a href="https://tedport.com" style="color:#94a3b8; text-decoration:none;">tedport.com</a></p>
+            <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#94a3b8;">Tedport &nbsp;|&nbsp; <a href="https://tedport.com" style="color:#94a3b8; text-decoration:none;">tedport.com</a></p>
             <p style="margin:6px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#cbd5e1;">Bu mail hesabinizda kayıtlı olan hatırlatıcı nedeniyle gönderilmiştir.</p>
           </td>
         </tr>
@@ -199,102 +199,102 @@ const renderReminderEmail = (
 };
 
 Deno.serve(async (request) => {
-    if (request.method === "OPTIONS") {
-        return new Response("ok", { headers: corsHeaders });
-    }
+  if (request.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
-    if (request.method !== "POST") {
-        return jsonResponse({ error: "Method not allowed" }, 405);
-    }
+  if (request.method !== "POST") {
+    return jsonResponse({ error: "Method not allowed" }, 405);
+  }
 
-    if (!isAuthorizedRequest(request)) {
-        return jsonResponse({ error: "Unauthorized" }, 401);
-    }
+  if (!isAuthorizedRequest(request)) {
+    return jsonResponse({ error: "Unauthorized" }, 401);
+  }
 
-    const supabaseAdmin = createAdminClient();
-    const now = new Date().toISOString();
-    const appBaseUrl = Deno.env.get("APP_BASE_URL") || "http://localhost:5173";
+  const supabaseAdmin = createAdminClient();
+  const now = new Date().toISOString();
+  const appBaseUrl = Deno.env.get("APP_BASE_URL") || "https://www.tedport.com";
 
-    const { data: dueReminders, error: remindersError } = await supabaseAdmin
+  const { data: dueReminders, error: remindersError } = await supabaseAdmin
+    .from("kullanici_hatirlaticilari")
+    .select("*")
+    .eq("status", "pending")
+    .lte("reminder_at", now)
+    .order("reminder_at", { ascending: true })
+    .limit(50);
+
+  if (remindersError) {
+    return jsonResponse({ error: remindersError.message }, 500);
+  }
+
+  const results: Array<Record<string, unknown>> = [];
+
+  for (const reminder of dueReminders || []) {
+    try {
+      const detailUrl = `${appBaseUrl}/firmadetay/${
+        encodeURIComponent(String(reminder.firma_id || ""))
+      }`;
+      await sendReminderEmail({
+        to: String(reminder.reminder_email || ""),
+        subject: `Tedport Hatırlatma: ${
+          String(reminder.note_title || "Notunuz")
+        }`,
+        html: renderReminderEmail({ reminder, detailUrl }),
+      });
+
+      await supabaseAdmin.from("bildirimler").insert([{
+        user_id: reminder.user_id,
+        type: "reminder",
+        // Enes Doğanay | 8 Nisan 2026: Site bildirimi not içeriğine odaklı olarak güncellendi
+        title: `Not Hatırlatması: ${
+          String(reminder.note_title || "İsimsiz Not")
+        }`,
+        message: String(reminder.note_body || "").slice(0, 200) ||
+          "Hatırlatma zamanı geldi.",
+        firma_id: reminder.firma_id,
+        note_id: reminder.note_id,
+        reminder_id: reminder.id,
+        is_read: false,
+        metadata: {
+          reminder_at: reminder.reminder_at,
+          reminder_email: reminder.reminder_email,
+          note_title: reminder.note_title,
+          note_body: String(reminder.note_body || "").slice(0, 300),
+        },
+      }]);
+
+      await supabaseAdmin
         .from("kullanici_hatirlaticilari")
-        .select("*")
-        .eq("status", "pending")
-        .lte("reminder_at", now)
-        .order("reminder_at", { ascending: true })
-        .limit(50);
+        .update({
+          status: "sent",
+          sent_at: now,
+          email_error: null,
+          updated_at: now,
+        })
+        .eq("id", reminder.id);
 
-    if (remindersError) {
-        return jsonResponse({ error: remindersError.message }, 500);
+      results.push({ id: reminder.id, status: "sent" });
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "Bilinmeyen hata";
+      await supabaseAdmin
+        .from("kullanici_hatirlaticilari")
+        .update({
+          status: "failed",
+          failed_at: now,
+          email_error: errorMessage,
+          updated_at: now,
+        })
+        .eq("id", reminder.id);
+
+      results.push({
+        id: reminder.id,
+        status: "failed",
+        error: errorMessage,
+      });
     }
+  }
 
-    const results: Array<Record<string, unknown>> = [];
-
-    for (const reminder of dueReminders || []) {
-        try {
-            const detailUrl = `${appBaseUrl}/firmadetay/${
-                encodeURIComponent(String(reminder.firma_id || ""))
-            }`;
-            await sendReminderEmail({
-                to: String(reminder.reminder_email || ""),
-                subject: `Tedport Hatırlatma: ${
-                    String(reminder.note_title || "Notunuz")
-                }`,
-                html: renderReminderEmail({ reminder, detailUrl }),
-            });
-
-            await supabaseAdmin.from("bildirimler").insert([{
-                user_id: reminder.user_id,
-                type: "reminder",
-                // Enes Doğanay | 8 Nisan 2026: Site bildirimi not içeriğine odaklı olarak güncellendi
-                title: `Not Hatırlatması: ${
-                    String(reminder.note_title || "İsimsiz Not")
-                }`,
-                message: String(reminder.note_body || "").slice(0, 200) ||
-                    "Hatırlatma zamanı geldi.",
-                firma_id: reminder.firma_id,
-                note_id: reminder.note_id,
-                reminder_id: reminder.id,
-                is_read: false,
-                metadata: {
-                    reminder_at: reminder.reminder_at,
-                    reminder_email: reminder.reminder_email,
-                    note_title: reminder.note_title,
-                    note_body: String(reminder.note_body || "").slice(0, 300),
-                },
-            }]);
-
-            await supabaseAdmin
-                .from("kullanici_hatirlaticilari")
-                .update({
-                    status: "sent",
-                    sent_at: now,
-                    email_error: null,
-                    updated_at: now,
-                })
-                .eq("id", reminder.id);
-
-            results.push({ id: reminder.id, status: "sent" });
-        } catch (error) {
-            const errorMessage = error instanceof Error
-                ? error.message
-                : "Bilinmeyen hata";
-            await supabaseAdmin
-                .from("kullanici_hatirlaticilari")
-                .update({
-                    status: "failed",
-                    failed_at: now,
-                    email_error: errorMessage,
-                    updated_at: now,
-                })
-                .eq("id", reminder.id);
-
-            results.push({
-                id: reminder.id,
-                status: "failed",
-                error: errorMessage,
-            });
-        }
-    }
-
-    return jsonResponse({ processed: results.length, results });
+  return jsonResponse({ processed: results.length, results });
 });

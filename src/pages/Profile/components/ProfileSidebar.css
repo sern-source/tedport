@@ -514,3 +514,120 @@
 }
 
 /* ── DARK MODE: SIDEBAR ── */
+/* Enes Doğanay | 23 Mayıs 2026: ProfileSidebar dark mode */
+
+[data-theme="dark"] .sidebar-user-card {
+  background: linear-gradient(135deg, #1e293b 0%, #162032 100%);
+  border-color: rgba(51, 65, 85, 0.8);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .sidebar-user-name { color: #f1f5f9; }
+
+[data-theme="dark"] .sidebar-nav {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(51, 65, 85, 0.6);
+}
+
+[data-theme="dark"] .nav-item { color: #94a3b8; }
+
+[data-theme="dark"] .nav-item:hover {
+  background: rgba(15, 23, 42, 0.5);
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .nav-item.active {
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.6) 0%, rgba(30, 64, 175, 0.3) 100%);
+  color: #93c5fd;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .nav-item.active .material-symbols-outlined { color: #60a5fa; }
+
+[data-theme="dark"] .nav-item.logout:hover {
+  background: rgba(127, 29, 29, 0.2);
+  color: #f87171;
+}
+
+[data-theme="dark"] .sidebar-divider { border-top-color: rgba(51, 65, 85, 0.5); }
+
+[data-theme="dark"] .sidebar-lists {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(51, 65, 85, 0.6);
+}
+
+[data-theme="dark"] .sidebar-lists__label { color: #475569; }
+
+[data-theme="dark"] .sidebar-lists__add-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #64748b;
+}
+
+[data-theme="dark"] .sidebar-lists__add-btn:hover {
+  background: rgba(30, 58, 95, 0.4);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .list-item { color: #94a3b8; }
+
+[data-theme="dark"] .list-item:hover:not(.active) {
+  background: rgba(15, 23, 42, 0.4);
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .list-item.active {
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.6) 0%, rgba(30, 64, 175, 0.3) 100%);
+  color: #93c5fd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .list-item-count {
+  background: #1e293b;
+  color: #64748b;
+}
+
+[data-theme="dark"] .list-item.active .list-item-count {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+}
+
+[data-theme="dark"] .list-item-delete:hover {
+  background: rgba(127, 29, 29, 0.25);
+  color: #f87171;
+}
+
+[data-theme="dark"] .cl-form__input {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .cl-form__input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .cl-form__submit {
+  background: rgba(30, 58, 95, 0.4);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .cl-form__submit:hover {
+  background: rgba(37, 99, 235, 0.3);
+  border-color: #60a5fa;
+}
+
+[data-theme="dark"] .cl-form__cancel {
+  background: #1e293b;
+  border-color: #334155;
+  color: #64748b;
+}
+
+[data-theme="dark"] .cl-form__cancel:hover {
+  background: rgba(127, 29, 29, 0.2);
+  border-color: #f87171;
+  color: #f87171;
+}
