@@ -65,7 +65,8 @@ export const useProfileCore = () => {
         const fetchInitial = async () => {
             try {
                 const session = await fetchSession();
-                if (!session) { if (!cancelled) { setLoading(false); router.push('/login'); } return; }
+                // Enes Doğanay | 23 Mayıs 2026: Oturum yoksa tam URL'i redirect param'a aktar
+                if (!session) { if (!cancelled) { setLoading(false); router.push('/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search)); } return; }
                 const currentUser = session.user;
                 const companyData = await fetchCompanyMembership(currentUser.id);
                 if (companyData?.firma_id && companyData.role === 'owner') { if (!cancelled) { setLoading(false); router.push('/firma-profil'); } return; }

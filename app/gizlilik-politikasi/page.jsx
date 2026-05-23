@@ -1,6 +1,15 @@
 ﻿// Enes Doğanay | 22 Mayıs 2026: Gizlilik Politikası — Next.js App Router page
-'use client';
-// Enes Doganay | 23 Mayis 2026: force-dynamic — useSearchParams ve auth gerektiren sayfalarda static prerender devre disi
+// Enes Doğanay | 23 Mayıs 2026: Server Component — metadata SSR için 'use client' kaldırıldı
 export const dynamic = 'force-dynamic';
 import GizlilikPolitikasiPage from '../../src/pages/StaticPages/GizlilikPolitikasiPage';
-export default GizlilikPolitikasiPage;
+import { Suspense } from 'react';
+
+// Enes Doğanay | 23 Mayıs 2026: SSR metadata — Google botu sayfa başlık/açıklamasını HTML'de görür
+export const metadata = {
+    title: 'Gizlilik Politikası',
+    description: 'Tedport gizlilik politikası — kişisel verileriniz nasıl korunur.',
+};
+
+export default function GizlilikPolitikasiRoute() {
+    return <Suspense fallback={null}><GizlilikPolitikasiPage /></Suspense>;
+}

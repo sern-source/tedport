@@ -51,6 +51,7 @@ const FirmaDetayHero = ({
                                 alt={firma.firma_adi}
                                 fill
                                 priority
+                                sizes="(max-width: 768px) 80px, 100px"
                                 style={{ objectFit: 'contain', padding: '6px' }}
                                 onError={() => setLogoError(true)}
                             />

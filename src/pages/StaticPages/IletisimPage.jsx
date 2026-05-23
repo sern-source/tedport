@@ -1,4 +1,6 @@
 ﻿// Enes Doğanay | 6 Mayıs 2026: İletişim sayfası — koordinatör
+// Enes Doğanay | 23 Mayıs 2026: Client Component — useIletisim hook'u için gerekli
+'use client';
 import React from 'react';
 import './IletisimPage.css';
 import './IletisimPage.footer.css';

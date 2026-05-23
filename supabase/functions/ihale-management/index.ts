@@ -64,6 +64,18 @@ interface TenderInput {
   sektor?: string | null;
 }
 
+// Enes Doğanay | 23 Mayıs 2026: firma_ihaleleri tablosundan dönen satır tipi — Supabase SDK jenerik döndürdüğünden spesifik tip gerekli
+interface IhaleRow {
+  id?: string | number;
+  baslik?: string;
+  durum?: string;
+  ihale_tipi?: string | null;
+  kategori?: string | null;
+  il_ilce?: string | null;
+  son_basvuru_tarihi?: string | null;
+  [key: string]: unknown;
+}
+
 // Enes Doganay | 6 Nisan 2026: Bos string -> null donusturur
 const str = (v?: string | null): string | null => {
   const t = String(v || "").trim();
@@ -730,14 +742,15 @@ Deno.serve(async (request) => {
 
         // Enes Doganay | 14 Mayis 2026: Sadece acik ihaleler abonelere bildirilir — davetli ihalelerde genel uyari email gonderilmez
         if (
-          data.durum === "canli" && (data as any).ihale_tipi !== "Davetli İhale"
+          data.durum === "canli" &&
+          (data as IhaleRow).ihale_tipi !== "Davetli İhale"
         ) {
           sendAlertSubscriberEmails(supabaseAdmin, {
             id: data.id,
             baslik: data.baslik,
-            kategori: (data as any).kategori ?? null,
-            il_ilce: (data as any).il_ilce ?? null,
-            son_basvuru_tarihi: (data as any).son_basvuru_tarihi ?? null,
+            kategori: (data as IhaleRow).kategori ?? null,
+            il_ilce: (data as IhaleRow).il_ilce ?? null,
+            son_basvuru_tarihi: (data as IhaleRow).son_basvuru_tarihi ?? null,
             firma_adi: firmaAdi,
           }).catch((err) =>
             console.error("sendAlertSubscriberEmails hata:", err)
@@ -854,15 +867,16 @@ Deno.serve(async (request) => {
         // Enes Doganay | 14 Mayis 2026: Sadece acik ihaleler abonelere bildirilir — davetli ihalelerde genel uyari email gonderilmez
         if (
           updatedTender.durum === "canli" && oldDurum === "draft" &&
-          (updatedTender as any).ihale_tipi !== "Davetli İhale"
+          (updatedTender as IhaleRow).ihale_tipi !== "Davetli İhale"
         ) {
           sendAlertSubscriberEmails(supabaseAdmin, {
             id: updatedTender.id,
             baslik: updatedTender.baslik,
-            kategori: (updatedTender as any).kategori ?? null,
-            il_ilce: (updatedTender as any).il_ilce ?? null,
-            son_basvuru_tarihi: (updatedTender as any).son_basvuru_tarihi ??
-              null,
+            kategori: (updatedTender as IhaleRow).kategori ?? null,
+            il_ilce: (updatedTender as IhaleRow).il_ilce ?? null,
+            son_basvuru_tarihi:
+              (updatedTender as IhaleRow).son_basvuru_tarihi ??
+                null,
             firma_adi: updFirmaAdi,
           }).catch((err) =>
             console.error("sendAlertSubscriberEmails (update) hata:", err)
@@ -1028,7 +1042,7 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: "Gecersiz aksiyon." }, 400);
   } catch (err) {
     // Enes Doganay | 6 Nisan 2026: PostgrestError instanceof Error degil, .message ile yakala
-    const message = (err as any)?.message ||
+    const message = (err as { message?: string })?.message ||
       (typeof err === "string" ? err : "Bilinmeyen sunucu hatasi.");
     console.error("ihale-management error:", message, err);
     return jsonResponse({ error: message }, 500);

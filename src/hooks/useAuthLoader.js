@@ -58,7 +58,10 @@ export const useAuthLoader = () => {
                     fetchUnreadNotifications(user.id),
                     fetchNotifPrefs(user.id),
                 ]);
-                if (profileResult.error) {
+                // Enes Doğanay | 23 Mayıs 2026: profileResult.error yerine !data kontrolü —
+                // .maybeSingle() ağ/RLS hatasında error döndürür ama satır yoksa data=null error=null döner;
+                // sadece gerçekten profil yoksa OAuth insert çalışır
+                if (!profileResult.data && !profileResult.error) {
                     const meta = user.user_metadata;
                     if (meta && (meta.full_name || meta.name || meta.email)) {
                         const { error: upsertError, profile: oauthProfile } = await upsertOAuthProfile(user.id, meta, user.email, navigator.userAgent, user.app_metadata?.provider || 'oauth');

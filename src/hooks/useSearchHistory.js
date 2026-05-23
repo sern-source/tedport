@@ -16,7 +16,7 @@ export function useSearchHistory() {
     setHistory(prev => {
       const filtered = prev.filter(h => h !== trimmed);
       const next = [trimmed, ...filtered].slice(0, MAX);
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore — localStorage kota */ }
       return next;
     });
   }, []);
@@ -24,14 +24,14 @@ export function useSearchHistory() {
   const removeFromHistory = useCallback((term) => {
     setHistory(prev => {
       const next = prev.filter(h => h !== term);
-      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* ignore — localStorage kota */ }
       return next;
     });
   }, []);
 
   const clearHistory = useCallback(() => {
     setHistory([]);
-    try { localStorage.removeItem(KEY); } catch {}
+    try { localStorage.removeItem(KEY); } catch { /* ignore — localStorage kota */ }
   }, []);
 
   return { history, addToHistory, removeFromHistory, clearHistory };

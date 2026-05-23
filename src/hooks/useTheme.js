@@ -28,7 +28,7 @@ export function useTheme() {
         document.documentElement.setAttribute('data-theme', theme);
         try {
             localStorage.setItem('tedport-theme', theme);
-        } catch {}
+        } catch { /* ignore — localStorage kota veya SSR */ }
     }, [theme]);
 
     // Enes Doğanay | 3 Mayıs 2026: Toggle — tüm örneklere event yayınla

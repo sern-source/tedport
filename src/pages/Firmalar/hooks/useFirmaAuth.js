@@ -18,7 +18,7 @@ export const useFirmaAuth = () => {
       try {
         const favs = await fetchFavorites(session.user.id);
         setFavoriteIds(new Set(favs.map(f => f.firma_id)));
-      } catch {}
+      } catch (err) { console.error('[useFirmaAuth] Favoriler yüklenemedi:', err); }
     };
     init();
   }, []);

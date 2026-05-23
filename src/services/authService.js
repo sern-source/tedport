@@ -2,12 +2,14 @@
 import { supabase } from '../supabaseClient';
 
 // Enes Doğanay | 6 Mayıs 2026: Kullanıcı profili — first_name, last_name
+// Enes Doğanay | 23 Mayıs 2026: .single() → .maybeSingle() — profil yoksa error değil null döner;
+// böylece geçici ağ/RLS hatası mevcut profili override etmez
 export async function fetchUserProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')
     .select('first_name, last_name')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   return { data, error };
 }
 
@@ -54,6 +56,8 @@ export async function fetchNotifPrefs(userId) {
 }
 
 // Enes Doğanay | 6 Mayıs 2026: OAuth ile ilk giriş — profil oluştur + KVKK consent kaydı
+// Enes Doğanay | 23 Mayıs 2026: upsert → insert; sadece profil YOK iken çağrılır,
+// mevcut profil verilerini (isim/avatar) asla override etmez
 export async function upsertOAuthProfile(userId, meta, userEmail, userAgent, provider) {
   const fullName = meta.full_name || meta.name || '';
   const nameParts = fullName.trim().split(/\s+/);
@@ -66,7 +70,7 @@ export async function upsertOAuthProfile(userId, meta, userEmail, userAgent, pro
     email: meta.email || userEmail || '',
     avatar: meta.avatar_url || null,
   };
-  const { error } = await supabase.from('profiles').upsert(profileData);
+  const { error } = await supabase.from('profiles').insert(profileData);
   if (!error) {
     await supabase.from('consent_logs').insert({
       user_id: userId,

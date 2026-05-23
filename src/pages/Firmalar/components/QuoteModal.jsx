@@ -36,16 +36,26 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
   // Enes Doğanay | 19 Mayıs 2026: Özel birim modu
   const [customBirimMode, setCustomBirimMode] = useState(false);
   const [customBirimInput, setCustomBirimInput] = useState('');
+  // Enes Doğanay | 23 Mayıs 2026: Birim arama
+  const [birimSearch, setBirimSearch] = useState('');
   // Enes Doğanay | 16 Mayıs 2026: Dosya türü hata mesajı — component yerel state
   const [fileError, setFileError] = useState('');
   const kalemBirimRef = useRef(null);
   const customBirimRef = useRef(null);
+  const birimSearchRef = useRef(null);
   // Enes Doğanay | 14 Mayıs 2026: Kalem eklendikten sonra madde input'a fokuslan
   const maddeInputRef = useRef(null);
+  // Enes Doğanay | 23 Mayıs 2026: Auto-expand textarea ref'leri
+  const aciklamaRef = useRef(null);
+  const konuRef = useRef(null);
 
   useEffect(() => {
     if (customBirimMode && customBirimRef.current) customBirimRef.current.focus();
   }, [customBirimMode]);
+  // Enes Doğanay | 23 Mayıs 2026: Dropdown açılınca arama input'una fokuslan
+  useEffect(() => {
+    if (kalemBirimOpen && birimSearchRef.current) birimSearchRef.current.focus();
+  }, [kalemBirimOpen]);
 
   // Enes Doğanay | 14 Mayıs 2026: Teklif gönderildikten 4 saniye sonra modalı otomatik kapat
   useEffect(() => {
@@ -59,8 +69,24 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
       const r = kalemBirimRef.current.getBoundingClientRect();
       setKalemBirimMenuPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 170) });
     }
-    if (kalemBirimOpen) { setCustomBirimMode(false); setCustomBirimInput(''); }
+    if (kalemBirimOpen) { setCustomBirimMode(false); setCustomBirimInput(''); setBirimSearch(''); }
     setKalemBirimOpen(o => !o);
+  };
+
+  // Enes Doğanay | 23 Mayıs 2026: Auto-expand textarea — max 3 satır, fazlası reddedilir
+  const handleExpandChange = (e, prevVal, setter) => {
+    const el = e.target;
+    const newVal = el.value;
+    el.style.height = 'auto';
+    const s = getComputedStyle(el);
+    const lh = parseFloat(s.lineHeight) || 18;
+    const maxH = lh * 3 + parseFloat(s.paddingTop) + parseFloat(s.paddingBottom);
+    if (el.scrollHeight > maxH + 1 && newVal.length > prevVal.length) {
+      el.style.height = maxH + 'px';
+      return; // 3 satır limitine ulaşıldı — reddedildi
+    }
+    el.style.height = Math.min(el.scrollHeight, maxH) + 'px';
+    setter(newVal);
   };
 
   const handleAddKalem = () => {
@@ -73,6 +99,9 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
       aciklama: yeniAciklama.trim(),
     }]);
     setYeniMadde(''); setYeniAdet('1'); setYeniAciklama('');
+    // Enes Doğanay | 23 Mayıs 2026: Textarea yüksekliklerini sıfırla
+    if (maddeInputRef.current) maddeInputRef.current.style.height = '';
+    if (aciklamaRef.current) aciklamaRef.current.style.height = '';
     // Enes Doğanay | 14 Mayıs 2026: Madde input'a fokuslan — state güncellenmesi beklenir
     setTimeout(() => maddeInputRef.current?.focus(), 0);
   };
@@ -138,9 +167,13 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
           <div className="quote-modal-body">
             <div className="quote-form-group">
               <label>Talep Başlığı *</label>
-              <input
-                type="text" placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi"
-                value={form.konu} onChange={e => onSetField('konu', e.target.value)} maxLength={200}
+              {/* Enes Doğanay | 23 Mayıs 2026: Auto-expand textarea — max 3 satır */}
+              <textarea
+                rows={1} placeholder="Ör: Paslanmaz Çelik Boru Fiyat Talebi"
+                value={form.konu}
+                onChange={e => handleExpandChange(e, form.konu, v => onSetField('konu', v))}
+                onKeyDown={e => { if (e.key === 'Enter') e.preventDefault(); }}
+                maxLength={200} className="quote-expand-ta" ref={konuRef}
               />
               {fieldError.key === 'konu' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
             </div>
@@ -175,18 +208,23 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
                     </button>
                   </div>
                 </div>
-                <input
-                  type="text" placeholder="Ürün / Malzeme adı *"
-                  value={yeniMadde} onChange={e => setYeniMadde(e.target.value)}
+                {/* Enes Doğanay | 23 Mayıs 2026: Auto-expand textarea — max 3 satır */}
+                <textarea
+                  rows={1} placeholder="Ürün / Malzeme adı *"
+                  value={yeniMadde}
+                  onChange={e => handleExpandChange(e, yeniMadde, setYeniMadde)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
                   className="quote-kalem-madde-input"
                   ref={maddeInputRef}
                 />
-                <input
-                  type="text" placeholder="Açıklama (opsiyonel)"
-                  value={yeniAciklama} onChange={e => setYeniAciklama(e.target.value)}
+                {/* Enes Doğanay | 23 Mayıs 2026: Auto-expand textarea — max 3 satır */}
+                <textarea
+                  rows={1} placeholder="Açıklama (opsiyonel)"
+                  value={yeniAciklama}
+                  onChange={e => handleExpandChange(e, yeniAciklama, setYeniAciklama)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKalem(); } }}
                   className="quote-kalem-aciklama-input"
+                  ref={aciklamaRef}
                 />
                 <button type="button" className="quote-kalem-add-btn" onClick={handleAddKalem} disabled={!yeniMadde.trim()}>
                   <span className="material-symbols-outlined">add</span>
@@ -233,7 +271,7 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
               <textarea
                 placeholder="Talep detaylarınızı yazın... (Ölçüler, malzeme tercihi vb.)"
                 value={form.mesaj} onChange={e => onSetField('mesaj', e.target.value)}
-                rows={3} maxLength={2000}
+                rows={3} maxLength={2000} className="quote-detaylar-ta"
               />
               {fieldError.key === 'mesaj' && <span className="cmp-field-err"><span className="material-symbols-outlined">error</span>{fieldError.msg}</span>}
             </div>
@@ -291,20 +329,42 @@ const QuoteModal = ({ supplier, form, quoteFile, sending, sent, userProfile, onC
       <>
         <div style={{ position: 'fixed', inset: 0, zIndex: 99998 }} onClick={() => { setKalemBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); }} />
         <div className="quote-birim-menu" style={{ position: 'fixed', top: kalemBirimMenuPos.top, left: kalemBirimMenuPos.left, minWidth: kalemBirimMenuPos.width, zIndex: 99999 }}>
-          {BIRIM_CATEGORIES.map(cat => (
-            <div key={cat.label}>
-              <div className="quote-birim-category">{cat.label}</div>
-              {cat.options.map(b => (
-                <button key={b} type="button"
-                  className={yeniBirim === b ? 'quote-birim-option active' : 'quote-birim-option'}
-                  onClick={() => { setYeniBirim(b); setKalemBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); }}
-                >
-                  <span className="quote-birim-option-label">{b}</span>
-                  {yeniBirim === b && <span className="material-symbols-outlined quote-birim-check">check</span>}
-                </button>
-              ))}
-            </div>
-          ))}
+          {/* Enes Doğanay | 23 Mayıs 2026: Birim arama çubuğu */}
+          <div className="quote-birim-search-wrap">
+            <span className="material-symbols-outlined quote-birim-search-icon">search</span>
+            <input ref={birimSearchRef} type="text" className="quote-birim-search"
+              placeholder="Birim ara..."
+              value={birimSearch}
+              onChange={e => setBirimSearch(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Escape') { setKalemBirimOpen(false); setBirimSearch(''); } }}
+            />
+            {birimSearch && (
+              <button type="button" className="quote-birim-search-clear" onClick={() => setBirimSearch('')}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            )}
+          </div>
+          {(() => {
+            const q = birimSearch.trim().toLowerCase();
+            const cats = q
+              ? BIRIM_CATEGORIES.map(c => ({ ...c, options: c.options.filter(o => o.toLowerCase().includes(q)) })).filter(c => c.options.length > 0)
+              : BIRIM_CATEGORIES;
+            if (cats.length === 0) return <div className="quote-birim-empty">Eşleşen birim bulunamadı</div>;
+            return cats.map(cat => (
+              <div key={cat.label}>
+                {!q && <div className="quote-birim-category">{cat.label}</div>}
+                {cat.options.map(b => (
+                  <button key={b} type="button"
+                    className={yeniBirim === b ? 'quote-birim-option active' : 'quote-birim-option'}
+                    onClick={() => { setYeniBirim(b); setKalemBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); setBirimSearch(''); }}
+                  >
+                    <span className="quote-birim-option-label">{b}</span>
+                    {yeniBirim === b && <span className="material-symbols-outlined quote-birim-check">check</span>}
+                  </button>
+                ))}
+              </div>
+            ));
+          })()}
           <div className="quote-birim-category-divider" />
           {customBirimMode ? (
             <div className="quote-birim-custom-input-wrap">

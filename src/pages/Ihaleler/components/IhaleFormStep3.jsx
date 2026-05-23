@@ -31,20 +31,29 @@ const IhaleFormStep3 = ({
     // Enes Doğanay | 19 Mayıs 2026: Özel birim modu — kullanıcı istediği birimi yazar
     const [customBirimMode, setCustomBirimMode] = useState(false);
     const [customBirimInput, setCustomBirimInput] = useState('');
+    // Enes Doğanay | 23 Mayıs 2026: Birim arama state
+    const [birimSearch, setBirimSearch] = useState('');
     const triggerRef = useRef(null);
     const customBirimRef = useRef(null);
+    // Enes Doğanay | 23 Mayıs 2026: Birim arama
+    const birimSearchRef = useRef(null);
     const secilenBirim = yeniGereksinimBirim || 'Adet';
 
     useEffect(() => {
         if (customBirimMode && customBirimRef.current) customBirimRef.current.focus();
     }, [customBirimMode]);
 
+    // Enes Doğanay | 23 Mayıs 2026: Dropdown açılınca arama inputuna odaklan
+    useEffect(() => {
+        if (birimOpen && birimSearchRef.current) birimSearchRef.current.focus();
+    }, [birimOpen]);
+
     const handleToggle = () => {
         if (!birimOpen && triggerRef.current) {
             const r = triggerRef.current.getBoundingClientRect();
             setMenuPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 170) });
         }
-        if (birimOpen) { setCustomBirimMode(false); setCustomBirimInput(''); }
+        if (birimOpen) { setCustomBirimMode(false); setCustomBirimInput(''); setBirimSearch(''); }
         setBirimOpen(o => !o);
     };
 
@@ -107,27 +116,52 @@ const IhaleFormStep3 = ({
                     <>
                         <div
                             style={{ position: 'fixed', inset: 0, zIndex: 99998 }}
-                            onClick={() => { setBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); }}
+                            onClick={() => { setBirimOpen(false); setCustomBirimMode(false); setCustomBirimInput(''); setBirimSearch(''); }}
                         />
                         <div
                             className="ihale-birim-menu"
                             style={{ position: 'fixed', top: menuPos.top, left: menuPos.left, minWidth: menuPos.width, zIndex: 99999 }}
                         >
-                            {BIRIM_CATEGORIES.map(cat => (
-                                <div key={cat.label}>
-                                    <div className="ihale-birim-category">{cat.label}</div>
-                                    {cat.options.map(b => (
-                                        <button
-                                            key={b} type="button"
-                                            className={secilenBirim === b ? 'ihale-birim-option active' : 'ihale-birim-option'}
-                                            onClick={() => handleSelect(b)}
-                                        >
-                                            <span className="ihale-birim-option-label">{b}</span>
-                                            {secilenBirim === b && <span className="material-symbols-outlined ihale-birim-check">check</span>}
-                                        </button>
-                                    ))}
-                                </div>
-                            ))}
+                            {/* Enes Doğanay | 23 Mayıs 2026: Birim arama çubuğu */}
+                            <div className="ihale-birim-search-wrap">
+                                <span className="material-symbols-outlined ihale-birim-search-icon">search</span>
+                                <input
+                                    ref={birimSearchRef}
+                                    type="text"
+                                    className="ihale-birim-search"
+                                    placeholder="Birim ara..."
+                                    value={birimSearch}
+                                    onChange={e => setBirimSearch(e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Escape') { setBirimOpen(false); setBirimSearch(''); } }}
+                                />
+                                {birimSearch && (
+                                    <button type="button" className="ihale-birim-search-clear" onClick={() => { setBirimSearch(''); birimSearchRef.current?.focus(); }}>
+                                        <span className="material-symbols-outlined">close</span>
+                                    </button>
+                                )}
+                            </div>
+                            {(() => {
+                                const q = birimSearch.trim().toLocaleLowerCase('tr');
+                                const cats = q
+                                    ? BIRIM_CATEGORIES.map(c => ({ ...c, options: c.options.filter(o => o.toLocaleLowerCase('tr').includes(q)) })).filter(c => c.options.length > 0)
+                                    : BIRIM_CATEGORIES;
+                                if (cats.length === 0) return <div className="ihale-birim-empty">Eşleşen birim bulunamadı</div>;
+                                return cats.map(cat => (
+                                    <div key={cat.label}>
+                                        {!q && <div className="ihale-birim-category">{cat.label}</div>}
+                                        {cat.options.map(b => (
+                                            <button
+                                                key={b} type="button"
+                                                className={secilenBirim === b ? 'ihale-birim-option active' : 'ihale-birim-option'}
+                                                onClick={() => handleSelect(b)}
+                                            >
+                                                <span className="ihale-birim-option-label">{b}</span>
+                                                {secilenBirim === b && <span className="material-symbols-outlined ihale-birim-check">check</span>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ));
+                            })()}
                             <div className="ihale-birim-category-divider" />
                             {customBirimMode ? (
                                 <div className="ihale-birim-custom-input-wrap">

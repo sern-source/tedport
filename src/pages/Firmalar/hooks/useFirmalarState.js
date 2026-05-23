@@ -81,13 +81,13 @@ export const useFirmalarState = ({ currentUserId }) => {
     }, [page, setSearchParams]);
     useEffect(() => {
         try { sessionStorage.setItem('tedport_firmalar_state', JSON.stringify({ search, filters, viewMode, sortMode })); }
-        catch {}
+        catch { /* ignore — sessionStorage kota veya SSR */ }
     }, [search, filters, page, viewMode, sortMode]);
 
     const toggleViewMode = () => {
         const next = viewMode === 'grid' ? 'list' : 'grid';
         setViewMode(next);
-        if (currentUserId) { try { localStorage.setItem(`tedport_firmalar_view_${currentUserId}`, next); } catch {} }
+        if (currentUserId) { try { localStorage.setItem(`tedport_firmalar_view_${currentUserId}`, next); } catch { /* ignore — localStorage kota */ } }
     };
 
     // Enes Doğanay | 19 Mayıs 2026: Arama/filtre/sort değişince sayfa 1'e reset — mount'ta değil, sadece kullanıcı aksiyon alınca

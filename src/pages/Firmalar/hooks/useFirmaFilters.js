@@ -49,7 +49,7 @@ export const useFirmaFilters = (activeFilters, onApplyFilters) => {
         setCities(buildSortedCities(cityData));
         const uniqueCats = [...new Set(categoryData.map(c => c.category_name))].filter(Boolean).sort();
         setCategories(uniqueCats);
-      } catch {} finally {
+      } catch (err) { console.error('[useFirmaFilters] Sidebar verisi yüklenemedi:', err); } finally {
         setLoading(false);
       }
     };

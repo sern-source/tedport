@@ -22,7 +22,7 @@ const DatePickerMonthView = ({ viewYear, viewMonth, prevMonth, nextMonth, cells,
                 const isSelected = cell.dateStr === value;
                 const isDisabled = !!min && cell.dateStr < min;
                 return (
-                    <button key={i} type="button"
+                    <button key={cell.dateStr || `empty-${i}`} type="button"
                         className={['dp-day',
                             cell.type === 'other' ? 'dp-day--other'    : '',
                             isToday                ? 'dp-day--today'    : '',

@@ -58,6 +58,11 @@
     border-radius: 8px;
 }
 
+/* Enes Doğanay | 23 Mayıs 2026: CSS logo geçişi — data-theme'e bağlı, sayfa yenileme flash'ı yok */
+.sf-logo-dark { display: none; }
+[data-theme="dark"] .sf-logo-light { display: none; }
+[data-theme="dark"] .sf-logo-dark { display: inline; }
+
 /* Enes Doğanay | 2 Mayıs 2026: Faz 3 — transparan PNG kullanılıyor, light/dark show-hide kaldırıldı */
 
 .sf-brand-desc {

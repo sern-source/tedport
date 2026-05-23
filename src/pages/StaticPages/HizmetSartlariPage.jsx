@@ -1,4 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: src/pages/StaticPages/ taşındı
+// Enes Doğanay | 23 Mayıs 2026: Client Component — SharedHeader auth context için gerekli
+'use client';
 import React from 'react';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';

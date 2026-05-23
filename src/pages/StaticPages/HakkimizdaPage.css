@@ -519,3 +519,30 @@
   background: linear-gradient(to bottom right, rgba(168, 85, 247, 0.2), transparent);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Enes Doğanay | 23 Mayıs 2026: HakkimizdaPage dark mode
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .about-page-wrapper .about-gray-bg {
+  background-color: #0f172a;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-light {
+  background-color: #1e293b;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-light:hover {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-outline {
+  background-color: transparent;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .about-page-wrapper .about-btn-outline:hover {
+  background-color: #1e293b;
+}
+

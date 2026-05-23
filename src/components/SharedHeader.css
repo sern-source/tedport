@@ -173,6 +173,11 @@
     object-fit: contain;
 }
 
+/* Enes Doğanay | 23 Mayıs 2026: CSS logo geçişi — data-theme'e bağlı, sayfa yenileme flash'ı yok */
+.shared-logo-dark { display: none; }
+[data-theme="dark"] .shared-logo-light { display: none; }
+[data-theme="dark"] .shared-logo-dark { display: inline; }
+
 /* Enes Doğanay | 14 Mayıs 2026: Mobil header kompakt — logo küçük, header daha ince */
 @media (max-width: 639px) {
     .shared-logo-area {

@@ -87,19 +87,23 @@ export default function DatePicker({ value, onChange, min, placeholder = 'gg.aa.
                 aria-haspopup="dialog"
                 aria-label={value ? `Seçilen tarih: ${toDisplay(value)}, değiştirmek için tıklayın` : placeholder}
             >
-                <span className="material-symbols-outlined dp-icon">calendar_month</span>
+                {/* Enes Doğanay | 23 Mayıs 2026: dp-icon sağa taşındı, dp-actions wrapper eklendi — CitySelect yapısıyla aynı */}
                 <span className={value ? 'dp-value' : 'dp-placeholder'}>{value ? toDisplay(value) : placeholder}</span>
-                {value && (
-                    // Enes Doğanay | 8 Mayıs 2026: span — nested button geçersiz HTML; role+tabIndex+onKeyDown ile keyboard erişimi
-                    <span
-                        className="material-symbols-outlined dp-clear"
-                        onClick={(e) => { e.stopPropagation(); onChange(''); }}
-                        role="button"
-                        tabIndex={0}
-                        aria-label="Tarihi temizle"
-                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onChange(''); } }}
-                    >close</span>
-                )}
+                <span className="dp-actions">
+                    {value && (
+                        <span
+                            className="dp-clear"
+                            onClick={(e) => { e.stopPropagation(); onChange(''); setOpen(false); }}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Tarihi temizle"
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onChange(''); setOpen(false); } }}
+                        >
+                            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+                        </span>
+                    )}
+                    <span className="material-symbols-outlined dp-icon" style={{ transform: open ? 'rotate(180deg)' : 'none' }}>expand_more</span>
+                </span>
             </button>
             {open && createPortal(
                 <div className={`dp-panel${variantCls}${compact ? ' dp-panel--compact' : ''}`} style={panelStyle} ref={panelRef}>

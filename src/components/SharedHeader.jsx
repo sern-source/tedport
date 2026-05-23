@@ -86,10 +86,13 @@ const SharedHeader = ({
                         <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                     <Link href="/" className="shared-logo-area" aria-label="Tedport ana sayfa">
-                        <img className="shared-logo-image"
-                            src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'}
-                            alt="Tedport Logo"
-                            suppressHydrationWarning />
+                        {/* Enes Doğanay | 23 Mayıs 2026: CSS ile logo geçişi — data-theme script'e bağlı, React state flash'ını önler */}
+                        <img className="shared-logo-image shared-logo-light"
+                            src="/tedport-logo_no-background.png"
+                            alt="Tedport Logo" />
+                        <img className="shared-logo-image shared-logo-dark"
+                            src="/tedport-logo_no-background-dark.png"
+                            alt="" aria-hidden="true" />
                     </Link>
                 </div>
 

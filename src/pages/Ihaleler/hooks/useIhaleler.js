@@ -108,7 +108,7 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId, isDemoUser = false }
     const toggleViewMode = () => {
         const next = viewMode === 'grid' ? 'list' : 'grid';
         setViewMode(next);
-        try { localStorage.setItem('tedport_ihale_view', next); } catch {}
+        try { localStorage.setItem('tedport_ihale_view', next); } catch { /* ignore — localStorage kota */ }
     };
 
     const totalPages = Math.ceil(total / PAGE_SIZE);

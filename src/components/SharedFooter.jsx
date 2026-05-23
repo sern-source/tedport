@@ -3,8 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '../AuthContext';
-// Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo
-import { useTheme } from '../hooks/useTheme';
 import './SharedFooter.css';
 
 // Enes Doğanay | 8 Mayıs 2026: Build anında sabitlenir — her render’da new Date() çağrısı gereksiz
@@ -13,8 +11,6 @@ const CURRENT_YEAR = new Date().getFullYear();
 const SharedFooter = () => {
     // Enes Doğanay | 2 Mayıs 2026: Giriş yapmış kullanıcıya Kayıt/Giriş linkleri gösterilmez
     const { userProfile } = useAuth();
-    // Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo
-    const { theme } = useTheme();
 
     return (
         <footer className="sf-footer">
@@ -23,8 +19,9 @@ const SharedFooter = () => {
                     {/* Brand */}
                     <div className="sf-brand">
                         <Link href="/" className="sf-logo-link">
-                            {/* Enes Doğanay | 3 Mayıs 2026: Dark modda ayrı logo */}
-                            <img src={theme === 'dark' ? '/tedport-logo_no-background-dark.png' : '/tedport-logo_no-background.png'} alt="Tedport Logo" className="sf-logo" loading="lazy" suppressHydrationWarning />
+                            {/* Enes Doğanay | 23 Mayıs 2026: CSS ile logo geçişi — data-theme script'e bağlı, React state flash'ını önler */}
+                            <img src="/tedport-logo_no-background.png" alt="Tedport Logo" className="sf-logo sf-logo-light" loading="lazy" />
+                            <img src="/tedport-logo_no-background-dark.png" alt="" aria-hidden="true" className="sf-logo sf-logo-dark" loading="lazy" />
                         </Link>
                         <p className="sf-brand-desc">
                             Türkiye'nin güvenilir B2B tedarik platformu. Firmalar arası ticareti dijitalleştiriyoruz.

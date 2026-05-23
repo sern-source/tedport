@@ -1,7 +1,4 @@
-import {
-    createAdminClient,
-    createAnonClient,
-} from "../_shared/supabaseAdmin.ts";
+import { createAdminClient } from "../_shared/supabaseAdmin.ts";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
 type CorporateAction = "submit" | "list" | "review";
@@ -443,7 +440,7 @@ const createTemporaryPassword = () => {
 };
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal onayda firma kaydi icin stabil ve okunur firmaID uretilir
-const slugifyCompanyName = (value: string) => {
+const _slugifyCompanyName = (value: string) => {
     return String(value || "")
         .toLocaleLowerCase("tr-TR")
         .normalize("NFD")
@@ -620,7 +617,7 @@ const findExistingUserByEmail = async (
         }
 
         const users = data?.users || [];
-        const matchedUser = users.find((user) =>
+        const matchedUser = users.find((user: { email?: string | null }) =>
             String(user.email || "").trim().toLowerCase() === normalizedEmail
         );
         if (matchedUser) {
@@ -859,7 +856,7 @@ Deno.serve(async (request) => {
                         supabaseAdmin,
                         applicationId: Number(application.id),
                         userId: approvedUserId,
-                        firmaId: managedFirmaId,
+                        firmaId: managedFirmaId!,
                     });
                 } catch (error) {
                     if (createdManagedFirmaIdForRollback) {
