@@ -418,24 +418,28 @@ Deno.serve(async (request) => {
 
         // Enes Doğanay | 23 Mayıs 2026: owner/admin rolleri page_permissions'dan bağımsız olarak dahil edilmeli
         const authorizedUserIds = (ekipRows || [])
-            .filter((m: { role?: string; page_permissions?: { teklif_yonetimi?: boolean } }) =>
-                m.role === "owner" ||
+            .filter((
+                m: {
+                    role?: string;
+                    page_permissions?: { teklif_yonetimi?: boolean };
+                },
+            ) => m.role === "owner" ||
                 m.role === "admin" ||
                 m.page_permissions?.teklif_yonetimi === true
             )
             .map((m: { user_id: string }) => m.user_id);
 
+        // Enes Doğanay | 23 Mayıs 2026: profiles.email yerine auth.users'dan çek — profiles.email bazı üyeler için null olabilir
         let teamEmails: string[] = [];
-        if (authorizedUserIds.length > 0) {
-            const { data: profiles } = await supabaseAdmin
-                .from("profiles")
-                .select("email")
-                .in("id", authorizedUserIds);
-            teamEmails = (profiles || [])
-                .map((p: { email?: string }) =>
-                    String(p.email || "").trim().toLowerCase()
-                )
-                .filter(Boolean);
+        for (const uid of authorizedUserIds) {
+            try {
+                const { data: authUser } = await supabaseAdmin.auth.admin
+                    .getUserById(uid);
+                const email = (authUser?.user?.email || "").trim().toLowerCase();
+                if (email) teamEmails.push(email);
+            } catch {
+                // kullanıcı bulunamazsa atla
+            }
         }
 
         // 3. Benzersiz alıcı listesi
