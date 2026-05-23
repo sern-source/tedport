@@ -179,7 +179,7 @@ export function useFirmaDetay(slug, initialFirma = null) {
         setQuoteSending(true);
         try {
             // Enes Doğanay | 14 Mayıs 2026: managedCompanyId geçirilmiyor — teklif talebi her zaman bireysel
-            await sendQuoteRequestService({ firmaId: id, userId: sessionUserIdRef.current, userProfile, quoteForm: finalForm, quoteFile });
+            await sendQuoteRequestService({ firmaId: firmaIdRef.current, userId: sessionUserIdRef.current, userProfile, quoteForm: finalForm, quoteFile });
             setQuoteSent(true);
             setTimeout(() => { setShowQuoteModal(false); setQuoteSent(false); setQuoteFormState(EMPTY_QUOTE_FORM); setQuoteFile(null); }, 2000);
         } catch { showFdToast('error', 'Teklif talebi gönderilemedi.'); }
@@ -189,7 +189,8 @@ export function useFirmaDetay(slug, initialFirma = null) {
     const adresText = firma?.adres || firma?.il_ilce || '';
     const encodedAddress = encodeURIComponent(adresText);
     const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-    const isCurrentUserCompanyManager = Boolean(userProfile && managedCompanyId && String(managedCompanyId) === String(id));
+    // Enes Doğanay | 23 Mayıs 2026: firmaIdRef.current — id kapsam dışında, ref kullanılır
+    const isCurrentUserCompanyManager = Boolean(userProfile && managedCompanyId && String(managedCompanyId) === String(firmaIdRef.current));
 
     return {
         firma, loading, firmaEkip, isVerified, isDemo, isCurrentUserCompanyManager,
