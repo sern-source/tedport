@@ -1,6 +1,15 @@
 // Enes Doğanay | 14 Mayıs 2026: Firma Analitik Dashboard bileşeni
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import './FirmaDashboardTab.css';
+
+/* ─── Para birimi formatı ─── */
+// Enes Doğanay | 23 Mayıs 2026: Türkçe para formatı
+const CURRENCY_SYMBOL = { TRY: '₺', USD: '$', EUR: '€', GBP: '£' };
+const formatMoney = (n, c = 'TRY') => {
+    const num = Number(n);
+    if (!Number.isFinite(num)) return '—';
+    return `${CURRENCY_SYMBOL[c] || c} ${num.toLocaleString('tr-TR', { maximumFractionDigits: 0 })}`;
+};
 
 /* ─── Yardımcı: kısa gün adı ─── */
 const DAY_TR = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
@@ -51,7 +60,8 @@ const ViewsChart = ({ dailyViews }) => {
 };
 
 /* ─── İhale durum dağılımı ─── */
-const TenderStatusRow = ({ tenderStats }) => {
+// Enes Doğanay | 23 Mayıs 2026: onTamamlandiClick + reportOpen prop eklendi — tamamlandi pill kliklenilebilir
+const TenderStatusRow = ({ tenderStats, onTamamlandiClick, reportOpen }) => {
     const entries = Object.entries(tenderStats).filter(([k]) => k !== 'draft');
     const total = entries.reduce((s, [, v]) => s + v, 0);
     return (
@@ -59,10 +69,25 @@ const TenderStatusRow = ({ tenderStats }) => {
             {entries.map(([key, count]) => {
                 const meta = TENDER_DURUM[key] || { label: key, cls: 'canli' };
                 const pct = total ? Math.round((count / total) * 100) : 0;
+                const clickable = key === 'tamamlandi' && count > 0;
                 return (
-                    <div key={key} className={`fdb-status-pill fdb-status-pill--${meta.cls}`}>
+                    <div
+                        key={key}
+                        className={`fdb-status-pill fdb-status-pill--${meta.cls}${clickable ? ' fdb-status-pill--clickable' : ''}${clickable && reportOpen ? ' fdb-status-pill--active' : ''}`}
+                        onClick={clickable ? onTamamlandiClick : undefined}
+                        role={clickable ? 'button' : undefined}
+                        tabIndex={clickable ? 0 : undefined}
+                        onKeyDown={clickable ? (e) => e.key === 'Enter' && onTamamlandiClick() : undefined}
+                    >
                         <span className="fdb-status-pill-count">{count}</span>
-                        <span className="fdb-status-pill-label">{meta.label}</span>
+                        <span className="fdb-status-pill-label">
+                            {meta.label}
+                            {clickable && (
+                                <span className="material-symbols-outlined fdb-pill-chevron">
+                                    {reportOpen ? 'expand_less' : 'expand_more'}
+                                </span>
+                            )}
+                        </span>
                         {total > 0 && <span className="fdb-status-pill-pct">{pct}%</span>}
                     </div>
                 );
@@ -136,8 +161,140 @@ const TopTenders = ({ topTenders }) => {
     );
 };
 
+/* ─── Tamamlanan ihaleler rapor içeriği ─── */
+// Enes Doğanay | 23 Mayıs 2026: Tamamlanan ihaleler raporu — özet metrikler + ürün listesi + ihale kartları
+const CompletedReportContent = ({ data }) => {
+    const { tenders, summary } = data;
+    const spendEntries = Object.entries(summary.totalSpend).filter(([, v]) => v > 0);
+    return (
+        <>
+            <div className="fdb-report-summary">
+                <div className="fdb-report-stat">
+                    <span className="material-symbols-outlined">gavel</span>
+                    <span className="fdb-report-stat-val">{tenders.length}</span>
+                    <span className="fdb-report-stat-lbl">Tamamlanan</span>
+                </div>
+                <div className="fdb-report-stat">
+                    <span className="material-symbols-outlined">check_circle</span>
+                    <span className="fdb-report-stat-val">{summary.totalAcceptedOffers}</span>
+                    <span className="fdb-report-stat-lbl">Kabul Edilen Teklif</span>
+                </div>
+                {spendEntries.length > 0
+                    ? spendEntries.map(([c, v]) => (
+                        <div key={c} className="fdb-report-stat fdb-report-stat--spend">
+                            <span className="material-symbols-outlined">payments</span>
+                            <span className="fdb-report-stat-val">{formatMoney(v, c)}</span>
+                            <span className="fdb-report-stat-lbl">Toplam Harcama ({c})</span>
+                        </div>
+                    ))
+                    : (
+                        <div className="fdb-report-stat">
+                            <span className="material-symbols-outlined">payments</span>
+                            <span className="fdb-report-stat-val">—</span>
+                            <span className="fdb-report-stat-lbl">Tutar Bilgisi Yok</span>
+                        </div>
+                    )
+                }
+            </div>
+            {tenders.length === 0 ? (
+                <div className="fdb-report-empty">
+                    <span className="material-symbols-outlined">assignment_turned_in</span>
+                    <p>Henüz tamamlanan ihale bulunmuyor.</p>
+                </div>
+            ) : (
+                <div className="fdb-report-grid">
+                    <div className="fdb-report-col">
+                        <div className="fdb-report-col-title">
+                            <span className="material-symbols-outlined">list_alt</span>
+                            İhaleler
+                        </div>
+                        {tenders.map((t) => (
+                            <div key={t.id} className="fdb-report-tender-item">
+                                <div className="fdb-report-tender-head">
+                                    <span className="fdb-report-tender-name">{t.baslik}</span>
+                                    {t.kategori && <span className="fdb-report-tender-cat">{t.kategori}</span>}
+                                </div>
+                                {t.acceptedOffer ? (
+                                    <div className="fdb-report-offer">
+                                        <span className="fdb-report-offer-firm">
+                                            <span className="material-symbols-outlined">business</span>
+                                            {t.acceptedOffer.gonderen_firma_adi || t.acceptedOffer.gonderen_ad_soyad || 'Bilinmeyen'}
+                                        </span>
+                                        <span className="fdb-report-offer-amount">
+                                            {formatMoney(t.acceptedOffer.toplam_tutar, t.acceptedOffer.para_birimi)}
+                                            {t.acceptedOffer.kdv_dahil && <span className="fdb-report-kdv"> KDV dahil</span>}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <span className="fdb-report-no-offer">Kabul edilen teklif bulunamadı</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="fdb-report-col">
+                        <div className="fdb-report-col-title">
+                            <span className="material-symbols-outlined">inventory_2</span>
+                            En Çok Alınan Ürünler
+                        </div>
+                        {summary.topProducts.length === 0 ? (
+                            <span className="fdb-empty-note">Kalem bilgisi bulunamadı</span>
+                        ) : summary.topProducts.map((p, i) => (
+                            <div key={p.madde} className="fdb-report-product-row">
+                                <span className="fdb-report-product-rank">{i + 1}</span>
+                                <div className="fdb-report-product-info">
+                                    <span className="fdb-report-product-name">{p.madde}</span>
+                                    {p.avgFiyat != null && (
+                                        <span className="fdb-report-product-price">
+                                            Ort. {formatMoney(p.avgFiyat)} / {p.birim || 'adet'}
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="fdb-report-product-qty">{p.totalAdet} {p.birim || 'adet'}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
+/* ─── Tamamlanan ihaleler raporu wrapper (accordion) ─── */
+const CompletedTendersReport = ({ completedReport, reportLoading, onClose }) => (
+    <div className="fdb-section fdb-section--wide fdb-completed-report">
+        <div className="fdb-section-header">
+            <span className="material-symbols-outlined">assignment_turned_in</span>
+            Tamamlanan İhaleler — Detay Raporu
+            <button className="fdb-report-close" onClick={onClose}>
+                <span className="material-symbols-outlined">close</span>
+                Kapat
+            </button>
+        </div>
+        <div className="fdb-section-body">
+            {reportLoading ? (
+                <div className="fdb-report-loading">
+                    <span className="material-symbols-outlined fdb-report-spin">hourglass_top</span>
+                    <span>Rapor yükleniyor…</span>
+                </div>
+            ) : !completedReport || completedReport.error ? (
+                <span className="fdb-empty-note">{completedReport?.error || 'Veri yüklenemedi'}</span>
+            ) : (
+                <CompletedReportContent data={completedReport} />
+            )}
+        </div>
+    </div>
+);
+
 /* ─── Ana bileşen ─── */
-const FirmaDashboardTab = ({ stats, loading, error }) => {
+// Enes Doğanay | 23 Mayıs 2026: completedReport, reportLoading, loadCompletedReport prop eklendi
+const FirmaDashboardTab = ({ stats, loading, error, completedReport, reportLoading, loadCompletedReport }) => {
+    const [showReport, setShowReport] = useState(false);
+    const handleTamamlandiClick = useCallback(() => {
+        setShowReport((prev) => {
+            if (!prev) loadCompletedReport?.();
+            return !prev;
+        });
+    }, [loadCompletedReport]);
     if (loading) return (
         <div className="fdb-loading">
             <span className="material-symbols-outlined fdb-loading-icon">bar_chart</span>
@@ -218,9 +375,18 @@ const FirmaDashboardTab = ({ stats, loading, error }) => {
                     <div className="fdb-section-header">
                         <span className="material-symbols-outlined">pie_chart</span>
                         İhale Durumları
+                        {(tenderStats?.tamamlandi ?? 0) > 0 && (
+                            <span className="fdb-section-badge">
+                                {showReport ? 'Raporu Kapat' : 'Tamamlananları Gör'}
+                            </span>
+                        )}
                     </div>
                     <div className="fdb-section-body">
-                        <TenderStatusRow tenderStats={tenderStats ?? {}} />
+                        <TenderStatusRow
+                            tenderStats={tenderStats ?? {}}
+                            onTamamlandiClick={handleTamamlandiClick}
+                            reportOpen={showReport}
+                        />
                     </div>
                 </div>
 
@@ -249,6 +415,15 @@ const FirmaDashboardTab = ({ stats, loading, error }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Enes Doğanay | 23 Mayıs 2026: Tamamlanan ihaleler detay raporu — accordion */}
+            {showReport && (
+                <CompletedTendersReport
+                    completedReport={completedReport}
+                    reportLoading={reportLoading}
+                    onClose={() => setShowReport(false)}
+                />
+            )}
         </div>
     );
 };

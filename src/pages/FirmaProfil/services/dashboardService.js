@@ -109,3 +109,68 @@ export const fetchDashboardStats = async (firmaId) => {
     ]);
     return { viewStats, ...tenderOfferStats, quoteStats };
 };
+
+// Enes Doğanay | 23 Mayıs 2026: Tamamlanan ihaleler için detaylı rapor — kabul edilen teklifler + ürün özeti
+export const fetchCompletedTendersReport = async (firmaId) => {
+    const { data: tenders } = await supabase
+        .from('firma_ihaleleri')
+        .select('id, baslik, kategori, yayin_tarihi, son_basvuru_tarihi')
+        .eq('firma_id', String(firmaId))
+        .eq('durum', 'tamamlandi')
+        .order('son_basvuru_tarihi', { ascending: false });
+
+    if (!tenders?.length) {
+        return { tenders: [], summary: { totalSpend: {}, topProducts: [], totalAcceptedOffers: 0 } };
+    }
+
+    const tenderIds = tenders.map((t) => t.id);
+    const { data: offers } = await supabase
+        .from('ihale_teklifleri')
+        .select('ihale_id, gonderen_firma_adi, gonderen_ad_soyad, toplam_tutar, para_birimi, kdv_dahil, kalemler, created_at')
+        .in('ihale_id', tenderIds)
+        .eq('durum', 'kabul');
+
+    const allOffers = offers || [];
+
+    // Her ihaleye ait ilk kabul edilen teklifi eşleştir
+    const offerByTender = {};
+    for (const o of allOffers) {
+        if (!offerByTender[o.ihale_id]) offerByTender[o.ihale_id] = o;
+    }
+
+    // Tüm kabul edilen tekliflerdeki kalemleri agregasyon için topla
+    const productMap = {};
+    const totalSpend = {};
+    for (const o of allOffers) {
+        if (Number(o.toplam_tutar) > 0) {
+            totalSpend[o.para_birimi] = (totalSpend[o.para_birimi] || 0) + Number(o.toplam_tutar);
+        }
+        const items = Array.isArray(o.kalemler) ? o.kalemler : [];
+        for (const item of items) {
+            const key = item.madde || 'Bilinmeyen Ürün';
+            if (!productMap[key]) {
+                productMap[key] = { madde: key, birim: item.birim || '', totalAdet: 0, prices: [] };
+            }
+            productMap[key].totalAdet += Number(item.miktar || item.adet || 1);
+            const p = Number(item.birim_fiyat);
+            if (p > 0) productMap[key].prices.push(p);
+        }
+    }
+
+    const topProducts = Object.values(productMap)
+        .map((p) => ({
+            madde: p.madde,
+            birim: p.birim,
+            totalAdet: p.totalAdet,
+            avgFiyat: p.prices.length ? p.prices.reduce((a, b) => a + b, 0) / p.prices.length : null,
+            minFiyat: p.prices.length ? Math.min(...p.prices) : null,
+            maxFiyat: p.prices.length ? Math.max(...p.prices) : null,
+        }))
+        .sort((a, b) => b.totalAdet - a.totalAdet)
+        .slice(0, 8);
+
+    return {
+        tenders: tenders.map((t) => ({ ...t, acceptedOffer: offerByTender[t.id] || null })),
+        summary: { totalSpend, topProducts, totalAcceptedOffers: allOffers.length },
+    };
+};
