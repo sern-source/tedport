@@ -35,6 +35,8 @@ export const useAuthLoader = () => {
         badges.setPendingQuoteCount(0);
         badges.setMyOffersUnreadCount(0);
         badges.setIhaleYonetimiUnreadCount(0);
+        // Enes Doğanay | 23 Mayıs 2026: Middleware cookie'sini temizle
+        if (typeof document !== 'undefined') document.cookie = 'tedport-session=; path=/; max-age=0; SameSite=Lax';
     }, [badges.setManagedCompanyName, badges.setPendingQuoteCount, badges.setMyOffersUnreadCount, badges.setIhaleYonetimiUnreadCount]);
 
     const loadUserData = useCallback(async () => {
@@ -84,6 +86,8 @@ export const useAuthLoader = () => {
                 setManagedCompanyId(companyId);
                 // Enes Doğanay | 13 Mayıs 2026: email AuthContext'te de tutulur — alertService için
                 setUserProfile({ ...(profileResult.data || { first_name: 'Profilime', last_name: 'Git' }), id: user.id, email: user.email });
+                // Enes Doğanay | 23 Mayıs 2026: Middleware cookie — oturum doğrulandı, /profile ve /firma-profil erişilebilir
+                if (typeof document !== 'undefined') document.cookie = 'tedport-session=1; path=/; SameSite=Lax';
             } catch {
                 /* sessiz — AbortError veya ağ hatası, session etkilenmez */
             }
