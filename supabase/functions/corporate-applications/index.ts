@@ -7,6 +7,7 @@ import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 type CorporateAction = "submit" | "list" | "review";
 
 // Enes Doğanay | 6 Nisan 2026: Kurumsal basvuru payload'lari edge function icinde tiplenir
+// Enes Doğanay | 23 Mayıs 2026: companyIl, companyIlce, companyOpenAddress, companyPhone, selectedFirmaId, authorizationDocUrl eklendi
 type CorporateSubmitPayload = {
     action: "submit";
     applicantFirstName: string;
@@ -20,6 +21,12 @@ type CorporateSubmitPayload = {
     taxOffice?: string;
     taxNumber?: string;
     companyAddress?: string;
+    companyIl?: string;
+    companyIlce?: string;
+    companyOpenAddress?: string;
+    companyPhone?: string;
+    selectedFirmaId?: string | number;
+    authorizationDocUrl?: string;
     verificationNote?: string;
 };
 
@@ -492,9 +499,10 @@ const buildManagedFirmaPayload = (
     const companyOpenAddress = String(meta.company_open_address || "").trim();
     const companyPhone = String(meta.company_phone || "").trim();
     const addressText = String(application.company_address || "").trim();
-    // İl/İlçe formatı: "İstanbul, Bahçelievler"
-    const ilIlce = [companyIl, companyIlce].filter(Boolean).join(", ") ||
-        addressText || "Belirtilmedi";
+    // Enes Doğanay | 23 Mayıs 2026: il/ilçe format düzeltildi — parseLocation "ilçe/il" (Eyüpsultan/İstanbul) bekliyor; eskiden "İstanbul, Eyüpsultan" (ters) yazılıyordu
+    const ilIlce = (companyIlce && companyIl)
+        ? `${companyIlce}/${companyIl}`
+        : (companyIlce || companyIl || addressText || "Belirtilmedi");
 
     return {
         firmaID: firmaId,
@@ -1060,11 +1068,31 @@ Deno.serve(async (request) => {
             tax_office: String(submitPayload.taxOffice || "").trim() || null,
             tax_number: String(submitPayload.taxNumber || "").trim() || null,
             company_address:
+                // Enes Doğanay | 23 Mayıs 2026: companyOpenAddress → company_address düzeltildi; companyAddress alanı artık gönderilmiyor
+                [submitPayload.companyIl, submitPayload.companyIlce, submitPayload.companyOpenAddress]
+                    .map((v) => String(v || "").trim()).filter(Boolean).join(", ") ||
                 String(submitPayload.companyAddress || "").trim() || null,
             verification_note:
                 String(submitPayload.verificationNote || "").trim() || null,
             metadata: {
                 source: "supabase-edge-function",
+                // Enes Doğanay | 23 Mayıs 2026: il/ilçe ve diğer eksik alanlar metadata'ya eklendi
+                ...(submitPayload.companyIl
+                    ? {
+                        company_il: submitPayload.companyIl,
+                        company_ilce: submitPayload.companyIlce || "",
+                        company_open_address: submitPayload.companyOpenAddress || "",
+                    }
+                    : {}),
+                ...(submitPayload.companyPhone
+                    ? { company_phone: String(submitPayload.companyPhone).trim() }
+                    : {}),
+                ...(submitPayload.selectedFirmaId
+                    ? { requested_firma_id: submitPayload.selectedFirmaId }
+                    : {}),
+                ...(submitPayload.authorizationDocUrl
+                    ? { authorization_doc_url: submitPayload.authorizationDocUrl }
+                    : {}),
             },
         }])
         .select("*")
