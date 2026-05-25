@@ -52,7 +52,7 @@ const HeroSection = ({
                         </span>
                         <span className="sc-hero-metric">
                             <span className="material-symbols-outlined">receipt_long</span>
-                            20 Sektör
+                            32 Sektör
                         </span>
                         <span className="sc-hero-metric">
                             <span className="material-symbols-outlined">location_on</span>
