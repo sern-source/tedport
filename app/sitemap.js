@@ -5,22 +5,36 @@ import { toSlug } from '../src/pages/SektorLanding/utils/sektorSlugUtils';
 
 const BASE_URL = 'https://tedport.com';
 
-// Enes Doğanay | 23 Mayıs 2026: Anon key ile tüm public firma slug'larını çek (RLS erişim kontrolü yapar)
+// Enes Doğanay | 28 Mayıs 2026: Supabase PostgREST max_rows=1000 limiti aşmak için pagination
+// limit=10000 göndersek bile sunucu en fazla 1000 satır döndürür — offset ile tüm kayıtlar çekilir
+const SUPABASE_PAGE_SIZE = 1000;
+
 async function fetchFirmaSlugs() {
-    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/firmalar?slug=not.is.null&select=slug&limit=10000`;
+    const allSlugs = [];
+    let offset = 0;
+
     try {
-        const res = await fetch(url, {
-            headers: {
-                apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-            },
-            next: { revalidate: 3600 },
-        });
-        if (!res.ok) return [];
-        return await res.json();
+        while (true) {
+            const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/firmalar?slug=not.is.null&select=slug&limit=${SUPABASE_PAGE_SIZE}&offset=${offset}`;
+            const res = await fetch(url, {
+                headers: {
+                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+                },
+                next: { revalidate: 3600 },
+            });
+            if (!res.ok) break;
+            const batch = await res.json();
+            if (!Array.isArray(batch) || batch.length === 0) break;
+            allSlugs.push(...batch);
+            if (batch.length < SUPABASE_PAGE_SIZE) break;
+            offset += SUPABASE_PAGE_SIZE;
+        }
     } catch {
-        return [];
+        return allSlugs;
     }
+
+    return allSlugs;
 }
 
 // Enes Doğanay | 23 Mayıs 2026: Next.js sitemap() — tüm URL'leri birleştirir

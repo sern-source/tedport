@@ -2,9 +2,10 @@
 
 import { SEKTORLER } from '../../Firmalar/utils/sektorData';
 
-// Enes Doğanay | 12 Mayıs 2026: Türkçe karakterleri slug'a çevir
+// Enes Doğanay | 28 Mayıs 2026: İ → i önce çevrilmeli; V8'de 'İ'.toLowerCase() = 'i\u0307' üretir → regex - koyar
 export const toSlug = (str) =>
     str
+        .replace(/İ/g, 'i')
         .toLowerCase()
         .replace(/ğ/g, 'g')
         .replace(/ü/g, 'u')
