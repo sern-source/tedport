@@ -4,7 +4,7 @@ import { supabase } from '../../../supabaseClient';
 import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 import {
     fetchChatMessages, sendChatMessage as sendChatMessageService,
-    enrichTeklifMessages,
+    enrichTeklifMessages, sendChatMessageWithFile, getAttachmentSignedUrl,
 } from '../services/teklifService';
 import { markNotificationsRead, markTeklifFirmaNotificationsRead } from '../services/firmaService';
 
@@ -142,9 +142,39 @@ export const useTeklifChat = ({
         } finally { setChatSending(false); }
     }, [chatInput, activeQuoteChat, chatSending, userId, incomingQuotes, scrollChatToBottom, setIncomingQuotes, setOutgoingQuotes]);
 
+    // Enes Doğanay | 29 Mayıs 2026: Chat'e dosya gönder — yalnızca firma tarafı
+    // Enes Doğanay | 29 Mayıs 2026: message — dosyayla birlikte opsiyonel metin desteği
+    const handleSendFileMessage = useCallback(async (file, message) => {
+        if (!activeQuoteChat || chatSending) return;
+        setChatSending(true);
+        const isIncoming = incomingQuotes.some(q => q.id === activeQuoteChat.id);
+        const senderRole = isIncoming ? 'company' : 'user';
+        try {
+            const data = await sendChatMessageWithFile({ teklifId: activeQuoteChat.id, userId, senderRole, companyId, file, message });
+            setChatMessages(prev => [...prev, data]);
+            chatChannelRef.current?.send({ type: 'broadcast', event: 'new-message', payload: data }).catch(() => {});
+            const newStatus = isIncoming ? 'replied' : 'awaiting_reply';
+            const updater = prev => prev.map(q => q.id === activeQuoteChat.id ? { ...q, _displayStatus: newStatus } : q);
+            if (isIncoming) setIncomingQuotes(updater); else setOutgoingQuotes(updater);
+            setActiveQuoteChat(prev => prev ? { ...prev, _displayStatus: newStatus } : null);
+            scrollChatToBottom();
+        } catch (err) {
+            showFpToast?.('error', err.message || 'Dosya gönderilemedi.');
+        } finally { setChatSending(false); }
+    }, [activeQuoteChat, chatSending, userId, companyId, incomingQuotes, scrollChatToBottom, setIncomingQuotes, setOutgoingQuotes, showFpToast]);
+
+    // Enes Doğanay | 29 Mayıs 2026: Chat eki için imzalı URL ile yeni sekmede aç
+    const handleOpenChatAttachment = useCallback(async (path) => {
+        if (!path) return;
+        try {
+            const url = await getAttachmentSignedUrl(path);
+            if (url) window.open(url, '_blank', 'noopener,noreferrer');
+        } catch { /* sessizce başarısız ol */ }
+    }, []);
+
     return {
         activeQuoteChat, setActiveQuoteChat, chatMessages, setChatMessages,
         chatLoading, chatInput, setChatInput, chatSending, chatEndRef,
-        handleOpenQuoteChat, handleSendChatMessage,
+        handleOpenQuoteChat, handleSendChatMessage, handleSendFileMessage, handleOpenChatAttachment,
     };
 };

@@ -26,6 +26,8 @@ const TeklifChatView = ({
   setReportModal,
   setReportNeden,
   setReportAciklama,
+  handleSendFileMessage,
+  handleOpenChatAttachment,
 }) => {
   const isIncoming = incomingQuotes?.some((iq) => iq.id === q.id) ?? false;
   const isClosed = q.durum === 'closed' || q.durum === 'rejected';
@@ -70,6 +72,8 @@ const TeklifChatView = ({
         closedMessage="Bu teklif talebi kapatılmıştır — mesaj gönderilemez."
         onClose={() => setActiveQuoteChat(null)}
         onSend={handleSendChatMessage}
+        onAttachFile={handleSendFileMessage}
+        onOpenAttachment={handleOpenChatAttachment}
         onReport={(msgId) => {
           const msg = (chatMessages || []).find(m => m.id === msgId);
           if (msg) {

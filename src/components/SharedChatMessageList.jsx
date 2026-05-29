@@ -8,7 +8,7 @@ const msgTimeFormatter = new Intl.DateTimeFormat('tr-TR', {
 
 const formatMsgTime = (created_at) => msgTimeFormatter.format(new Date(created_at));
 
-const SharedChatMessageList = ({ messages, loading, error, endRef, title, onReport }) => {
+const SharedChatMessageList = ({ messages, loading, error, endRef, title, onReport, onOpenAttachment }) => {
     // Enes Doğanay | 7 Mayıs 2026: Scroll-to-bottom butonu görünürlüğü
     const [showScrollBtn, setShowScrollBtn] = useState(false);
     const messagesRef = useRef(null);
@@ -73,7 +73,24 @@ const SharedChatMessageList = ({ messages, loading, error, endRef, title, onRepo
                                 <strong>{msg._senderLabel || (msg._isMine ? 'Siz' : title)}</strong>
                                 <span>{timeStr}</span>
                             </div>
-                            <p className="scm-bubble__text">{msg.mesaj}</p>
+                            {/* Enes Doğanay | 29 Mayıs 2026: Metin ve ek dosya ayrı ayrı göster — her ikisi de olabilir */}
+                            {msg.mesaj ? <p className="scm-bubble__text">{msg.mesaj}</p> : null}
+                            {msg.ek_dosya_url && msg.ek_dosya_adi ? (
+                                <div
+                                    className="scm-bubble__attachment"
+                                    onClick={() => onOpenAttachment?.(msg.ek_dosya_url)}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={e => e.key === 'Enter' && onOpenAttachment?.(msg.ek_dosya_url)}
+                                >
+                                    <span className="material-symbols-outlined scm-bubble__attachment-icon">description</span>
+                                    <div className="scm-bubble__attachment-info">
+                                        <span className="scm-bubble__attachment-name">{msg.ek_dosya_adi}</span>
+                                        <span className="scm-bubble__attachment-hint">Görüntülemek için tıklayın</span>
+                                    </div>
+                                    <span className="material-symbols-outlined scm-bubble__attachment-open">open_in_new</span>
+                                </div>
+                            ) : null}
                             {!msg._isMine && onReport && (
                                 <button
                                     className="scm-report-btn"                                    aria-label="Mesajı Şikayet et"                                    data-tooltip="Mesajı şikayet et"

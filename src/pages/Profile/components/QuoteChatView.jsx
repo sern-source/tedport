@@ -24,6 +24,13 @@ const QuoteChatView = ({
     if (url) window.open(url, '_blank');
   };
 
+  // Enes Doğanay | 29 Mayıs 2026: Chat'teki ek dosyaları görüntüle — firma ekledi, kullanıcı okuyabilir
+  const handleOpenChatAttachment = async (path) => {
+    if (!path) return;
+    const url = await getQuoteAttachmentSignedUrl(path);
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   // Enes Doğanay | 7 Mayıs 2026: Mesajları SharedChatModal formatına normalize et
   const normalizedMessages = (quoteChatMessages || []).map(m => ({
     ...m,
@@ -147,6 +154,7 @@ const QuoteChatView = ({
         closedMessage="Bu teklif talebi kapatılmıştır — mesaj gönderilemez."
         onClose={() => setActiveQuoteId(null)}
         onSend={sendQuoteChatMessage}
+        onOpenAttachment={handleOpenChatAttachment}
         onReport={(msgId) => {
           const msg = (quoteChatMessages || []).find(m => m.id === msgId);
           if (msg) {

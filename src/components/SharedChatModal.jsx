@@ -25,9 +25,14 @@ const SharedChatModal = ({
     onSend,
     onReport,
     extraActions,
+    // Enes Doğanay | 29 Mayıs 2026: Header altında okunabilir eylem strip’i — ör. İletişim Bilgileri butonu
+    headerBanner,
     // Enes Doğanay | 7 Mayıs 2026: inline mod — overlay olmadan satır içi render
     inline = false,
     hideHeader = false,
+    // Enes Doğanay | 29 Mayıs 2026: Opsiyonel dosya ekleme (firma teklif chat'i) — diğer kullanımlar etkisiz
+    onAttachFile,
+    onOpenAttachment,
 }) => {
     // Enes Doğanay | 7 Mayıs 2026: Avatar yüklenemezse fallback'e geç
     const [avatarErr, setAvatarErr] = useState(false);
@@ -88,6 +93,13 @@ const SharedChatModal = ({
                 </div>
                 )}
 
+                {/* Enes Doğanay | 29 Mayıs 2026: headerBanner — header altında okunabilir eylem strip’i */}
+                {headerBanner && (
+                    <div className="scm-header-banner">
+                        {headerBanner}
+                    </div>
+                )}
+
                 {/* ── MESAJLAR + SCROLL BUTONU ── */}
                 <SharedChatMessageList
                     messages={messages}
@@ -96,9 +108,10 @@ const SharedChatModal = ({
                     endRef={endRef}
                     title={title}
                     onReport={onReport}
-                />
+                    onOpenAttachment={onOpenAttachment}
+/>
 
-                {/* ── FOOTER ── */}
+                {/* —— FOOTER —— */}
                 <SharedChatInputBar
                     input={input}
                     setInput={setInput}
@@ -106,6 +119,7 @@ const SharedChatModal = ({
                     isClosed={isClosed}
                     closedMessage={closedMessage}
                     onSend={onSend}
+                    onAttachFile={onAttachFile}
                 />
             </div>
         </div>

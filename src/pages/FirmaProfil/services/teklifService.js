@@ -1,5 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif yönetimi servisi
 import { supabase } from '../../../supabaseClient';
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 
 /* Enes Doğanay | 6 Mayıs 2026: İlk yükleme — gelen + giden teklifler */
 export const fetchQuotesInitial = async (companyId) => {
@@ -260,4 +261,24 @@ export const getAttachmentSignedUrl = async (path) => {
     .from('teklif-ekleri')
     .createSignedUrl(path, 300);
   return data?.signedUrl || null;
+};
+
+/* Enes Doğanay | 29 Mayıs 2026: Chat mesajı + dosya gönder — yalnızca firma tarafı için */
+// Enes Doğanay | 29 Mayıs 2026: message — dosyayla birlikte opsiyonel metin
+export const sendChatMessageWithFile = async ({ teklifId, userId, senderRole, companyId, file, message }) => {
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) throw new Error(ALLOWED_EK_DOSYA_HATA);
+  const path = `chat_files/${companyId}/${teklifId}/${Date.now()}.${ext}`;
+  const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(path, file);
+  if (uploadErr) throw new Error('Dosya yüklenemedi: ' + uploadErr.message);
+  const { data, error } = await supabase
+    .from('teklif_mesajlari')
+    .insert([{ teklif_id: teklifId, sender_id: userId, sender_role: senderRole, mesaj: message || '', ek_dosya_url: path, ek_dosya_adi: file.name }])
+    .select()
+    .single();
+  if (error) {
+    await supabase.storage.from('teklif-ekleri').remove([path]);
+    throw new Error(error.message);
+  }
+  return data;
 };
