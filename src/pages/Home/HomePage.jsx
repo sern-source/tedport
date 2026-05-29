@@ -1,4 +1,5 @@
 // Enes Doğanay | 6 Mayıs 2026: Home sayfası — bileşenleri + hook'ları birleştirir
+'use client';
 import React from 'react';
 import './HomePage.css';
 import SharedHeader from '../../components/SharedHeader';
