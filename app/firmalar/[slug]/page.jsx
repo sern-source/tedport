@@ -19,20 +19,45 @@ async function fetchFirmaSSR(slug) {
     return rows?.[0] || null;
 }
 
+// Enes Doğanay | 29 Mayıs 2026: Hukuki ekleri (A.Ş., Ltd. Şti. vb.) title'dan siler — SEO için kısa isim
+const LEGAL_SUFFIX_PATTERNS = [
+    /\s+San\.\s+ve\s+Tic\.\s+A\.Ş\.\s*$/i,
+    /\s+San\.\s+ve\s+Tic\.\s+Ltd\.\s+Şti\.\s*$/i,
+    /\s+Tic\.\s+ve\s+San\.\s+A\.Ş\.\s*$/i,
+    /\s+Sanayi\s+ve\s+Ticaret\s+A\.Ş\.\s*$/i,
+    /\s+Sanayi\s+ve\s+Ticaret\s+Ltd\.\s+Şti\.\s*$/i,
+    /\s+San\.\s+A\.Ş\.\s*$/i,
+    /\s+Tic\.\s+A\.Ş\.\s*$/i,
+    /\s+A\.Ş\.\s*$/i,
+    /\s+Ltd\.\s+Şti\.\s*$/i,
+    /\s+Şti\.\s*$/i,
+];
+
+function getShortName(firmaAdi) {
+    if (!firmaAdi) return firmaAdi;
+    let name = firmaAdi;
+    for (const pattern of LEGAL_SUFFIX_PATTERNS) {
+        name = name.replace(pattern, '');
+    }
+    return name.trim();
+}
+
 // Enes Doğanay | 23 Mayıs 2026: Next.js generateMetadata — server-side <title> ve og:* tagları
 export async function generateMetadata({ params }) {
     const { slug } = await params;
     const firma = await fetchFirmaSSR(slug);
     if (!firma) return { title: 'Firma Bulunamadı' };
 
+    // Enes Doğanay | 29 Mayıs 2026: shortName — hukuki ek olmadan kısa marka adı
+    const shortName = getShortName(firma.firma_adi);
     const description = `${firma.firma_adi}${firma.category_name ? ' — ' + firma.category_name : ''}${firma.il_ilce ? ', ' + firma.il_ilce : ''}. Tedport'ta firma profilini inceleyin, teklif talebi gönderin.`;
     const logoUrl = firma.logo_url?.includes('firma-logolari') ? firma.logo_url : null;
 
     return {
-        title: firma.firma_adi,
+        title: shortName,
         description,
         openGraph: {
-            title: `${firma.firma_adi} | Tedport`,
+            title: `${shortName} | Tedport`,
             description,
             url: `https://tedport.com/firmalar/${slug}`,
             ...(logoUrl ? { images: [{ url: logoUrl }] } : {}),
@@ -47,6 +72,8 @@ function buildOrganizationJsonLd(firma, slug) {
         '@context': 'https://schema.org',
         '@type': 'Organization',
         name: firma.firma_adi,
+        // Enes Doğanay | 29 Mayıs 2026: alternativeName — Google kısa marka adını öğrenir
+        ...(getShortName(firma.firma_adi) !== firma.firma_adi ? { alternativeName: getShortName(firma.firma_adi) } : {}),
         url: `https://tedport.com/firmalar/${slug}`,
         ...(firma.description ? { description: firma.description } : {}),
         ...(firma.web_sitesi ? { sameAs: [firma.web_sitesi] } : {}),
@@ -55,6 +82,20 @@ function buildOrganizationJsonLd(firma, slug) {
         ...(firma.ana_sektor ? { knowsAbout: firma.ana_sektor } : {}),
     };
     // Enes Doğanay | 23 Mayıs 2026: </script> injection'ı önle
+    return JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+}
+
+// Enes Doğanay | 29 Mayıs 2026: Breadcrumb JSON-LD — Google arama sonuçlarında yol gösterir
+function buildBreadcrumbJsonLd(firma, slug) {
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://tedport.com' },
+            { '@type': 'ListItem', position: 2, name: 'Firmalar', item: 'https://tedport.com/firmalar' },
+            { '@type': 'ListItem', position: 3, name: getShortName(firma.firma_adi), item: `https://tedport.com/firmalar/${slug}` },
+        ],
+    };
     return JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
 }
 
@@ -67,6 +108,12 @@ export default async function FirmaDetayRoute({ params }) {
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: buildOrganizationJsonLd(initialFirma, slug) }}
+                />
+            )}
+            {initialFirma && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: buildBreadcrumbJsonLd(initialFirma, slug) }}
                 />
             )}
             <FirmaDetayPage initialFirma={initialFirma} />
