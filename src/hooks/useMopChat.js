@@ -5,6 +5,7 @@ import { containsProfanity, PROFANITY_ERROR_MSG } from '../utils/contentModerati
 import {
     fetchChatMessages, markMessagesReadByBidder, markTeklifNotificationsRead,
     sendChatMessage, notifyFirmaManagers, markSingleMessageRead, fetchFirmaManagerIds,
+    sendIhaleChatMessageWithFile, getIhaleChatAttachmentSignedUrl,
 } from '../services/myOffersService';
 // Enes Doğanay | 7 Mayıs 2026: Chat + unread badge state — offers/tenderMap/firmaMap dışarıdan gelir
 const TENDER_STATUS_MAP = { canli: 'active', active: 'active', kapali: 'closed', closed: 'closed', iptal: 'cancelled', cancelled: 'cancelled', taslak: 'draft', draft: 'draft' };
@@ -151,10 +152,45 @@ export function useMopChat({ offers, tenderMap, firmaMap, firmaLogoMap, userProf
         } catch { setMopChatInput(messageText); setMopChatSending(false); }
     }, [mopChatInput, activeMopChat, tenderMap, userProfile, scrollMopChatToBottom, getUserId]);
 
+    // Enes Doğanay | 1 Haziran 2026: Bidder ihale chat'ten dosya + opsiyonel metin gönderebilsin
+    const handleSendMopFileMessage = useCallback(async (file, message) => {
+        if (!activeMopChat || mopChatSending) return;
+        const senderId = getUserId?.();
+        if (!senderId) return;
+        const tender = tenderMap[String(activeMopChat.offer.ihale_id)];
+        setMopChatSending(true);
+        try {
+            const data = await sendIhaleChatMessageWithFile({ teklifId: activeMopChat.offer.id, userId: senderId, file, message });
+            setMopChatMessages(prev => [...prev, data]);
+            scrollMopChatToBottom();
+            if (mopChatChannelRef.current) void mopChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data });
+            if (tender?.firma_id) {
+                void fetchFirmaManagerIds(tender.firma_id).then((managers) => {
+                    if (!managers?.length) return;
+                    const userName = [userProfile?.first_name, userProfile?.last_name].filter(Boolean).join(' ') || senderId;
+                    const notifRows = managers.filter(m => m.user_id !== senderId).map(m => ({ user_id: m.user_id, type: 'tender_offer_message', title: 'İhale teklifine dosya eklendi', message: `"${activeMopChat.tenderTitle || 'İhale'}" teklifine ${userName} dosya gönderdi.`, is_read: false, metadata: { ihale_id: activeMopChat.offer.ihale_id, teklif_id: activeMopChat.offer.id, ihale_baslik: activeMopChat.tenderTitle } }));
+                    notifyFirmaManagers(tender.firma_id, notifRows);
+                });
+            }
+        } catch (err) {
+            throw err;
+        } finally {
+            setMopChatSending(false);
+        }
+    }, [activeMopChat, mopChatSending, tenderMap, userProfile, scrollMopChatToBottom, getUserId]);
+
+    // Enes Doğanay | 1 Haziran 2026: İhale chat eki için imzalı URL al, yeni sekmede aç
+    const handleOpenMopAttachment = useCallback(async (path) => {
+        if (!path) return;
+        const url = await getIhaleChatAttachmentSignedUrl(path);
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    }, []);
+
     return {
         activeMopChat, mopChatMessages, mopChatLoading, mopChatError,
         mopChatInput, setMopChatInput, mopChatSending, mopChatEndRef,
         unreadMopChatIds, setUnreadMopChatIds, unreadMopChatCounts, setUnreadMopChatCounts,
         handleOpenMopChat, handleCloseMopChat, handleSendMopChatMessage,
+        handleSendMopFileMessage, handleOpenMopAttachment,
     };
 }

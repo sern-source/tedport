@@ -19,3 +19,14 @@ USING (
         AND t.user_id = auth.uid()
     )
 );
+
+-- Enes Doğanay | 1 Haziran 2026: Kullanıcı kendi yüklediği chat dosyalarını okuyabilsin
+-- Kullanıcı chat dosyası yolu: chat_files/{userId}/{quoteId}/file — foldername[2] = userId
+DROP POLICY IF EXISTS "Chat file read for uploader" ON storage.objects;
+CREATE POLICY "Chat file read for uploader"
+ON storage.objects FOR SELECT
+USING (
+    bucket_id = 'teklif-ekleri'
+    AND (storage.foldername(name))[1] = 'chat_files'
+    AND (storage.foldername(name))[2] = auth.uid()::text
+);

@@ -1,7 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale teklif sohbet state — realtime kanal + okunmamış takibi
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import * as ihaleService from '../services/ihaleService';
-import { enrichMessagesWithSender, fetchSenderAvatarUrl } from '../services/ihaleService';
+import { enrichMessagesWithSender, fetchSenderAvatarUrl, sendIhaleChatMessageWithFile, getIhaleChatAttachmentSignedUrl } from '../services/ihaleService';
 import { getAuthSession } from '../services/firmaService';
 import { supabase } from '../../../supabaseClient'; // Enes Doğanay | 8 Mayıs 2026: sadece realtime channel için
 import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
@@ -122,6 +122,10 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
                 setTenderChatMessages(prev => { if (prev.some(m => m.id === payload.id)) return prev; return [...prev, { ...payload, _isMine: payload.sender_role === 'company' }]; });
                 scrollToBottom();
                 if (payload.sender_role === 'bidder') { ihaleService.markChatMessagesRead([payload.id]).catch(() => {}); }
+                // Enes Doğanay | 1 Haziran 2026: Broadcast mesajını da zenginleştir — ekip üyesi adı doğru görünsün
+                enrichMessagesWithSender([payload]).then(([enriched]) => {
+                    if (enriched) setTenderChatMessages(prev => prev.map(m => m.id === enriched.id ? { ...enriched, _isMine: enriched.sender_role === 'company' } : m));
+                }).catch(() => {});
             })
             .subscribe();
         tenderChatChannelRef.current = channel;
@@ -161,6 +165,38 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
         }
     }, [tenderChatInput, activeTenderChat, scrollToBottom]);
 
+    // Enes Doğanay | 1 Haziran 2026: Firma ihale chat'ten dosya + opsiyonel metin gönderebilsin
+    const handleSendTenderFileMessage = useCallback(async (getUserId, file, message) => {
+        if (!activeTenderChat || tenderChatSending) return;
+        const senderId = getUserId?.();
+        if (!senderId) return;
+        setTenderChatSending(true);
+        try {
+            const data = await sendIhaleChatMessageWithFile({ teklifId: activeTenderChat.offer.id, senderId, file, message });
+            setTenderChatMessages(prev => [...prev, { ...data, _isMine: true }]);
+            // Enes Doğanay | 1 Haziran 2026: Dosya mesajını da zenginleştir — şirket adı görünsün
+            enrichMessagesWithSender([data]).then(([enriched]) => {
+                if (enriched) setTenderChatMessages(prev => prev.map(m => m.id === enriched.id ? { ...enriched, _isMine: true } : m));
+            }).catch(() => {});
+            scrollToBottom();
+            if (tenderChatChannelRef.current) tenderChatChannelRef.current.send({ type: 'broadcast', event: 'new-tender-message', payload: data }).catch(() => {});
+            if (activeTenderChat.offer.user_id) {
+                ihaleService.insertNotification({ user_id: activeTenderChat.offer.user_id, type: 'tender_offer_message', title: 'İhale teklifine dosya eklendi', message: `"${activeTenderChat.tenderTitle || 'İhale'}" teklifinize firma dosya gönderdi.`, is_read: false, metadata: { ihale_id: activeTenderChat.offer.ihale_id, teklif_id: activeTenderChat.offer.id, ihale_baslik: activeTenderChat.tenderTitle } });
+            }
+        } catch (err) {
+            throw err;
+        } finally {
+            setTenderChatSending(false);
+        }
+    }, [activeTenderChat, tenderChatSending, scrollToBottom]);
+
+    // Enes Doğanay | 1 Haziran 2026: İhale chat eki için imzalı URL al, yeni sekmede aç
+    const handleOpenTenderAttachment = useCallback(async (path) => {
+        if (!path) return;
+        const url = await getIhaleChatAttachmentSignedUrl(path);
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    }, []);
+
     const submitReport = useCallback(async () => {
         if (!reportState.modal || reportState.sending) return;
         setReportState(p => ({ ...p, sending: true }));
@@ -184,6 +220,7 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
         tenderChatInput, setTenderChatInput, tenderChatSending, tenderChatEndRef,
         unread, tenderUnreadSet, reportState, setReportState,
         openTenderChat, closeTenderChat, sendTenderChatMessage, submitReport,
+        handleSendTenderFileMessage, handleOpenTenderAttachment,
     };
 };
 

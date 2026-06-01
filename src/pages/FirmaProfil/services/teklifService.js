@@ -220,19 +220,20 @@ export const enrichTeklifMessages = async (messages) => {
   const profileMap = Object.fromEntries((profRes.data || []).map((p) => [p.id, p]));
   const memberMap = Object.fromEntries((memberRes.data || []).map((m) => [m.user_id, m]));
 
-  const ownerFirmaIds = [
+  // Enes Doğanay | 1 Haziran 2026: Tüm üyelerin firma adlarını çek (owner + ekip üyeleri)
+  const allMemberFirmaIds = [
     ...new Set(
       (memberRes.data || [])
-        .filter((m) => m.role === 'owner' && m.firma_id)
+        .filter((m) => m.firma_id)
         .map((m) => m.firma_id)
     ),
   ];
   const firmaNameMap = {};
-  if (ownerFirmaIds.length > 0) {
+  if (allMemberFirmaIds.length > 0) {
     const { data: firmalar } = await supabase
       .from('firmalar')
       .select('firmaID, firma_adi')
-      .in('firmaID', ownerFirmaIds);
+      .in('firmaID', allMemberFirmaIds);
     (firmalar || []).forEach((f) => {
       firmaNameMap[f.firmaID] = f.firma_adi;
     });
@@ -241,16 +242,24 @@ export const enrichTeklifMessages = async (messages) => {
   return messages.map((msg) => {
     const member = memberMap[msg.sender_id];
     const isOwner = member?.role === 'owner';
-    const firmaAdi = isOwner && member?.firma_id ? firmaNameMap[member.firma_id] : null;
+    const firmaAdi = member?.firma_id ? firmaNameMap[member.firma_id] : null;
     const prof = profileMap[msg.sender_id];
+    const fullName = prof ? [prof.first_name, prof.last_name].filter(Boolean).join(' ') || null : null;
+    // Enes Doğanay | 1 Haziran 2026: Owner → firma adı; ekip üyesi → "Ad — Firma Adı"
+    let _senderName;
+    if (isOwner) {
+      _senderName = firmaAdi || fullName || null;
+    } else if (fullName && firmaAdi) {
+      _senderName = `${fullName} — ${firmaAdi}`;
+    } else {
+      _senderName = fullName || firmaAdi || null;
+    }
     return {
       ...msg,
-      _senderName:
-        firmaAdi ||
-        (prof ? [prof.first_name, prof.last_name].filter(Boolean).join(' ') || null : null),
+      _senderName,
       _senderRole: member?.role || null,
       _senderTitle: member?.title || null,
-      _senderIsFirma: !!firmaAdi,
+      _senderIsFirma: !!member,
     };
   });
 };

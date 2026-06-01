@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: MyOffersService — ihale teklifleri Supabase sorguları (shared)
 import { supabase } from '../supabaseClient';
+// Enes Doğanay | 1 Haziran 2026: Dosya yükleme sabitleri
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../constants/fileUpload';
 
 // Enes Doğanay | 6 Mayıs 2026: Kullanıcı/firma tekliflerini ihale ve firma bilgileriyle çek
 export async function fetchMyOffers(userId, companyId) {
@@ -202,4 +204,29 @@ export async function fetchFirmaManagerIds(firmaId) {
         .select('user_id')
         .eq('firma_id', String(firmaId));
     return data || [];
+}
+
+// Enes Doğanay | 1 Haziran 2026: Bidder ihale chat'ten dosya + opsiyonel metin gönderebilsin
+export async function sendIhaleChatMessageWithFile({ teklifId, userId, file, message }) {
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) throw new Error(ALLOWED_EK_DOSYA_HATA);
+    const path = `ihale_chat_files/${teklifId}/bidder/${Date.now()}.${ext}`;
+    const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(path, file);
+    if (uploadErr) throw new Error('Dosya yüklenemedi: ' + uploadErr.message);
+    const { data, error } = await supabase
+        .from('ihale_teklif_mesajlari')
+        .insert([{ teklif_id: teklifId, sender_id: userId, sender_role: 'bidder', mesaj: message || null, ek_dosya_url: path, ek_dosya_adi: file.name, okundu_bidder: true }])
+        .select().single();
+    if (error) {
+        await supabase.storage.from('teklif-ekleri').remove([path]);
+        throw new Error(error.message);
+    }
+    return data;
+}
+
+// Enes Doğanay | 1 Haziran 2026: İhale chat eki için imzalı URL — bidder tarafı
+export async function getIhaleChatAttachmentSignedUrl(path) {
+    if (!path) return null;
+    const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(path, 300);
+    return data?.signedUrl || null;
 }

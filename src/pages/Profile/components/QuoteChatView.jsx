@@ -15,6 +15,8 @@ const QuoteChatView = ({
   activeQuote, quoteChatMessages, quoteChatLoading, quoteChatInput, setQuoteChatInput,
   quoteChatSending, quoteChatEndRef, sendQuoteChatMessage, setActiveQuoteId, setReportModal,
   setReportNeden, setReportAciklama, navigate,
+  // Enes Doğanay | 1 Haziran 2026: Kullanıcı chat'ten dosya gönderebîlsin
+  handleSendFileMessage,
 }) => {
   const displayDurum = activeQuote._displayStatus || activeQuote.durum;
   const isClosed = activeQuote.durum === 'closed' || activeQuote.durum === 'rejected';
@@ -154,6 +156,7 @@ const QuoteChatView = ({
         closedMessage="Bu teklif talebi kapatılmıştır — mesaj gönderilemez."
         onClose={() => setActiveQuoteId(null)}
         onSend={sendQuoteChatMessage}
+        onAttachFile={handleSendFileMessage}
         onOpenAttachment={handleOpenChatAttachment}
         onReport={(msgId) => {
           const msg = (quoteChatMessages || []).find(m => m.id === msgId);

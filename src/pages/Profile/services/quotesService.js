@@ -1,6 +1,8 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif talepleri Supabase servisleri
 import { supabase } from '../../../supabaseClient';
 import { runSupabaseQueryWithTimeout } from '../../../supabaseRecovery';
+// Enes Doğanay | 1 Haziran 2026: Dosya yükleme sabitleri
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 
 export const fetchQuotes = async (userId) => {
   const { data, error } = await supabase
@@ -94,4 +96,23 @@ export const getQuoteAttachmentSignedUrl = async (path) => {
   if (!path) return null;
   const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(path, 300);
   return data?.signedUrl || null;
+};
+
+// Enes Doğanay | 1 Haziran 2026: Kullanıcı chat'ten dosya + opsiyonel metin gönderebilsin
+export const sendQuoteChatMessageWithFile = async ({ quoteId, userId, file, message }) => {
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) throw new Error(ALLOWED_EK_DOSYA_HATA);
+  const path = `chat_files/${userId}/${quoteId}/${Date.now()}.${ext}`;
+  const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(path, file);
+  if (uploadErr) throw new Error('Dosya yüklenemedi: ' + uploadErr.message);
+  const { data, error } = await supabase
+    .from('teklif_mesajlari')
+    .insert([{ teklif_id: quoteId, sender_id: userId, sender_role: 'user', mesaj: message || '', ek_dosya_url: path, ek_dosya_adi: file.name }])
+    .select()
+    .single();
+  if (error) {
+    await supabase.storage.from('teklif-ekleri').remove([path]);
+    throw new Error(error.message);
+  }
+  return data;
 };

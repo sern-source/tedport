@@ -51,13 +51,18 @@ const SharedChatInputBar = ({ input, setInput, sending, isClosed, onSend, closed
     };
 
     // Enes Doğanay | 29 Mayıs 2026: Dosya varsa onu gönder (varsa metni de birlikte ilet), yoksa sadece text gönder
+    // Enes Doğanay | 1 Haziran 2026: Hata yakalandı — yükleme başarısız olursa sendError göster
     const handleSend = () => {
         if (pendingFile) {
             const file = pendingFile;
             const text = input.trim();
             setPendingFile(null);
             if (text) setInput('');
-            onAttachFile(file, text || null);
+            Promise.resolve(onAttachFile(file, text || null)).catch(err => {
+                const msg = err?.message || 'Dosya gönderilemedi.';
+                setSendError(msg);
+                setTimeout(() => setSendError(''), 4000);
+            });
         } else if (input.trim()) {
             handleSendWithCheck();
         }

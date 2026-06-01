@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { onSupabaseConnectionEvent } from '../../../supabaseRecovery';
-import { fetchQuoteMessages, sendQuoteMessageService, markQuoteNotificationsRead } from '../services/quotesService';
+import { fetchQuoteMessages, sendQuoteMessageService, markQuoteNotificationsRead, sendQuoteChatMessageWithFile } from '../services/quotesService';
 import { containsProfanity, PROFANITY_ERROR_MSG } from '../../../utils/contentModeration';
 
 const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, setNotifications, setMyQuotes }) => {
@@ -121,9 +121,27 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
         }
     }, [quoteChatInput, activeQuoteId, userId, quoteChatSending, scrollToBottom, setMyQuotes]);
 
+    // Enes Doğanay | 1 Haziran 2026: Kullanıcı chat'ten dosya + opsiyonel metin gönderebilsin
+    const handleSendFileMessage = useCallback(async (file, message) => {
+        if (!activeQuoteId || !userId || quoteChatSending) return;
+        setQuoteChatSending(true);
+        try {
+            const data = await sendQuoteChatMessageWithFile({ quoteId: activeQuoteId, userId, file, message });
+            setQuoteChatMessages(prev => [...prev, data]);
+            quoteChatChannelRef.current?.send({ type: 'broadcast', event: 'new-message', payload: data }).catch(() => {});
+            setMyQuotes(prev => prev.map(q => q.id === activeQuoteId ? { ...q, _displayStatus: 'awaiting_reply' } : q));
+            scrollToBottom();
+        } catch (err) {
+            throw err;
+        } finally {
+            setQuoteChatSending(false);
+        }
+    }, [activeQuoteId, userId, quoteChatSending, scrollToBottom, setMyQuotes]);
+
     return {
         quoteChatMessages, quoteChatLoading, quoteChatInput, setQuoteChatInput,
         quoteChatSending, quoteChatEndRef, openQuoteChat, sendQuoteChatMessage,
+        handleSendFileMessage,
     };
 };
 

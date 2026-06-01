@@ -63,7 +63,15 @@ export const useTeklifChat = ({
         };
         const stopPolling = () => { if (pollInterval) { clearInterval(pollInterval); pollInterval = null; } };
         const channel = supabase.channel(`teklif-chat-${teklifId}`)
-            .on('broadcast', { event: 'new-message' }, ({ payload }) => addMessage(payload))
+            .on('broadcast', { event: 'new-message' }, ({ payload }) => {
+                addMessage(payload);
+                // Enes Doğanay | 1 Haziran 2026: Broadcast mesajını da zenginleştir — ekip üyesi adı doğru görünsün
+                enrichTeklifMessages([payload]).then(([enriched]) => {
+                    if (enriched && !cleaned) {
+                        setChatMessages(prev => prev.map(m => m.id === enriched.id ? enriched : m));
+                    }
+                }).catch(() => {});
+            })
             .subscribe((status) => {
                 // Enes Doğanay | 13 Mayıs 2026: SUBSCRIBED → polling kapalı; kanal yokken polling açık
                 // Enes Doğanay | 14 Mayıs 2026: cleaned guard — removeChannel tetiklediği CLOSED callback'ini yakalar

@@ -24,6 +24,8 @@ const QuotesTab = ({
   setReportModal, setReportNeden, setReportAciklama,
   openQuoteChat, sendQuoteChatMessage, handleDeleteQuote, getFilteredSortedQuotes,
   unreadQuoteIds, navigate,
+  // Enes Doğanay | 1 Haziran 2026: Kullanıcı chat'ten dosya gönderebilsin
+  handleSendFileMessage,
 }) => {
   // Enes Doğanay | 8 Mayıs 2026: Search lokal state — hooks koşullu çağrılamaz, early return'dan önce
   const [quoteSearch, setQuoteSearch] = useState('');
@@ -41,6 +43,7 @@ const QuotesTab = ({
         quoteChatSending={quoteChatSending}
         quoteChatEndRef={quoteChatEndRef}
         sendQuoteChatMessage={sendQuoteChatMessage}
+        handleSendFileMessage={handleSendFileMessage}
         setActiveQuoteId={setActiveQuoteId}
         setReportModal={setReportModal}
         setReportNeden={setReportNeden}

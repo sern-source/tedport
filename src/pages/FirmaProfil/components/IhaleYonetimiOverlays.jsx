@@ -19,6 +19,8 @@ const IhaleYonetimiOverlays = ({ chat, offerModals, tenderActions, create, offer
             tenderChatSending={chat.tenderChatSending} tenderChatEndRef={chat.tenderChatEndRef}
             isTenderClosed={isTenderClosed} onClose={chat.closeTenderChat}
             onSend={() => chat.sendTenderChatMessage(getUserId)}
+            onAttachFile={(file, message) => chat.handleSendTenderFileMessage(getUserId, file, message)}
+            onOpenAttachment={chat.handleOpenTenderAttachment}
             onOpenContact={() => offerModals.openContact(chat.activeTenderChat?.offer)}
             onOpenReport={({ mesajId, mesajIcerik }) => chat.setReportState(p => ({ ...p, modal: { mesajId, mesajIcerik }, neden: '', aciklama: '' }))}
         />

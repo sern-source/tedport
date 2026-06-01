@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: İhale yönetimi Supabase servis katmanı
 import { supabase } from '../../../supabaseClient';
+// Enes Doğanay | 1 Haziran 2026: Dosya yükleme sabitleri
+import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 export { listMyTenders, updateTender, deleteTender, createTender, completeTender } from '../../../services/ihaleManagementApi';
 
 /* ─── Teklif Sorguları ─── */
@@ -85,18 +87,29 @@ export const enrichMessagesWithSender = async (messages) => {
     const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
     const { data: members } = await supabase.from('kurumsal_firma_yoneticileri').select('user_id, role, title, firma_id').in('user_id', senderIds);
     const memberMap = Object.fromEntries((members || []).map(m => [m.user_id, m]));
-    const ownerFirmaIds = [...new Set((members || []).filter(m => m.role === 'owner' && m.firma_id).map(m => m.firma_id))];
+    // Enes Doğanay | 1 Haziran 2026: Tüm üyelerin firma adlarını çek (owner + ekip üyeleri)
+    const allMemberFirmaIds = [...new Set((members || []).filter(m => m.firma_id).map(m => m.firma_id))];
     const firmaNameMap = {};
-    if (ownerFirmaIds.length > 0) {
-        const { data: firmalar } = await supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', ownerFirmaIds);
+    if (allMemberFirmaIds.length > 0) {
+        const { data: firmalar } = await supabase.from('firmalar').select('firmaID, firma_adi').in('firmaID', allMemberFirmaIds);
         (firmalar || []).forEach(f => { firmaNameMap[f.firmaID] = f.firma_adi; });
     }
     return messages.map(msg => {
         const p = profileMap[msg.sender_id];
         const m = memberMap[msg.sender_id];
         const isOwner = m?.role === 'owner';
-        const firmaAdi = isOwner && m?.firma_id ? firmaNameMap[m.firma_id] : null;
-        return { ...msg, _senderName: firmaAdi || (p ? [p.first_name, p.last_name].filter(Boolean).join(' ') || null : null), _senderRole: m?.role || null, _senderTitle: m?.title || null, _senderIsFirma: !!firmaAdi };
+        const firmaAdi = m?.firma_id ? firmaNameMap[m.firma_id] : null;
+        const fullName = p ? [p.first_name, p.last_name].filter(Boolean).join(' ') || null : null;
+        // Enes Doğanay | 1 Haziran 2026: Owner → firma adı; ekip üyesi → "Ad — Firma Adı"
+        let _senderName;
+        if (isOwner) {
+            _senderName = firmaAdi || fullName || null;
+        } else if (fullName && firmaAdi) {
+            _senderName = `${fullName} — ${firmaAdi}`;
+        } else {
+            _senderName = fullName || firmaAdi || null;
+        }
+        return { ...msg, _senderName, _senderRole: m?.role || null, _senderTitle: m?.title || null, _senderIsFirma: !!m };
     });
 };
 
@@ -243,6 +256,31 @@ export const getTeklifFileSignedUrl = async (rawPath) => {
         } catch { /* orijinal path kullan */ }
     }
     const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(filePath, 300);
+    return data?.signedUrl || null;
+};
+
+// Enes Doğanay | 1 Haziran 2026: İhale chat dosyası gönder — firma (company) tarafı
+export const sendIhaleChatMessageWithFile = async ({ teklifId, senderId, file, message }) => {
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    if (!ALLOWED_EK_DOSYA_UZANTILARI.has(ext)) throw new Error(ALLOWED_EK_DOSYA_HATA);
+    const path = `ihale_chat_files/${teklifId}/company/${Date.now()}.${ext}`;
+    const { error: uploadErr } = await supabase.storage.from('teklif-ekleri').upload(path, file);
+    if (uploadErr) throw new Error('Dosya yüklenemedi: ' + uploadErr.message);
+    const { data, error } = await supabase
+        .from('ihale_teklif_mesajlari')
+        .insert([{ teklif_id: teklifId, sender_id: senderId, sender_role: 'company', mesaj: message || null, ek_dosya_url: path, ek_dosya_adi: file.name, okundu_firma: true }])
+        .select().single();
+    if (error) {
+        await supabase.storage.from('teklif-ekleri').remove([path]);
+        throw new Error(error.message);
+    }
+    return data;
+};
+
+// Enes Doğanay | 1 Haziran 2026: İhale chat eki için imzalı URL
+export const getIhaleChatAttachmentSignedUrl = async (path) => {
+    if (!path) return null;
+    const { data } = await supabase.storage.from('teklif-ekleri').createSignedUrl(path, 300);
     return data?.signedUrl || null;
 };
 

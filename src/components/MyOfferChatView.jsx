@@ -16,6 +16,9 @@ const MyOfferChatView = ({
     onClose,
     onSend,
     onOpenReportModal,
+    // Enes Doğanay | 1 Haziran 2026: Dosya gönderme desteği
+    onAttachFile,
+    onOpenAttachment,
 }) => {
     if (!activeMopChat) return null;
 
@@ -47,6 +50,8 @@ const MyOfferChatView = ({
             isClosed={isClosed}
             onClose={onClose}
             onSend={onSend}
+            onAttachFile={onAttachFile}
+            onOpenAttachment={onOpenAttachment}
             onReport={onOpenReportModal ? (msgId) => {
                 const msg = mopChatMessages.find(m => m.id === msgId);
                 if (msg) onOpenReportModal({ mesajId: msg.id, mesajIcerik: msg.mesaj });

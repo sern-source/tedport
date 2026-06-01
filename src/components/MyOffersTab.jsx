@@ -26,6 +26,8 @@ const MyOffersTab = ({ userId, companyId, mopChatTrigger, onChatOpened, onUnread
         activeMopChat, mopChatMessages, mopChatLoading, mopChatError,
         mopChatInput, setMopChatInput, mopChatSending, mopChatEndRef,
         handleOpenMopChat, handleCloseMopChat, handleSendMopChatMessage,
+        // Enes Doğanay | 1 Haziran 2026: Dosya gönderme + ek görüntüleme
+        handleSendMopFileMessage, handleOpenMopAttachment,
         deleteConfirm, setDeleteConfirm, deleting, handleDeleteOffer,
         firmaContactPopup, setFirmaContactPopup, firmaContactLoading, handleOpenFirmaContact,
         reportModal, setReportModal, reportSending,
@@ -101,6 +103,7 @@ const MyOffersTab = ({ userId, companyId, mopChatTrigger, onChatOpened, onUnread
                 mopChatInput={mopChatInput} setMopChatInput={setMopChatInput}
                 mopChatSending={mopChatSending} mopChatEndRef={mopChatEndRef}
                 tenderMap={tenderMap} onClose={handleCloseMopChat} onSend={handleSendMopChatMessage}
+                onAttachFile={handleSendMopFileMessage} onOpenAttachment={handleOpenMopAttachment}
                 onRetry={handleRetryChat} onOpenReportModal={handleOpenReportModal} />
             {/* Enes Doğanay | 7 Mayıs 2026: Ortak şikayet modal */}
             <SharedReportModal

@@ -2,16 +2,21 @@
 import React from 'react';
 import SharedChatModal from '../../../components/SharedChatModal';
 
-const IhaleChatModal = ({ activeTenderChat, tenderChatMessages, tenderChatLoading, tenderChatError, tenderChatInput, setTenderChatInput, tenderChatSending, tenderChatEndRef, isTenderClosed, onClose, onSend, onOpenContact, onOpenReport }) => {
+const IhaleChatModal = ({ activeTenderChat, tenderChatMessages, tenderChatLoading, tenderChatError, tenderChatInput, setTenderChatInput, tenderChatSending, tenderChatEndRef, isTenderClosed, onClose, onSend, onOpenContact, onOpenReport,
+    // Enes Doğanay | 1 Haziran 2026: Dosya gönderme desteği
+    onAttachFile, onOpenAttachment }) => {
     if (!activeTenderChat) return null;
 
     const { offer, senderAvatar } = activeTenderChat;
     const senderName = offer.gonderen_firma_adi || offer.gonderen_ad_soyad || offer.gonderen_email;
     // Enes Doğanay | 7 Mayıs 2026: Mesajları SharedChatModal formatına dönüştür — ihale sahibi = mine
+    // Enes Doğanay | 1 Haziran 2026: _senderName kullan — owner → firma adı, ekip üyesi → Ad — Firma
     const normalizedMessages = (tenderChatMessages || []).map(m => ({
         ...m,
         _isMine: m.sender_role === 'company' || m._isMine,
-        _senderLabel: (m.sender_role === 'company' || m._isMine) ? 'Siz' : senderName,
+        _senderLabel: (m.sender_role === 'company' || m._isMine)
+            ? (m._senderName || 'Firma')
+            : senderName,
     }));
 
     // Enes Doğanay | 7 Mayıs 2026: mesaj içeriğini bul — onReport sadece msgId geçirir, tam obje gerekli
@@ -39,6 +44,8 @@ const IhaleChatModal = ({ activeTenderChat, tenderChatMessages, tenderChatLoadin
             onClose={onClose}
             onSend={onSend}
             onReport={handleReport}
+            onAttachFile={onAttachFile}
+            onOpenAttachment={onOpenAttachment}
             headerBanner={
                 onOpenContact && (
                     <button className="scm-contact-strip-btn" onClick={onOpenContact} type="button">
