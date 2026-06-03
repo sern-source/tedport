@@ -45,6 +45,20 @@ const SharedFooter = () => {
                             {/* Enes Doğanay | 16 Mayıs 2026: "Ücretsız Kayıt Ol" → "Platforma Katıl" */}
                             {!userProfile && <li><Link href="/register">Platforma Katıl</Link></li>}
                             {!userProfile && <li><Link href="/login">Giriş Yap</Link></li>}
+                            {/* Enes Doğanay | 3 Haziran 2026: Giriş yapan kullanıcıya profil hızlı erişim */}
+                            {userProfile && <li><Link href="/profile">Profilim</Link></li>}
+                        </ul>
+                    </div>
+
+                    {/* Kaynaklar */}
+                    {/* Enes Doğanay | 3 Haziran 2026: Bilgi Merkezi / Blog linki footer'a eklendi */}
+                    <div className="sf-links">
+                        <h4>Kaynaklar</h4>
+                        <ul>
+                            <li><Link href="/blog">Bilgi Merkezi</Link></li>
+                            <li><Link href="/blog/turkiyede-ihale-sureci-nasil-isler">İhale Rehberi</Link></li>
+                            <li><Link href="/blog/b2b-satinalma-kritik-hatalar">B2B Satınalma</Link></li>
+                            <li><Link href="/sss">Sıkça Sorulan Sorular</Link></li>
                         </ul>
                     </div>
 
@@ -53,7 +67,6 @@ const SharedFooter = () => {
                         <h4>Kurumsal</h4>
                         <ul>
                             <li><Link href="/hakkimizda">Hakkımızda</Link></li>
-                            <li><Link href="/sss">Sıkça Sorulan Sorular</Link></li>
                             <li><Link href="/iletisim">İletişim</Link></li>
                             <li><a href="https://www.linkedin.com/company/tedport/about/" target="_blank" rel="noopener noreferrer">Kariyer</a></li>
                         </ul>

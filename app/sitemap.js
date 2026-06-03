@@ -37,9 +37,28 @@ async function fetchFirmaSlugs() {
     return allSlugs;
 }
 
+// Enes Doğanay | 3 Haziran 2026: Blog slug'larını Supabase'den çek
+async function fetchBlogSlugsSitemap() {
+    try {
+        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/blog_posts?is_published=eq.true&select=slug,published_at`;
+        const res = await fetch(url, {
+            headers: {
+                apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+            next: { revalidate: 3600 },
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+    } catch {
+        return [];
+    }
+}
+
 // Enes Doğanay | 23 Mayıs 2026: Next.js sitemap() — tüm URL'leri birleştirir
 export default async function sitemap() {
-    const firmaSlugs = await fetchFirmaSlugs();
+    const [firmaSlugs, blogSlugs] = await Promise.all([fetchFirmaSlugs(), fetchBlogSlugsSitemap()]);
 
     // Enes Doğanay | 23 Mayıs 2026: Statik sayfalar
     const staticRoutes = [
@@ -48,6 +67,7 @@ export default async function sitemap() {
         { url: `${BASE_URL}/ihaleler`,             lastModified: new Date(), changeFrequency: 'daily',   priority: 0.9 },
         { url: `${BASE_URL}/hakkimizda`,           lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
         { url: `${BASE_URL}/sss`,                  lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+        { url: `${BASE_URL}/blog`,                 lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8 },
         { url: `${BASE_URL}/iletisim`,             lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
         { url: `${BASE_URL}/kvkk`,                 lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.4 },
         { url: `${BASE_URL}/hizmet-sartlari`,      lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.4 },
@@ -62,6 +82,14 @@ export default async function sitemap() {
         priority: 0.85,
     }));
 
+    // Enes Doğanay | 3 Haziran 2026: Blog yazısı sayfaları
+    const blogRoutes = blogSlugs.map(({ slug, published_at }) => ({
+        url: `${BASE_URL}/blog/${slug}`,
+        lastModified: published_at ? new Date(published_at) : new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.75,
+    }));
+
     // Enes Doğanay | 23 Mayıs 2026: Firma detay sayfaları — DB'den çekilen slug'lar
     const firmaRoutes = firmaSlugs.map(({ slug }) => ({
         url: `${BASE_URL}/firmalar/${slug}`,
@@ -70,5 +98,5 @@ export default async function sitemap() {
         priority: 0.8,
     }));
 
-    return [...staticRoutes, ...sektorRoutes, ...firmaRoutes];
+    return [...staticRoutes, ...sektorRoutes, ...blogRoutes, ...firmaRoutes];
 }

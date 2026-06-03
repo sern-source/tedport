@@ -10,10 +10,12 @@ import HeaderUserMenu from './HeaderUserMenu';
 import HeaderMobileMenu from './HeaderMobileMenu';
 
 // Enes Doğanay | 8 Mayıs 2026: Module seviyesine taşındı — her render’da yeni referans oluşturmasını önler
+// Enes Doğanay | 3 Haziran 2026: Bilgi Merkezi nav'a eklendi
 const DEFAULT_NAV_ITEMS = [
     { label: 'Anasayfa', href: '/' },
     { label: 'Firmalar', href: '/firmalar' },
     { label: 'İhaleler', href: '/ihaleler' },
+    { label: 'Bilgi Merkezi', href: '/blog' },
     { label: 'Hakkımızda', href: '/hakkimizda' },
     { label: 'İletişim', href: '/iletisim' },
 ];

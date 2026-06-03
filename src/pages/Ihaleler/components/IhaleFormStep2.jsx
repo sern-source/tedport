@@ -84,6 +84,47 @@ const IhaleFormStep2 = ({
                 handleFirmaSearch={handleFirmaSearch} addDavetliFirma={addDavetliFirma} removeDavetliFirma={removeDavetliFirma}
             />
         )}
+        {/* Enes Doğanay | 3 Haziran 2026: Akıllı puanlama ağırlıkları — ihale oluşturma adımında kriter önceliği */}
+        <div className="ihale-weights-section">
+            <div className="ihale-weights-header">
+                <span className="material-symbols-outlined">tune</span>
+                <div>
+                    <strong>Akıllı Puanlama Ağırlıkları</strong>
+                    <p>Teklifler geldiğinde hangi kriterin daha ağır basacağını belirleyin. İhaleyi açtıktan sonra dilediğiniz zaman güncelleyebilirsiniz.</p>
+                </div>
+            </div>
+            <div className="ihale-weights-slider">
+                <div className="ihale-weights-labels">
+                    <span className="ihale-weights-side ihale-weights-side--left">
+                        <span className="material-symbols-outlined">payments</span>Fiyat
+                    </span>
+                    <span className="ihale-weights-side ihale-weights-side--right">
+                        Teslim<span className="material-symbols-outlined">local_shipping</span>
+                    </span>
+                </div>
+                <div
+                    className="ihale-weights-track"
+                    style={{ '--thumb-pos': `${form.puanlama_agirliklar?.price ?? 50}%` }}
+                >
+                    <div className="ihale-weights-fill-left" style={{ width: `${form.puanlama_agirliklar?.price ?? 50}%` }} />
+                    <div className="ihale-weights-fill-right" style={{ width: `${form.puanlama_agirliklar?.delivery ?? 50}%` }} />
+                    <input
+                        type="range" min="0" max="100"
+                        value={form.puanlama_agirliklar?.price ?? 50}
+                        onChange={e => {
+                            const p = Number(e.target.value);
+                            setForm(prev => ({ ...prev, puanlama_agirliklar: { price: p, delivery: 100 - p } }));
+                        }}
+                        className="ihale-weights-input"
+                    />
+                </div>
+                <div className="ihale-weights-readout">
+                    <span style={{ color: '#059669', fontWeight: 800 }}>Fiyat {form.puanlama_agirliklar?.price ?? 50}%</span>
+                    <span className="ihale-weights-divider">·</span>
+                    <span style={{ color: '#d97706', fontWeight: 800 }}>Teslim {form.puanlama_agirliklar?.delivery ?? 50}%</span>
+                </div>
+            </div>
+        </div>
     </div>
 );
 

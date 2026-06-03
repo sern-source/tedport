@@ -72,6 +72,13 @@ const IhaleFormStep4 = ({ form, formError, formSaving, editingTender, onClose, h
             {form.ek_dosyalar.length > 0 && (
                 <PreviewSection icon="attach_file" label={`Ek Dokümanlar (${form.ek_dosyalar.length})`} tags={form.ek_dosyalar.map(f => f.name)} />
             )}
+            {/* Enes Doğanay | 3 Haziran 2026: Puanlama ağırlıkları önizleme */}
+            {form.puanlama_agirliklar && (
+                <div className="ihale-preview__weights">
+                    <span className="material-symbols-outlined">tune</span>
+                    <span>Puanlama: <strong style={{ color: '#059669' }}>Fiyat {form.puanlama_agirliklar.price}%</strong> · <strong style={{ color: '#d97706' }}>Teslim {form.puanlama_agirliklar.delivery}%</strong></span>
+                </div>
+            )}
         </div>
         {formError && <p className="ihale-form-error">{formError}</p>}
         <div className="ihale-modal__footer ihale-modal__footer--preview">

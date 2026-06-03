@@ -169,3 +169,16 @@
 [data-theme="dark"] .ihale-anonim-row { background: #1e293b; border-color: #334155; }
 [data-theme="dark"] .ihale-anonim-toggle { background: #334155; }
 [data-theme="dark"] .ihale-anonim-toggle--on { background: #2563eb; }
+
+/* Enes Doğanay | 3 Haziran 2026: Puanlama ağırlıkları dark mode */
+[data-theme="dark"] .ihale-weights-section {
+    background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(79,70,229,0.05) 100%);
+    border-color: rgba(99,102,241,0.25);
+}
+[data-theme="dark"] .ihale-weights-header strong { color: var(--text-dark); }
+[data-theme="dark"] .ihale-weights-header p { color: #94a3b8; }
+[data-theme="dark"] .ihale-weights-side { color: #cbd5e1; }
+[data-theme="dark"] .ihale-weights-track { background: #334155; }
+[data-theme="dark"] .ihale-weights-input::-webkit-slider-thumb { background: #1e293b; border-color: #475569; }
+[data-theme="dark"] .ihale-weights-track::after { background: #1e293b; border-color: #818cf8; box-shadow: 0 2px 8px rgba(99,102,241,0.3); }
+[data-theme="dark"] .ihale-weights-divider { color: #475569; }

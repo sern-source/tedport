@@ -15,12 +15,17 @@ import CategoriesSection from './components/CategoriesSection';
 import SuppliersSection from './components/SuppliersSection';
 import CTASection from './components/CTASection';
 import AppBanner from './components/AppBanner';
+// Enes Doğanay | 3 Haziran 2026: Ana sayfa blog önizleme bölümü
+import BlogPreviewSection from './components/BlogPreviewSection';
+import { useHomeBlog } from './hooks/useHomeBlog';
 
 const HomePage = () => {
     const searchProps = useHomeSearch();
     const { topSuppliers, isLoading } = useHomeSuppliers();
     // Enes Doğanay | 13 Mayıs 2026: Hero badge için canlı firma sayısı
     const { stats: platformStats } = useHomePlatformStats();
+    // Enes Doğanay | 3 Haziran 2026: Son 3 blog yazısı
+    const { posts: blogPosts, isLoading: blogLoading } = useHomeBlog();
 
     return (
         <div className="supplier-connect-wrapper">
@@ -39,6 +44,8 @@ const HomePage = () => {
                 <HowItWorksSection />
                 <CategoriesSection />
                 <SuppliersSection topSuppliers={topSuppliers} isLoading={isLoading} />
+                {/* Enes Doğanay | 3 Haziran 2026: Blog önizleme — SuppliersSection ile CTASection arası */}
+                <BlogPreviewSection posts={blogPosts} isLoading={blogLoading} />
                 <CTASection />
                 <AppBanner />
             </main>

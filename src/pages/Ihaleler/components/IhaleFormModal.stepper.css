@@ -616,3 +616,29 @@
     font-size: 16px;
     color: #ca8a04;
 }
+
+/* Enes Doğanay | 3 Haziran 2026: Puanlama ağırlıkları — önizleme satırı */
+.ihale-preview__weights {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    background: #f0f4ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #334155;
+    margin-top: 8px;
+}
+.ihale-preview__weights .material-symbols-outlined {
+    font-size: 16px;
+    color: #6366f1;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .ihale-preview__weights {
+    background: rgba(99,102,241,0.1);
+    border-color: rgba(99,102,241,0.25);
+    color: #cbd5e1;
+}
+[data-theme="dark"] .ihale-preview__weights .material-symbols-outlined { color: #818cf8; }

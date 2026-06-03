@@ -64,8 +64,11 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
         setEditingTender(tender);
         let teslimIl = tender.teslim_il || ''; let teslimIlce = tender.teslim_ilce || '';
         if (!teslimIl && tender.il_ilce) { const parts = tender.il_ilce.split('/').map(s => s.trim()); teslimIl = parts[0] || ''; teslimIlce = parts[1] || ''; }
+        // Enes Doğanay | 3 Haziran 2026: Kaydedilmiş ağırlıkları localStorage'dan yükle
+        let savedWeights = { price: 50, delivery: 50 };
+        try { const w = localStorage.getItem(`tedport_weights_${tender.id}`); if (w) { const p = JSON.parse(w); if (typeof p.price === 'number') savedWeights = p; } } catch { /* ignore */ }
         // Enes Doğanay | 12 Mayıs 2026: Snapshot — dirty tracking için orijinal formu sakla
-        const formSnapshot = { baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: toDateInput(tender.yayin_tarihi), son_basvuru_tarihi: toDateInput(tender.son_basvuru_tarihi), teslim_suresi: tender.teslim_suresi || '', durum: tender.durum || 'canli', referans_no: tender.referans_no || '', teslim_il: teslimIl, teslim_ilce: teslimIlce, sektor: tender.kategori || '', gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: tender.ek_dosyalar || [], anonim: tender.anonim === true };
+        const formSnapshot = { baslik: tender.baslik || '', aciklama: tender.aciklama || '', ihale_tipi: tender.ihale_tipi || 'Açık İhale', kdv_durumu: tender.kdv_durumu || 'haric', yayin_tarihi: toDateInput(tender.yayin_tarihi), son_basvuru_tarihi: toDateInput(tender.son_basvuru_tarihi), teslim_suresi: tender.teslim_suresi || '', durum: tender.durum || 'canli', referans_no: tender.referans_no || '', teslim_il: teslimIl, teslim_ilce: teslimIlce, sektor: tender.kategori || '', gereksinimler: tender.gereksinimler || [], davet_emailleri: tender.davet_emailleri || [], davetli_firmalar: tender.davetli_firmalar || [], ek_dosyalar: tender.ek_dosyalar || [], anonim: tender.anonim === true, puanlama_agirliklar: savedWeights };
         setForm(formSnapshot);
         originalFormRef.current = formSnapshot;
         setFormError(''); setStepperStep(0); invites.resetInvites(); setShowModal(true);
@@ -118,10 +121,14 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
             const pendingEmail = invites.emailInput.trim().toLowerCase();
             const finalEmails = (pendingEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pendingEmail) && invites.emailStatus === 'valid' && !form.davet_emailleri.includes(pendingEmail))
                 ? [...form.davet_emailleri, pendingEmail] : form.davet_emailleri;
-            const payload = { ...form, durum: forceDurum || form.durum, il_ilce: [form.teslim_il, form.teslim_ilce].filter(Boolean).join(' / '), ek_dosyalar: uploadedFiles, davet_emailleri: finalEmails };
+            // Enes Doğanay | 3 Haziran 2026: puanlama_agirliklar DB payload'ına girmez — localStorage'a ayrıca kaydedilir
+            const { puanlama_agirliklar, ...formWithoutWeights } = form;
+            const payload = { ...formWithoutWeights, durum: forceDurum || form.durum, il_ilce: [form.teslim_il, form.teslim_ilce].filter(Boolean).join(' / '), ek_dosyalar: uploadedFiles, davet_emailleri: finalEmails };
             // Enes Doğanay | 12 Mayıs 2026: Draft kayıt ve taslak→yayın durumlarına göre farklı başarı mesajı
             if (editingTender) {
                 await updateTender(editingTender.id, payload);
+                // Enes Doğanay | 3 Haziran 2026: Puanlama ağırlıklarını localStorage'a kaydet
+                try { localStorage.setItem(`tedport_weights_${editingTender.id}`, JSON.stringify(puanlama_agirliklar || { price: 50, delivery: 50 })); } catch { /* ignore */ }
                 const savedDurum = forceDurum || form.durum;
                 if (savedDurum === 'draft') {
                     setIhaleUpdateSuccess('draft');
@@ -133,6 +140,8 @@ const useIhaleForm = ({ managedFirmaId, generateReferansNo, fetchMyTenders, fetc
             }
             else {
                 const created = await createTender(payload);
+                // Enes Doğanay | 3 Haziran 2026: Puanlama ağırlıklarını localStorage'a kaydet
+                if (created?.id) { try { localStorage.setItem(`tedport_weights_${created.id}`, JSON.stringify(puanlama_agirliklar || { price: 50, delivery: 50 })); } catch { /* ignore */ } }
                 const savedDurum = forceDurum || form.durum;
                 // Enes Doğanay | 14 Mayıs 2026: Yeni ihale taslağı için ayrı tip — 'draft-new'
                 if (savedDurum === 'draft') {

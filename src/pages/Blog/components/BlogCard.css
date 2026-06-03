@@ -1,0 +1,157 @@
+/* Enes Doğanay | 3 Haziran 2026: Blog kart bileşeni stilleri */
+
+.blog-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.22s cubic-bezier(0.4,0,0.2,1),
+                border-color 0.22s;
+    box-shadow: 0 2px 10px rgba(15,23,42,0.05);
+    cursor: pointer;
+    position: relative;
+}
+
+.blog-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(15,23,42,0.12);
+    border-color: var(--accent, #2563eb);
+}
+
+/* Enes Doğanay | 3 Haziran 2026: Renkli üst şerit */
+.blog-card__accent {
+    height: 5px;
+    background: var(--accent, #2563eb);
+    flex-shrink: 0;
+}
+
+.blog-card__body {
+    flex: 1;
+    padding: 18px 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.blog-card__category {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent, #2563eb);
+    background: color-mix(in srgb, var(--accent, #2563eb) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent, #2563eb) 20%, transparent);
+    padding: 3px 9px 3px 6px;
+    border-radius: 99px;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.blog-card__category .material-symbols-outlined {
+    font-size: 13px;
+}
+
+.blog-card__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-card__summary {
+    margin: 0;
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.blog-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.blog-card__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+}
+
+.blog-card__meta-item .material-symbols-outlined {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.blog-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent, #2563eb);
+    white-space: nowrap;
+    transition: gap 0.18s;
+}
+
+.blog-card:hover .blog-card__cta {
+    gap: 8px;
+}
+
+.blog-card__cta .material-symbols-outlined {
+    font-size: 15px;
+}
+
+/* ─── Dark Mode ─── */
+[data-theme="dark"] .blog-card {
+    background: #1e293b;
+    border-color: rgba(99,102,241,0.15);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+[data-theme="dark"] .blog-card:hover {
+    border-color: var(--accent, #818cf8);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] .blog-card__title { color: #f1f5f9; }
+[data-theme="dark"] .blog-card__summary { color: #94a3b8; }
+[data-theme="dark"] .blog-card__footer { border-color: rgba(148,163,184,0.12); }
+[data-theme="dark"] .blog-card__meta-item { color: #64748b; }
+
+/* ─── Mobile ─── */
+@media (max-width: 480px) {
+    .blog-card__body { padding: 14px 16px 10px; }
+    .blog-card__title { font-size: 0.94rem; }
+    .blog-card__footer { padding: 10px 16px 14px; }
+    .blog-card__meta { gap: 8px; }
+}

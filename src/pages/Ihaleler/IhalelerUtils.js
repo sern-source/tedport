@@ -22,6 +22,8 @@ export const EMPTY_FORM = {
     ek_dosyalar: [],         // File[]
     // Enes Doğanay | 2 Mayıs 2026: Anonim ihale — firma adı gizlenir
     anonim: false,
+    // Enes Doğanay | 3 Haziran 2026: Akıllı puanlama ağırlıkları — fiyat/teslim dengesi
+    puanlama_agirliklar: { price: 50, delivery: 50 },
 };
 
 // Enes Doğanay | 10 Nisan 2026: Stepper adım tanımları

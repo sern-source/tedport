@@ -7,7 +7,14 @@ import OncekiTekliflerPopup from './OncekiTekliflerPopup';
 
 const IhaleOffersSection = ({ displayOffers, compareList, compareIds, compareHintDismissed, setCompareHintDismissed, selectedTender, displayState, setDisplayState, sortState, setSortState, sortDropdownRef, unread, shortlist, notes, highlightRef, highlightState, statusDropdownId, setStatusDropdownId, showScoringInfo, setShowScoringInfo, offerModals }) => {
     const handleToggleExpand = (id) => setDisplayState(p => ({ ...p, expandedId: p.expandedId === id ? null : id }));
-    const handleBalanceChange = (val) => setDisplayState(p => ({ ...p, weights: { price: val, delivery: 100 - val } }));
+    // Enes Doğanay | 3 Haziran 2026: Ağırlık değişince localStorage'a da kaydet
+    const handleBalanceChange = (val) => {
+        const newWeights = { price: val, delivery: 100 - val };
+        if (selectedTender?.id) {
+            try { localStorage.setItem(`tedport_weights_${selectedTender.id}`, JSON.stringify(newWeights)); } catch { /* ignore */ }
+        }
+        setDisplayState(p => ({ ...p, weights: newWeights }));
+    };
     // Enes Doğanay | 7 Mayıs 2026: Karşılaştırma temizle — offerModals üzerinden hook'a ilet
     const handleClearCompare = () => offerModals.clearCompare?.();
     // Enes Doğanay | 9 Mayıs 2026: Önceki teklifler popup state

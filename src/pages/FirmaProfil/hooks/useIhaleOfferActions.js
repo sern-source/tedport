@@ -24,9 +24,17 @@ const useIhaleOfferActions = ({ rawOffers, selectedTender }) => {
     }, [rawOffers]);
 
     // Enes Doğanay | 7 Mayıs 2026: İhale değişince karşılaştırma seçimini ve filtreyi temizle
+    // Enes Doğanay | 3 Haziran 2026: Kaydedilmiş ağırlıkları localStorage'dan yükle
     useEffect(() => {
         setCompareState(prev => ({ ...prev, ids: [] }));
-        setDisplayState(prev => ({ ...prev, filter: 'all', expandedId: null }));
+        let weights = { price: 50, delivery: 50 };
+        if (selectedTender?.id) {
+            try {
+                const saved = localStorage.getItem(`tedport_weights_${selectedTender.id}`);
+                if (saved) { const p = JSON.parse(saved); if (typeof p.price === 'number') weights = p; }
+            } catch { /* ignore */ }
+        }
+        setDisplayState(prev => ({ ...prev, filter: 'all', expandedId: null, weights }));
     }, [selectedTender?.id]);
 
     // Enes Doğanay | 6 Mayıs 2026: Sıralama dropdown dışarı tıklama
