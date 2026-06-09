@@ -90,11 +90,11 @@ export default async function sitemap() {
         priority: 0.75,
     }));
 
-    // Enes Doğanay | 23 Mayıs 2026: Firma detay sayfaları — DB'den çekilen slug'lar
+    // Enes Doğanay | 9 Haziran 2026: Firma detay sayfaları — changeFrequency monthly yapıldı (crawl budget optimizasyonu)
     const firmaRoutes = firmaSlugs.map(({ slug }) => ({
         url: `${BASE_URL}/firmalar/${slug}`,
         lastModified: new Date(),
-        changeFrequency: 'weekly',
+        changeFrequency: 'monthly',
         priority: 0.8,
     }));
 
