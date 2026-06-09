@@ -4,6 +4,7 @@ import {
     fetchFirmaSertifikalari,
     fetchFirmaPendingSertifikaTalepleri,
     submitSertifikaTalebi,
+    deleteFirmaSertifikasi,
 } from '../services/sertifikaService';
 
 const EMPTY_FORM = { selectedTur: '', digerTur: '', file: null };
@@ -16,6 +17,11 @@ export const useCertificateSection = ({ companyId, firmaAdi }) => {
     const [turDropOpen, setTurDropOpen] = useState(false);
     const [sending, setSending] = useState(false);
     const [feedback, setFeedback] = useState({ type: '', msg: '' });
+    // Enes Doğanay | 9 Haziran 2026: Sertifika silme — inline onay için bekleyen id
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+    // Enes Doğanay | 9 Haziran 2026: Silme hatası — form feedback'inden bağımsız gösterilir
+    const [deleteError, setDeleteError] = useState('');
     const turDropRef = useRef(null);
 
     // Enes Doğanay | 12 Mayıs 2026: Dışarı tıkla dropdown kapansın
@@ -38,7 +44,8 @@ export const useCertificateSection = ({ companyId, firmaAdi }) => {
             fetchFirmaPendingSertifikaTalepleri(companyId).catch(() => []),
         ]).then(([approvedData, talep]) => {
             setApproved(approvedData);
-            setTalepleri(talep);
+            // Enes Doğanay | 9 Haziran 2026: Onaylananlar badge'de gösteriliyor — listede gereksiz
+            setTalepleri(talep.filter(t => t.durum !== 'onaylandi'));
         }).finally(() => setLoading(false));
     }, [companyId]);
 
@@ -52,6 +59,22 @@ export const useCertificateSection = ({ companyId, firmaAdi }) => {
     const handleFileChange = (e) => {
         const file = e.target.files?.[0] || null;
         setForm(p => ({ ...p, file }));
+    };
+
+    // Enes Doğanay | 9 Haziran 2026: Onaylı sertifikayı kaldır
+    const handleDeleteSertifika = async (sertifikaId) => {
+        setDeleting(true);
+        setDeleteError('');
+        try {
+            await deleteFirmaSertifikasi(sertifikaId);
+            setApproved(prev => prev.filter(s => s.id !== sertifikaId));
+            setConfirmDeleteId(null);
+        } catch (err) {
+            setDeleteError(err.message);
+            setConfirmDeleteId(null);
+        } finally {
+            setDeleting(false);
+        }
     };
 
     // Enes Doğanay | 12 Mayıs 2026: Sertifika talebi gönder
@@ -71,7 +94,7 @@ export const useCertificateSection = ({ companyId, firmaAdi }) => {
             setForm(EMPTY_FORM);
             setFeedback({ type: 'ok', msg: 'Talebiniz alındı. Admin onayından sonra profilinizde görünecektir.' });
             const updated = await fetchFirmaPendingSertifikaTalepleri(companyId).catch(() => []);
-            setTalepleri(updated);
+            setTalepleri(updated.filter(t => t.durum !== 'onaylandi'));
         } catch (err) {
             setFeedback({ type: 'err', msg: err.message });
         } finally {
@@ -90,8 +113,13 @@ export const useCertificateSection = ({ companyId, firmaAdi }) => {
         turDropRef,
         sending,
         feedback,
+        confirmDeleteId,
+        setConfirmDeleteId,
+        deleting,
+        deleteError,
         handleTurSelect,
         handleFileChange,
         handleCertSubmit,
+        handleDeleteSertifika,
     };
 };

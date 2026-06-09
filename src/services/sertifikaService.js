@@ -85,6 +85,16 @@ async function uploadSertifikaBelgesi(firmaId, file) {
     return path;
 }
 
+// Enes Doğanay | 9 Haziran 2026: Onaylı sertifikayı firma_sertifikalari tablosundan kaldır
+export async function deleteFirmaSertifikasi(sertifikaId) {
+    const { error, count } = await supabase
+        .from('firma_sertifikalari')
+        .delete({ count: 'exact' })
+        .eq('id', sertifikaId);
+    if (error) throw new Error(error.message);
+    if (count === 0) throw new Error('Silme yetkisi yok veya kayıt bulunamadı.');
+}
+
 // Enes Doğanay | 12 Mayıs 2026: Firma yeni sertifika talebi gönder
 export async function submitSertifikaTalebi({ firmaId, firmaAdi, sertifikaTuru, sertifikaTuruDiger, file }) {
     let belgeUrl = null;

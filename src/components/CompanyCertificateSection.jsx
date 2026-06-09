@@ -31,7 +31,8 @@ const CompanyCertificateSection = ({ company }) => {
         approved, talepleri, loading,
         form, setForm, turDropOpen, setTurDropOpen, turDropRef,
         sending, feedback,
-        handleTurSelect, handleFileChange, handleCertSubmit,
+        confirmDeleteId, setConfirmDeleteId, deleting, deleteError,
+        handleTurSelect, handleFileChange, handleCertSubmit, handleDeleteSertifika,
     } = useCertificateSection({ companyId: company?.firmaID, firmaAdi: company?.firma_adi });
 
     const selectedMeta = form.selectedTur ? SERTIFIKA_META[form.selectedTur] : null;
@@ -61,18 +62,61 @@ const CompanyCertificateSection = ({ company }) => {
                     <div className="cmp-cert-badges">
                         {approved.map(s => {
                             const meta = SERTIFIKA_META[s.sertifika_turu] || SERTIFIKA_META['Diger'];
+                            const isConfirming = confirmDeleteId === s.id;
                             return (
                                 <span
                                     key={s.id}
-                                    className="cmp-cert-badge"
+                                    className={`cmp-cert-badge${isConfirming ? ' cmp-cert-badge--confirming' : ''}`}
                                     style={{ '--cb-color': meta.color, '--cb-bg': meta.bg, '--cb-border': meta.border }}
                                 >
-                                    <span className="material-symbols-outlined">verified</span>
-                                    {s.sertifika_turu}
+                                    {/* Enes Doğanay | 9 Haziran 2026: Normal görünüm */}
+                                    {!isConfirming && (
+                                        <>
+                                            <span className="material-symbols-outlined">verified</span>
+                                            {s.sertifika_turu}
+                                            <button
+                                                type="button"
+                                                className="cmp-cert-badge-del"
+                                                title="Sertifikayı kaldır"
+                                                onClick={() => setConfirmDeleteId(s.id)}
+                                            >
+                                                <span className="material-symbols-outlined">close</span>
+                                            </button>
+                                        </>
+                                    )}
+                                    {/* Enes Doğanay | 9 Haziran 2026: Onay görünümü */}
+                                    {isConfirming && (
+                                        <>
+                                            <span className="cmp-cert-badge-confirm-txt">Kaldırılsın mı?</span>
+                                            <button
+                                                type="button"
+                                                className="cmp-cert-badge-confirm-yes"
+                                                disabled={deleting}
+                                                onClick={() => handleDeleteSertifika(s.id)}
+                                            >
+                                                {deleting ? <span className="material-symbols-outlined">progress_activity</span> : 'Evet'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="cmp-cert-badge-confirm-no"
+                                                disabled={deleting}
+                                                onClick={() => setConfirmDeleteId(null)}
+                                            >
+                                                Hayır
+                                            </button>
+                                        </>
+                                    )}
                                 </span>
                             );
                         })}
                     </div>
+                    {/* Enes Doğanay | 9 Haziran 2026: Silme hata mesajı — badge'den bağımsız */}
+                    {deleteError && (
+                        <div className="cmp-cert-feedback cmp-cert-feedback--err" style={{ marginTop: 8 }}>
+                            <span className="material-symbols-outlined">error</span>
+                            {deleteError}
+                        </div>
+                    )}
                 </div>
             )}
 

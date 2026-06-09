@@ -30,9 +30,69 @@
     color: var(--cb-color);
     font-size: 0.78rem;
     font-weight: 700;
+    transition: border-color 0.15s;
 }
 
 .cmp-cert-badge .material-symbols-outlined { font-size: 14px; }
+
+/* Enes Doğanay | 9 Haziran 2026: Badge sil butonu */
+.cmp-cert-badge-del {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 2px;
+    margin-left: 2px;
+    cursor: pointer;
+    color: var(--cb-color);
+    opacity: 0.35;
+    transition: opacity 0.15s;
+    line-height: 1;
+    min-width: 20px;
+    min-height: 20px;
+}
+.cmp-cert-badge-del:hover { opacity: 0.85; }
+.cmp-cert-badge-del .material-symbols-outlined { font-size: 13px; }
+
+/* Enes Doğanay | 9 Haziran 2026: Badge onay durumu */
+.cmp-cert-badge--confirming {
+    border-color: #ef4444;
+    background: #fff1f1;
+    color: #b91c1c;
+}
+.cmp-cert-badge-confirm-txt {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.cmp-cert-badge-confirm-yes,
+.cmp-cert-badge-confirm-no {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    transition: background 0.12s;
+}
+.cmp-cert-badge-confirm-yes { color: #b91c1c; }
+.cmp-cert-badge-confirm-yes:hover { background: #fee2e2; }
+.cmp-cert-badge-confirm-no { color: #475569; }
+.cmp-cert-badge-confirm-no:hover { background: #f1f5f9; }
+.cmp-cert-badge-confirm-yes:disabled,
+.cmp-cert-badge-confirm-no:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Enes Doğanay | 9 Haziran 2026: Dark mode — badge sil + onay */
+[data-theme="dark"] .cmp-cert-badge--confirming {
+    border-color: #ef4444;
+    background: #2d1515;
+    color: #f87171;
+}
+[data-theme="dark"] .cmp-cert-badge-confirm-yes { color: #f87171; }
+[data-theme="dark"] .cmp-cert-badge-confirm-yes:hover { background: #3f1818; }
+[data-theme="dark"] .cmp-cert-badge-confirm-no { color: #94a3b8; }
+[data-theme="dark"] .cmp-cert-badge-confirm-no:hover { background: #1e293b; }
 
 /* ── BEKLEYEN TALEPLERİ LİSTESİ ──────────────────────────────────────────── */
 .cmp-cert-talep-list { display: flex; flex-direction: column; gap: 6px; }
@@ -61,6 +121,12 @@
     color: #b91c1c;
     margin-top: 2px;
 }
+
+/* Enes Doğanay | 9 Haziran 2026: Dark mode — talep status renkleri */
+[data-theme="dark"] .cmp-cert-talep-status--bekliyor { color: #fbbf24; }
+[data-theme="dark"] .cmp-cert-talep-status--onaylandi { color: #4ade80; }
+[data-theme="dark"] .cmp-cert-talep-status--reddedildi { color: #f87171; }
+[data-theme="dark"] .cmp-cert-talep-red-note { color: #f87171; }
 
 /* ── FORM BÖLÜMÜ ──────────────────────────────────────────────────────────── */
 .cmp-cert-form-head {
@@ -234,4 +300,16 @@
 @media (max-width: 768px) {
     .cmp-cert-file-row { flex-wrap: wrap; }
     .cmp-cert-badge { font-size: 0.75rem; padding: 3px 8px; }
+
+    /* Enes Doğanay | 9 Haziran 2026: Talep satırı mobilde sarabilsin */
+    .cmp-cert-talep-item { flex-wrap: wrap; row-gap: 4px; }
+    .cmp-cert-talep-status { margin-left: 0; }
+
+    /* Enes Doğanay | 9 Haziran 2026: Confirming badge mobilde taşmasın */
+    .cmp-cert-badge--confirming { flex-wrap: wrap; border-radius: 10px; padding: 5px 10px; }
+
+    /* Enes Doğanay | 9 Haziran 2026: Touch target — sil + onay butonları */
+    .cmp-cert-badge-del { min-width: 44px; min-height: 44px; margin-left: 0; }
+    .cmp-cert-badge-confirm-yes,
+    .cmp-cert-badge-confirm-no { min-height: 32px; padding: 4px 10px; }
 }

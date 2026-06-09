@@ -115,6 +115,17 @@ export function useFirmaDetay(slug, initialFirma = null) {
             trackFirmaView(id, sessionData.userId || null);
         } else {
             fetchFirmaViewCount(id).then(cnt => setViewCount(cnt)).catch(() => {});
+            // Enes Doğanay | 9 Haziran 2026: Firma sahibi kendi sayfasını görüntülüyorsa SSR cache'i bypass et
+            // — kaydedilen değişiklikler anında görünsün. Ziyaretçiler için ek sorgu atılmaz.
+            if (hasInitialFirmaRef.current) {
+                fetchFirmaBySlug(slug).then(fresh => {
+                    if (fresh) {
+                        setFirma(fresh);
+                        setIsVerified(fresh?.onayli_hesap === true);
+                        setIsDemo(fresh?.is_demo === true);
+                    }
+                }).catch(() => {});
+            }
         }
         notes.setSavedNotes(sessionData.notes);
         favorites.setMyLists(sessionData.lists);
