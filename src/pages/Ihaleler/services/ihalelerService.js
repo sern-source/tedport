@@ -140,19 +140,22 @@ export const fetchTenderCounts = async ({ firmaFilter, isDemoUser = false } = {}
 
     // Enes Doğanay | 14 Mayıs 2026: Sayaçlar tarih koşullarıyla hizalandı
     const now = new Date().toISOString();
-    const [canliRes, yaklaşanRes, kapaliRes] = await Promise.all([
+    // Enes Doğanay | 9 Haziran 2026: tamamlandi sayacı eklendi
+    const [canliRes, yaklaşanRes, kapaliRes, tamamlandiRes] = await Promise.all([
         makeBase()
             .eq('durum', 'canli')
             .or(`yayin_tarihi.is.null,yayin_tarihi.lte.${now}`)
             .or(`son_basvuru_tarihi.is.null,son_basvuru_tarihi.gt.${now}`),
         makeBase().or(`durum.eq.yaklasan,and(durum.eq.canli,yayin_tarihi.gt.${now})`),
         makeBase().eq('durum', 'kapali').or('kapali_gorunurluk.is.null,kapali_gorunurluk.neq.gizle'),
+        makeBase().eq('durum', 'tamamlandi'),
     ]);
 
     return {
-        liveCount:     canliRes.count    ?? 0,
-        upcomingCount: yaklaşanRes.count ?? 0,
-        closedCount:   kapaliRes.count   ?? 0,
+        liveCount:        canliRes.count       ?? 0,
+        upcomingCount:    yaklaşanRes.count    ?? 0,
+        closedCount:      kapaliRes.count      ?? 0,
+        tamamlandiCount:  tamamlandiRes.count  ?? 0,
     };
 };
 

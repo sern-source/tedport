@@ -4,7 +4,7 @@ import React from 'react';
 import './TendersHero.css';
 
 // Enes Doğanay | 5 Mayıs 2026: Yalnızca UI — props ile gelir
-const TendersHero = ({ selectedFirmaName, liveCount, upcomingCount, closedCount }) => (
+const TendersHero = ({ selectedFirmaName, liveCount, upcomingCount, closedCount, tamamlandiCount }) => (
     <section className="tenders-hero-compact">
         <div className="tenders-hero-compact__left">
             <h1>{selectedFirmaName ? `${selectedFirmaName} İhaleleri` : 'İhaleler'}</h1>
@@ -29,6 +29,12 @@ const TendersHero = ({ selectedFirmaName, liveCount, upcomingCount, closedCount 
                 <span className="material-symbols-outlined">check_circle</span>
                 <strong>{closedCount}</strong>
                 <span>Kapanmış</span>
+            </div>
+            {/* Enes Doğanay | 9 Haziran 2026: Tamamlandı sayacı */}
+            <div className="tenders-mini-stat tenders-mini-stat--done">
+                <span className="material-symbols-outlined">task_alt</span>
+                <strong>{tamamlandiCount}</strong>
+                <span>Tamamlandı</span>
             </div>
         </div>
     </section>

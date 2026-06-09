@@ -75,6 +75,9 @@
 .tenders-mini-stat--upcoming strong { color: #fde68a; }
 .tenders-mini-stat--closed .material-symbols-outlined { color: #cbd5e1; }
 .tenders-mini-stat--closed strong { color: #cbd5e1; }
+/* Enes Doğanay | 9 Haziran 2026: Tamamlandı badge rengi — yeşil ton */
+.tenders-mini-stat--done .material-symbols-outlined { color: #6ee7b7; }
+.tenders-mini-stat--done strong { color: #6ee7b7; }
 
 /* === Responsive === */
 @media (max-width: 1200px) {

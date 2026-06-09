@@ -95,7 +95,7 @@ const IhalelerPage = () => {
                 />
                 <TendersHero
                     selectedFirmaName={ihaleler.selectedFirmaName}
-                    liveCount={ihaleler.liveCount} upcomingCount={ihaleler.upcomingCount} closedCount={ihaleler.closedCount}
+                    liveCount={ihaleler.liveCount} upcomingCount={ihaleler.upcomingCount} closedCount={ihaleler.closedCount} tamamlandiCount={ihaleler.tamamlandiCount}
                 />
                 <TendersToolbar
                     searchTerm={ihaleler.searchTerm} setSearchTerm={ihaleler.setSearchTerm}

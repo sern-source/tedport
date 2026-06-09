@@ -32,9 +32,11 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId, isDemoUser = false }
     const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
     const sortDropdownRef = useRef(null);
     // Enes Doğanay | 13 Mayıs 2026: Badge sayıları — ayrı COUNT sorgusundan gelir
+    // Enes Doğanay | 9 Haziran 2026: tamamlandiCount eklendi
     const [liveCount, setLiveCount] = useState(0);
     const [upcomingCount, setUpcomingCount] = useState(0);
     const [closedCount, setClosedCount] = useState(0);
+    const [tamamlandiCount, setTamamlandiCount] = useState(0);
     const [viewMode, setViewMode] = useState(() => {
         try { return localStorage.getItem('tedport_ihale_view') || 'grid'; } catch { return 'grid'; }
     });
@@ -81,6 +83,7 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId, isDemoUser = false }
             setLiveCount(counts.liveCount);
             setUpcomingCount(counts.upcomingCount);
             setClosedCount(counts.closedCount);
+            setTamamlandiCount(counts.tamamlandiCount ?? 0);
         } catch { /* sessiz — badge sayıları kritik değil */ }
     }, [firmaFilter, isDemoUser]);
 
@@ -161,7 +164,7 @@ const useIhaleler = (firmaFilter, { userEmail, userFirmaId, isDemoUser = false }
         filteredTenders: mergedTenders,
         paginatedTenders: mergedTenders,
         total, totalPages, smartPages,
-        liveCount, upcomingCount, closedCount,
+        liveCount, upcomingCount, closedCount, tamamlandiCount,
         fetchPublicTenders: loadTenders,
         reloadInvitedTenders: loadInvitedTenders,
     };
