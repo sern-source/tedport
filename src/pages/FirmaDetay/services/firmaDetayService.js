@@ -236,7 +236,9 @@ export async function fetchSuggestionsService(search) {
     const { data } = await supabase
         .from('firmalar')
         // Enes Doğanay | 23 Mayıs 2026: has_logo + onayli_hesap + arama_etiketleri + logo eklendi
+        // Enes Doğanay | 9 Haziran 2026: Demo firmalar autocomplete'de görünmez
         .select('firmaID, slug, firma_adi, il_ilce, best, logo_url, has_logo, onayli_hesap')
+        .or('is_demo.is.null,is_demo.eq.false')
         .or(`firma_adi.ilike."%${safeSearch}%",description.ilike."%${safeSearch}%",ana_sektor.ilike."%${safeSearch}%",urun_kategorileri.ilike."%${safeSearch}%",arama_etiketleri.ilike."%${safeSearch}%"`)
         .order('has_logo',    { ascending: false, nullsFirst: false })
         .order('onayli_hesap', { ascending: false, nullsFirst: false })

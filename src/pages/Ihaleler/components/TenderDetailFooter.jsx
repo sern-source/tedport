@@ -4,7 +4,8 @@ import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 
 const TenderDetailActions = ({ dt, isOwnTender, userOffer, onTeklif, onEdit }) => {
     const stMeta = getTenderStatusMeta(dt);
-    const isClosed = stMeta.key === 'kapali' || stMeta.key === 'iptal';
+    // Enes Doğanay | 9 Haziran 2026: tamamlandi da kapalı sayılır — teklif verilemez
+    const isClosed = stMeta.key === 'kapali' || stMeta.key === 'iptal' || stMeta.key === 'tamamlandi';
     if (isOwnTender) return (
         <button type="button" className="tender-action tender-action--own-edit tender-action--full" onClick={onEdit} disabled={isClosed}>
             <span className="material-symbols-outlined">edit_square</span>İhaleyi Düzenle
@@ -20,11 +21,14 @@ const TenderDetailActions = ({ dt, isOwnTender, userOffer, onTeklif, onEdit }) =
             <span className="material-symbols-outlined">verified</span>Teklifiniz Kabul Edildi
         </span>
     );
+    // Enes Doğanay | 9 Haziran 2026: Kapalı/tamamlandı + teklif yok → buton gösterme
+    if (isClosed && !hasOffer) return null;
     const btnClass = hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join';
     const btnIcon = hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake';
-    const btnLabel = hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Yeniden Teklif Ver' : (isClosed ? 'Teklif Verildi' : 'Teklifi Güncelle'))) : 'Teklif Ver';
+    // Enes Doğanay | 9 Haziran 2026: Kapalı/tamamlandı'da her durumda 'Teklif Verildi'
+    const btnLabel = hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isClosed ? 'Teklif Verildi' : (isRejected ? 'Yeniden Teklif Ver' : 'Teklifi Güncelle'))) : 'Teklif Ver';
     return (
-        <button type="button" className={`tender-action ${btnClass} tender-action--full`} onClick={onTeklif} disabled={isClosed && hasOffer && !isDraft}>
+        <button type="button" className={`tender-action ${btnClass} tender-action--full`} onClick={onTeklif} disabled={isClosed}>
             <span className="material-symbols-outlined">{btnIcon}</span>{btnLabel}
         </button>
     );

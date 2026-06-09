@@ -126,4 +126,6 @@ export const CREATE_EMPTY_FORM = {
     yayin_tarihi: '', son_basvuru_tarihi: '', teslim_suresi: '', durum: 'canli',
     referans_no: '', teslim_il: '', teslim_ilce: '',
     gereksinimler: [], davet_emailleri: [], davetli_firmalar: [], ek_dosyalar: [],
+    // Enes Doğanay | 9 Haziran 2026: Anonim ihale varsayılan değeri
+    anonim: false,
 };

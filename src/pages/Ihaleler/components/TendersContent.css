@@ -327,6 +327,22 @@
     color: #047857;
 }
 
+/* Enes Doğanay | 9 Haziran 2026: Kapalı/tamamlandı + teklif verildi — silik, tıklanamaz */
+.tenders-list-action-btn--verildi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.65;
+}
+
 /* Enes Doğanay | 13 Nisan 2026: Kabul edilmiş teklif — list view ikon */
 .tenders-list-action-btn--accepted {
     display: inline-flex;
@@ -531,6 +547,12 @@
     border-color: #7f1d1d;
 }
 [data-theme="dark"] .tenders-list-action-btn--rejected:hover { background: #7f1d1d; color: #fee2e2; }
+/* Enes Doğanay | 9 Haziran 2026: verildi dark mode */
+[data-theme="dark"] .tenders-list-action-btn--verildi {
+    background: #1e293b;
+    color: #475569;
+    border-color: #334155;
+}
 
 /* Enes Doğanay | 7 Mayıs 2026: Alt pagination — FirmalarPage.css pagination stiliyle eşleştirildi */
 .tenders-pagination {

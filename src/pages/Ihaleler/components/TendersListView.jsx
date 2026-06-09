@@ -5,7 +5,8 @@ import { formatTenderDate, getTenderStatusMeta } from '../../../constants/tender
 // Enes Doğanay | 6 Mayıs 2026: Liste satırı aksiyonları — kendi ihalesi, teklif durumu
 const RowActions = ({ tender, isOwnTender, userOffers, onEdit, onTeklif, onContact, onDetail }) => {
     if (isOwnTender) {
-        const isClosed = ['kapali', 'iptal'].includes(getTenderStatusMeta(tender).key);
+        // Enes Doğanay | 9 Haziran 2026: tamamlandi da kapalı sayılır
+        const isClosed = ['kapali', 'iptal', 'tamamlandi'].includes(getTenderStatusMeta(tender).key);
         return (
             <>
                 {!isClosed && (
@@ -26,7 +27,8 @@ const RowActions = ({ tender, isOwnTender, userOffers, onEdit, onTeklif, onConta
     const isRejected = hasOffer && offer.durum === 'red';
     const isDraft = hasOffer && offer.durum === 'taslak';
     // Enes Doğanay | 9 Mayıs 2026: Kapalı ihalede teklif yoksa buton gösterme
-    const isClosed = ['kapali', 'iptal'].includes(getTenderStatusMeta(tender).key);
+    // Enes Doğanay | 9 Haziran 2026: tamamlandi da kapalı sayılır — teklif verilemez
+    const isClosed = ['kapali', 'iptal', 'tamamlandi'].includes(getTenderStatusMeta(tender).key);
     return (
         <>
             {isAccepted ? (
@@ -39,7 +41,12 @@ const RowActions = ({ tender, isOwnTender, userOffers, onEdit, onTeklif, onConta
                         <span className="material-symbols-outlined">contact_phone</span>
                     </button>
                 </>
-            ) : (!isClosed || hasOffer) ? (
+            ) : isClosed && hasOffer ? (
+                // Enes Doğanay | 9 Haziran 2026: Kapalı/tamamlandı + teklif varsa silik "Teklif Verildi" — kart görünümüyle aynı davranış
+                <span className="tenders-list-action-btn tenders-list-action-btn--verildi" data-tooltip="Teklif Verildi">
+                    <span className="material-symbols-outlined">handshake</span>
+                </span>
+            ) : !isClosed ? (
                 <button type="button"
                     className={`tenders-list-action-btn ${hasOffer ? (isDraft ? 'tenders-list-action-btn--draft' : (isRejected ? 'tenders-list-action-btn--rejected' : 'tenders-list-action-btn--update')) : 'tenders-list-action-btn--join'}`}
                     data-tooltip={hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Reddedildi — Güncelle' : 'Teklifi Güncelle')) : 'Teklif Ver'}

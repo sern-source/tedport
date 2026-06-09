@@ -153,6 +153,8 @@ export const fetchFirmalar = async ({ page, search, filters, sortMode, searchMod
     'firmaID, slug, firma_adi, il_ilce, description, ana_sektor, urun_kategorileri, logo_url, category_name, best, telefon, eposta, web_sitesi, adres, onayli_hesap, is_demo',
     { count: 'exact' }
   );
+  // Enes Doğanay | 9 Haziran 2026: Demo firmalar listede görünmez (is_demo = true olanlar hariç)
+  query = query.or('is_demo.is.null,is_demo.eq.false');
   // Enes Doğanay | 11 Mayıs 2026: searchMode'a göre farklı alanlar aranır
   query = buildSearchQuery(query, search, searchMode);
   query = buildFilterQuery(query, filters);

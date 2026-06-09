@@ -67,16 +67,16 @@ const MyTendersPanel = ({
                                 </div>
                                 {/* Enes Doğanay | 12 Mayıs 2026: Butonlar — draft farklı aksiyon setine sahip */}
                                 <div className="my-tender-row__actions">
-                                {/* Enes Doğanay | 12 Mayıs 2026: Kapalı/iptal için Düzenle gizlenir */}
-                                {sm.key !== 'kapali' && sm.key !== 'iptal' && (
+                                {/* Enes Doğanay | 12 Mayıs 2026: Kapalı/iptal/tamamlandı için Düzenle gizlenir */}
+                                {sm.key !== 'kapali' && sm.key !== 'iptal' && sm.key !== 'tamamlandi' && (
                                     <button type="button" className="my-tender-btn my-tender-btn--edit" onClick={() => onEdit(t)}>
                                         <span className="material-symbols-outlined">{sm.key === 'draft' ? 'edit_note' : 'edit'}</span>
                                         {sm.key === 'draft' ? 'Taslağı Düzenle' : 'Düzenle'}
                                     </button>
                                 )}
-                                    {/* Enes Doğanay | 12 Mayıs 2026: draft/yaklaşan için İhaleyi Kapat gizle */}
+                                    {/* Enes Doğanay | 9 Haziran 2026: tamamlandi da tekrarla butonu göster */}
                                     {sm.key !== 'draft' && sm.key !== 'yaklasan' && (
-                                        (sm.key === 'kapali' || sm.key === 'iptal') ? (
+                                        (sm.key === 'kapali' || sm.key === 'iptal' || sm.key === 'tamamlandi') ? (
                                             <button type="button" className="my-tender-btn my-tender-btn--repeat" onClick={() => onClone(t)}>
                                                 <span className="material-symbols-outlined">replay</span>
                                                 İhaleyi Tekrarla

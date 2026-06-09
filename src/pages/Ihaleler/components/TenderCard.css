@@ -465,6 +465,16 @@
     box-shadow: 0 6px 18px rgba(220, 38, 38, 0.28);
     transform: translateY(-1px);
 }
+/* Enes Doğanay | 9 Haziran 2026: Kapalı/tamamlandı'da reddedilen teklif — silik disabled */
+.tender-action--rejected:disabled {
+    background: var(--bg-light);
+    color: #94a3b8;
+    border-color: var(--border);
+    border: 1px solid var(--border);
+    box-shadow: none;
+    cursor: default;
+    transform: none;
+}
 
 .tender-action--detail {
     background: transparent;
@@ -668,6 +678,8 @@
     border-color: #d97706;
 }
 [data-theme="dark"] .tender-action--own-edit:disabled { background: #334155; color: var(--text-muted); border-color: #334155; }
+/* Enes Doğanay | 9 Haziran 2026: Kapalı+reddedilen disabled dark mode */
+[data-theme="dark"] .tender-action--rejected:disabled { background: #1e293b; color: #475569; border-color: #334155; }
 [data-theme="dark"] .tender-action--firma { background: var(--bg-light); color: var(--text-dark); border-color: var(--border); }
 
 /* Enes Doğanay | 7 Mayıs 2026: TenderCard responsive */

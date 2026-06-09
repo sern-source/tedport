@@ -4,7 +4,8 @@ import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 
 const TenderCardActions = ({ tender, isOwnTender, userOffer, onEdit, onTeklif, onContact, onDetail }) => {
     const st = getTenderStatusMeta(tender);
-    const isClosed = st.key === 'kapali' || st.key === 'iptal';
+    // Enes Doğanay | 9 Haziran 2026: tamamlandi da kapalı sayılır — teklif verilemez
+    const isClosed = st.key === 'kapali' || st.key === 'iptal' || st.key === 'tamamlandi';
     const offer = userOffer;
     const hasOffer = !!offer;
     const isDraft = hasOffer && offer.durum === 'taslak';
@@ -27,7 +28,8 @@ const TenderCardActions = ({ tender, isOwnTender, userOffer, onEdit, onTeklif, o
             ) : (!isClosed || hasOffer) ? (
                 <button type="button" className={`tender-action ${hasOffer ? (isDraft ? 'tender-action--draft' : (isRejected ? 'tender-action--rejected' : 'tender-action--update')) : 'tender-action--join'}`} onClick={onTeklif} disabled={isClosed && hasOffer && !isDraft}>
                     <span className="material-symbols-outlined">{hasOffer ? (isDraft ? 'draft' : (isRejected ? 'refresh' : 'edit')) : 'handshake'}</span>
-                    {hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isRejected ? 'Yeniden Teklif Ver' : (isClosed ? 'Teklif Verildi' : 'Teklifi Güncelle'))) : 'Teklif Ver'}
+                    {/* Enes Doğanay | 9 Haziran 2026: Kapalı/tamamlandı'da her durumda 'Teklif Verildi' göster */}
+                    {hasOffer ? (isDraft ? 'Taslağı Görüntüle' : (isClosed ? 'Teklif Verildi' : (isRejected ? 'Yeniden Teklif Ver' : 'Teklifi Güncelle'))) : 'Teklif Ver'}
                 </button>
             ) : null}
             <button type="button" className="tender-action tender-action--detail" onClick={onDetail}>

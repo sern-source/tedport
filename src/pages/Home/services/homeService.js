@@ -12,7 +12,9 @@ export async function fetchHeroSuggestions(term) {
     const { data, error } = await supabase
         .from('firmalar')
         // Enes Doğanay | 23 Mayıs 2026: has_logo + onayli_hesap eklendi — sıralama önceliği
+        // Enes Doğanay | 9 Haziran 2026: Demo firmalar autocomplete'de görünmez
         .select('firmaID, slug, firma_adi, il_ilce, logo_url, has_logo, onayli_hesap, best')
+        .or('is_demo.is.null,is_demo.eq.false')
         .or(
             expandSearchTerms(safe).flatMap(t => [
                 `firma_adi.ilike."%${t}%"`,
@@ -54,7 +56,9 @@ export async function fetchTopSuppliers() {
     const { data, error } = await supabase
         .from('firmalar')
         // Enes Doğanay | 23 Mayıs 2026: slug eklendi
+        // Enes Doğanay | 9 Haziran 2026: Demo firmalar öne çıkanlarda görünmez
         .select('firmaID, slug, firma_adi, il_ilce, ana_sektor, logo_url, urun_kategorileri, onayli_hesap, best, has_logo')
+        .or('is_demo.is.null,is_demo.eq.false')
         .order('has_logo', { ascending: false, nullsFirst: false })
         .order('onayli_hesap', { ascending: false, nullsFirst: false })
         .order('best', { ascending: false })

@@ -24,7 +24,8 @@ const MyOfferChatView = ({
 
     const { offer, tenderTitle, firmaAdi, firmaLogo, anonim } = activeMopChat;
     const tender = tenderMap[String(offer.ihale_id)] || {};
-    const isClosed = getTenderStatus(tender.durum).tone === 'closed';
+    // Enes Doğanay | 9 Haziran 2026: tamamlandi da kapalı sayılır — mesaj gönderilemesin
+    const isClosed = getTenderStatus(tender.durum).tone === 'closed' || tender.durum === 'tamamlandi' || tender.durum === 'completed';
     const displayName = anonim ? 'Anonim Firma' : (firmaAdi || 'Firma');
 
     // Enes Doğanay | 7 Mayıs 2026: mesajları SharedChatModal formatına dönüştür
