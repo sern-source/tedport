@@ -73,24 +73,8 @@ const AdminChatbotTraining = () => {
   /* Silme onayı */
   const [deleteTarget, setDeleteTarget] = useState(null); // { type: 'qa'|'qq', id }
 
-  /* ── Admin yetki kontrolü ─────────────────────────────────── */
-  useEffect(() => {
-    const check = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { router.push('/login'); return; }
-      if (!(await resolveIsAdminUser(session.user.email, isAdminEmail))) {
-        setAccessDenied(true);
-        setSessionChecked(true);
-        return;
-      }
-      setSessionChecked(true);
-      fetchQA();
-      fetchQQ();
-    };
-    check();
-  }, []);
-
   /* ── Veri çekme ───────────────────────────────────────────── */
+  // Enes Doğanay | 10 Haziran 2026: Fonksiyonlar useEffect'ten önce tanımlandı — hoisting fix
   const fetchQA = useCallback(async () => {
     setQaLoading(true);
     const { data, error } = await supabase
@@ -110,6 +94,23 @@ const AdminChatbotTraining = () => {
     if (!error && data) setQqList(data);
     setQqLoading(false);
   }, []);
+
+  /* ── Admin yetki kontrolü ─────────────────────────────────── */
+  useEffect(() => {
+    const check = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { router.push('/login'); return; }
+      if (!(await resolveIsAdminUser(session.user.email, isAdminEmail))) {
+        setAccessDenied(true);
+        setSessionChecked(true);
+        return;
+      }
+      setSessionChecked(true);
+      fetchQA();
+      fetchQQ();
+    };
+    check();
+  }, [fetchQA, fetchQQ, router]);
 
   /* ── Q&A işlemleri ────────────────────────────────────────── */
   const openQaForm = (item = null) => {

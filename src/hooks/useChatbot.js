@@ -30,6 +30,7 @@ const useChatbot = () => {
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
         const mq = window.matchMedia('(max-width: 768px)');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsMobile(mq.matches);
         const handler = (e) => setIsMobile(e.matches);
         mq.addEventListener('change', handler);
@@ -71,6 +72,7 @@ const useChatbot = () => {
 
     // Enes Doğanay | 6 Mayıs 2026: Pencere açıldığında focus + okunmadıkları sıfırla
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (open) { setUnread(0); setTimeout(() => inputRef.current?.focus(), 100); }
     }, [open]);
 

@@ -172,8 +172,6 @@ export function useMopChat({ offers, tenderMap, firmaMap, firmaLogoMap, userProf
                     notifyFirmaManagers(tender.firma_id, notifRows);
                 });
             }
-        } catch (err) {
-            throw err;
         } finally {
             setMopChatSending(false);
         }

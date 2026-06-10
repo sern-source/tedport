@@ -14,8 +14,9 @@ const IhaleYonetimiBody = ({
 
     // Enes Doğanay | 8 Mayıs 2026: URL/bildirim ile selectedId değişince → detay görünümüne geç
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (core.selectedId) setMobileView('detail');
-    }, [core.selectedId]); // eslint-disable-line
+    }, [core.selectedId]);
 
     // Enes Doğanay | 8 Mayıs 2026: Tender seçimi — mobilde detay görünümüne geç
     const handleSelectTender = (id) => {

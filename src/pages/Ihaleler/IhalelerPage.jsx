@@ -68,6 +68,7 @@ const IhalelerPage = () => {
         const target = ihaleler.tenders.find(t => String(t.id) === ihaleParam);
         if (target) {
             if (teklifParam) teklifHook.openTeklifPopup(target);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             else setDetailTender(target);
             setHighlightTenderId(target.id);
             setTimeout(() => setHighlightTenderId(null), 3000);

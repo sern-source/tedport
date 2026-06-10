@@ -13,9 +13,9 @@ const TeklifMainPopup = ({
     setWithdrawConfirm, setDraftDeleteConfirm,
     onClose, onSubmit, onUpdateKalem, getGroupedTotals, isTeklifDirty,
 }) => {
-    if (!teklifTender) return null;
-    // Enes Doğanay | 16 Mayıs 2026: Dosya türü hatası — component yerel state
+    // Enes Doğanay | 10 Haziran 2026: Hook koşullu return'den ÖNCE çağrılmalı — rules-of-hooks
     const [fileTypeError, setFileTypeError] = useState('');
+    if (!teklifTender) return null;
     const tt = teklifTender;
     const gereksinimler = Array.isArray(tt.gereksinimler) ? tt.gereksinimler : [];
     const hasKalemler = teklifForm.kalemler.length > 0;

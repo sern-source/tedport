@@ -1,6 +1,6 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: Teklif koordinatör hook — popup, iletişim, teklif mutasyonları
 import { useEffect, useState, useMemo } from 'react';
-import { fetchUserOffers, fetchFirmaContactInfo, fetchCurrentUserOffersMap } from '../services/teklifFormService';
+import { fetchFirmaContactInfo, fetchCurrentUserOffersMap } from '../services/teklifFormService';
 import useTeklifSubmitActions from './useTeklifSubmitActions';
 
 // Enes Doğanay | 7 Mayıs 2026: Teklif işlem handler'ları + openTeklifPopup

@@ -34,7 +34,8 @@ export default function DatePicker({ value, onChange, min, placeholder = 'gg.aa.
         const left   = Math.min(rect.left, vw - panelW - 8);
         const top    = rect.bottom + 6 + panelH > vh ? rect.top - panelH - 6 : rect.bottom + 6;
         setPanelStyle({ position: 'fixed', top: Math.max(8, top), left: Math.max(8, left), width: panelW, zIndex: 99999 });
-    }, []);
+    // Enes Doğanay | 10 Haziran 2026: compact bunu etkiliyor — exhaustive-deps
+    }, [compact]);
 
     const handleOpen = () => {
         if (!open) {

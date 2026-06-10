@@ -29,7 +29,7 @@ const MyOffersTab = ({ userId, companyId, mopChatTrigger, onChatOpened, onUnread
         // Enes Doğanay | 1 Haziran 2026: Dosya gönderme + ek görüntüleme
         handleSendMopFileMessage, handleOpenMopAttachment,
         deleteConfirm, setDeleteConfirm, deleting, handleDeleteOffer,
-        firmaContactPopup, setFirmaContactPopup, firmaContactLoading, handleOpenFirmaContact,
+        firmaContactPopup, setFirmaContactPopup, firmaContactLoading,
         reportModal, setReportModal, reportSending,
         reportNeden, setReportNeden, reportAciklama, setReportAciklama,
         reportSuccess, handleSubmitReport,

@@ -36,7 +36,7 @@ const ProfilePage = () => {
   const { user, profile, cities, loading, uploading, pendingEmail, fieldFeedback, setFieldFeedback,
     marketingConsent, marketingConsentSaving, myCompany, myCompanyFirma, pendingInvites,
     mopChatTrigger, setMopChatTrigger,
-    prToast, setPrToast, notifPrefs, setNotifPrefs, fileInputRef, theme,
+    prToast, setPrToast, notifPrefs, setNotifPrefs, fileInputRef,
     searchParams, setSearchParams, navigate, showPrToast,
     handleLogout, handleAvatarUpload, handleUpdateField,
     handleCancelEmailChange, handleResendEmailChange, handleDavetKabul, handleDavetRed, handleToggleMarketing,

@@ -105,8 +105,10 @@ const useIhaleCreate = ({ companyId, reloadTenders }) => {
     const refNoCopied = publishState.refNoCopied; const setRefNoCopied = (val) => setPublishState(p => ({ ...p, refNoCopied: val }));
     const handleFormSubmit = (_e, forceDurum) => handlers.handleCreateFormSubmit(forceDurum);
     // Enes Doğanay | 12 Mayıs 2026: Dirty tracking — taslak düzenleme ve yeni form her zaman aktif
+    // eslint-disable-next-line react-hooks/refs
     const isFormDirty = !editTenderId || !originalFormRef.current || createForm.durum === 'draft'
         ? true
+        // eslint-disable-next-line react-hooks/refs
         : JSON.stringify(createForm) !== JSON.stringify(originalFormRef.current);
 
     return {

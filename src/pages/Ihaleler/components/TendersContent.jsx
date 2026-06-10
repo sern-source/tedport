@@ -8,10 +8,10 @@ import TendersPagination from './TendersPagination';
 
 const TendersContent = ({
     tableMissing, loading, filteredTenders, paginatedTenders,
-    userProfile, searchTerm, statusFilter, viewMode,
+    searchTerm, statusFilter, viewMode,
     highlightTenderId, highlightTenderRef, authManagedCompanyId, userOffers,
     page, setPage, totalPages, smartPages,
-    onDetail, onEdit, onTeklif, onContact, onNavigateFirma, onLoginRedirect, onRegisterRedirect,
+    onDetail, onEdit, onTeklif, onContact, onNavigateFirma,
 }) => {
     if (tableMissing) return (
         <section className="tenders-empty-state">

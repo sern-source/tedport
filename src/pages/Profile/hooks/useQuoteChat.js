@@ -131,8 +131,6 @@ const useQuoteChat = ({ activeQuoteId, setActiveQuoteId, userId, refreshCounts, 
             quoteChatChannelRef.current?.send({ type: 'broadcast', event: 'new-message', payload: data }).catch(() => {});
             setMyQuotes(prev => prev.map(q => q.id === activeQuoteId ? { ...q, _displayStatus: 'awaiting_reply' } : q));
             scrollToBottom();
-        } catch (err) {
-            throw err;
         } finally {
             setQuoteChatSending(false);
         }

@@ -20,12 +20,14 @@ const useIhaleOfferActions = ({ rawOffers, selectedTender }) => {
     useEffect(() => {
         const all = {};
         rawOffers.forEach(o => { if (o.alici_notu) all[String(o.id)] = o.alici_notu; });
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setNotes(all);
     }, [rawOffers]);
 
     // Enes Doğanay | 7 Mayıs 2026: İhale değişince karşılaştırma seçimini ve filtreyi temizle
     // Enes Doğanay | 3 Haziran 2026: Kaydedilmiş ağırlıkları localStorage'dan yükle
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCompareState(prev => ({ ...prev, ids: [] }));
         let weights = { price: 50, delivery: 50 };
         if (selectedTender?.id) {

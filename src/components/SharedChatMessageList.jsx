@@ -1,5 +1,5 @@
 // Enes Doğanay | 7 Mayıs 2026: Mesaj listesi + scroll yönetimi — SharedChatModal sub-component
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 // Enes Doğanay | 8 Mayıs 2026: Module seviyesi formatçı — her render’da yeni Intl nesnesi üretmez
 const msgTimeFormatter = new Intl.DateTimeFormat('tr-TR', {

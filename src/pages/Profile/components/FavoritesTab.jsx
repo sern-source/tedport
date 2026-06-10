@@ -21,8 +21,6 @@ const FavoritesTab = ({ favorites, myLists, selectedListId, setSelectedListId, i
   else if (favSort === 'oldest') displayed.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
   else displayed.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
 
-  const listName = selectedListId === null ? 'Tüm Favoriler' : myLists.find(l => l.id === selectedListId)?.liste_adi;
-
   // Enes Doğanay | 7 Mayıs 2026: Hero için KPI hesapla
   const totalCount = favorites.length;
   const listCount = myLists.length;

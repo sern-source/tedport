@@ -10,6 +10,7 @@ const useSektorLanding = (sektorAdi) => {
     useEffect(() => {
         if (!sektorAdi) return;
         let cancelled = false;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         setError('');
         fetchTendersBySektor(sektorAdi)

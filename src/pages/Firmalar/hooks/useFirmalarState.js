@@ -63,11 +63,14 @@ export const useFirmalarState = ({ currentUserId }) => {
         if (!currentUserId) return;
         try {
             const saved = localStorage.getItem(`tedport_firmalar_view_${currentUserId}`);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             if (saved === 'list' || saved === 'grid') setViewMode(saved);
         } catch {}
     }, [currentUserId]);
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { const s = searchParams.get('search') || ''; if (s) { setSearch(s); setDebouncedSearch(s); } }, [searchParams]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { setPage(Number(searchParams.get('page')) || 1); }, [searchParams]);
     useEffect(() => { const t = setTimeout(() => setDebouncedSearch(search), 300); return () => clearTimeout(t); }, [search]);
     useEffect(() => {

@@ -103,7 +103,7 @@ export const useProfileCore = () => {
     useEffect(() => {
         if (searchParams.get('tab') !== 'sirketim' || !user) return;
         fetchPendingInvites(user.id).then(invites => setPendingInvites(invites)).catch(() => {});
-    }, [searchParams, user]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [searchParams, user]);
 
     const handleLogout = useCallback(async () => { await signOutService(); router.push('/'); }, []);
 

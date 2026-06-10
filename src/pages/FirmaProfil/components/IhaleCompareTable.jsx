@@ -79,7 +79,7 @@ const IhaleCompareTable = ({ compareList, onClear }) => {
                                 <span className="material-symbols-outlined tom-cmp__lbl-icon-ms">{row.icon}</span>
                                 <span>{row.label}</span>
                             </div>
-                            {compareList.map((o, idx) => {
+                            {compareList.map((o) => {
                                 if (row.type === 'score') {
                                     const s = o._score?.[row.key] ?? 0;
                                     const isBest = s === best[row.key] && best[row.key] > 0;

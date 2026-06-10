@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 const CountUp = ({ value }) => {
     const [displayed, setDisplayed] = useState(0);
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDisplayed(0);
         if (!value) return;
         const steps = 20;

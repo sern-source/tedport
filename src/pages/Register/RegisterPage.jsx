@@ -35,11 +35,13 @@ const RegisterPage = () => {
     const [showMarketingTooltip, setShowMarketingTooltip] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setRegistrationType(searchParams.get('type') === 'corporate' ? 'corporate' : 'individual');
     }, [searchParams]);
 
     // Enes Doğanay | 6 Mayıs 2026: Sekme değişince marketing modal/tooltip sıfırla
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setShowMarketingModal(false);
         setShowMarketingTooltip(false);
     }, [registrationType]);

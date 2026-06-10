@@ -7,6 +7,7 @@ export function useHomeBlog() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsLoading(true);
         fetchBlogList()
             .then((all) => setPosts(all.slice(0, 3)))

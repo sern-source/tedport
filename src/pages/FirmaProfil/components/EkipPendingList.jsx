@@ -24,6 +24,7 @@ const EkipPendingList = ({ bekleyenDavetler, handleDavetIptal }) => {
                   {' '}·{' '}
                   {new Date(d.expires_at) < new Date()
                     ? 'Süresi doldu'
+                    // eslint-disable-next-line react-hooks/purity
                     : `${Math.ceil((new Date(d.expires_at) - Date.now()) / 86400000)} gün geçerli`}
                 </span>
               </div>

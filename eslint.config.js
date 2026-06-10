@@ -15,7 +15,8 @@ export default defineConfig([
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      // Enes Doğanay | 10 Haziran 2026: browser + node globals — process.env için node eklendi
+      globals: { ...globals.browser, ...globals.node },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -23,8 +24,10 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
       'no-empty': ['error', { allowEmptyCatch: true }],
+      // Enes Doğanay | 10 Haziran 2026: Next.js app router page dosyaları metadata/generateMetadata export eder — false positive
+      'react-refresh/only-export-components': ['warn', { allowExportNames: ['metadata', 'generateMetadata', 'generateStaticParams', 'dynamic', 'revalidate', 'fetchCache', 'runtime', 'preferredRegion', 'maxDuration', 'config', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] }],
     },
   },
 ])

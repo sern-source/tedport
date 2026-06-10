@@ -9,7 +9,7 @@ const MODES = [
 
 // Enes Doğanay | 14 Mayıs 2026: searchMode null ise render edilmez — diğer sayfalarda görünmez
 const SearchModeToggle = ({ searchMode, onSearchModeChange }) => {
-    if (!searchMode || !onSearchModeChange) return null;
+    // Enes Doğanay | 10 Haziran 2026: Hook'lar early return'den önce — rules-of-hooks
     const [open, setOpen] = useState(false);
     const ref = useRef(null);
 
@@ -19,6 +19,8 @@ const SearchModeToggle = ({ searchMode, onSearchModeChange }) => {
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, [open]);
+
+    if (!searchMode || !onSearchModeChange) return null;
 
     const current = MODES.find(m => m.key === searchMode) || MODES[0];
 

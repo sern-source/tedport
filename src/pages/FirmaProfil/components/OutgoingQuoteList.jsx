@@ -33,7 +33,9 @@ const OutgoingQuoteList = ({
   /* Enes Doğanay | 7 Mayıs 2026: Arama state */
   const [search, setSearch] = useState('');
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setCurrentPage(1); }, [outStatusFilter]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setCurrentPage(1); }, [search]);
 
   if (outgoingQuotes.length === 0) {

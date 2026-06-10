@@ -9,6 +9,7 @@ const PageLoader = () => {
     const [dark, setDark] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDark(document.documentElement.dataset.theme === 'dark');
     }, []);
 

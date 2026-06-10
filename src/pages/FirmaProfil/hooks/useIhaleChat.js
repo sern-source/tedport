@@ -183,8 +183,6 @@ const useIhaleChat = ({ offersByTender, loading, setActiveViewingTeklifId, refre
             if (activeTenderChat.offer.user_id) {
                 ihaleService.insertNotification({ user_id: activeTenderChat.offer.user_id, type: 'tender_offer_message', title: 'İhale teklifine dosya eklendi', message: `"${activeTenderChat.tenderTitle || 'İhale'}" teklifinize firma dosya gönderdi.`, is_read: false, metadata: { ihale_id: activeTenderChat.offer.ihale_id, teklif_id: activeTenderChat.offer.id, ihale_baslik: activeTenderChat.tenderTitle } });
             }
-        } catch (err) {
-            throw err;
         } finally {
             setTenderChatSending(false);
         }

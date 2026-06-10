@@ -1,6 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Firmalar sayfası — tüm Supabase sorguları
 import { supabase } from '../../../supabaseClient';
-import { getManagedCompanyId } from '../../../services/companyManagementApi';
+
 import { expandSearchTerms, levenshtein } from '../../../constants/synonyms';
 import { sanitizeSearch, ISTANBUL_AVRUPA, ISTANBUL_ANADOLU, getSektorKeywords } from '../utils/firmaUtils';
 import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
@@ -121,7 +121,8 @@ const fetchFirmalarSeeded = async ({ page, search, filters, searchMode, sessionS
 
   if (error) throw new Error(error.message);
   const count = Number(data?.[0]?.total_count ?? 0);
-  const rows = (data || []).map(({ total_count, ...rest }) => rest);
+  // Enes Doğanay | 10 Haziran 2026: total_count server'dan gelir, satırlardan hariç tutulur
+  const rows = (data || []).map(({ total_count: _tc, ...rest }) => rest);
   return { data: rows, count };
 };
 

@@ -97,7 +97,6 @@ const BlogPostPage = ({ slug }) => {
                     <div className="blog-post-layout">
                         <article className="blog-post-content">
                             {/* Güvenli: içerik yalnızca admin seed data'sından gelir */}
-                            {/* eslint-disable-next-line react/no-danger */}
                             <div
                                 className="blog-prose"
                                 dangerouslySetInnerHTML={{ __html: post.content }}

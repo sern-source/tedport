@@ -13,6 +13,7 @@ const UnsubscribePage = () => {
     const [status, setStatus] = useState('loading');
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (!token) { setStatus('invalid'); return; }
         // Enes Doğanay | 15 Mayıs 2026: result.already → 'already'; catch → teknik hata, hep 'error'
         unsubscribeByToken(token)

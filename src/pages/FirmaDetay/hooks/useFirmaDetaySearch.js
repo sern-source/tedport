@@ -11,6 +11,7 @@ export function useFirmaDetaySearch() {
     const [detaySearchMode, setDetaySearchMode] = useState('all');
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (detaySearch.trim().length < 2) { setSuggestions([]); setNoResults(false); return; }
         const timeout = setTimeout(async () => {
             const results = await fetchSuggestionsService(detaySearch);

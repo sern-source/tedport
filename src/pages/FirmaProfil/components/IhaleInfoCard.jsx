@@ -1,7 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Seçili ihale bilgi kartı — detaylar, dosyalar, link, aksiyonlar
 import React from 'react';
 import { useState } from 'react';
-import { getTenderStatus, formatDate } from '../constants/ihaleConstants';
+import { formatDate } from '../constants/ihaleConstants';
 import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 import { getIhaleFileSignedUrl } from '../services/ihaleService';
 import DatePicker from '../../../components/DatePicker';

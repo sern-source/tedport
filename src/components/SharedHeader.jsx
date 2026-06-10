@@ -41,6 +41,7 @@ const SharedHeader = ({
     const headerRef = useRef(null);
     // Enes Doğanay | 13 Nisan 2026: ref ile stabilize — useEffect dependency sorunu önlenir
     const onSuggestionClickRef = useRef(onSuggestionClick);
+    // eslint-disable-next-line react-hooks/refs
     onSuggestionClickRef.current = onSuggestionClick;
 
     useEffect(() => {

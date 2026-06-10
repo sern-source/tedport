@@ -49,23 +49,7 @@ const AdminMesajSikayetleri = () => {
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [adminNotEdit, setAdminNotEdit] = useState({}); // id → text being edited
 
-  /* Enes Doğanay | 2 Mayıs 2026: Admin yetki kontrolü */
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) { router.push('/login'); return; }
-      if (!(await resolveIsAdminUser(session.user.email, isAdminEmail))) {
-        setAccessDenied(true);
-        setLoading(false);
-        setSessionChecked(true);
-        return;
-      }
-      setSessionChecked(true);
-      fetchReports();
-    };
-    checkAdmin();
-  }, []);
-
+  // Enes Doğanay | 10 Haziran 2026: fetchReports useEffect'ten önce tanımlandı — immutability fix
   /* Enes Doğanay | 2 Mayıs 2026: Şikayetleri çek + reporter & sender profil zenginleştirme */
   const fetchReports = async () => {
     setLoading(true);
@@ -207,6 +191,23 @@ const AdminMesajSikayetleri = () => {
     setReports(enriched);
     setLoading(false);
   };
+
+  /* Enes Doğanay | 10 Haziran 2026: Admin yetki kontrolü */
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { router.push('/login'); return; }
+      if (!(await resolveIsAdminUser(session.user.email, isAdminEmail))) {
+        setAccessDenied(true);
+        setLoading(false);
+        setSessionChecked(true);
+        return;
+      }
+      setSessionChecked(true);
+      fetchReports();
+    };
+    checkAdmin();
+  }, [fetchReports, router]);
 
   /* Enes Doğanay | 2 Mayıs 2026: Durum güncelle */
   const updateDurum = async (id, newDurum) => {

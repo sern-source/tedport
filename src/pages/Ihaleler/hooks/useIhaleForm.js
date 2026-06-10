@@ -1,5 +1,5 @@
 ﻿// Enes Doğanay | 7 Mayıs 2026: İhale form koordinatör — supabase kaldırıldı, davet sub-hook ayrıldı
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createTender, updateTender } from '../../../services/ihaleManagementApi';
 import { uploadIhaleFiles } from '../services/ihaleFormService';
 import { EMPTY_FORM, toDateInput } from '../IhalelerUtils';

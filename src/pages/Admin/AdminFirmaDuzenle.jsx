@@ -288,7 +288,7 @@ const AdminFirmaDuzenle = () => {
         setPurging(true);
 
         /* Güvenlik: silinecek kayıtların JSON yedeği */
-        const backup = purgePreview.remove.map(f => ({
+        const _backup = purgePreview.remove.map(f => ({
             firmaID: f.firmaID, firma_adi: f.firma_adi, category_name: f.category_name,
             description: f.description, telefon: f.telefon, eposta: f.eposta,
             adres: f.adres, web_sitesi: f.web_sitesi, logo_url: f.logo_url,

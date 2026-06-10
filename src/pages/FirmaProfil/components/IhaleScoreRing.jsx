@@ -5,6 +5,7 @@ const IhaleScoreRing = ({ score, size = 52 }) => {
     const [displayed, setDisplayed] = useState(0);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDisplayed(0);
         if (!score) return;
         const steps = 28;

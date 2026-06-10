@@ -34,6 +34,20 @@ const AdminContactMessages = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [actionLoadingId, setActionLoadingId] = useState(null);
 
+  // Enes Doğanay | 10 Haziran 2026: fetchMessages useEffect'ten önce tanımlandı — immutability fix
+  const fetchMessages = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('iletisim')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    /* Enes Doğanay | 14 Nisan 2026: Hata varsa konsola yaz */
+    if (error) console.error('iletisim fetch error:', error);
+    if (data) setMessages(data);
+    setLoading(false);
+  };
+
   /* Enes Doğanay | 14 Nisan 2026: Admin yetki kontrolü — env + DB çift katmanlı (resolveIsAdminUser) */
   useEffect(() => {
     const checkAdmin = async () => {
@@ -49,20 +63,7 @@ const AdminContactMessages = () => {
       fetchMessages();
     };
     checkAdmin();
-  }, []);
-
-  const fetchMessages = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('iletisim')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    /* Enes Doğanay | 14 Nisan 2026: Hata varsa konsola yaz */
-    if (error) console.error('iletisim fetch error:', error);
-    if (data) setMessages(data);
-    setLoading(false);
-  };
+  }, [fetchMessages, router]);
 
   /* Enes Doğanay | 14 Nisan 2026: Mesaj durumunu güncelle */
   const updateStatus = async (id, newStatus) => {

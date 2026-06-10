@@ -25,11 +25,14 @@ export const useFirmaContent = ({
   const hasMoreNotifications = filteredNotifications.length > limit;
   const unreadNotifCount = filteredNotifications.filter((n) => !n.is_read).length;
 
+  // Enes Doğanay | 10 Haziran 2026: now sabitleniyor — react-hooks/purity: Date.now render başında bir kez
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
   const futureUpcomingReminders = upcomingReminders.filter(
-    (r) => new Date(r.reminder_at).getTime() > Date.now()
+    (r) => new Date(r.reminder_at).getTime() > now
   );
   const overduePendingReminders = upcomingReminders.filter(
-    (r) => new Date(r.reminder_at).getTime() <= Date.now()
+    (r) => new Date(r.reminder_at).getTime() <= now
   );
 
   // Enes Doğanay | 6 Mayıs 2026: Okunmamış teklif bildirim ID'leri

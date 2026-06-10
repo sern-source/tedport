@@ -80,7 +80,7 @@ const useIhaleCore = ({ companyId, refreshCounts }) => {
             onUpdate: (row) => setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: (prev[k] || []).map(o => String(o.id) === String(row.id) ? row : o) }; }),
             onDelete: (row) => setOffersByTender(prev => { const k = String(row.ihale_id); return { ...prev, [k]: (prev[k] || []).filter(o => String(o.id) !== String(row.id)) }; }),
         });
-    }, [companyId, tenderIdKey]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [companyId, tenderIdKey]);
 
     // Enes Doğanay | 22 Mayıs 2026: İhale seçilince bildirimlerini okundu yap
     useEffect(() => {
@@ -126,7 +126,7 @@ const useIhaleCore = ({ companyId, refreshCounts }) => {
             if (prev && filteredTenders.some(t => String(t.id) === String(prev))) return prev;
             return filteredTenders[0].id;
         });
-    }, [filteredTenders]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [filteredTenders]);
 
     const rawOffers = useMemo(() => offersByTender[String(selectedId)] || [], [offersByTender, selectedId]);
     const totalOffers = useMemo(() => Object.values(offersByTender).flat().length, [offersByTender]);

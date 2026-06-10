@@ -1,6 +1,6 @@
 // Enes Doğanay | 6 Mayıs 2026: Sol panel — ihale listesi, arama, filtreler, sayfalama
 import React, { useState, useRef, useEffect } from 'react';
-import { getTenderStatus, daysUntil, TOM_PAGE_SIZE } from '../constants/ihaleConstants';
+import { daysUntil, TOM_PAGE_SIZE } from '../constants/ihaleConstants';
 // Enes Doğanay | 12 Mayıs 2026: Tarih temelli durum için (yaklaşan)
 import { getTenderStatusMeta } from '../../../constants/tenderUtils';
 

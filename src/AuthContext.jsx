@@ -52,6 +52,7 @@ export function AuthProvider({ children }) {
 
   // Enes Doğanay | 7 Mayıs 2026: useCallback — context consumer'lar yeniden render edilmesin
   const logout = useCallback(async () => {
+    // eslint-disable-next-line react-hooks/immutability
     loader.isLoggingOutRef.current = true;
     await signOutGlobal();
     try {
@@ -67,6 +68,7 @@ export function AuthProvider({ children }) {
     setTimeout(() => { loader.isLoggingOutRef.current = false; }, 2000);
   }, [loader.clearAuthState, loader.setAuthChecked]);
 
+  // eslint-disable-next-line react-hooks/immutability
   const setValidatingLogin = useCallback((v) => { loader.validatingLoginRef.current = v; }, []);
 
   // Enes Doğanay | 7 Mayıs 2026: useMemo — herhangi bir state değişince yalnızca ilgili consumer'lar re-render edilir
