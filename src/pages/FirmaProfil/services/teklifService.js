@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif yönetimi servisi
 import { supabase } from '../../../supabaseClient';
+// Enes Doğanay | 12 Haziran 2026: Admin bildirimi
+import { notifyAdmin } from '../../../services/adminNotify';
 import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
 
 /* Enes Doğanay | 6 Mayıs 2026: İlk yükleme — gelen + giden teklifler */
@@ -155,6 +157,8 @@ export const submitMesajSikayet = async ({
     },
   ]);
   if (error) throw new Error(error.message);
+  // Enes Doğanay | 12 Haziran 2026: Admin bildirimi — fire-and-forget
+  notifyAdmin('complaint', { reporterId, neden, kaynak, mesajIcerik, aciklama });
 };
 
 /* Enes Doğanay | 6 Mayıs 2026: Teklif sahibi iletişim bilgilerini getir */

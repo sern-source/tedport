@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: MyOffersService — ihale teklifleri Supabase sorguları (shared)
 import { supabase } from '../supabaseClient';
+// Enes Doğanay | 12 Haziran 2026: Admin bildirimi
+import { notifyAdmin } from './adminNotify';
 // Enes Doğanay | 1 Haziran 2026: Dosya yükleme sabitleri
 import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../constants/fileUpload';
 
@@ -190,6 +192,8 @@ export async function submitMessageReport({ reporterId, mesajId, mesajIcerik, ne
         aciklama: aciklama?.trim() || null,
     }]);
     if (error) throw error;
+    // Enes Doğanay | 12 Haziran 2026: Admin bildirimi — fire-and-forget
+    notifyAdmin('complaint', { reporterId, neden, kaynak: 'ihale_teklifi', mesajIcerik, aciklama });
 }
 
 // Enes Doğanay | 7 Mayıs 2026: Tek mesajı bidder için okundu işaretle

@@ -207,7 +207,8 @@ const AdminMesajSikayetleri = () => {
       fetchReports();
     };
     checkAdmin();
-  }, [fetchReports, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   /* Enes Doğanay | 2 Mayıs 2026: Durum güncelle */
   const updateDurum = async (id, newDurum) => {

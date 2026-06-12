@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: MyOffersService — shared servise yönlendirme
 import { supabase } from '../../../supabaseClient';
+// Enes Doğanay | 12 Haziran 2026: Admin bildirimi
+import { notifyAdmin } from '../../../services/adminNotify';
 
 // Enes Doğanay | 6 Mayıs 2026: Kullanıcı/firma tekliflerini ihale ve firma bilgileriyle çek
 export async function fetchMyOffers(userId, companyId) {
@@ -172,4 +174,6 @@ export async function submitMessageReport({ reporterId, mesajId, mesajIcerik, ne
         aciklama: aciklama?.trim() || null,
     }]);
     if (error) throw error;
+    // Enes Doğanay | 12 Haziran 2026: Admin bildirimi — fire-and-forget
+    notifyAdmin('complaint', { reporterId, neden, kaynak: 'ihale_teklifi', mesajIcerik, aciklama });
 }

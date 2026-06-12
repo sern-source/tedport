@@ -1,0 +1,2 @@
+# Enes Doğanay | 12 Haziran 2026: Admin bildirim maili — JWT doğrulaması yok, EDGE_FUNCTION_SECRET ile güvence
+verify_jwt = false

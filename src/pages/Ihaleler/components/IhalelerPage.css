@@ -19,6 +19,169 @@
     }
 }
 
+/* Enes Doğanay | 12 Haziran 2026: İhale aç bilgi banner'ı */
+.ihale-ac-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: var(--bg-white);
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #2563eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    animation: ihale-banner-in 0.3s ease;
+}
+
+@keyframes ihale-banner-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.ihale-ac-banner__left {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.ihale-ac-banner__icon-wrap {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: #eff6ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ihale-ac-banner__icon-wrap .material-symbols-outlined {
+    font-size: 20px;
+    color: #2563eb;
+}
+
+.ihale-ac-banner__text {
+    min-width: 0;
+}
+
+.ihale-ac-banner__title {
+    margin: 0 0 3px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.ihale-ac-banner__desc {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.ihale-ac-banner__desc strong {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.ihale-ac-banner__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.ihale-ac-banner__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 0.80rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.15s;
+}
+
+.ihale-ac-banner__cta:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.ihale-ac-banner__cta .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.ihale-ac-banner__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 4px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ihale-ac-banner__close:hover {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.ihale-ac-banner__close .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Dark mode */
+[data-theme="dark"] .ihale-ac-banner {
+    background: #1e2736;
+    border-color: #1e40af;
+    border-left-color: #3b82f6;
+}
+
+[data-theme="dark"] .ihale-ac-banner__icon-wrap {
+    background: #1e3a8a;
+}
+
+[data-theme="dark"] .ihale-ac-banner__icon-wrap .material-symbols-outlined {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .ihale-ac-banner__cta {
+    background: #2563eb;
+}
+
+[data-theme="dark"] .ihale-ac-banner__cta:hover {
+    background: #1d4ed8;
+}
+
+/* Mobil */
+@media (max-width: 640px) {
+    .ihale-ac-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .ihale-ac-banner__actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .ihale-ac-banner__cta {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
 /* Enes Doğanay | 13 Mayıs 2026: Uyarı satırı — toolbar altında */
 .tenders-alert-row {
     display: flex;

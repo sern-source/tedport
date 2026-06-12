@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif talepleri Supabase servisleri
 import { supabase } from '../../../supabaseClient';
+// Enes Doğanay | 12 Haziran 2026: Admin bildirimi
+import { notifyAdmin } from '../../../services/adminNotify';
 import { runSupabaseQueryWithTimeout } from '../../../supabaseRecovery';
 // Enes Doğanay | 1 Haziran 2026: Dosya yükleme sabitleri
 import { ALLOWED_EK_DOSYA_UZANTILARI, ALLOWED_EK_DOSYA_HATA } from '../../../constants/fileUpload';
@@ -51,6 +53,8 @@ export const deleteQuoteService = async (quoteId, ekDosyaUrl) => {
 export const submitMessageReportService = async (reportData) => {
   const { error } = await supabase.from('mesaj_sikayetleri').insert([reportData]);
   if (error) throw new Error(error.message);
+  // Enes Doğanay | 12 Haziran 2026: Admin bildirimi — fire-and-forget
+  notifyAdmin('complaint', { reporterId: reportData.reporter_id, neden: reportData.neden, kaynak: reportData.kaynak, mesajIcerik: reportData.mesaj_icerik, aciklama: reportData.aciklama });
 };
 
 export const markQuoteAsViewed = async (quoteId, viewedByUserId) => {

@@ -63,7 +63,8 @@ const AdminContactMessages = () => {
       fetchMessages();
     };
     checkAdmin();
-  }, [fetchMessages, router]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   /* Enes Doğanay | 14 Nisan 2026: Mesaj durumunu güncelle */
   const updateStatus = async (id, newStatus) => {

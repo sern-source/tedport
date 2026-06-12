@@ -18,6 +18,7 @@ import TendersToolbar from "./components/TendersToolbar";
 import TendersContent from "./components/TendersContent";
 import IhalelerModals from "./components/IhalelerModals";
 import AlertSubscriptionPanel from "./components/AlertSubscriptionPanel";
+import IhaleAcBanner from "./components/IhaleAcBanner";
 
 const IhalelerPage = () => {
     const router = useRouter();
@@ -40,7 +41,7 @@ const IhalelerPage = () => {
     const teklifParam = searchParams.get("teklif") || "";
     const yeniIhaleParam = searchParams.get("yeniIhale") || "";
     const duzenleParam = searchParams.get("duzenle") || "";
-    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName } = useAuth() || {};
+    const { userProfile, managedCompanyId: authManagedCompanyId, managedCompanyName, authChecked } = useAuth() || {};
 
     // Enes Doğanay | 16 Mayıs 2026: Demo hesap tespiti — demo.* @tedport.com patternı
     const isDemoUser = /^demo\.[^@]+@tedport\.com$/.test(userProfile?.email || '');
@@ -98,6 +99,8 @@ const IhalelerPage = () => {
                     selectedFirmaName={ihaleler.selectedFirmaName}
                     liveCount={ihaleler.liveCount} upcomingCount={ihaleler.upcomingCount} closedCount={ihaleler.closedCount} tamamlandiCount={ihaleler.tamamlandiCount}
                 />
+                {/* Enes Doğanay | 12 Haziran 2026: Kurumsal hesabı olmayan kullanıcılara ihale açma bilgisi */}
+                <IhaleAcBanner authManagedCompanyId={authManagedCompanyId} authChecked={authChecked} />
                 <TendersToolbar
                     searchTerm={ihaleler.searchTerm} setSearchTerm={ihaleler.setSearchTerm}
                     viewMode={ihaleler.viewMode} toggleViewMode={ihaleler.toggleViewMode}

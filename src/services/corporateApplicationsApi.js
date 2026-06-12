@@ -1,4 +1,6 @@
 import { supabase, supabaseAnonKey, supabaseUrl } from '../supabaseClient';
+// Enes Doğanay | 12 Haziran 2026: Admin bildirimi
+import { notifyAdmin } from './adminNotify';
 
 // Enes Doğanay | 8 Mayıs 2026: Magic number sabit — fallback DB sorgusunda maksimum başvuru sayısı
 const MAX_APPLICATIONS_FETCH = 200;
@@ -91,7 +93,15 @@ export const submitCorporateApplication = async (formData) => {
         action: 'submit'
       }
     });
-
+    // Enes Doğanay | 12 Haziran 2026: Admin bildirimi — fire-and-forget
+    notifyAdmin('corporate', {
+      companyName: formData.listedCompanyName,
+      contactName: `${formData.applicantFirstName || ''} ${formData.applicantLastName || ''}`.trim(),
+      corporateEmail: formData.corporateEmail,
+      industry: formData.industry,
+      companySize: formData.companySize,
+      notes: formData.verificationNote,
+    });
     return { application: data?.application, mode: 'edge' };
   } catch (error) {
     const fallbackReason = error?.message || 'Kurumsal başvuru Edge Function çağrısı başarısız oldu.';
@@ -119,7 +129,15 @@ export const submitCorporateApplication = async (formData) => {
     if (insertError) {
       throw new Error(insertError.message || 'Kurumsal başvuru oluşturulamadı.');
     }
-
+    // Enes Doğanay | 12 Haziran 2026: Admin bildirimi — fire-and-forget
+    notifyAdmin('corporate', {
+      companyName: formData.listedCompanyName,
+      contactName: `${formData.applicantFirstName || ''} ${formData.applicantLastName || ''}`.trim(),
+      corporateEmail: formData.corporateEmail,
+      industry: formData.industry,
+      companySize: formData.companySize,
+      notes: formData.verificationNote,
+    });
     return { application: databasePayload, mode: 'database', fallbackReason };
   }
 };

@@ -18,6 +18,8 @@ const TENDER_STATUS_MAP = {
     kapali: { label: 'Kapandı', tone: 'closed' }, closed: { label: 'Kapandı', tone: 'closed' },
     iptal: { label: 'İptal', tone: 'cancelled' }, cancelled: { label: 'İptal', tone: 'cancelled' },
     taslak: { label: 'Taslak', tone: 'draft' }, draft: { label: 'Taslak', tone: 'draft' },
+    // Enes Doğanay | 12 Haziran 2026: tamamlandi/completed eksikti — "Bilinmiyor" olarak görünüyordu
+    tamamlandi: { label: 'Tamamlandı', tone: 'closed' }, completed: { label: 'Tamamlandı', tone: 'closed' },
 };
 export const getTenderStatus = (v) => TENDER_STATUS_MAP[String(v || '').toLowerCase()] || { label: 'Bilinmiyor', tone: 'unknown' };
 
