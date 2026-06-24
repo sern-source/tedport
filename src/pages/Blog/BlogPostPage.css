@@ -171,6 +171,41 @@
 
 .blog-prose h2:first-child { margin-top: 0; }
 
+/* Enes Doğanay | 24 Haziran 2026: Makale tablosu — yeni makaleler tablo içeriyor */
+.blog-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.2em 0;
+    font-size: 0.88rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.blog-prose thead tr {
+    background: #eff6ff;
+}
+
+.blog-prose th {
+    padding: 10px 14px;
+    font-weight: 700;
+    color: #1e40af;
+    text-align: left;
+    border-bottom: 2px solid #bfdbfe;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.blog-prose td {
+    padding: 9px 14px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.blog-prose tbody tr:last-child td { border-bottom: none; }
+.blog-prose tbody tr:hover { background: #f8fafc; }
+
 /* ─── CTA ─── */
 .blog-post-cta {
     display: flex;
@@ -316,6 +351,11 @@
 [data-theme="dark"] .blog-prose li { color: #94a3b8; }
 [data-theme="dark"] .blog-prose strong { color: #e2e8f0; }
 [data-theme="dark"] .blog-prose a { color: #818cf8; }
+[data-theme="dark"] .blog-prose table { border-color: rgba(148,163,184,0.15); }
+[data-theme="dark"] .blog-prose thead tr { background: rgba(99,102,241,0.12); }
+[data-theme="dark"] .blog-prose th { color: #a5b4fc; border-color: rgba(99,102,241,0.25); }
+[data-theme="dark"] .blog-prose td { color: #94a3b8; border-color: rgba(148,163,184,0.08); }
+[data-theme="dark"] .blog-prose tbody tr:hover { background: rgba(255,255,255,0.04); }
 [data-theme="dark"] .blog-related { background: #1e293b; border-color: rgba(148,163,184,0.1); }
 [data-theme="dark"] .blog-related__title { color: #f1f5f9; }
 [data-theme="dark"] .blog-post-loading { color: #64748b; }

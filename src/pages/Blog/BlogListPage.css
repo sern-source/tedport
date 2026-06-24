@@ -223,6 +223,23 @@
     border-top: 1px solid var(--border);
 }
 
+/* ─── Pagination wrapper ─── */
+/* Enes Doğanay | 24 Haziran 2026: Shared Pagination sarmalayıcı — üst ayraç + hizalama */
+.blog-pagination-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+}
+
+/* Enes Doğanay | 24 Haziran 2026: index.css'deki margin: 20px auto 0 stacking'ini sıfırla */
+.blog-pagination-wrap .pagination {
+    margin-top: 0;
+}
+
+[data-theme="dark"] .blog-pagination-wrap { border-color: rgba(148,163,184,0.12); }
+
 /* ─── Dark Mode ─── */
 [data-theme="dark"] .blog-list-page { background: #0f172a; }
 [data-theme="dark"] .blog-filters-bar { background: #1e293b; border-color: rgba(148,163,184,0.12); }

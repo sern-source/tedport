@@ -1,12 +1,14 @@
 // Enes Doğanay | 3 Haziran 2026: Blog liste sayfası — hero + kategori filtreler + yazı grid'i
+// Enes Doğanay | 24 Haziran 2026: Shared Pagination component entegre edildi
 'use client';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
 import SharedFooter from '../../components/SharedFooter';
 import SEO from '../../components/SEO';
 import BlogCard from './components/BlogCard';
+import Pagination from '../../components/Pagination';
 import { useBlogList, BLOG_CATEGORIES } from './hooks/useBlogList';
 import './BlogListPage.css';
 
@@ -34,7 +36,19 @@ const SkeletonCard = () => (
 );
 
 const BlogListPage = () => {
-    const { posts, isLoading, hasError, category, handleCategoryChange } = useBlogList();
+    const { paginatedPosts, totalPages, page, isLoading, hasError, category, handleCategoryChange, handlePageChange } = useBlogList();
+    // Enes Doğanay | 24 Haziran 2026: Re-render sonrası scroll — useEffect ile browser focus bug'ını önle
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [page]);
+
+    const goToPage = (newPage) => handlePageChange(newPage);
 
     return (
         <div className="blog-list-page">
@@ -85,15 +99,22 @@ const BlogListPage = () => {
                     <div className="blog-grid">
                         {isLoading
                             ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-                            : posts.length === 0
+                            : paginatedPosts.length === 0
                                 ? (
                                     <div className="blog-empty">
                                         <span className="material-symbols-outlined">article</span>
                                         <p>Bu kategoride henüz yazı bulunmuyor.</p>
                                     </div>
                                 )
-                                : posts.map(post => <BlogCard key={post.id} post={post} />)
+                                : paginatedPosts.map(post => <BlogCard key={post.id} post={post} />)
                         }
+                    </div>
+                )}
+
+                {/* Enes Doğanay | 24 Haziran 2026: Shared Pagination — firmalar/ihaleler ile aynı stil */}
+                {!isLoading && !hasError && (
+                    <div className="blog-pagination-wrap">
+                        <Pagination page={page} totalPages={totalPages} onPageChange={goToPage} />
                     </div>
                 )}
             </main>
