@@ -4,13 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import './BlogCard.css';
 
-// Enes Doğanay | 3 Haziran 2026: Kategori ikonları
+// Enes Doğanay | 28 Haziran 2026: Rehber kaldırıldı → Mevzuat + Sektör Rehberi eklendi
 const CATEGORY_ICONS = {
-    'İhale Rehberi':    'gavel',
-    'Satınalma':        'shopping_cart',
-    'Dijital Dönüşüm':  'bolt',
-    'Rehber':           'menu_book',
-    'Mevzuat':          'balance',
+    'İhale Rehberi':   'gavel',
+    'Satınalma':       'shopping_cart',
+    'Dijital Dönüşüm': 'bolt',
+    'Mevzuat':         'balance',
+    'Sektör Rehberi':  'factory',
 };
 
 const formatDate = (iso) => {

@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { fetchBlogList } from '../services/blogService';
 
-export const BLOG_CATEGORIES = ['Tümü', 'İhale Rehberi', 'Satınalma', 'Dijital Dönüşüm', 'Rehber'];
+// Enes Doğanay | 28 Haziran 2026: Rehber kaldırıldı → Mevzuat + Sektör Rehberi eklendi
+export const BLOG_CATEGORIES = ['Tümü', 'İhale Rehberi', 'Satınalma', 'Mevzuat', 'Dijital Dönüşüm', 'Sektör Rehberi'];
 
 const POSTS_PER_PAGE = 6;
 

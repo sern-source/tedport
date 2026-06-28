@@ -4,12 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import './BlogPreviewSection.css';
 
-// Enes Doğanay | 3 Haziran 2026: Kategori etiket renk eşlemesi
+// Enes Doğanay | 28 Haziran 2026: Rehber kaldırıldı → Mevzuat + Sektör Rehberi eklendi
 const CATEGORY_COLORS = {
-    'İhale Rehberi': '#2563eb',
-    'Satınalma':     '#059669',
+    'İhale Rehberi':   '#2563eb',
+    'Satınalma':       '#059669',
     'Dijital Dönüşüm': '#dc2626',
-    'Rehber':        '#7c3aed',
+    'Mevzuat':         '#b45309',
+    'Sektör Rehberi':  '#0891b2',
 };
 
 // Enes Doğanay | 3 Haziran 2026: Yükleme iskelet kartı
