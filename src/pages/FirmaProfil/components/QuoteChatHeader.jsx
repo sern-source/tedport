@@ -1,16 +1,8 @@
 // Enes Doğanay | 6 Mayıs 2026: Teklif chat başlık kartı — metadata, ek dosya, aksiyonlar
 import React from 'react';
 import { getAttachmentSignedUrl } from '../services/teklifService';
-
-/* Enes Doğanay | 6 Mayıs 2026: Durum etiket haritaları */
-const STATUS_MAP_IN = {
-  pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı',
-  awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı',
-};
-const STATUS_MAP_OUT = {
-  pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi',
-  awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı',
-};
+// Enes Doğanay | 28 Haziran 2026: Durum etiket haritaları constants'a taşındı — QuoteCard, QuoteChatView ile paylaşımlı
+import { QUOTE_STATUS_LABELS_IN, QUOTE_STATUS_LABELS_OUT } from '../../../constants/quoteStatus';
 
 /* Enes Doğanay | 6 Mayıs 2026: Chat başlık kartı — teklif bilgileri + aksiyonlar */
 const QuoteChatHeader = ({
@@ -24,7 +16,7 @@ const QuoteChatHeader = ({
   setConfirmCloseQuoteId,
 }) => {
   const displayDurum = q._displayStatus || q.durum;
-  const st = (isIncoming ? STATUS_MAP_IN : STATUS_MAP_OUT)[displayDurum] || 'Yeni';
+  const st = (isIncoming ? QUOTE_STATUS_LABELS_IN : QUOTE_STATUS_LABELS_OUT)[displayDurum] || 'Yeni';
 
   const handleOpenAttachment = async () => {
     const url = await getAttachmentSignedUrl(q.ek_dosya_url);

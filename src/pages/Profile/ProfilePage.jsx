@@ -22,13 +22,6 @@ import SirketimTab from './components/SirketimTab';
 import NotificationsTab from './components/NotificationsTab';
 import ProfileModals from './components/ProfileModals';
 
-const NAV_ITEMS = [
-  { label: 'Anasayfa', href: '/' },
-  { label: 'Firmalar', href: '/firmalar' },
-  { label: 'İhaleler', href: '/ihaleler' },
-  { label: 'Hakkımızda', href: '/hakkimizda' },
-  { label: 'İletişim', href: '/iletisim' },
-];
 
 const ProfilePage = () => {
   const { latestNotification, pendingQuoteCount, setActiveViewingTeklifId, updateNotifPrefsCache, myOffersUnreadCount, setMyOffersUnreadCount, refreshCounts } = useAuth();
@@ -76,7 +69,7 @@ const ProfilePage = () => {
   return (
     <>
       <ProfileToast toast={prToast} onClose={() => setPrToast(null)} />
-      <SharedHeader navItems={NAV_ITEMS} />
+      <SharedHeader />
       <div className="page">
         <div className="layout">
           <ProfileSidebar

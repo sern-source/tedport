@@ -1,19 +1,11 @@
 // Enes Doğanay | 7 Mayıs 2026: Ortak teklif kartı bileşeni — bireysel ve kurumsal profil
 import React from 'react';
+// Enes Doğanay | 28 Haziran 2026: Durum etiket haritaları constants'a taşındı — QuoteChatHeader, QuoteChatView ile paylaşımlı
+import { QUOTE_STATUS_LABELS_IN, QUOTE_STATUS_LABELS_OUT } from '../constants/quoteStatus';
 import './QuoteCard.css';
 
-// Enes Doğanay | 8 Mayıs 2026: Module seviyesi formatter — her render’da yeni Intl nesnesi üretmez
+// Enes Doğanay | 8 Mayıs 2026: Module seviyesi formatter — her render'da yeni Intl nesnesi üretmez
 const quoteDateFormatter = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' });
-
-/* Enes Doğanay | 7 Mayıs 2026: Durum etiket haritaları */
-const STATUS_MAP_IN = {
-  pending: 'Yeni', read: 'Okundu', replied: 'Yanıtlandı',
-  awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı',
-};
-const STATUS_MAP_OUT = {
-  pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi',
-  awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı',
-};
 
 /* Enes Doğanay | 7 Mayıs 2026: Teklif listesi kartı */
 const QuoteCard = ({
@@ -26,7 +18,7 @@ const QuoteCard = ({
   handleOpenQuoteChat,
   handleDeleteQuote,
 }) => {
-  const stMap = isIncoming ? STATUS_MAP_IN : STATUS_MAP_OUT;
+  const stMap = isIncoming ? QUOTE_STATUS_LABELS_IN : QUOTE_STATUS_LABELS_OUT;
   const displayDurum = q._displayStatus || q.durum;
   const senderLabel = senderLabelProp !== undefined
     ? senderLabelProp
@@ -87,4 +79,5 @@ const QuoteCard = ({
   );
 };
 
-export default QuoteCard;
+// Enes Doğanay | 28 Haziran 2026: React.memo — teklif listesinde gereksiz re-render önler
+export default React.memo(QuoteCard);

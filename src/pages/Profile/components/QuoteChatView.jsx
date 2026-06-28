@@ -5,11 +5,9 @@ import SharedChatModal from '../../../components/SharedChatModal';
 import { getQuoteAttachmentSignedUrl } from '../services/quotesService';
 import '../../../components/QuoteChatShared.css';
 import './QuoteChatView.css';
+// Enes Doğanay | 28 Haziran 2026: Durum etiket haritası constants'a taşındı — QuoteCard, QuoteChatHeader ile paylaşımlı
+import { QUOTE_STATUS_LABELS_OUT } from '../../../constants/quoteStatus';
 
-const STATUS_MAP = {
-  pending: 'Beklemede', read: 'Firma Görüntüledi', replied: 'Yanıt Geldi',
-  awaiting_reply: 'Yanıt Bekleniyor', rejected: 'Reddedildi', closed: 'Sonlandırıldı',
-};
 
 const QuoteChatView = ({
   activeQuote, quoteChatMessages, quoteChatLoading, quoteChatInput, setQuoteChatInput,
@@ -68,7 +66,7 @@ const QuoteChatView = ({
               )}
             </div>
             <span className={`cmp-quote-status cmp-quote-status--${displayDurum}`}>
-              {STATUS_MAP[displayDurum] || 'Beklemede'}
+              {QUOTE_STATUS_LABELS_OUT[displayDurum] || 'Beklemede'}
             </span>
           </div>
 

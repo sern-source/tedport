@@ -59,7 +59,8 @@ export const useTeklifYonetimi = ({ companyId, userId, notifications, setNotific
                 chat.setActiveQuoteChat(prev => { if (!prev) return null; const up = [...incoming, ...outgoing].find(q => q.id === prev.id); return (up && up._displayStatus !== prev._displayStatus) ? { ...prev, _displayStatus: up._displayStatus } : prev; });
             } catch (err) { showFpToast?.('error', err.message || 'Teklifler güncellenemedi.'); }
         };
-        const interval = setInterval(poll, 5000);
+        // Enes Doğanay | 28 Haziran 2026: Realtime zaten aktif — interval 5s yerine 30s fallback olarak yeterli
+        const interval = setInterval(poll, 30000);
         return () => clearInterval(interval);
     }, [companyId]); // eslint-disable-line react-hooks/exhaustive-deps
 

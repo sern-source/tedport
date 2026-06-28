@@ -17,20 +17,13 @@ import AboutFeatures from './components/AboutFeatures';
 import AboutTimeline from './components/AboutTimeline';
 import AboutCTA from './components/AboutCTA';
 
-const NAV_ITEMS = [
-    { label: 'Anasayfa', href: '/' },
-    { label: 'Firmalar', href: '/firmalar' },
-    { label: 'İhaleler', href: '/ihaleler' },
-    { label: 'İletişim', href: '/iletisim' },
-];
-
 const About = () => {
     const router = useRouter();
 
     return (
         <>
             <SEO title="Hakkımızda" description="Türkiye'nin B2B çözüm ortaklığı platformu Tedport hakkında bilgi edinin. Misyonumuz, vizyonumuz ve platformun sunduğu avantajlar." path="/hakkimizda" />
-            <SharedHeader navItems={NAV_ITEMS} />
+            <SharedHeader />
 
             <div className="about-page-wrapper">
                 <main className="about-main">

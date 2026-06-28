@@ -112,4 +112,5 @@ const SupplierCard = ({ supplier, isFavorited, onToggleFavorite, isLoggedIn, onQ
   );
 };
 
-export default SupplierCard;
+// Enes Doğanay | 28 Haziran 2026: React.memo — büyük listelerde gereksiz re-render önler
+export default React.memo(SupplierCard);

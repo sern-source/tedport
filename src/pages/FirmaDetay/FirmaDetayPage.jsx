@@ -15,13 +15,6 @@ import FirmaDetayModals from './components/FirmaDetayModals';
 import FdToast from './components/FdToast';
 import './FirmaDetayPage.css';
 
-const NAV_ITEMS = [
-    { label: 'Anasayfa', href: '/' },
-    { label: 'Firmalar', href: '/firmalar' },
-    { label: 'İhaleler', href: '/ihaleler' },
-    { label: 'Hakkımızda', href: '/hakkimizda' },
-    { label: 'İletişim', href: '/iletisim' }
-];
 
 // Enes Doğanay | 23 Mayıs 2026: initialFirma — SSR Server Component'ten gelen ön-çekilmiş firma verisi
 const FirmaDetayPage = ({ initialFirma = null }) => {
@@ -47,7 +40,7 @@ const FirmaDetayPage = ({ initialFirma = null }) => {
                 image={fd.firma.logo_url?.includes('firma-logolari') ? fd.firma.logo_url : undefined}
             />
             <FdToast toast={fd.fdToast} onClose={() => fd.setFdToast(null)} />
-            <SharedHeader search={fd.detaySearch} setSearch={fd.setDetaySearch} showSearchBar={true} suggestions={fd.suggestions} onSuggestionClick={fd.handleSuggestionClick} onSearchSubmit={fd.handleSearchSubmit} noResults={fd.noResults} navItems={NAV_ITEMS} searchMode={fd.detaySearchMode} onSearchModeChange={fd.setDetaySearchMode} />
+            <SharedHeader search={fd.detaySearch} setSearch={fd.setDetaySearch} showSearchBar={true} suggestions={fd.suggestions} onSuggestionClick={fd.handleSuggestionClick} onSearchSubmit={fd.handleSearchSubmit} noResults={fd.noResults} searchMode={fd.detaySearchMode} onSearchModeChange={fd.setDetaySearchMode} />
             {/* Enes Doğanay | 13 Mayıs 2026: viewCount — firma sahibine analitik badge */}
             <FirmaDetayHero firma={fd.firma} isVerified={fd.isVerified} isDemo={fd.isDemo} isCurrentUserCompanyManager={fd.isCurrentUserCompanyManager} firmaEkip={fd.firmaEkip} onShowEkipModal={() => fd.setShowEkipModal(true)} isLoggedIn={!!fd.userProfile} sertifikalar={fd.sertifikalar} viewCount={fd.viewCount} />
             <FirmaDetayMain fd={fd} firmaId={fd.firma?.firmaID} />

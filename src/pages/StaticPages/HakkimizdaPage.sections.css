@@ -399,5 +399,17 @@
 
 /* ═══════════════════════════════════════════════════════════════
    Enes Doğanay | 2 Mayıs 2026: hakkimizda.css dark mode
+   Enes Doğanay | 28 Haziran 2026: Dark mode kuralları eklendi
    ═══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] .about-page-wrapper .about-solution-banner {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 27, 75, 0.7));
+  border-color: rgba(99, 102, 241, 0.3);
+}
+[data-theme="dark"] .about-page-wrapper .about-solution-banner strong { color: #93c5fd; }
+[data-theme="dark"] .about-page-wrapper .about-solution-banner p { color: #60a5fa; }
+[data-theme="dark"] .about-page-wrapper .about-feature-icon {
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(37, 99, 235, 0.2);
+  color: #60a5fa;
+}
 

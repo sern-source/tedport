@@ -8,14 +8,6 @@ import './Login.css';
 import './Login.dark.css';
 import { useResetPassword } from './hooks/useResetPassword';
 
-const NAV = [
-  { label: 'Anasayfa', href: '/' },
-  { label: 'Firmalar', href: '/firmalar' },
-  { label: 'İhaleler', href: '/ihaleler' },
-  { label: 'Hakkımızda', href: '/hakkimizda' },
-  { label: 'İletişim', href: '/iletisim' },
-];
-
 export default function ResetPasswordPage() {
   const router = useRouter();
   const {
@@ -29,7 +21,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="app-container">
-      <SharedHeader navItems={NAV} />
+      <SharedHeader />
 
       <main className="main-content">
         <div className="login-card">

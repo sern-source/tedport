@@ -1,4 +1,5 @@
 // Enes Doğanay | 6 Mayıs 2026: SSS sayfası — hook ile yeniden yazıldı
+// Enes Doğanay | 28 Haziran 2026: sanitizeHtml eklendi — item.answer XSS'e karşı temizlenir
 'use client';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -7,16 +8,8 @@ import SharedHeader from '../../components/SharedHeader';
 import SharedFooter from '../../components/SharedFooter';
 import SEO from '../../components/SEO';
 import { useSSS } from './hooks/useSSS';
+import { sanitizeHtml } from '../../utils/sanitize';
 import './SSSPage.css';
-
-// Enes Doğanay | 8 Mayıs 2026: Module-level sabiti — JSX içi inline array kaldırıldı
-const SSS_NAV = [
-  { label: 'Anasayfa',   href: '/' },
-  { label: 'Firmalar',   href: '/firmalar' },
-  { label: 'İhaleler',   href: '/ihaleler' },
-  { label: 'Hakkımızda', href: '/hakkimizda' },
-  { label: 'İletişim',   href: '/iletisim' },
-];
 
 // Enes Doğanay | 6 Mayıs 2026: Kategori ikonları sabiti
 const CATEGORY_ICONS = {
@@ -68,7 +61,7 @@ export default function SSSPage() {
       )}
 
       <SharedHeader
-        navItems={SSS_NAV}
+       
       />
 
       <main className="sss-page">
@@ -164,7 +157,7 @@ export default function SSSPage() {
                     <div className="sss-answer-wrap">
                       <div
                         className="sss-answer"
-                        dangerouslySetInnerHTML={{ __html: item.answer }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.answer) }}
                       />
                     </div>
                   </div>

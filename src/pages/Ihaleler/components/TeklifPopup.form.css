@@ -516,3 +516,18 @@
 }
 
 /* Responsive */
+
+/* Enes Doğanay | 28 Haziran 2026: Dark mode */
+[data-theme="dark"] .firma-contact-card__close:hover { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; }
+[data-theme="dark"] .firma-contact-row:hover { background: rgba(37, 99, 235, 0.12); border-color: rgba(96, 165, 250, 0.3); }
+[data-theme="dark"] .teklif-popup__toggle-slider { background: #334155; }
+[data-theme="dark"] .teklif-popup__file-upload:hover { background: rgba(37, 99, 235, 0.12); color: #60a5fa; border-color: #3b82f6; }
+[data-theme="dark"] .teklif-popup__file-chip { background: rgba(29, 78, 216, 0.15); color: #93c5fd; }
+[data-theme="dark"] .teklif-popup__file-chip button { background: rgba(37, 99, 235, 0.12); color: #93c5fd; }
+[data-theme="dark"] .teklif-popup__file-chip button:hover { background: rgba(37, 99, 235, 0.22); }
+[data-theme="dark"] .teklif-popup__error { background: rgba(153, 27, 27, 0.15); border-color: rgba(252, 165, 165, 0.2); color: #fca5a5; }
+[data-theme="dark"] .teklif-btn--withdraw { background: rgba(220, 38, 38, 0.1); color: #fca5a5; border-color: rgba(252, 165, 165, 0.2); }
+[data-theme="dark"] .teklif-btn--delete-draft { background: var(--bg-white); color: #fca5a5; border-color: rgba(252, 165, 165, 0.2); }
+[data-theme="dark"] .teklif-btn--delete-draft:hover { background: rgba(220, 38, 38, 0.1); border-color: rgba(248, 113, 113, 0.35); }
+[data-theme="dark"] .teklif-btn--submit { background: rgba(37, 99, 235, 0.12); color: #60a5fa; border-color: rgba(147, 197, 253, 0.2); }
+

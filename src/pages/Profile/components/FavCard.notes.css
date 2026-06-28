@@ -429,3 +429,64 @@
     height: 40px;
   }
 }
+
+/* Enes Doğanay | 28 Haziran 2026: Dark mode — not paneli renkleri */
+[data-theme="dark"] .note-count-chip {
+  background: linear-gradient(180deg, #2d2416 0%, #3a2e18 100%);
+  color: #fbbf24;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .note-edit-link {
+  color: #fbbf24;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: #4a3b1a;
+}
+
+[data-theme="dark"] .note-edit-link:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: #7c5e1e;
+}
+
+[data-theme="dark"] .note-meta-input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #4a3b1a;
+  color: #e5c882;
+}
+
+[data-theme="dark"] .note-meta-input:focus {
+  border-color: #d29a42;
+  box-shadow: 0 0 0 3px rgba(210, 154, 66, 0.18);
+}
+
+[data-theme="dark"] .note-textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #4a3b1a;
+  color: #e5c882;
+}
+
+[data-theme="dark"] .note-textarea:focus {
+  border-color: #d29a42;
+  box-shadow: 0 0 0 3px rgba(210, 154, 66, 0.18);
+}
+
+[data-theme="dark"] .note-save-feedback {
+  background: rgba(21, 128, 61, 0.15);
+  border-color: rgba(187, 247, 208, 0.25);
+  color: #4ade80;
+}
+
+[data-theme="dark"] .note-btn-cancel {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #334155;
+}
+
+[data-theme="dark"] .note-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #475569;
+}
+
+[data-theme="dark"] .note-display p {
+  color: #d4a853;
+}

@@ -115,4 +115,5 @@ const MyOfferCard = ({
     );
 };
 
-export default MyOfferCard;
+// Enes Doğanay | 28 Haziran 2026: React.memo — tekliflerim listesinde gereksiz re-render önler
+export default React.memo(MyOfferCard);

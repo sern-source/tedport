@@ -70,4 +70,5 @@ const TenderCard = ({ tender, isHighlighted, isOwnTender, userOffer, highlightRe
     );
 };
 
-export default TenderCard;
+// Enes Doğanay | 28 Haziran 2026: React.memo — büYük listelerde gereksiz re-render önler
+export default React.memo(TenderCard);

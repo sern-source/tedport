@@ -22,15 +22,17 @@ export const fetchBlogList = async ({ category } = {}) => {
 };
 
 // Enes Doğanay | 3 Haziran 2026: Slug ile tekil yazıyı getir
+// Enes Doğanay | 28 Haziran 2026: .single() → .maybeSingle() — bulunamayan slug için PGRST116 yerine null döner
 export const fetchBlogPost = async (slug) => {
     const { data, error } = await supabase
         .from('blog_posts')
         .select(SELECT_ALL)
         .eq('slug', slug)
         .eq('is_published', true)
-        .single();
+        .maybeSingle();
 
     if (error) throw new Error(error.message);
+    if (!data) throw new Error('Yazı bulunamadı');
     return data;
 };
 

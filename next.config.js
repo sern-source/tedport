@@ -10,6 +10,11 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'gsdbutprqfnxjtppwwhn.supabase.co',
             },
+            // Enes Doğanay | 28 Haziran 2026: IletisimPage'deki Unsplash hero görseli için
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+            },
         ],
     },
 };

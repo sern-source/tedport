@@ -12,7 +12,7 @@ const VisitorCompanies = ({ visitors, loading }) => {
     return (
         <div className="fdb-visitors-list">
             {visitors.map((v, i) => (
-                <div key={i} className="fdb-visitor-row">
+                <div key={`${v.name}-${i}`} className="fdb-visitor-row">
                     <span className="fdb-visitor-rank">#{i + 1}</span>
                     <span className="fdb-visitor-name">{v.name}</span>
                     <div className="fdb-visitor-bar-wrap">

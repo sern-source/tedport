@@ -1,6 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: src/pages/StaticPages/ taşındı
+// Enes Doğanay | 28 Haziran 2026: fromRegister useState/useEffect ile SSR-safe hale getirildi; navItems kaldırıldı
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SharedHeader from '../../components/SharedHeader';
 import '../../components/SharedHeader.css';
@@ -9,8 +10,11 @@ import SEO from '../../components/SEO';
 import './KvkkPage.css';
 
 const Kvkk = () => {
-    // Enes Doğanay | 23 Mayıs 2026: SSR güvenli — document SSR'da mevcut değil
-    const fromRegister = typeof document !== 'undefined' && document.referrer.includes('/register');
+    // Enes Doğanay | 28 Haziran 2026: useState+useEffect — document.referrer render sırasında okunamaz (hydration hatası)
+    const [fromRegister, setFromRegister] = useState(false);
+    useEffect(() => {
+        setFromRegister(document.referrer.includes('/register'));
+    }, []);
 
     return (
         <>
@@ -19,15 +23,7 @@ const Kvkk = () => {
                 description="Tedport Kişisel Verilerin Korunması Kanunu Aydınlatma Metni"
                 path="/kvkk"
             />
-            <SharedHeader
-                navItems={[
-                    { label: 'Anasayfa', href: '/' },
-                    { label: 'Firmalar', href: '/firmalar' },
-                    { label: 'İhaleler', href: '/ihaleler' },
-                    { label: 'Hakkımızda', href: '/hakkimizda' },
-                    { label: 'İletişim', href: '/iletisim' }
-                ]}
-            />
+            <SharedHeader />
 
             <main className="kvkk-page">
                 <div className="kvkk-container">

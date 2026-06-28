@@ -65,7 +65,10 @@ export const useFirmalarState = ({ currentUserId }) => {
             const saved = localStorage.getItem(`tedport_firmalar_view_${currentUserId}`);
             // eslint-disable-next-line react-hooks/set-state-in-effect
             if (saved === 'list' || saved === 'grid') setViewMode(saved);
-        } catch {}
+        } catch (err) {
+            // Enes Doğanay | 28 Haziran 2026: localStorage erişimi bazı ortamlarda kısıtlı olabilir
+            console.error('useFirmalarState: view mode okuma hatası', err);
+        }
     }, [currentUserId]);
 
     // eslint-disable-next-line react-hooks/set-state-in-effect

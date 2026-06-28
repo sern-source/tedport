@@ -2,19 +2,8 @@
 // Enes Doganay | 14 Mayis 2026: Birim dropdown - position:fixed ile modal overflow'dan cikar
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-
-// Enes Doğanay | 19 Mayıs 2026: Kategorili birim listesi — geniş sektör kapsamı için
-const BIRIM_CATEGORIES = [
-    { label: '📦 Adet / Paketleme', options: ['Adet', 'Paket', 'Kutu', 'Koli', 'Palet', 'Rulo', 'Takım', 'Set', 'Çift', 'Deste', 'Varil', 'Bidon', 'Çuval', 'Şişe', 'Tüp', 'Konteyner'] },
-    { label: '⚖️ Ağırlık', options: ['Gram', 'Kilogram', 'Ton', 'Miligram'] },
-    { label: '📏 Uzunluk', options: ['Milimetre', 'Santimetre', 'Metre', 'Kilometre'] },
-    { label: '🧱 Alan / Hacim', options: ['m²', 'Dekar', 'Hektar', 'Mililitre', 'Litre', 'm³'] },
-    { label: '⏱️ Zaman', options: ['Saat', 'Gün', 'Hafta', 'Ay', 'Yıl'] },
-    { label: '👷 Hizmet / İş Gücü', options: ['Kişi', 'Adam/Saat', 'Sefer', 'Vardiya', 'Proje', 'Hizmet', 'İş Kalemi'] },
-    { label: '🚛 Lojistik', options: ['Tır', 'Kamyon', 'Yük', 'Parti'] },
-    { label: '⚡ Enerji / Teknik', options: ['Watt', 'Kilowatt', 'kWh', 'kVA', 'Volt', 'Amper'] },
-    { label: '💻 Yazılım / Dijital', options: ['Lisans', 'Kullanıcı', 'Abonelik'] },
-];
+// Enes Doğanay | 28 Haziran 2026: BIRIM_CATEGORIES constants'a taşındı — QuoteModal ile paylaşımlı
+import { BIRIM_CATEGORIES } from '../../../constants/birimCategories';
 
 const IhaleFormStep3 = ({
     form,
@@ -234,8 +223,9 @@ const IhaleFormStep3 = ({
                 </div>
                 {form.ek_dosyalar.length > 0 && (
                     <div className="ihale-file-list">
+                        {/* Enes Doğanay | 28 Haziran 2026: key={i} yerine f.name+f.size — index anti-pattern */}
                         {form.ek_dosyalar.map((f, i) => (
-                            <div key={i} className="ihale-file-item">
+                            <div key={`${f.name}-${f.size}`} className="ihale-file-item">
                                 <span className="material-symbols-outlined">description</span>
                                 <span className="ihale-file-name">{f.name}</span>
                                 <span className="ihale-file-size">{(f.size / 1024).toFixed(0)} KB</span>

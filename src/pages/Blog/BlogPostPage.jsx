@@ -1,4 +1,5 @@
 // Enes Doğanay | 3 Haziran 2026: Blog tekil yazı sayfası
+// Enes Doğanay | 28 Haziran 2026: sanitizeHtml eklendi — post.content XSS'e karşı temizlenir
 'use client';
 import React from 'react';
 import Link from 'next/link';
@@ -8,16 +9,8 @@ import SharedFooter from '../../components/SharedFooter';
 import SEO from '../../components/SEO';
 import BlogCard from './components/BlogCard';
 import { useBlogPost } from './hooks/useBlogPost';
+import { sanitizeHtml } from '../../utils/sanitize';
 import './BlogPostPage.css';
-
-const NAV_ITEMS = [
-    { label: 'Anasayfa', href: '/' },
-    { label: 'Firmalar', href: '/firmalar' },
-    { label: 'İhaleler', href: '/ihaleler' },
-    { label: 'Bilgi Merkezi', href: '/blog' },
-    { label: 'Hakkımızda', href: '/hakkimizda' },
-    { label: 'İletişim', href: '/iletisim' },
-];
 
 const formatDate = (iso) => {
     if (!iso) return '';
@@ -36,7 +29,7 @@ const BlogPostPage = ({ slug }) => {
                     canonical={`https://tedport.com/blog/${slug}`}
                 />
             )}
-            <SharedHeader navItems={NAV_ITEMS} />
+            <SharedHeader />
 
             {/* Geri butonu */}
             <div className="blog-post-breadcrumb">
@@ -96,10 +89,10 @@ const BlogPostPage = ({ slug }) => {
                     {/* Yazı içeriği */}
                     <div className="blog-post-layout">
                         <article className="blog-post-content">
-                            {/* Güvenli: içerik yalnızca admin seed data'sından gelir */}
+                            {/* Enes Doğanay | 28 Haziran 2026: sanitizeHtml — DOMPurify ile XSS temizleme */}
                             <div
                                 className="blog-prose"
-                                dangerouslySetInnerHTML={{ __html: post.content }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
                             />
 
                             {/* CTA */}

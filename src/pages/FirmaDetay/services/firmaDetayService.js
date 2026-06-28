@@ -12,7 +12,7 @@ export async function fetchFirmaById(id) {
         .from('firmalar')
         .select(FIRMA_SELECT)
         .eq('firmaID', id)
-        .single();
+        .maybeSingle();
     if (error) throw error;
     return data;
 }
@@ -23,7 +23,7 @@ export async function fetchFirmaBySlug(slug) {
         .from('firmalar')
         .select(FIRMA_SELECT)
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
     if (error) throw error;
     return data;
 }
@@ -34,7 +34,7 @@ export async function fetchFirmaSlugById(id) {
         .from('firmalar')
         .select('slug')
         .eq('firmaID', id)
-        .single();
+        .maybeSingle();
     return data?.slug || null;
 }
 

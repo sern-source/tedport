@@ -85,4 +85,5 @@ const FavCard = ({
   </div>
 );
 
-export default FavCard;
+// Enes Doğanay | 28 Haziran 2026: React.memo — favori listesinde gereksiz re-render önler
+export default React.memo(FavCard);

@@ -12,14 +12,6 @@ import Pagination from '../../components/Pagination';
 import { useBlogList, BLOG_CATEGORIES } from './hooks/useBlogList';
 import './BlogListPage.css';
 
-const NAV_ITEMS = [
-    { label: 'Anasayfa', href: '/' },
-    { label: 'Firmalar', href: '/firmalar' },
-    { label: 'İhaleler', href: '/ihaleler' },
-    { label: 'Bilgi Merkezi', href: '/blog' },
-    { label: 'Hakkımızda', href: '/hakkimizda' },
-    { label: 'İletişim', href: '/iletisim' },
-];
 
 // Enes Doğanay | 3 Haziran 2026: Yükleniyor iskelet kartları
 const SkeletonCard = () => (
@@ -56,7 +48,7 @@ const BlogListPage = () => {
                 title="Bilgi Merkezi — İhale ve B2B Satınalma Rehberleri"
                 description="Türkiye'de ihale süreci, B2B satınalma stratejileri ve tedarik zinciri yönetimi hakkında kapsamlı rehberler."
             />
-            <SharedHeader navItems={NAV_ITEMS} />
+            <SharedHeader />
 
             {/* Hero */}
             <section className="blog-hero">

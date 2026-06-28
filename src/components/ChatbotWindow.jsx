@@ -1,5 +1,7 @@
 // Enes Doğanay | 6 Mayıs 2026: Chatbot popup penceresi — mesajlar, hızlı sorular, form
+// Enes Doğanay | 28 Haziran 2026: sanitizeHtml eklendi — DB kaynaklı HTML XSS'e karşı temizlenir
 import React from 'react';
+import { sanitizeHtml } from '../utils/sanitize';
 
 const ChatbotWindow = ({ messages, typing, quickQuestions, input, setInput, messagesEndRef, inputRef, sendMessage, handleSubmit, onClose }) => (
     // Enes Doğanay | 8 Mayıs 2026: aria-modal eklendi — role=dialog tek başına yeterli değil
@@ -28,7 +30,7 @@ const ChatbotWindow = ({ messages, typing, quickQuestions, input, setInput, mess
             {messages.map(msg => msg.from === 'bot' ? (
                 <div key={msg.id} className="cb-row cb-row--bot">
                     <div className="cb-bubble cb-bubble--bot">
-                        {msg.html ? <span dangerouslySetInnerHTML={{ __html: msg.text }} /> : msg.text}
+                        {msg.html ? <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(msg.text) }} /> : msg.text}
                     </div>
                 </div>
             ) : (

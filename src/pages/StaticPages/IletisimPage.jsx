@@ -12,12 +12,6 @@ import SEO from '../../components/SEO';
 import { useIletisim } from './hooks/useIletisim';
 import IletisimForm from './IletisimForm';
 
-const NAV_ITEMS = [
-  { label: 'Anasayfa', href: '/' },
-  { label: 'Firmalar', href: '/firmalar' },
-  { label: 'İhaleler', href: '/ihaleler' },
-  { label: 'Hakkımızda', href: '/hakkimizda' },
-];
 
 // Enes Doğanay | 12 Mayıs 2026: İletişim amaç kartları
 const PURPOSES = [
@@ -32,7 +26,7 @@ const IletisimPage = () => {
   return (
     <>
       <SEO title="İletişim" description="Tedport ile iletişime geçin. Sorularınız ve önerileriniz için bize ulaşın." path="/iletisim" />
-      <SharedHeader navItems={NAV_ITEMS} />
+      <SharedHeader />
       <div className="contact-page-wrapper">
         <main className="contact-main">
           <div className="contact-hero">

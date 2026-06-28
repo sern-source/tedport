@@ -18,7 +18,7 @@ const CategoryPerformance = ({ categories, loading }) => {
                 const kabulW = c.offerCount > 0 ? Math.round((c.kabul / c.offerCount) * 100) : 0;
 
                 return (
-                    <div key={i} className="fdb-cat-row">
+                    <div key={c.kategori} className="fdb-cat-row">
                         <div className="fdb-cat-meta">
                             <span className="fdb-cat-name">{c.kategori}</span>
                             <div className="fdb-cat-stats">

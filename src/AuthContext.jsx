@@ -62,7 +62,10 @@ export function AuthProvider({ children }) {
       window.localStorage.removeItem('tedport-auth-storage-mode');
       window.sessionStorage.removeItem('tedport-auth-storage-mode');
       window.sessionStorage.removeItem('tom_compare_hint_dismissed');
-    } catch {}
+    } catch (err) {
+      // Enes Doğanay | 28 Haziran 2026: localStorage/sessionStorage erişimi bazı ortamlarda kısıtlı olabilir
+      console.error('AuthContext: storage cleanup failed', err);
+    }
     loader.clearAuthState();
     loader.setAuthChecked(true);
     setTimeout(() => { loader.isLoggingOutRef.current = false; }, 2000);

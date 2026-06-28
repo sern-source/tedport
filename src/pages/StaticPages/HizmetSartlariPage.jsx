@@ -17,13 +17,6 @@ const HizmetSartlari = () => {
                 path="/hizmet-sartlari"
             />
             <SharedHeader
-                navItems={[
-                    { label: 'Anasayfa', href: '/' },
-                    { label: 'Firmalar', href: '/firmalar' },
-                    { label: 'İhaleler', href: '/ihaleler' },
-                    { label: 'Hakkımızda', href: '/hakkimizda' },
-                    { label: 'İletişim', href: '/iletisim' }
-                ]}
             />
 
             <main className="kvkk-page">
